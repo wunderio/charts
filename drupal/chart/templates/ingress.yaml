@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    release: "{{ .Release.Name }}"
+  annotations:
+    {{- range $key, $value := .Values.ingress.annotations }}
+      {{ $key }}: {{ $value | quote }}
+    {{- end }}
+    ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: "gce"
+spec:
+  backend:
+    serviceName: {{ .Release.Name }}-drupal
+    servicePort: 80
+  rules:
+    - host: {{ .Values.ingress.hostname }}
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: {{ .Release.Name }}-drupal
+              servicePort: 80
+    - host: {{ .Release.Name }}.{{ .Release.Namespace }}.silta.wdr.io
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: {{ .Release.Name }}-drupal
+              servicePort: 80
+{{- if .Values.ingress.tls }}
+  tls:
+{{ toYaml .Values.ingress.tls | indent 4 }}
+{{- end -}}

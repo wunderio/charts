@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-postinstall"
+  labels:
+    app: postinstall
+    release: {{ .Release.Name }}
+  annotations:
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: postinstall
+        image: {{ .Values.drupal.image | quote }}
+        command: ["/bin/sh", "-c"]
+        args:
+        - cd web;
+          bootstrapped=$(drush status --field=bootstrap);
+          if [[ $bootstrapped = *'Success'* ]]; then drush updatedb -n; drush config-import -n; drush entity-updates -n;
+          else drush site-install -n config_installer; conf_count=$(ls ../config/sync/ | wc -l); if [ $conf_count -lt 2 ]; then drush site-install minimal -y; fi; fi;
+        env:
+        - name: PHP_FPM_CLEAR_ENV
+          value: "no"
+        - name: DB_USER
+          value: "{{ .Values.mariadb.db.user }}"
+        - name: DB_NAME
+          value: "{{ .Values.mariadb.db.name }}"
+        - name: DB_HOST
+          value: "{{ .Release.Name }}-mariadb"
+        - name: DB_PASS
+          valueFrom:
+            secretKeyRef:
+              name: "{{ .Release.Name }}-mariadb"
+              key: mariadb-password
+        - name: HASH_SALT
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-secrets-drupal
+              key: hashsalt
+      {{- range $key, $val := .Values.drupal.env }}
+        - name: {{ $key }}
+          value: {{ $val | quote }}
+      {{- end }}
+        volumeMounts:
+          - name: drupal-files-volume
+            mountPath: /var/www/html/web/sites/default/files
+      imagePullSecrets:
+      - name: gcr
+      volumes:
+      - name: drupal-files-volume
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-public-files
