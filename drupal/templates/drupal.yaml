@@ -55,38 +55,13 @@ spec:
         - name: drupal-files-volume
           mountPath: /var/www/html/web/sites/default/files
 
-      - image: {{ .Values.drupal.image | quote }}
-        name: drupal
-        env:
-        - name: DB_USER
-          value: "{{ .Values.mariadb.db.user }}"
-        - name: DB_NAME
-          value: "{{ .Values.mariadb.db.name }}"
-        - name: DB_HOST
-          value: {{ .Release.Name }}-mariadb
-        - name: DB_PASS
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Release.Name }}-mariadb
-              key: mariadb-password
-        - name: HASH_SALT
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Release.Name }}-secrets-drupal
-              key: hashsalt
-      {{- range $key, $val := .Values.drupal.env }}
-        - name: {{ $key }}
-          value: {{ $val | quote }}
-      {{- end }} 
+      - name: drupal
         ports:
         - containerPort: 9000
           name: drupal
-        volumeMounts:
-        - name: drupal-files-volume
-          mountPath: /var/www/html/web/sites/default/files
+{{ include "drupal.drupal-container" . | indent 8 }}
+
       imagePullSecrets:
       - name: gcr
       volumes:
-      - name: drupal-files-volume
-        persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-public-files
+{{ include "drupal.drupal-files-volume" . | indent 6 }}
