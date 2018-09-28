@@ -23,6 +23,9 @@ mariadb:
 
 ingress:
   hostname: "silta.wdr.io"
+  annotations:
+    ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: "gce"
 
 secrets:
     hashsalt: "template-hash-salt"

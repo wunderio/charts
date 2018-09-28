@@ -6,10 +6,8 @@ metadata:
     release: "{{ .Release.Name }}"
   annotations:
     {{- range $key, $value := .Values.ingress.annotations }}
-      {{ $key }}: {{ $value | quote }}
+    {{ $key }}: {{ $value | quote }}
     {{- end }}
-    ingress.kubernetes.io/rewrite-target: /
-    kubernetes.io/ingress.class: "gce"
 spec:
   backend:
     serviceName: {{ .Release.Name }}-drupal
