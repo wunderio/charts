@@ -16,18 +16,9 @@ spec:
             command:
             - drush
             - cron
-            env:
-            - name: PHP_FPM_CLEAR_ENV
-              value: "no"
-            - name: DB_USER
-              value: "{{ .Values.mariadb.db.user }}"
-            - name: DB_NAME
-              value: "{{ .Values.mariadb.db.name }}"
-            - name: DB_HOST
-              value: "{{ .Release.Name }}-mariadb"
-            - name: DB_PASS
-              valueFrom:
-                secretKeyRef:
-                  name: "{{ .Release.Name }}-mariadb"
-                  key: mariadb-password
+{{ include "drupal.drupal-container" . | indent 12 }}
+          imagePullSecrets:
+          - name: gcr
+          volumes:
+{{ include "drupal.drupal-files-volume" . | indent 10 }}
           restartPolicy: OnFailure
