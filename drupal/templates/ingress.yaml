@@ -22,13 +22,6 @@ spec:
             backend:
               serviceName: {{ .Release.Name }}-drupal
               servicePort: 80
-    - host: {{ .Release.Name }}.{{ .Release.Namespace }}.silta.wdr.io
-      http:
-        paths:
-          - path: /
-            backend:
-              serviceName: {{ .Release.Name }}-drupal
-              servicePort: 80
 {{- if .Values.ingress.tls }}
   tls:
 {{ toYaml .Values.ingress.tls | indent 4 }}
