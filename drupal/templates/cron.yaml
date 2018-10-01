@@ -30,6 +30,7 @@ spec:
                 secretKeyRef:
                   name: "{{ .Release.Name }}-mariadb"
                   key: mariadb-password
+          {{- if .Values.secrets.imagePullSecrets }}        
           imagePullSecrets:
           {{- range .Values.secrets.imagePullSecrets }}
             - name: {{ . }}
