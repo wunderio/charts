@@ -26,3 +26,6 @@ ingress:
 
 secrets:
     hashsalt: "template-hash-salt"
+    imagePullSecrets:
+      name: gcr
+      

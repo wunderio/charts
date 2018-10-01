@@ -30,4 +30,5 @@ spec:
                 secretKeyRef:
                   name: "{{ .Release.Name }}-mariadb"
                   key: mariadb-password
+          imagePullSecrets: {{ .Values.secrets.imagePullSecrets }}        
           restartPolicy: OnFailure
