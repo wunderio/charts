@@ -47,7 +47,11 @@ spec:
         volumeMounts:
           - name: drupal-files-volume
             mountPath: /var/www/html/web/sites/default/files
-      imagePullSecrets: {{ .Values.secrets.imagePullSecrets }}
+      imagePullSecrets:
+      {{- range .Values.secrets.imagePullSecrets }}
+        - name: {{ . }}
+      {{- end}}
+      {{- end }} 
       volumes:
       - name: drupal-files-volume
         persistentVolumeClaim:
