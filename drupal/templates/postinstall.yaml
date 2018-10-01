@@ -17,10 +17,7 @@ spec:
         image: {{ .Values.drupal.image | quote }}
         command: ["/bin/sh", "-c"]
         args:
-        - cd web;
-          bootstrapped=$(drush status --field=bootstrap);
-          if [[ $bootstrapped = *'Success'* ]]; then drush updatedb -n; drush config-import -n; drush entity-updates -n;
-          else drush site-install -n config_installer; conf_count=$(ls ../config/sync/ | wc -l); if [ $conf_count -lt 2 ]; then drush site-install minimal -y; fi; fi;
+        - {{ .Values.commands.postinstall | quote }}
         env:
         - name: PHP_FPM_CLEAR_ENV
           value: "no"

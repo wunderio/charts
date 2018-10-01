@@ -13,9 +13,9 @@ spec:
           containers:
           - name: drupal-cron
             image: "{{ .Values.drupal.image }}"
-            command:
-            - drush
-            - cron
+            command: ["/bin/sh", "-c"]
+            args:
+            - {{ .Values.commands.cron | quote }}
             env:
             - name: PHP_FPM_CLEAR_ENV
               value: "no"
