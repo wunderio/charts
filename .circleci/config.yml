@@ -1,0 +1,11 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: wunderio/silta-circleci:v0.1
+
+    steps:
+      - checkout
+
+      - run: helm lint drupal/
+
