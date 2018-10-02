@@ -1,16 +1,16 @@
 apiVersion: v1
 entries:
   drupal:
-  - created: 2018-10-02T10:44:42.081533997+02:00
-    digest: c230114725142c18694178d98fd01675ca30d8cec632a2fb9b901a24d833a07d
+  - created: 2018-10-02T11:12:11.923719706+02:00
+    digest: 18f1a07cc161acfc205fc96cfb40824667874adb5638bc1606fa88342de3b285
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.1.tgz
     version: 0.1.1
-  - created: 2018-10-02T10:44:42.080288407+02:00
+  - created: 2018-10-02T11:12:11.922462907+02:00
     digest: 2b31988b0e2573ba8e891b1b56a0179ad068624f6a659bc93a7df92016bf8685
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.0.tgz
     version: 0.1.0
-generated: 2018-10-02T10:44:42.078118739+02:00
+generated: 2018-10-02T11:12:11.920361171+02:00
