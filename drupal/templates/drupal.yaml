@@ -5,6 +5,15 @@ metadata:
   labels:
     app: drupal
     release: {{ .Release.Name }}
+  annotations:
+    getambassador.io/config: |
+      ---
+      apiVersion: ambassador/v0
+      kind:  Mapping
+      name:  {{ .Release.Name }}-drupal
+      host: {{ template "drupal.domain" . }}
+      prefix: /
+      service: {{ .Release.Name }}-drupal.{{ .Release.Namespace }}.svc.cluster.local:80
 spec:
   type: NodePort
   ports:
@@ -52,7 +61,7 @@ spec:
         - containerPort: 80
           name: drupal
         volumeMounts:
-        - name: drupal-files-volume
+        - name: drupal-public-files
           mountPath: /var/www/html/web/sites/default/files
 
       - image: {{ .Values.drupal.image | quote }}
@@ -74,6 +83,12 @@ spec:
             secretKeyRef:
               name: {{ .Release.Name }}-secrets-drupal
               key: hashsalt
+
+        {{- if .Values.drupal.privateFiles.enabled }}
+        - name: PRIVATE_FILES_PATH
+          value: '/var/www/html/private'
+        {{- end }}
+
       {{- range $key, $val := .Values.drupal.env }}
         - name: {{ $key }}
           value: {{ $val | quote }}
@@ -82,11 +97,34 @@ spec:
         - containerPort: 9000
           name: drupal
         volumeMounts:
-        - name: drupal-files-volume
+        - name: drupal-public-files
           mountPath: /var/www/html/web/sites/default/files
+        {{- if .Values.drupal.privateFiles.enabled }}
+        - name: drupal-private-files
+          mountPath: /var/www/html/private
+        {{- end }}
       imagePullSecrets:
       - name: gcr
       volumes:
-      - name: drupal-files-volume
+      - name: drupal-public-files
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-public-files
+      {{- if .Values.drupal.privateFiles.enabled }}
+      - name: drupal-private-files
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-private-files
+      {{- end }}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-secrets-drupal
+  labels:
+    release: "{{ .Release.Name }}"
+type: Opaque
+data:
+  {{- if .Values.drupal.hashsalt }}
+  hashsalt: "{{ .Values.drupal.hashsalt | b64enc }}"
+  {{ else }}
+  hashsalt: {{ "{{ randAlphaNum 10 }}" | b64enc }}
+  {{- end }}

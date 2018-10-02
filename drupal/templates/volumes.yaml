@@ -12,3 +12,20 @@ spec:
   resources:
     requests:
       storage: 1Gi
+---
+{{- if .Values.drupal.privateFiles.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-private-files
+  labels:
+    app: drupal
+    release: {{ .Release.Name }}
+spec:
+  storageClassName: nfs
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+{{- end }}
