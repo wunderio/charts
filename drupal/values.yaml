@@ -9,9 +9,6 @@ drupal:
     PHP_FPM_CLEAR_ENV: "no"
 
 mariadb:
-  master:
-    persistence:
-      storageClass: standard
   replication:
     enabled: false
   rootUser:
