@@ -16,9 +16,6 @@ drupal:
     enabled: false
 
 mariadb:
-  master:
-    persistence:
-      storageClass: standard
   replication:
     enabled: false
   rootUser:
