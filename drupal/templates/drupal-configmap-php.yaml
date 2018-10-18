@@ -1,0 +1,171 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-php-conf
+data:
+  php.ini: |
+    [PHP]
+    engine = On
+    short_open_tag = Off
+    precision = -1
+    output_buffering = 4096
+    zlib.output_compression = Off
+    implicit_flush = Off
+    unserialize_callback_func =
+    serialize_precision = -1
+    disable_classes =
+    realpath_cache_size = 32k
+    realpath_cache_ttl = 120
+    zend.enable_gc = On
+    expose_php = Off
+    max_execution_time = 60
+    max_input_time = 60
+    memory_limit = 256M
+    error_reporting = E_ALL
+    display_errors = 0
+    display_startup_errors = 0
+    log_errors = 1
+    log_errors_max_len = 10240
+    ignore_repeated_errors = Off
+    ignore_repeated_source = Off
+    report_memleaks = On
+    track_errors = 0
+    html_errors = On
+    variables_order = EGPCS
+    request_order = GP
+    register_argc_argv = Off
+    auto_globals_jit = On
+    post_max_size = {{ .Values.drupal.php.post_max_size }}
+    auto_prepend_file =
+    auto_append_file =
+    default_mimetype = "text/html"
+    default_charset = "UTF-8"
+    doc_root =
+    user_dir =
+    enable_dl = Off
+    cgi.fix_pathinfo = 0
+    file_uploads = On
+    upload_max_filesize = {{ .Values.drupal.php.upload_max_filesize }}
+    max_file_uploads = 20
+    allow_url_fopen = On
+    allow_url_include = Off
+    default_socket_timeout = 60
+
+    [CLI Server]
+    cli_server.color = On
+
+    [Date]
+    date.timezone = Europe/Helsinki
+    
+    [Pdo_mysql]
+    pdo_mysql.cache_size = 2000
+    pdo_mysql.default_socket =
+
+    [mail function]
+    mail.add_x_header = Off
+
+    [SQL]
+    sql.safe_mode = Off
+
+    [MySQLi]
+    mysqli.max_persistent = -1
+    mysqli.allow_persistent = On
+    mysqli.max_links = -1
+    mysqli.cache_size = 2000
+    mysqli.default_port = 3306
+    mysqli.reconnect = Off
+
+    [mysqlnd]
+    mysqlnd.collect_statistics = On
+    mysqlnd.collect_memory_statistics = Off
+
+    [PostgreSQL]
+    pgsql.allow_persistent = On
+    pgsql.auto_reset_persistent = Off
+    pgsql.max_persistent = -1
+    pgsql.max_links = -1
+    pgsql.ignore_notice = 0
+    pgsql.log_notice = 0
+
+    [bcmath]
+    bcmath.scale = 0
+
+    [Session]
+    session.save_handler = files
+    session.save_path = /tmp
+    session.use_strict_mode = 0
+    session.use_cookies = 1
+    session.use_only_cookies = 1
+    session.name = PHPSESSID
+    session.auto_start = 0
+    session.cookie_lifetime = 0
+    session.cookie_path = /
+    session.cookie_domain =
+    session.cookie_httponly = 1
+    session.serialize_handler = php_binary
+    session.gc_probability = 1
+    session.gc_divisor = 10000
+    session.gc_maxlifetime = 1440
+    session.referer_check =
+    session.cache_limiter = nocache
+    session.cache_expire = 180
+    session.use_trans_sid = 0
+    session.hash_function = 0
+    session.hash_bits_per_character = 5
+    url_rewriter.tags = "a=href,area=href,frame=src,input=src,form=fakeentry"
+
+    [Assertion]
+    zend.assertions = -1
+
+    [mbstring]
+    mbstring.internal_encoding = UTF-8
+
+    [Tidy]
+    tidy.clean_output = Off
+
+    [soap]
+    soap.wsdl_cache_enabled = 1
+    soap.wsdl_cache_dir = "/tmp"
+    soap.wsdl_cache_ttl = 86400
+    soap.wsdl_cache_limit = 5
+
+    [ldap]
+    ldap.max_links = -1
+
+    [opcache]
+    opcache.enable = 1
+    opcache.enable_cli = 0
+    opcache.memory_consumption = 128
+    opcache.interned_strings_buffer = 32
+    opcache.max_accelerated_files = 10000
+    opcache.use_cwd = ${PHP_OPCACHE_USE_CWD}
+    opcache.validate_timestamps = 1
+    opcache.revalidate_freq = 2
+    opcache.enable_file_override = 0
+    opcache.log_verbosity_level = 2
+
+    [igbinary]
+    igbinary.compact_strings=1                                           
+  
+
+  php-fpm.conf: |
+    [global]
+    error_log = /proc/self/fd/2
+    log_level = {{ .Values.drupal.php.loglevel }} ; Possible Values: alert, error, warning, notice, debug
+    daemonize = no
+    include=/etc/php7/php-fpm.d/*.conf                                               
+
+  www.conf: |
+    [www]
+    listen = [::]:9000
+    pm = ondemand
+    pm.max_children = 100
+    pm.start_servers = 5
+    pm.min_spare_servers = 5
+    pm.max_spare_servers = 20
+    pm.process_idle_timeout = 60s
+    pm.max_requests = 500
+    access.log = /proc/self/fd/2
+    catch_workers_output = yes
+    clear_env = no
+    

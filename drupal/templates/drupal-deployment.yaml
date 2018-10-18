@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-drupal
+  labels:
+    app: {{ .Values.drupal.app | quote }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.drupal.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.drupal.app | quote }}
+      release: {{ .Release.Name }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.drupal.app | quote }}
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+      # php-fpm container.
+      - name: drupal
+        {{ include "drupal.php-container" . | indent 8}}
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - drush status
+        readinessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - drush status
+        resources:
+{{ .Values.drupal.resources | toYaml | indent 10 }}
+
+      # Nginx container
+      - name: nginx
+        image: {{ .Values.nginx.image | quote }}
+        resources:
+          requests:
+            cpu: "50m"
+        env:
+        ports:
+        - containerPort: 80
+          name: drupal
+        volumeMounts:
+        - name: drupal-public-files
+          mountPath: /var/www/html/web/sites/default/files
+        - name: nginx-conf
+          mountPath: /etc/nginx/nginx.conf # mount nginx-conf configmap volume to /etc/nginx
+          readOnly: true
+          subPath: nginx.conf
+        - name: nginx-conf
+          mountPath: /etc/nginx/conf.d/drupal.conf # mount nginx-conf configmap volume to /etc/nginx
+          readOnly: true
+          subPath: conf.d/drupal.conf
+        resources:
+{{ .Values.nginx.resources | toYaml | indent 10 }}
+
+      volumes:
+        {{ include "drupal.volumes" . | indent 8}}
+        - name: nginx-conf
+          configMap:
+            name: {{ .Release.Name }}-nginx-conf
+            items:
+              - key: nginx.conf
+                path: nginx.conf
+              - key: drupal.conf
+                path: conf.d/drupal.conf
+      {{ include "drupal.imagePullSecrets" . | indent 6 }}

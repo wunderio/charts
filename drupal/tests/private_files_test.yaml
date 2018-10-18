@@ -1,0 +1,85 @@
+suite: drupal private files
+templates:
+  - drupal-deployment.yaml
+  - drupal-volumes.yaml
+  - postinstall.yaml
+  - postupgrade.yaml
+  - drupal-cron.yaml
+tests:
+  - it: private files should be disabled by default
+    asserts:
+      # No private files volume is mounted.
+      - notContains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-private-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-private-files
+      # Only one volume is defined.
+      - hasDocuments:
+          count: 1
+        template: drupal-volumes.yaml
+
+  - it: private files should work when enabled
+    set:
+      drupal.privateFiles:
+        enabled: true
+        storage: 123Gi
+        storageClassName: foo
+    asserts:
+      # A private files volume is mounted
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-private-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-private-files
+
+      # The environment variable is set
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PRIVATE_FILES_PATH
+            value: '/var/www/html/private'
+
+      # There are two volumes defined.
+      - template: drupal-volumes.yaml
+        hasDocuments:
+          count: 2
+
+      # Private files are available for cron jobs.
+      - template: drupal-cron.yaml
+        contains:
+          path: spec.jobTemplate.spec.template.spec.volumes
+          content:
+            name: "drupal-private-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-private-files
+
+      # Private files are available for in the post-install hooks.
+      - template: postinstall.yaml
+        contains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-private-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-private-files
+      - template: postupgrade.yaml
+        contains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-private-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-private-files
+
+      - template: drupal-volumes.yaml
+        documentIndex: 1
+        equal:
+          path: spec.storageClassName
+          value: foo
+      - template: drupal-volumes.yaml
+        documentIndex: 1
+        equal:
+          path: spec.resources.requests.storage
+          value: 123Gi
+

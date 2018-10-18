@@ -1,0 +1,17 @@
+suite: drupal volumes
+templates:
+  - drupal-volumes.yaml
+tests:
+  - it: public files volume should be configurable
+    set:
+      drupal.publicFiles:
+        storage: 123Gi
+        storageClassName: foo
+
+    asserts:
+      - equal:
+          path: spec.storageClassName
+          value: foo
+      - equal:
+          path: spec.resources.requests.storage
+          value: 123Gi

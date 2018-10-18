@@ -1,0 +1,1 @@
+Deployed {{ .Release.Name }} successfully, your site is available here: http://{{- template "drupal.domain" . }}

@@ -1,0 +1,30 @@
+{{- range $index, $job := .Values.drupal.cron }}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ $.Release.Name }}-cron-{{ $index }}
+  labels:
+    release: "{{ $.Release.Name }}"
+spec:
+  schedule: {{ $job.schedule | quote }}
+  concurrencyPolicy: Forbid
+  backOffLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: drupal-cron
+            {{ include "drupal.php-container" $ | indent 12 }}
+            command: ["/bin/sh", "-c"]
+            args:
+              - {{ $job.command | quote }}
+            resources:
+{{ $.Values.drupal.resources | toYaml | indent 14 }}
+          restartPolicy: OnFailure
+          volumes:
+            {{ include "drupal.volumes" $ | indent 12 }}
+
+          {{ include "drupal.imagePullSecrets" $ | indent 10 }}
+---
+{{- end }}

@@ -2,18 +2,60 @@
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
+  loglevel: warn # Possible Values: debug; info; notice; warn; error; crit; alert; emerg 
+  resources:
+    requests:
+      cpu: 1m
+      memory: 10M
+
 drupal:
   image: 'you need to pass in a value for drupal.image to your helm chart'
+
+  cron:
+    - schedule: '0 * * * *'
+      command: 'drush cron'
+
   # will be generated random hashsalt if not provided here
   # need to be base64 encoded
   hashsalt: "template-hash-salt" 
   env:
-  #these are added to drupal environment
-    PHP_FPM_CLEAR_ENV: "no"
+  php:
+    loglevel: warn # Possible Values: alert, error, warning, notice, debug
+    upload_max_filesize: 60M
+    post_max_size: 60M
+
+  replicas: 1
+  resources:
+    requests:
+      cpu: 5m
+      memory: 128M
+
+  publicFiles:
+    storage: 1Gi
+    storageClassName: nfs
 
   # Create a volume for private files.
   privateFiles:
     enabled: false
+    storage: 1G
+    storageClassName: nfs
+    
+  app: drupal
+
+  postinstall:
+    command: |
+      cd web;
+      conf_count=$(ls ../config/sync/ | wc -l);
+      if [ $conf_count -gt 1 ]; then drush site-install -n config_installer;
+      else drush site-install minimal -y;
+      fi;
+
+  postupgrade:
+    command: |
+      cd web;
+      conf_count=$(ls ../config/sync/ | wc -l);
+      if [ $conf_count -gt 1 ]; then drush updatedb -n; drush config-import -n; drush entity-updates -n;
+      fi;
 
 mariadb:
   replication:
@@ -25,5 +67,11 @@ mariadb:
     user: drupal
     password: "{{ randAlphaNum 10 }}" # pass in a value to your helm chart to override this
 
+# Cluster configuration.
 clusterDomain: "silta.wdr.io"
+
+# Configure image pull secrets for the containers. This is not needed on GKE.
+# See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+
 branchname: "default"

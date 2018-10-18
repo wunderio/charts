@@ -1,0 +1,57 @@
+suite: drupal post-install hook
+templates:
+  - postinstall.yaml
+  - postupgrade.yaml
+tests:
+  - it: is a helm hook
+    asserts:
+      - isKind:
+          of: Job
+      - template: postupgrade.yaml
+        isKind:
+          of: Job
+
+  - it: uses the right docker image
+    set:
+      drupal.image: 'drupal-12345'
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: 'drupal-12345'
+      - template: postupgrade.yaml
+        equal:
+          path: spec.template.spec.containers[0].image
+          value: 'drupal-12345'
+
+  - it: sets environment variables correctly
+    set:
+      drupal.env:
+        foo: bar
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: foo
+            value: bar
+      - template: postupgrade.yaml
+        contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: foo
+            value: bar
+
+  - it: has public files mounted
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-public-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-public-files
+      - template: postupgrade.yaml
+        contains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-public-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-public-files

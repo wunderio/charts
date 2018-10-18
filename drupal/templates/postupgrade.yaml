@@ -1,26 +1,26 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ .Release.Name }}-postinstall"
+  name: "{{ .Release.Name }}-postupgrade"
   labels:
-    app: postinstall
+    app: postupgrade
     release: {{ .Release.Name }}
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
-    "helm.sh/hook": post-install
+    "helm.sh/hook": post-upgrade
     "helm.sh/hook-weight": "-5"
-    "helm.sh/hook-delete-policy": "hook-succeeded,before-hook-creation"
+    "helm.sh/hook-delete-policy": hook-succeeded,hook-failed
 spec:
   template:
     spec:
       restartPolicy: Never
       containers:
-      - name: postinstall
+      - name: postupgrade
         {{ include "drupal.php-container" . | indent 8 }}
         command: ["/bin/sh", "-c"]
         args:
-        - {{ .Values.drupal.postinstall.command | quote }}
+        - {{ .Values.drupal.postupgrade.command | quote }}
       {{ include "drupal.imagePullSecrets" . | indent 6 }}
       volumes:
         {{ include "drupal.volumes" . | indent 8 }}

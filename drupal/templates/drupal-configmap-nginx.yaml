@@ -1,0 +1,391 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-nginx-conf
+data:
+  nginx.conf: |
+    user                            nginx;                                                 
+    worker_processes                auto;                                                  
+    error_log                       /proc/self/fd/2 {{ .Values.nginx.loglevel }};                                 
+                                                                                          
+    events {                                                                               
+        worker_connections          1024;                                                  
+        multi_accept                on;                                                    
+    }                                                                                      
+                                                                                          
+    http {                                                                                 
+        include                     /etc/nginx/mime.types;                                 
+        default_type                application/octet-stream;                              
+                                                                                          
+        log_format                  real_ip '$http_x_real_ip - $remote_user [$time_local] '
+                                            '"$request" $status $body_bytes_sent '
+                                            '"$http_referer" "$http_user_agent"';
+                                                            
+                                                                                                              
+        access_log                  /proc/self/fd/1 combined;
+                                              
+        send_timeout                60s;       
+        sendfile                    on;        
+        client_body_timeout         60s;       
+        client_header_timeout       60s;                                                                                                                   
+        client_max_body_size        32m;                                                                                                                   
+        client_body_buffer_size     16k;                                                                                                                   
+        client_header_buffer_size   4k;                                                                                                                    
+        large_client_header_buffers 8 16K;                                                                                                                 
+        keepalive_timeout           75s;                                                                                                                   
+        keepalive_requests          100;                                                                                                                   
+        reset_timedout_connection   off;                                                                                                                   
+        tcp_nodelay                 on;                                                                                                                    
+        tcp_nopush                  on;                                                                                                                    
+        server_tokens               off;                                                                                                                   
+                                                                                                                                                          
+        ## upload_progress             uploads 1m;          
+                                              
+        gzip                        on;                      
+        gzip_buffers                16 8k;     
+        gzip_comp_level             1;         
+        gzip_http_version           1.1;       
+        gzip_min_length             20;        
+        gzip_types                  text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascrip
+        gzip_vary                   on;                                                                                                                    
+        gzip_proxied                any;       
+        gzip_disable                msie6;                                                                                                                 
+                                                                                                                                                          
+        ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.                                                                                                                                                   
+        add_header                  X-XSS-Protection '1; mode=block';                                                                                      
+        add_header                  X-Frame-Options SAMEORIGIN;                                                                                            
+        add_header                  X-Content-Type-Options nosniff;
+        add_header                  Strict-Transport-Security max-age=31536000;
+        add_header                  X-XSS-Protection '1; mode=block';                                                                                                                                              
+                                                                    
+        map $uri $no_slash_uri {                                                                                                                           
+            ~^/(?<no_slash>.*)$ $no_slash;                                                                                                                 
+        }                                                            
+                                                                                                                                                          
+        include conf.d/*.conf;                                                                                                                             
+    }     
+
+  drupal.conf: |
+    upstream php {                                                  
+        server localhost:9000;                   
+    }                            
+                                              
+    map $http_x_forwarded_proto $fastcgi_https {                                                        
+        default $https;                                            
+        http '';                          
+        https on;                          
+    }                                      
+                                          
+    server {                               
+        server_name drupal;                          
+        listen 80;          
+                                        
+        root /var/www/html/web;                                     
+        index index.php;
+                                                                              
+        include fastcgi.conf;
+                                          
+                                              
+        location / {                                                        
+                                                    
+            location ~* /system/files/ {
+                include fastcgi.conf;                                                                                                                      
+                fastcgi_param QUERY_STRING q=$uri&$args;
+                fastcgi_param SCRIPT_NAME /index.php;
+                fastcgi_param SCRIPT_FILENAME $document_root/index.php;     
+                fastcgi_pass php;  
+                log_not_found off;         
+            }                    
+                                            
+            location ~* /sites/.+/files/private/ {
+                internal;                                          
+            }                              
+
+            location ~* /sites/.+/files/.+\.txt {    
+                access_log off;                                        
+                expires 30d;                            
+                tcp_nodelay off;                                                                        
+                open_file_cache off;                                   
+                open_file_cache_valid 45s;                             
+                open_file_cache_min_uses 2;                            
+                open_file_cache_errors off;                            
+            }                                                                                                   
+                                                                              
+            location ~* /admin/reports/hacked/.+/diff/ {                    
+                try_files $uri @drupal;                                        
+            }                                                                  
+                                                                              
+            location ~* /rss.xml {                                             
+                try_files $uri @drupal-no-args;                                
+            }  
+
+            location ~* /sitemap.xml {                                      
+                try_files $uri @drupal;                                        
+            }                                                                                                                             
+                                                                                                        
+            location ~* ^.+\.(?:pdf|pptx?)$ {                                                           
+                expires 30d;                                                   
+                tcp_nodelay off;                                                                        
+            }                                                                  
+                                                                                                        
+            ## Handle D7 image styles
+            location ~* /files/styles/ {
+                expires 365d;
+                try_files $uri @drupal;
+            }
+
+            ## Advanced Help module makes each module provided README available.
+            location ~* ^/help/[^/]*/README\.txt$ {
+                try_files $uri @drupal;
+            }
+
+            ## Regular private file serving (i.e. handled by Drupal).
+            location ~ /system/files/ {
+                try_files $uri @drupal;
+                log_not_found off;
+            }
+
+            ## Allow download of .txt files from files directory
+            location ~* ^/sites/.*/files/(?:.+\.(?:txt)) {
+                tcp_nodelay     off;
+                expires         30d;
+                try_files $uri =404;
+                log_not_found off;
+            }
+
+            ## Replicate the Apache <FilesMatch> directive of Drupal standard
+            ## .htaccess. Disable access to any code files. Return a 404 to curtail
+            ## information disclosure. Hide also the text files.
+            location ~* ^(?:.+\.(?:htaccess|make|txt|engine|inc|info|module|profile|po|sh|.*sql|csv|yml|test|theme|tpl(?:\.php)?|xtmpl|config)|code-style\.pl|/Entries.*|/Repository|/Root|/Tag|/Template)$ {
+                return 404;
+            }
+
+            ###
+            ### Advagg_css and Advagg_js support.
+            ###
+            location ~* files/advagg_(?:css|js)/ {
+                expires       max;
+                etag          off;
+                access_log    off;
+                log_not_found off;
+                ## Set the OS file cache.
+                open_file_cache max=3000 inactive=120s;
+                open_file_cache_valid 45s;
+                open_file_cache_min_uses 2;
+                open_file_cache_errors off;
+                add_header Cache-Control "no-transform, public";
+                add_header Last-Modified "Wed, 20 Jan 1988 04:20:42 GMT";
+                add_header Access-Control-Allow-Origin *;
+                add_header X-Header "AdvAgg Generator 2.0 CDN";
+                try_files $uri @drupal;
+            }
+
+            ## Serve static files & images directly, without all standard drupal rewrites, php-fpm etc.
+            location ~* ^.+\.(?:css|js|jpe?g|gif|png|ico|svg|swf|docx?|xlsx?|tiff?|txt|cgi|bat|pl|dll|aspx?|exe|class)$ {
+                tcp_nodelay     off;
+                expires         365d;
+                add_header Cache-Control "public";
+                ## Set the OS file cache.
+                open_file_cache max=10000 inactive=120s;
+                open_file_cache_valid 45s;
+                open_file_cache_min_uses 2;
+                open_file_cache_errors off;
+                try_files $uri =404;
+                log_not_found off;
+                access_log off;
+            }
+
+            ## PDFs and powerpoint files handling.
+            location ~* ^.+\.(?:pdf|pptx?)$ {
+                expires 30d;
+                ## No need to bleed constant updates. Send the all shebang in one
+                ## fell swoop.
+                tcp_nodelay off;
+            }
+
+            # Configure webfont access
+            location ~* \.(?:ttf|ttc|otf|eot|woff|woff2|font.css)$ {
+                # Uncomment to allow cross domain webfont access
+                # Set cache rules for webfonts.
+                expires 365d;
+                add_header Cache-Control "public";
+                ## Set the OS file cache.
+                open_file_cache max=10000 inactive=120s;
+                open_file_cache_valid 45s;
+                open_file_cache_min_uses 2;
+                open_file_cache_errors off;
+                try_files $uri =404;
+                log_not_found off;
+                access_log off;
+            }
+
+            ## Serve bigger media/static/archive files directly, without all standard drupal rewrites, php-fpm etc.
+            location ~* ^.+\.(?:avi|mpe?g|mov|wmv|mp3|mp4|m4a|ogg|flv|wav|midi|zip|tar|t?gz|rar)$ {
+                expires         365d;
+                tcp_nodelay     off;
+                try_files $uri =404;
+                log_not_found off;
+                access_log off;
+            }
+
+            ## Deny bots on never cached uri without 403 response.
+            location ~* ^/(?:user|admin|cart|checkout|logout|abuse|flag) {
+                if ( $http_user_agent ~* (?:crawl|goog|yahoo|spider|bot|yandex|bing|tracker|click|parser) ) {
+                return 444;
+                }
+                try_files $uri @drupal;
+            }
+
+            location = /robots.txt {
+                add_header  Content-Type  text/plain;
+                return 200 "User-agent: *\nDisallow: /\n";
+            }
+
+            location = /radioactivity_node.php {
+                try_files $uri @drupal;
+            }
+
+            ## Allow radioactivity to work.
+            location ~* /emit.php {
+                include fastcgi.conf;
+                fastcgi_param  SCRIPT_FILENAME    $document_root/sites/all/modules/contrib/radioactivity/emit.php;
+                fastcgi_pass php;
+            }
+
+            # This is cool because no php is touched for static content                                                                                                                                                                                                                                                                                                   
+            try_files $uri @drupal;                                                                                                                        
+        }                                                                                                                                                  
+                                                                                                                                                                                                                                                                                                                                                                                                        
+        location @drupal {                                                                                                                                 
+            include fastcgi.conf;                                                                                                                          
+            fastcgi_param QUERY_STRING $query_string;                                                                                                      
+            fastcgi_param SCRIPT_NAME /index.php;                                                                                                          
+            fastcgi_param SCRIPT_FILENAME $document_root/index.php;                                     
+            fastcgi_pass php;                                                                                                                                                                                                                                                 
+        }
+
+        location @drupal-no-args {                                                                                                                         
+            include fastcgi.conf;                                                                                                                          
+            fastcgi_param QUERY_STRING q=$uri;                                                          
+            fastcgi_param SCRIPT_NAME /index.php;                                                                                                          
+            fastcgi_param SCRIPT_FILENAME $document_root/index.php;                                                                                        
+            fastcgi_pass php;                                                                                                                              
+        }                                                                                                                                                  
+                                                                                                                                                          
+        location = /index.php {                                                                         
+            fastcgi_pass php;                                                                                                                              
+        }
+
+        location ~* ^/core/authorize.php {                                                                                                                 
+            include fastcgi.conf;                                                                                                                          
+            fastcgi_param QUERY_STRING $args;                                                                                                              
+            fastcgi_param SCRIPT_NAME /core/authorize.php;                                                                                                 
+            fastcgi_param SCRIPT_FILENAME $document_root/core/authorize.php;                                                                               
+            fastcgi_pass php;                                                  
+        }                                                                                                                                                  
+                                                                                                                                                          
+        location = /core/modules/statistics/statistics.php {                                                                                               
+            fastcgi_pass php;                                                                                                                              
+        }                                                                                                                                                  
+                                                                                                                                                          
+        location = /cron {                                                                                                                                 
+            include fastcgi.conf;                                                                                                                          
+            fastcgi_param QUERY_STRING $args;                                                                                                              
+            fastcgi_param SCRIPT_NAME /index.php;                                                       
+            fastcgi_param SCRIPT_FILENAME $document_root/index.php;                                                                                        
+            fastcgi_pass php;                                                                                                                              
+        }
+
+        location ~* ^/update.php {                                                                                                                         
+            include fastcgi.conf;                                                                                                                          
+            fastcgi_param QUERY_STRING $args;                                                           
+            fastcgi_param SCRIPT_NAME /update.php;                                                                                                         
+            fastcgi_param SCRIPT_FILENAME $document_root/update.php;                                                                                       
+            fastcgi_pass php;                                                                                                                              
+        }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+                                                                                                                                                          
+        location = /robots.txt {                                                                        
+            access_log off;                                                                                                                                
+            try_files $uri @drupal-no-args;                                                                                                                
+        } 
+                                                                                                                                                                                                  
+        location ~* ^/.well-known/ {                                                                                                                       
+            allow all;                                                                                                                                     
+        }                                                                                                                                                  
+                                                                                                                                                          
+        location @empty {                                                                                                                                  
+            expires 30d;                                                       
+            empty_gif;                                                                                                                                     
+        }
+
+        location = /authorize.php {
+            include fastcgi.conf;
+            fastcgi_param  SCRIPT_FILENAME    $document_root/authorize.php;
+            fastcgi_pass php;
+        }
+
+        ## Run the update from the web interface with Drupal 7.
+        location = /update.php {
+            include fastcgi.conf;
+            fastcgi_param  SCRIPT_FILENAME    $document_root/update.php;
+            fastcgi_pass php;
+        }
+
+        ## Run the install from the web interface with Drupal 7.
+        location = /install.php {
+            include fastcgi.conf;
+            fastcgi_param  SCRIPT_FILENAME    $document_root/install.php;
+            fastcgi_pass php;
+        }
+
+        ## Run the install from the web interface with Drupal 8.
+        location = /core/install.php {
+            include fastcgi.conf;
+            fastcgi_param  SCRIPT_FILENAME    $document_root/core/install.php;
+            fastcgi_pass php;
+        }
+
+        ## Allow running _ping.php
+        location = /_ping.php {
+            include fastcgi.conf;
+            fastcgi_param  SCRIPT_FILENAME    $document_root/_ping.php;
+            fastcgi_pass php;
+            access_log off;
+        }
+
+        # Handle autocomplete to-cleanURLs policy
+        if ( $args ~* "^q=(?<query_value>.*)" ) {
+            rewrite ^/index.php$ $host/?q=$query_value? permanent;
+        }
+
+        ## Disallow access to patches directory.
+        location ^~ /patches { return 404; }
+
+        ## Disallow access to drush backup directory.
+        location ^~ /backup { return 404; }
+
+        ## Most sites won't have configured favicon
+        ## and since its always grabbed, turn it off in access log
+        ## and turn off it's not-found error in the error log
+        location = /favicon.ico { access_log off; log_not_found off; try_files /favicon.ico @empty; }
+
+        ## Same for apple-touch-icon files
+        location = /apple-touch-icon.png { access_log off; log_not_found off; }
+        location = /apple-touch-icon-precomposed.png { access_log off; log_not_found off; }
+
+        ## Return an in memory 1x1 transparent GIF.
+        location @empty {
+            expires 30d;
+            empty_gif;
+        }
+
+        ## Rather than just denying .ht* in the config, why not deny
+        ## access to all .invisible files
+        location ~ /\. { return 404; access_log off; log_not_found off; }
+
+        ## Any other attempt to access PHP files returns a 404.
+        location ~* ^.+\.php$ {
+            return 404;
+        }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+                                                                                                                                                                                                                                                                                                                                                                    
+    } 

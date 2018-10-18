@@ -1,0 +1,87 @@
+suite: drupal cron jobs
+templates:
+  - drupal-cron.yaml
+tests:
+  - it: is a cron job
+    asserts:
+      - isKind:
+          of: CronJob
+
+  - it: uses the right docker image
+    set:
+      drupal.image: 'drupal-12345'
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          value: 'drupal-12345'
+
+  - it: sets environment variables correctly
+    set:
+      drupal.env:
+        foo: bar
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: foo
+            value: bar
+
+  - it: has public files mounted
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.volumes
+          content:
+            name: "drupal-public-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-public-files
+
+  - it: runs multiple jobs
+    set:
+      drupal.cron:
+        - command: foo
+          schedule: "0 * * * *"
+        - command: bar
+          schedule: "30 * * * *"
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
+          value: 'foo'
+        documentIndex: 0
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
+          value: 'bar'
+        documentIndex: 1
+      - equal:
+          path: spec.schedule
+          value: "0 * * * *"
+        documentIndex: 0
+      - equal:
+          path: spec.schedule
+          value: "30 * * * *"
+        documentIndex: 1
+
+  - it: takes resource requests and limits
+    set:
+      drupal.resources:
+        requests:
+          cpu: 123m
+          memory: 1G
+        limits:
+          cpu: 234m
+          memory: 2G
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu
+          value: 123m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.memory
+          value: 1G
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.cpu
+          value: 234m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.memory
+          value: 2G
+
