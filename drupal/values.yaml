@@ -5,7 +5,7 @@ nginx:
   loglevel: warn # Possible Values: debug; info; notice; warn; error; crit; alert; emerg 
   resources:
     requests:
-      cpu: 1m
+      cpu: 10m
       memory: 10M
 
 drupal:
@@ -27,7 +27,7 @@ drupal:
   replicas: 1
   resources:
     requests:
-      cpu: 5m
+      cpu: 100m
       memory: 128M
 
   publicFiles:
