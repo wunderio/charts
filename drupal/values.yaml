@@ -1,47 +1,75 @@
 
+# Main domain of the cluster.
+# If using ambassador, subdomains of this domain will be created automatically for each environment.
+clusterDomain: "silta.wdr.io"
+
+# An optional human-readable label for the environment, defaults to the release name.
+# We typically pass the branch name when we build dedicated environments per branch.
+# This name is mainly used to create nice subdomains for each environment.
+environmentName: null
+
+# Configure image pull secrets for the containers. This is not needed on GKE.
+# See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+
+# The app label added to our Kubernetes resources.
+app: drupal
+
+# How many instances of the Drupal pod should be in our Kubernetes deployment.
+# A single pod (the default value) is good for development environments to minimise resource usage.
+# Multiple pods make sense for high availability.
+replicas: 1
+
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
-  loglevel: warn # Possible Values: debug; info; notice; warn; error; crit; alert; emerg 
+
+  # The Kubernetes resources for the nginx container.
+  # These values are optimised for development environments.
   resources:
     requests:
       cpu: 10m
       memory: 10M
+  
+  # Set of values to enable and use http basic authentication
+  # It is implemented only for very basic protection (like web crawlers)
+  basicauth:
+    enabled: true
 
-drupal:
+    # Define username and password
+    credentials:
+      username: silta
+      password: demo
+
+    # Trust X-Forwarded-For from these hosts for getting external IP 
+    realipfrom: 10.0.0.0/8
+
+    # Add IP addresses that should be excluded from basicauth
+    noauthips:
+      - 10.0.0.0/8 # GKE internal IPs
+
+  loglevel: warn # Possible Values: debug; info; notice; warn; error; crit; alert; emerg
+
+# Configuration for everything that runs in php containers.
+php:
+  # The docker image to be used. This is typically passed by your CI system using the --set parameter.
   image: 'you need to pass in a value for drupal.image to your helm chart'
 
-  cron:
-    - schedule: '0 * * * *'
-      command: 'drush cron'
-
-  # will be generated random hashsalt if not provided here
-  # need to be base64 encoded
-  hashsalt: "template-hash-salt" 
-  env:
-  php:
-    loglevel: warn # Possible Values: alert, error, warning, notice, debug
-    upload_max_filesize: 60M
-    post_max_size: 60M
-
-  replicas: 1
+  # The Kubernetes resources for the php containers.
+  # These values are optimised for development environments.
   resources:
     requests:
       cpu: 100m
       memory: 128M
 
-  publicFiles:
-    storage: 1Gi
-    storageClassName: nfs
+  # Cron tasks, each of which will be run into a dedicated temporary pod.
+  # When overriding this value, make sure to include the `drush cron` command.
+  cron:
+    - schedule: '0 * * * *'
+      command: 'drush cron'
 
-  # Create a volume for private files.
-  privateFiles:
-    enabled: false
-    storage: 1G
-    storageClassName: nfs
-    
-  app: drupal
-
+  # Post-installation hook.
+  # This is run every time a new environment is created.
   postinstall:
     command: |
       cd web;
@@ -50,6 +78,8 @@ drupal:
       else drush site-install minimal -y;
       fi;
 
+  # Post-upgrade hook.
+  # This is run every time a new environment is upgraded.
   postupgrade:
     command: |
       cd web;
@@ -57,21 +87,37 @@ drupal:
       if [ $conf_count -gt 1 ]; then drush updatedb -n; drush config-import -n; drush entity-updates -n;
       fi;
 
+  # Pass additional environment variables to all php containers as key-value pairs.
+  env: {}
+
+  # The hashsalt can be provided if you need to import an existing database and preserve the ability for
+  # users to log in. If not provided, a random value will be used.
+  hashsalt: "template-hash-salt"
+
+  # Custom php settings.
+  php_ini:
+    loglevel: warn # Possible Values: alert, error, warning, notice, debug
+    upload_max_filesize: 60M
+    post_max_size: 60M
+
+
+# Configure the volume used for Drupal public files.
+publicFiles:
+  storage: 1Gi
+  storageClassName: nfs
+
+# Configure an optional volume used for Drupal private files.
+privateFiles:
+  enabled: false
+  storage: 1G
+  storageClassName: nfs
+
+# Override the default values of the MariaDB subchart.
+# These settings are optimised for development environments.
 mariadb:
+  enabled: true
   replication:
     enabled: false
-  rootUser:
-    password: "{{ randAlphaNum 10 }}" # pass in a value to your helm chart to override this
   db:
     name: drupal
     user: drupal
-    password: "{{ randAlphaNum 10 }}" # pass in a value to your helm chart to override this
-
-# Cluster configuration.
-clusterDomain: "silta.wdr.io"
-
-# Configure image pull secrets for the containers. This is not needed on GKE.
-# See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-imagePullSecrets: []
-
-branchname: "default"

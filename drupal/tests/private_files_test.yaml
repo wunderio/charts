@@ -22,7 +22,7 @@ tests:
 
   - it: private files should work when enabled
     set:
-      drupal.privateFiles:
+      privateFiles:
         enabled: true
         storage: 123Gi
         storageClassName: foo

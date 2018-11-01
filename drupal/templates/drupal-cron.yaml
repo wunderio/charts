@@ -1,10 +1,10 @@
-{{- range $index, $job := .Values.drupal.cron }}
+{{- range $index, $job := .Values.php.cron }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: {{ $.Release.Name }}-cron-{{ $index }}
   labels:
-    release: "{{ $.Release.Name }}"
+    {{ include "drupal.release_labels" $ | indent 4 }}
 spec:
   schedule: {{ $job.schedule | quote }}
   concurrencyPolicy: Forbid
@@ -20,7 +20,7 @@ spec:
             args:
               - {{ $job.command | quote }}
             resources:
-{{ $.Values.drupal.resources | toYaml | indent 14 }}
+{{ $.Values.php.resources | toYaml | indent 14 }}
           restartPolicy: OnFailure
           volumes:
             {{ include "drupal.volumes" $ | indent 12 }}

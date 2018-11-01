@@ -4,7 +4,7 @@ templates:
 tests:
   - it: public files volume should be configurable
     set:
-      drupal.publicFiles:
+      publicFiles:
         storage: 123Gi
         storageClassName: foo
 

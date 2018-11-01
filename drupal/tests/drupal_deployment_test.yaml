@@ -2,14 +2,20 @@ suite: drupal deployment
 templates:
   - drupal-deployment.yaml
 tests:
-  - it: is a deployment
+  - it: is a deployment with default values
     asserts:
       - isKind:
           of: Deployment
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: metadata.labels.app
+          value: drupal
 
   - it: uses the right docker images
     set:
-      drupal.image: 'drupal-12345'
+      php.image: 'drupal-12345'
       nginx.image: 'nginx-12345'
     asserts:
       - equal:
@@ -21,7 +27,7 @@ tests:
 
   - it: sets environment variables correctly
     set:
-      drupal.env:
+      php.env:
         foo: bar
     asserts:
       - contains:
@@ -32,7 +38,7 @@ tests:
 
   - it: sets the replica count correctly
     set:
-      drupal.replicas: 3
+      replicas: 3
     asserts:
       - equal:
           path: spec.replicas
@@ -40,7 +46,7 @@ tests:
 
   - it: takes resource requests and limits
     set:
-      drupal.resources:
+      php.resources:
         requests:
           cpu: 123m
           memory: 1G

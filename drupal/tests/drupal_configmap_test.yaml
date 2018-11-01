@@ -1,0 +1,50 @@
+suite: drupal ConfigMaps
+templates:
+  - drupal-configmap-php.yaml
+  - drupal-configmap-nginx.yaml
+tests:
+  - it: is a ConfigMap
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.labels.app
+          value: drupal
+
+  - it: injects the php.ini values
+    set:
+      php.php_ini:
+        loglevel: 'debug'
+        upload_max_filesize: '123M'
+        post_max_size: '321M'
+    asserts:
+    - matchRegex:
+        path: data.php-fpm_conf
+        pattern: 'log_level = debug'
+    - matchRegex:
+        path: data.php_ini
+        pattern: 'post_max_size = 321M'
+    - matchRegex:
+        path: data.php_ini
+        pattern: 'upload_max_filesize = 123M'
+
+  - it: injects the nginx configuration
+    set:
+      nginx:
+        loglevel: 'debug'
+        basicauth:
+          enabled: true
+          realipfrom: '1.2.3.4'
+    asserts:
+    - template: drupal-configmap-nginx.yaml
+      matchRegex:
+        path: data.nginx_conf
+        pattern: '/proc/self/fd/2 debug;'
+    - template: drupal-configmap-nginx.yaml
+      matchRegex:
+        path: data.nginx_conf
+        pattern: 'set_real_ip_from *1.2.3.4'
+    - template: drupal-configmap-nginx.yaml
+      matchRegex:
+        path: data.drupal_conf
+        pattern: 'auth_basic "Restricted";'

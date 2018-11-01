@@ -6,10 +6,13 @@ tests:
     asserts:
       - isKind:
           of: CronJob
+      - equal:
+          path: metadata.labels.app
+          value: drupal
 
   - it: uses the right docker image
     set:
-      drupal.image: 'drupal-12345'
+      php.image: 'drupal-12345'
     asserts:
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].image
@@ -17,7 +20,7 @@ tests:
 
   - it: sets environment variables correctly
     set:
-      drupal.env:
+      php.env:
         foo: bar
     asserts:
       - contains:
@@ -37,7 +40,7 @@ tests:
 
   - it: runs multiple jobs
     set:
-      drupal.cron:
+      php.cron:
         - command: foo
           schedule: "0 * * * *"
         - command: bar
@@ -64,7 +67,7 @@ tests:
 
   - it: takes resource requests and limits
     set:
-      drupal.resources:
+      php.resources:
         requests:
           cpu: 123m
           memory: 1G

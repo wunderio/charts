@@ -1,0 +1,30 @@
+suite: drupal service
+templates:
+  - drupal-service.yaml
+tests:
+  - it: is a service
+    asserts:
+      - isKind:
+          of: Service
+
+  - it: sets the right domain with a custom environment name
+    set:
+      environmentName: 'bar'
+      clusterDomain: 'silta.example.com'
+    release:
+      namespace: 'foo'
+    asserts:
+      - equal:
+          path: "metadata.annotations.domain"
+          value: "bar.foo.silta.example.com"
+
+  - it: uses the release name as a fallback
+    set:
+      clusterDomain: 'silta.example.com'
+    release:
+      name: baz
+      namespace: 'foo'
+    asserts:
+      - equal:
+          path: "metadata.annotations.domain"
+          value: "baz.foo.silta.example.com"

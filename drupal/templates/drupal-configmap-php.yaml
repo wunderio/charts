@@ -2,8 +2,10 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-php-conf
+  labels:
+    {{ include "drupal.release_labels" . | indent 4 }}
 data:
-  php.ini: |
+  php_ini: |
     [PHP]
     engine = On
     short_open_tag = Off
@@ -35,7 +37,7 @@ data:
     request_order = GP
     register_argc_argv = Off
     auto_globals_jit = On
-    post_max_size = {{ .Values.drupal.php.post_max_size }}
+    post_max_size = {{ .Values.php.php_ini.post_max_size }}
     auto_prepend_file =
     auto_append_file =
     default_mimetype = "text/html"
@@ -45,7 +47,7 @@ data:
     enable_dl = Off
     cgi.fix_pathinfo = 0
     file_uploads = On
-    upload_max_filesize = {{ .Values.drupal.php.upload_max_filesize }}
+    upload_max_filesize = {{ .Values.php.php_ini.upload_max_filesize }}
     max_file_uploads = 20
     allow_url_fopen = On
     allow_url_include = Off
@@ -148,14 +150,14 @@ data:
     igbinary.compact_strings=1                                           
   
 
-  php-fpm.conf: |
+  php-fpm_conf: |
     [global]
     error_log = /proc/self/fd/2
-    log_level = {{ .Values.drupal.php.loglevel }} ; Possible Values: alert, error, warning, notice, debug
+    log_level = {{ .Values.php.php_ini.loglevel }} ; Possible Values: alert, error, warning, notice, debug
     daemonize = no
     include=/etc/php7/php-fpm.d/*.conf                                               
 
-  www.conf: |
+  www_conf: |
     [www]
     listen = [::]:9000
     pm = ondemand
