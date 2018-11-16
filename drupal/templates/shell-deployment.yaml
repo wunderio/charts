@@ -1,0 +1,24 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-shell
+  labels:
+    {{ include "shell.release_labels" . | indent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{ include "shell.release_labels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+        {{ include "shell.release_labels" . | indent 8 }}
+    spec:
+      containers:
+      - name: shell
+        {{ include "shell.ssh-container" . | indent 8 }}
+        resources:
+{{ .Values.php.resources | toYaml | indent 10 }}
+      volumes:
+        {{ include "drupal.volumes" . | indent 8}}
+      {{ include "drupal.imagePullSecrets" . | indent 6 }}

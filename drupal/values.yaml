@@ -6,7 +6,7 @@ clusterDomain: "silta.wdr.io"
 # An optional human-readable label for the environment, defaults to the release name.
 # We typically pass the branch name when we build dedicated environments per branch.
 # This name is mainly used to create nice subdomains for each environment.
-environmentName: null
+environmentName: ""
 
 # Configure image pull secrets for the containers. This is not needed on GKE.
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -48,8 +48,6 @@ nginx:
     noauthips:
       - 10.0.0.0/8 # GKE internal IPs
 
-  loglevel: warn # Possible Values: debug; info; notice; warn; error; crit; alert; emerg
-
 # Configuration for everything that runs in php containers.
 php:
   # The docker image to be used. This is typically passed by your CI system using the --set parameter.
@@ -66,26 +64,45 @@ php:
   # When overriding this value, make sure to include the `drush cron` command.
   cron:
     - schedule: '0 * * * *'
-      command: 'drush cron'
+      command: |
+        if drush check-bootstrap; then
+          drush cron
+        fi
 
   # Post-installation hook.
   # This is run every time a new environment is created.
   postinstall:
     command: |
-      cd web;
-      conf_count=$(ls ../config/sync/ | wc -l);
-      if [ $conf_count -gt 1 ]; then drush site-install -n config_installer;
-      else drush site-install minimal -y;
-      fi;
+      if [ -f reference-data/db.sql.gz ]; then
+        echo "Importing reference database dump"
+        cat reference-data/db.sql.gz | gunzip | drush sql-cli
+
+        echo "Importing public files"
+        tar xf reference-data/public_files.tar.gz
+
+        drush cr
+        drush updatedb -n
+        if [ -f config/sync/core.extension.yml ]; then
+          drush config-import -n
+        fi
+
+      elif [ -f config/sync/core.extension.yml ]; then
+        echo "Installing Drupal from existing configuration"
+        drush site-install -n config_installer
+
+      else
+        echo "No configuration found, installing a plain drupal site"
+        drush site-install -n standard
+      fi
 
   # Post-upgrade hook.
   # This is run every time a new environment is upgraded.
   postupgrade:
     command: |
-      cd web;
-      conf_count=$(ls ../config/sync/ | wc -l);
-      if [ $conf_count -gt 1 ]; then drush updatedb -n; drush config-import -n; drush entity-updates -n;
-      fi;
+      drush updatedb -n
+      if [ -f config/sync/core.extension.yml ]; then
+        drush config-import -n
+      fi
 
   # Pass additional environment variables to all php containers as key-value pairs.
   env: {}
@@ -101,6 +118,16 @@ php:
     post_max_size: 60M
 
 
+# Configuration for everything that runs in shell container.
+shell:
+  # The docker image to be used. This is typically passed by your CI system using the --set parameter.
+  image: 'you need to pass in a value for shell.image to your helm chart'
+  # Values for the SSH gitAuth.
+  gitAuth:
+    # Project's git repository URL
+    repositoryUrl: 'you need to pass in a value for repositoryUrl to your helm chart'
+    apiToken: 'you need to pass in a value for shell.gitAuth.apiToken to your helm chart'
+
 # Configure the volume used for Drupal public files.
 publicFiles:
   storage: 1Gi
@@ -109,6 +136,37 @@ publicFiles:
 # Configure an optional volume used for Drupal private files.
 privateFiles:
   enabled: false
+  storage: 1G
+  storageClassName: nfs
+
+# Configure reference data that will be used when creating new environments.
+referenceData:
+  enabled: true
+  
+  # The name of the environment from which reference data will be copied.
+  referenceEnvironment: 'master'
+
+  schedule: '0 3 * * *'
+  command: |
+    if drush check-bootstrap; then
+
+      if [ -d vendor/machbarmacher/gdpr-dump ] && [ -f gdpr.json ]; then
+
+        # NFS doesn't support replacing files, so we delete them instead.
+        rm -f reference-data/*
+
+        # Export database dump.
+        drush sql-dump --gzip --result-file ../reference-data/db.sql
+
+        # Export public files.
+        tar cz --exclude=css --exclude=js -f reference-data/public_files.tar.gz web/sites/default/files/
+      else
+        echo "Reference dumps are only enabled with proper sanitization. Make sure machbarmacher/gdpr-dump is installed and gdpr.json is present in the project root."
+      fi
+    else
+      echo "Drupal is not installed, skipping reference database dump."
+    fi
+
   storage: 1G
   storageClassName: nfs
 
@@ -121,3 +179,6 @@ mariadb:
   db:
     name: drupal
     user: drupal
+  master:
+    persistence:
+      size: 1G

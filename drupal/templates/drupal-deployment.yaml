@@ -9,12 +9,14 @@ spec:
   selector:
     matchLabels:
       {{ include "drupal.release_labels" . | indent 6 }}
+      deployment: drupal
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
         {{ include "drupal.release_labels" . | indent 8 }}
+        deployment: drupal
     spec:
       containers:
       # php-fpm container.
@@ -28,7 +30,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - drush status
+            - drush check-bootstrap
         resources:
 {{ .Values.php.resources | toYaml | indent 10 }}
 
@@ -58,7 +60,14 @@ spec:
           mountPath: /etc/nginx/.htaccess
           readOnly: true
           subPath: .htaccess
-        {{- end }}  
+        {{- end }}
+        livenessProbe:
+          tcpSocket:
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
         resources:
 {{ .Values.nginx.resources | toYaml | indent 10 }}
 

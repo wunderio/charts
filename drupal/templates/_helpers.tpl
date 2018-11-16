@@ -1,11 +1,27 @@
 {{- define "drupal.release_labels" }}
 app: {{ .Values.app | quote }}
-version: {{ .Chart.Version }}
+release: {{ .Release.Name }}
+{{- end }}
+
+{{- define "shell.release_labels" }}
+app: shell
 release: {{ .Release.Name }}
 {{- end }}
 
 {{- define "drupal.domain" -}}
-{{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
+{{ include "drupal.environmentName" . }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
+{{- end -}}
+
+{{- define "drupal.environmentName" -}}
+{{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower | trunc 50 | trimSuffix "-" }}
+{{- end -}}
+
+{{- define "drupal.referenceEnvironment" -}}
+{{ regexReplaceAll "[^[:alnum:]]" .Values.referenceData.referenceEnvironment "-" | lower | trunc 50 | trimSuffix "-" }}
+{{- end -}}
+
+{{- define "drupal.environment.hostname" -}}
+{{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower | trunc 50 | trimSuffix "-" }}
 {{- end -}}
 
 {{- define "drupal.php-container" }}
@@ -15,11 +31,33 @@ ports:
   - containerPort: 9000
     name: drupal
 volumeMounts:
+  {{ include "drupal.volumeMounts" . | indent 8 }}
+{{- end }}
+
+{{- define "shell.ssh-container" }}
+image: {{ .Values.shell.image | quote }}
+env:
+  {{ include "drupal.env" . | indent 2 }}
+  - name: GITAUTH_API_TOKEN
+    value: "{{ .Values.shell.gitAuth.apiToken }}"
+  - name: GITAUTH_REPOSITORY_URL
+    value: "{{ .Values.shell.gitAuth.repositoryUrl }}"
+ports:
+  - containerPort: 22
+volumeMounts:
+  {{ include "drupal.volumeMounts" . | indent 8 }}
+{{- end }}
+
+{{- define "drupal.volumeMounts" }}
   - name: drupal-public-files
     mountPath: /var/www/html/web/sites/default/files
   {{- if .Values.privateFiles.enabled }}
   - name: drupal-private-files
     mountPath: /var/www/html/private
+  {{- end }}
+  {{- if .Values.referenceData.enabled }}  
+  - name: reference-data-volume
+    mountPath: /var/www/html/reference-data
   {{- end }}
   - name: php-conf
     mountPath: /etc/php7/php.ini
@@ -54,6 +92,11 @@ volumeMounts:
         path: php-fpm_conf
       - key: www_conf
         path: www_conf
+{{- if .Values.referenceData.enabled }}        
+- name: reference-data-volume
+  persistentVolumeClaim:
+    claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
+{{- end }}
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}

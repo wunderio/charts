@@ -20,5 +20,4 @@ spec:
   ports:
     - port: 80
   selector:
-    app: {{ .Values.app | quote }}
-    release: {{ .Release.Name }}
+    {{ include "drupal.release_labels" . | indent 4 }}

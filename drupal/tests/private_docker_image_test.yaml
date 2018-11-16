@@ -2,8 +2,7 @@ suite: private docker image
 templates:
   - drupal-deployment.yaml
   - drupal-cron.yaml
-  - postinstall.yaml
-  - postupgrade.yaml
+  - post-release.yaml
 tests:
   - it: has no image pull secret by default
     asserts:
@@ -12,10 +11,7 @@ tests:
       - template: drupal-cron.yaml
         isNull:
           path: spec.jobTemplate.spec.template.spec.imagePullSecrets
-      - template: postinstall.yaml
-        isNull:
-          path: spec.template.spec.imagePullSecrets
-      - template: postupgrade.yaml
+      - template: post-release.yaml
         isNull:
           path: spec.template.spec.imagePullSecrets
 
@@ -36,15 +32,10 @@ tests:
          content:
            name: gcr
 
-     - template: postinstall.yaml
+     - template: post-release.yaml
        contains:
          path: spec.template.spec.imagePullSecrets
          content:
            name: gcr
 
-     - template: postupgrade.yaml
-       contains:
-         path: spec.template.spec.imagePullSecrets
-         content:
-           name: gcr
 

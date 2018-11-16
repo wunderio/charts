@@ -1,9 +1,6 @@
 suite: drupal mariadb
 templates:
   - drupal-deployment.yaml
-  - postinstall.yaml
-  - postupgrade.yaml
-  - drupal-cron.yaml
 tests:
   - it: sets mariadb user
     set:

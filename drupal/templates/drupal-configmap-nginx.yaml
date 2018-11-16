@@ -58,12 +58,11 @@ data:
         gzip_proxied                any;       
         gzip_disable                msie6;                                                                                                                 
                                                                                                                                                           
-        ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.                                                                                                                                                   
-        add_header                  X-XSS-Protection '1; mode=block';                                                                                      
+        ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.
         add_header                  X-Frame-Options SAMEORIGIN;                                                                                            
         add_header                  X-Content-Type-Options nosniff;
         add_header                  Strict-Transport-Security max-age=31536000;
-        add_header                  X-XSS-Protection '1; mode=block';                                                                                                                                              
+        add_header                  X-XSS-Protection '1; mode=block';
                                                                     
         map $uri $no_slash_uri {                                                                                                                           
             ~^/(?<no_slash>.*)$ $no_slash;                                                                                                                 
