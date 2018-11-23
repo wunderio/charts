@@ -1,3 +1,4 @@
+{{- if .Values.shell.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -11,3 +12,5 @@ spec:
       port: 22
   selector:
     {{ include "shell.release_labels" . | indent 4 }}
+{{- end }}
+---

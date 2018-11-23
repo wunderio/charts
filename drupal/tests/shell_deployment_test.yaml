@@ -1,0 +1,49 @@
+suite: shell deployment
+templates:
+  - shell-deployment.yaml
+tests:
+  - it: is a deployment with default values
+    set:
+      shell.enabled: true
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: metadata.labels.app
+          value: shell
+
+  - it: deployment does not exist when disabled
+    set:
+      shell.enabled: false
+    asserts:
+      - hasDocuments:
+        count: 0
+
+  - it: uses the right docker images
+    set:
+      shell.enabled: true
+      shell.image: 'shell-12345'
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: 'shell-12345'
+
+  - it: sets environment variables correctly
+    set:
+      shell.enabled: true
+      shell.gitAuth.repositoryUrl: 'foo'
+      shell.gitAuth.apiToken: 'bar'
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GITAUTH_REPOSITORY_URL
+            value: foo
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GITAUTH_API_TOKEN
+            value: bar

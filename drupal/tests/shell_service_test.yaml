@@ -1,0 +1,16 @@
+suite: shell service
+templates:
+  - shell-service.yaml
+tests:
+  - it: is a service when enabled
+    set:
+      shell.enabled: true
+    asserts:
+      - isKind:
+          of: Service
+  - it: service does not exist when disabled
+    set:
+      shell.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0

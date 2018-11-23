@@ -1,0 +1,23 @@
+suite: drupal memcached
+templates:
+  - drupal-deployment.yaml
+tests:
+  - it: sets memcached hostname in drupal environment if memcached is enabled
+    set:
+      memcached.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MEMCACHED_HOST
+            value: RELEASE-NAME-memcached
+
+  - it: sets no memcached hostname in drupal environment if memcached is disabled
+    set:
+      memcached.enabled: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MEMCACHED_HOST
+            value: RELEASE-NAME-memcached

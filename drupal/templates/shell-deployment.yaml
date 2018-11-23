@@ -1,3 +1,4 @@
+{{- if .Values.shell.enabled }}
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
@@ -22,3 +23,5 @@ spec:
       volumes:
         {{ include "drupal.volumes" . | indent 8}}
       {{ include "drupal.imagePullSecrets" . | indent 6 }}
+{{- end }}
+---

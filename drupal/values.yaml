@@ -132,6 +132,7 @@ php:
 
 # Configuration for everything that runs in shell container.
 shell:
+  enabled: true
   # The docker image to be used. This is typically passed by your CI system using the --set parameter.
   image: 'you need to pass in a value for shell.image to your helm chart'
   # Values for the SSH gitAuth.
@@ -194,3 +195,7 @@ mariadb:
   master:
     persistence:
       size: 1G
+
+memcached:
+  enabled: false
+  maxItemMemory: 128

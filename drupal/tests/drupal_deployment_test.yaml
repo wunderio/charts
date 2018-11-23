@@ -35,6 +35,11 @@ tests:
           content:
             name: foo
             value: bar
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SILTA_CLUSTER
+            value: '1'
 
   - it: sets the replica count correctly
     set:

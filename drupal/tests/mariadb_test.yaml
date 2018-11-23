@@ -14,7 +14,7 @@ tests:
 
   - it: sets mariadb user in drupal environment if mariadb explicitly enabled
     set:
-      mariad.enabled: true
+      mariadb.enabled: true
       mariadb.db.user: testuser
     asserts:
       - contains:
