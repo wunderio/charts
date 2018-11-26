@@ -1,7 +1,6 @@
 # Gatsby Helm Chart
 
 This helm chart is derived from https://github.com/wunderio/drupal-project
-All further info in this file relates to that project
 
 ## Usage
 
@@ -13,13 +12,9 @@ currently use CircleCI, you can check out our template repository [here](https:/
 Here is an example of how we instantiate this helm chart: 
 
 ```bash
-helm upgrade --install $RELEASE_NAME drupal \
+helm upgrade --install $RELEASE_NAME simplehtml \
             --repo https://wunderio.github.io/charts/ \
             --set environmentName=$CIRCLE_BRANCH \
-            --set drupal.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-drupal:$CIRCLE_SHA1 \
-            --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1 \
-            --set mariadb.rootUser.password=$DB_ROOT_PASS \
-            --set mariadb.db.password=$DB_USER_PASS \
             --namespace=${CIRCLE_PROJECT_REPONAME,,} \
             --values silta.yml \
             
@@ -29,12 +24,9 @@ What's happening above:
 
 1. We use `upgrade --install` to upgrade an existing release, or create one if there is no release with that name.
 2. `RELEASE_NAME` is based on the name of the repository and the name of the branch. This automatically gives us a dedicated environment for each branch.
-3. The `drupal` chart is pulled from our helm repository located at `https://wunderio.github.io/charts`
-4. We set the `environmentName` to match our branch name. This is used to have nicer URLs for branch-specific environments.
-5. We pass references to the docker images that were created earlier in the build process and tagged with the ID of the commit being deployed.
-6. We explicitly specify the MariaDB passwords. If these are not set, the MariaDB chart will set a random password on each deployment, which will result in a broken database. This applies to all Helm charts that store encrypted data, and won't be solved until Helm 3.
-7. We deploy each repository into a dedicated namespace to provide some separation.
-8. Each project has its own `silta.yml` file where the default configuration can be overridden.
+3. We set the `environmentName` to match our branch name. This is used to have nicer URLs for branch-specific environments.
+4. We deploy each repository into a dedicated namespace to provide some separation.
+5. Each project has its own `silta.yml` file where the default configuration can be overridden.
 
 ## Configuration
 
@@ -62,8 +54,6 @@ values assume that certain things will be in place in the cluster. Our setup of 
 the cluster itself can be seen here: https://github.com/wunderio/silta-cluster
 
 The relevant dependencies we currently have are:
-- An NFS server that provides an `nfs` storageClass. You can replace that with any
-storageClass that supports the `ReadWriteMany` access mode.
 - [Ambassador](https://getambassador.io) is running on the cluster with a wildcard DNS
 entry pointing to its load balancer. This makes it possible to have a dedicated
 domain added to each service with a simple annotation.
