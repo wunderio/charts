@@ -1,0 +1,48 @@
+
+# Main domain of the cluster.
+# If using ambassador, subdomains of this domain will be created automatically for each environment.
+clusterDomain: "silta.wdr.io"
+
+# An optional human-readable label for the environment, defaults to the release name.
+# We typically pass the branch name when we build dedicated environments per branch.
+# This name is mainly used to create nice subdomains for each environment.
+environmentName: ""
+
+# The app label added to our Kubernetes resources.
+app: simplehtml
+
+# How many instances of the Drupal pod should be in our Kubernetes deployment.
+# A single pod (the default value) is good for development environments to minimise resource usage.
+# Multiple pods make sense for high availability.
+replicas: 1
+
+# These variables are build-specific and should be passed via the --set parameter.
+nginx:
+  image: 'you need to pass in a value for nginx.image to your helm chart'
+
+  # The Kubernetes resources for the nginx container.
+  # These values are optimised for development environments.
+  resources:
+    requests:
+      cpu: 10m
+      memory: 10M
+
+  loglevel: error 
+  
+  # Set of values to enable and use http basic authentication
+  # It is implemented only for very basic protection (like web crawlers)
+  basicauth:
+    enabled: true
+
+    # Define username and password
+    credentials:
+      username: silta
+      password: simplehtml
+
+    # Trust X-Forwarded-For from these hosts for getting external IP 
+    realipfrom: 10.0.0.0/8
+
+    # Add IP addresses that should be excluded from basicauth
+    noauthips:
+      - 10.0.0.0/8 # GKE internal IPs
+
