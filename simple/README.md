@@ -12,7 +12,7 @@ currently use CircleCI, you can check out our template repository [here](https:/
 Here is an example of how we instantiate this helm chart: 
 
 ```bash
-helm upgrade --install $RELEASE_NAME simplehtml \
+helm upgrade --install $RELEASE_NAME simple \
             --repo https://wunderio.github.io/charts/ \
             --set environmentName=$CIRCLE_BRANCH \
             --namespace=${CIRCLE_PROJECT_REPONAME,,} \

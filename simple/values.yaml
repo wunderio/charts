@@ -9,7 +9,7 @@ clusterDomain: "silta.wdr.io"
 environmentName: ""
 
 # The app label added to our Kubernetes resources.
-app: simplehtml
+app: simple
 
 # How many instances of the Drupal pod should be in our Kubernetes deployment.
 # A single pod (the default value) is good for development environments to minimise resource usage.
@@ -37,7 +37,7 @@ nginx:
     # Define username and password
     credentials:
       username: silta
-      password: simplehtml
+      password: simplepass
 
     # Trust X-Forwarded-For from these hosts for getting external IP 
     realipfrom: 10.0.0.0/8
