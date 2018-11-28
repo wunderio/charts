@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-drupal
+  labels:
+    {{ include "drupal.release_labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{ include "drupal.release_labels" . | indent 6 }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        {{ include "drupal.release_labels" . | indent 8 }}
+    spec:
+      containers:
+      # Nginx container
+      - name: nginx
+        image: {{ .Values.nginx.image | quote }}
+        resources:
+          requests:
+            cpu: "50m"
+        env:
+        ports:
+        - containerPort: 80
+          name: drupal
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: /etc/nginx/nginx.conf # mount nginx-conf configmap volume to /etc/nginx
+          readOnly: true
+          subPath: nginx_conf
+        - name: nginx-conf
+          mountPath: /etc/nginx/conf.d/drupal.conf # mount nginx-conf configmap volume to /etc/nginx
+          readOnly: true
+          subPath: drupal_conf
+        {{- if .Values.nginx.basicauth.enabled }}
+        - name: nginx-basicauth
+          mountPath: /etc/nginx/.htaccess
+          readOnly: true
+          subPath: .htaccess
+        {{- end }}
+        livenessProbe:
+          tcpSocket:
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+        resources:
+{{ .Values.nginx.resources | toYaml | indent 10 }}
+
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: {{ .Release.Name }}-nginx-conf
+            items:
+              - key: nginx_conf
+                path: nginx_conf
+              - key: drupal_conf
+                path: drupal_conf
+        {{- if .Values.nginx.basicauth.enabled }}
+        - name: nginx-basicauth
+          secret:
+            secretName: {{ .Release.Name }}-secrets-drupal
+            items:
+              - key: .htaccess
+                path: .htaccess
+        {{- end }}
