@@ -12,7 +12,7 @@ tests:
           path: spec.replicas
           value: 1
       - equal:
-          path: metadata.labels.app
+          path: metadata.labels.service
           value: shell
 
   - it: deployment does not exist when disabled

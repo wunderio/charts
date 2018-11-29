@@ -4,16 +4,19 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-shell
   labels:
-    {{ include "shell.release_labels" . | indent 4 }}
+    {{ include "drupal.release_labels" . | indent 4 }}
+    service: shell
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{ include "shell.release_labels" . | indent 6 }}
+      {{ include "drupal.release_labels" . | indent 6 }}
+      service: shell
   template:
     metadata:
       labels:
-        {{ include "shell.release_labels" . | indent 8 }}
+        {{ include "drupal.release_labels" . | indent 8 }}
+        service: shell
     spec:
       containers:
       - name: shell

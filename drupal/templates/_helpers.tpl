@@ -3,11 +3,6 @@ app: {{ .Values.app | quote }}
 release: {{ .Release.Name }}
 {{- end }}
 
-{{- define "shell.release_labels" }}
-app: shell
-release: {{ .Release.Name }}
-{{- end }}
-
 {{- define "drupal.domain" -}}
 {{ include "drupal.environmentName" . }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
 {{- end -}}
@@ -128,6 +123,10 @@ imagePullSecrets:
 - name: MEMCACHED_HOST
   value: {{ .Release.Name }}-memcached
 {{- end }}
+{{- if .Values.elasticsearch.enabled }}
+- name: ELASTIC_HOST
+  value: {{ .Release.Name }}-elastic
+{{- end }}
 - name: HASH_SALT
   valueFrom:
     secretKeyRef:
@@ -155,4 +154,13 @@ imagePullSecrets:
   auth_basic "Restricted";
   auth_basic_user_file /etc/nginx/.htaccess;
   {{- end }}
+{{- end }}
+
+{{- define "drupal.post-release-command" -}}
+set -e
+{{ if .Release.IsInstall }}
+{{ .Values.php.postinstall.command}}
+{{ else }}
+{{ .Values.php.postupgrade.command}}
+{{ end }}
 {{- end }}

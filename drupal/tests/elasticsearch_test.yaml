@@ -1,0 +1,23 @@
+suite: drupal elasticsearch
+templates:
+  - drupal-deployment.yaml
+tests:
+  - it: sets elasticsearch hostname in drupal environment if elasticsearch is enabled
+    set:
+      elasticsearch.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: ELASTIC_HOST
+            value: RELEASE-NAME-elastic
+
+  - it: sets no elasticsearch hostname in drupal environment if elasticsearch is disabled
+    set:
+      elasticsearch.enabled: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: ELASTIC_HOST
+            value: RELEASE-NAME-elastic

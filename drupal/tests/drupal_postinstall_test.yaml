@@ -15,6 +15,21 @@ tests:
           path: spec.template.spec.containers[0].image
           value: 'drupal-12345'
 
+  - it: runs the right post-install command
+    set:
+      php.postinstall.command: foo
+      php.postupgrade.command: bar
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'set -e'
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'foo'
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'bar'
+
   - it: sets environment variables correctly
     set:
       php.env:

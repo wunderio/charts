@@ -1,0 +1,112 @@
+{{- if .Values.elasticsearch.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-elastic
+  labels:
+    {{ include "drupal.release_labels" . | indent 4 }}
+    service: elasticsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{ include "drupal.release_labels" . | indent 6 }}
+      service: elasticsearch
+  template:
+    metadata:
+      labels:
+        {{ include "drupal.release_labels" . | indent 8 }}
+        service: elasticsearch
+    #For pod updates, kill the current pod, stand up the new one
+    strategy:
+      type: Recreate
+    spec:
+      initContainers:
+      # Refer to https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
+      # and https://www.elastic.co/guide/en/elasticsearch/reference/current/setup-configuration-memory.html#mlockall
+      - name: increase-max-map-count
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command: ["sysctl", "-w", "vm.max_map_count=262144"]
+        securityContext:
+          privileged: true
+      - name: chown-data-volume-as-elastic
+        image: busybox
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "chown -R 1000:100 /usr/share/elasticsearch/data"]
+        volumeMounts:
+        - name: {{ .Release.Name }}-elastic-volume
+          mountPath: "/usr/share/elasticsearch/data"
+      #Allows ES container to disable swapping for performance boost
+      #http://man7.org/linux/man-pages/man7/capabilities.7.html
+      #https://github.com/kubernetes/kubernetes/issues/3595#issuecomment-423253874
+      securityContext:
+        fsGroup: 1000
+        capabilities:
+          add:
+            - IPC_LOCK
+            - SYS_RESOURCE
+      containers:
+      - name: elastic
+        image: docker.elastic.co/elasticsearch/elasticsearch:{{ .Values.elasticsearch.version }}
+        ports:
+        - containerPort: 9200
+        resources:
+{{ .Values.elasticsearch.resources | toYaml | indent 10 }}
+        readinessProbe:
+          httpGet:
+            path: /_cluster/health
+            port: 9200
+          initialDelaySeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /_cluster/health?local=true
+            port: 9200
+          initialDelaySeconds: 10
+        env:
+        - name: discovery.type
+          value: single-node
+        - name: cluster.name
+          value: {{ .Release.Name }}-search
+        - name: ES_JAVA_OPTS
+          value: -Xms{{ .Values.elasticsearch.heapSize }} -Xmx{{ .Values.elasticsearch.heapSize }}
+        volumeMounts:
+        - mountPath: "/usr/share/elasticsearch/data"
+          name: {{ .Release.Name }}-elastic-volume
+      restartPolicy: Always
+      volumes:
+      - name: {{ .Release.Name }}-elastic-volume
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-elastic-data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-elastic-data
+  labels:
+    {{ include "drupal.release_labels" . | indent 4 }}
+    service: elasticsearch
+spec:
+  storageClassName: {{ .Values.elasticsearch.persistence.storageClassName }}
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.elasticsearch.persistence.size }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-elastic
+  labels:
+    {{ include "drupal.release_labels" . | indent 4 }}
+    service: elasticsearch
+spec:
+  type: NodePort
+  ports:
+  - name: elastic
+    port: 9200
+  selector:
+    {{ include "drupal.release_labels" . | indent 4 }}
+    service: elasticsearch
+{{- end }}

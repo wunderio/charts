@@ -74,7 +74,7 @@ php:
   postinstall:
     command: |
       TIME_WAITING=0
-      until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST > /dev/null 2>&1; do
+      until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --silent; do
         echo "Waiting for database..."; sleep 5
         TIME_WAITING=$((TIME_WAITING+5))
 
@@ -195,6 +195,19 @@ mariadb:
   master:
     persistence:
       size: 1G
+
+elasticsearch:
+  enabled: false
+  #Choose versions in https://www.docker.elastic.co/ from "Elasticsearch" list
+  version: 6.5.0
+  heapSize: 256m
+  persistence:
+    size: 512Mi
+    storageClassName: nfs
+  resources:
+    requests:
+      cpu: 25m
+      memory: 512Mi
 
 memcached:
   enabled: false
