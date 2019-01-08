@@ -115,6 +115,7 @@ php:
       if [ -f config/sync/core.extension.yml ]; then
         drush config-import -n
       fi
+      drush cr
 
   # Pass additional environment variables to all php containers as key-value pairs.
   env: {}
