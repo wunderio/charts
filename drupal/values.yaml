@@ -111,11 +111,13 @@ php:
   # This is run every time a new environment is upgraded.
   postupgrade:
     command: |
+      drush cache-rebuild
       drush updatedb -n
       if [ -f config/sync/core.extension.yml ]; then
         drush config-import -n
       fi
-      drush cr
+      drush entity-updates -n
+      
 
   # Pass additional environment variables to all php containers as key-value pairs.
   env: {}
