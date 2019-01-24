@@ -30,6 +30,29 @@ tests:
           path: spec.template.spec.containers[0].args[0]
           pattern: 'bar'
 
+  - it: exports reference data by default after each deployment
+    set:
+      # Simulate a deployment on the reference environment
+      environmentName: reference-environment
+      referenceData.referenceEnvironment: reference-environment
+      referenceData.command: baz
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'baz'
+
+  - it: doesn't exports reference data after deployments if disabled
+    set:
+      # Simulate a deployment on the reference environment
+      environmentName: reference-environment
+      referenceData.referenceEnvironment: reference-environment
+      referenceData.updateAfterDeployment: false
+      referenceData.command: baz
+    asserts:
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'baz'
+
   - it: sets environment variables correctly
     set:
       php.env:

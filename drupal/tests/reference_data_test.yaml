@@ -1,22 +1,25 @@
 suite: reference data
 templates:
+  - post-release.yaml
+  - reference-data-cron.yaml
   - drupal-deployment.yaml
   - drupal-volumes.yaml
-  - reference-data-cron.yaml
 tests:
-  - it: By default no reference data PVC or CronJob is created, but the reference volume is mounted
+
+  - it: By default no reference data PVC or CronJob is created, but the reference volume is mounted for the post-release job
     set:
       referenceData:
         referenceEnvironment: 'FOO'
     asserts:
     # Only public files PVC is defined.
     - hasDocuments:
-        count: 1
+        count: 2
       template: drupal-volumes.yaml
     - hasDocuments:
         count: 0
       template: reference-data-cron.yaml
-    # Reference data volume is mounted in php container
+
+    # Reference data volume is mounted in post-release job
     - contains:
         path: spec.template.spec.volumes
         content:
@@ -28,7 +31,23 @@ tests:
         content:
           name: "reference-data-volume"
           mountPath: "/var/www/html/reference-data"
+          readOnly: true
 
+  - it: is not mounted on the main deployment
+    asserts:
+    - template: drupal-deployment.yaml
+      notContains:
+        path: spec.template.spec.volumes
+        content:
+          name: "reference-data-volume"
+          persistentVolumeClaim:
+            claimName: foo-reference-data
+    - template: drupal-deployment.yaml
+      notContains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: "reference-data-volume"
+          mountPath: "/var/www/html/reference-data"
             
   - it: takes reference data information
     set:
@@ -43,7 +62,7 @@ tests:
         foo: bar
     asserts:
     - hasDocuments:
-        count: 2
+        count: 3
       template: drupal-volumes.yaml
     - template: drupal-volumes.yaml
       documentIndex: 1
@@ -85,6 +104,12 @@ tests:
         path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
         value: "echo Hello World"
 
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: "reference-data-volume"
+          mountPath: "/var/www/html/reference-data"
+
   - it: can be disabled
     set:
       environmentName: 'FOO'
@@ -92,12 +117,12 @@ tests:
         enabled: false
         referenceEnvironment: 'FOO'
     asserts:
-    - hasDocuments:
-        count: 1
-      template: drupal-volumes.yaml
-    - hasDocuments:
+    - template: drupal-volumes.yaml
+      hasDocuments:
+        count: 2
+    - template: reference-data-cron.yaml
+      hasDocuments:
         count: 0
-      template: reference-data-cron.yaml
     - notContains:
         path: spec.template.spec.volumes
         content:

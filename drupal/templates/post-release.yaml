@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: "{{ .Release.Name }}-post-release"
   labels:
-    {{ include "drupal.release_labels" . | indent 4 }}
+    {{- include "drupal.release_labels" . | nindent 4 }}
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
@@ -18,10 +18,24 @@ spec:
       restartPolicy: Never
       containers:
       - name: post-release
-        {{ include "drupal.php-container" . | indent 8 }}
+        {{- include "drupal.php-container" . | nindent 8 }}
         command: ["/bin/sh", "-c"]
         args:
         - {{ include "drupal.post-release-command" . | quote }}
-      {{ include "drupal.imagePullSecrets" . | indent 6 }}
+        volumeMounts:
+          {{- include "drupal.volumeMounts" . | nindent 10 }}
+          {{- if .Values.referenceData.enabled }}
+          - name: reference-data-volume
+            mountPath: /var/www/html/reference-data
+            {{- if ne .Values.referenceData.referenceEnvironment .Values.environmentName }}
+            readOnly: true
+            {{- end }}
+          {{- end }}
+      {{- include "drupal.imagePullSecrets" . | nindent 6 }}
       volumes:
-        {{ include "drupal.volumes" . | indent 8 }}
+        {{- include "drupal.volumes" . | nindent 8 }}
+        {{- if .Values.referenceData.enabled }}
+        - name: reference-data-volume
+          persistentVolumeClaim:
+            claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
+        {{- end }}

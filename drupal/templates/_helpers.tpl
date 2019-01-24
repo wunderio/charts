@@ -1,4 +1,4 @@
-{{- define "drupal.release_labels" }}
+{{- define "drupal.release_labels" -}}
 app: {{ .Values.app | quote }}
 release: {{ .Release.Name }}
 {{- end }}
@@ -19,58 +19,36 @@ release: {{ .Release.Name }}
 {{ regexReplaceAll "[^[:alnum:]]" (.Values.environmentName | default .Release.Name) "-" | lower | trunc 50 | trimSuffix "-" }}
 {{- end -}}
 
-{{- define "drupal.php-container" }}
+{{- define "drupal.php-container" -}}
 image: {{ .Values.php.image | quote }}
 env: {{ include "drupal.env" . }}
 ports:
   - containerPort: 9000
     name: drupal
-volumeMounts:
-  {{ include "drupal.volumeMounts" . | indent 8 }}
 {{- end }}
 
-{{- define "shell.ssh-container" }}
-image: {{ .Values.shell.image | quote }}
-env:
-  {{ include "drupal.env" . | indent 2 }}
-  - name: GITAUTH_API_TOKEN
-    value: "{{ .Values.shell.gitAuth.apiToken }}"
-  - name: GITAUTH_REPOSITORY_URL
-    value: "{{ .Values.shell.gitAuth.repositoryUrl }}"
-  - name: DRUSH_OPTIONS_URI
-    value: "http://{{- template "drupal.domain" . }}"
-ports:
-  - containerPort: 22
-volumeMounts:
-  {{ include "drupal.volumeMounts" . | indent 8 }}
+{{- define "drupal.volumeMounts" -}}
+- name: drupal-public-files
+  mountPath: /var/www/html/web/sites/default/files
+{{- if .Values.privateFiles.enabled }}
+- name: drupal-private-files
+  mountPath: /var/www/html/private
+{{- end }}
+- name: php-conf
+  mountPath: /etc/php7/php.ini
+  readOnly: true
+  subPath: php_ini
+- name: php-conf
+  mountPath: /etc/php7/php-fpm.conf
+  readOnly: true
+  subPath: php-fpm_conf
+- name: php-conf
+  mountPath: /etc/php7/php-fpm.d/www.conf
+  readOnly: true
+  subPath: www_conf
 {{- end }}
 
-{{- define "drupal.volumeMounts" }}
-  - name: drupal-public-files
-    mountPath: /var/www/html/web/sites/default/files
-  {{- if .Values.privateFiles.enabled }}
-  - name: drupal-private-files
-    mountPath: /var/www/html/private
-  {{- end }}
-  {{- if .Values.referenceData.enabled }}  
-  - name: reference-data-volume
-    mountPath: /var/www/html/reference-data
-  {{- end }}
-  - name: php-conf
-    mountPath: /etc/php7/php.ini
-    readOnly: true
-    subPath: php_ini
-  - name: php-conf
-    mountPath: /etc/php7/php-fpm.conf
-    readOnly: true
-    subPath: php-fpm_conf
-  - name: php-conf
-    mountPath: /etc/php7/php-fpm.d/www.conf
-    readOnly: true
-    subPath: www_conf
-{{- end }}
-
-{{- define "drupal.volumes" }}
+{{- define "drupal.volumes" -}}
 - name: drupal-public-files
   persistentVolumeClaim:
     claimName: {{ .Release.Name }}-public-files
@@ -89,11 +67,6 @@ volumeMounts:
         path: php-fpm_conf
       - key: www_conf
         path: www_conf
-{{- if .Values.referenceData.enabled }}        
-- name: reference-data-volume
-  persistentVolumeClaim:
-    claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
-{{- end }}
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}
@@ -156,11 +129,57 @@ imagePullSecrets:
   {{- end }}
 {{- end }}
 
+{{- define "drupal.wait-for-db-command" }}
+TIME_WAITING=0
+  until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --silent; do
+  echo "Waiting for database..."; sleep 5
+  TIME_WAITING=$((TIME_WAITING+5))
+
+  if [ $TIME_WAITING -gt 90 ]; then
+    echo "Database connection timeout"
+    exit 1
+  fi
+done
+{{- end }}
+
+{{- define "drupal.wait-for-ref-fs-command" }}
+TIME_WAITING=0
+until touch /var/www/html/reference-data/_fs-test; do
+  echo "Waiting for reference-data fs..."; sleep 2
+  TIME_WAITING=$((TIME_WAITING+2))
+
+  if [ $TIME_WAITING -gt 20 ]; then
+    echo "Reference data filesystem timeout"
+    exit 1
+  fi
+done
+rm /var/www/html/reference-data/_fs-test
+{{- end }}
+
+{{- define "drupal.deployment-in-progress-test" -}}
+-f /var/www/html/web/sites/default/files/_deployment
+{{- end -}}
+
 {{- define "drupal.post-release-command" -}}
 set -e
+
+{{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
+{{ include "drupal.wait-for-ref-fs-command" . }}
+{{- end }}
+
+{{ include "drupal.wait-for-db-command" . }}
+
 {{ if .Release.IsInstall }}
+touch /var/www/html/web/sites/default/files/_deployment
 {{ .Values.php.postinstall.command}}
+rm /var/www/html/web/sites/default/files/_deployment
 {{ else }}
 {{ .Values.php.postupgrade.command}}
 {{ end }}
+
+{{- if and .Values.referenceData.enabled .Values.referenceData.updateAfterDeployment }}
+{{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
+{{ .Values.referenceData.command }}
+{{- end }}
+{{- end }}
 {{- end }}

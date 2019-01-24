@@ -4,7 +4,7 @@ kind: CronJob
 metadata:
   name: {{ $.Release.Name }}-cron-{{ $index }}
   labels:
-    {{ include "drupal.release_labels" $ | indent 4 }}
+    {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
   schedule: {{ $job.schedule | quote }}
   concurrencyPolicy: Forbid
@@ -12,19 +12,24 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            {{- include "drupal.release_labels" $ | nindent 12 }}
         spec:
           containers:
           - name: drupal-cron
-            {{ include "drupal.php-container" $ | indent 12 }}
+            {{- include "drupal.php-container" $ | nindent 12 }}
+            volumeMounts:
+              {{- include "drupal.volumeMounts" $ | nindent 14 }}
             command: ["/bin/sh", "-c"]
             args:
-              - {{ $job.command | quote }}
+              - "if [ ! {{ include "drupal.deployment-in-progress-test" . }} ]; then {{ $job.command }}; else exit 1; fi"
             resources:
-{{ $.Values.php.resources | toYaml | indent 14 }}
+              {{- $.Values.php.resources | toYaml | nindent 14 }}
           restartPolicy: OnFailure
           volumes:
-            {{ include "drupal.volumes" $ | indent 12 }}
+            {{- include "drupal.volumes" $ | nindent 12 }}
 
-          {{ include "drupal.imagePullSecrets" $ | indent 10 }}
+          {{- include "drupal.imagePullSecrets" $ | nindent 10 }}
 ---
 {{- end }}

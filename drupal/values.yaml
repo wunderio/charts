@@ -73,17 +73,6 @@ php:
   # This is run every time a new environment is created.
   postinstall:
     command: |
-      TIME_WAITING=0
-      until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --silent; do
-        echo "Waiting for database..."; sleep 5
-        TIME_WAITING=$((TIME_WAITING+5))
-
-        if [ $TIME_WAITING -gt 60 ]; then
-          echo "Database connection timeout"
-          exit 1
-        fi
-      done
-
       if [ -f reference-data/db.sql.gz ]; then
 
         echo "Importing reference database dump"
@@ -115,7 +104,6 @@ php:
       if [ -f config/sync/core.extension.yml ]; then
         drush config-import -n
       fi
-      drush cr
 
   # Pass additional environment variables to all php containers as key-value pairs.
   env: {}
@@ -126,7 +114,7 @@ php:
 
   # Custom php settings.
   php_ini:
-    loglevel: warn # Possible Values: alert, error, warning, notice, debug
+    loglevel: notice # Possible Values: alert, error, warning, notice, debug
     upload_max_filesize: 60M
     post_max_size: 60M
 
@@ -134,6 +122,11 @@ php:
 # Configuration for everything that runs in shell container.
 shell:
   enabled: true
+
+  # Persistent storage for SSH fingerprint keys
+  storage: 1M
+  storageClassName: nfs
+
   # The docker image to be used. This is typically passed by your CI system using the --set parameter.
   image: 'you need to pass in a value for shell.image to your helm chart'
   # Values for the SSH gitAuth.
@@ -160,7 +153,13 @@ referenceData:
   # The name of the environment from which reference data will be copied.
   referenceEnvironment: 'master'
 
+  # When to automatically update the reference data.
   schedule: '0 3 * * *'
+
+  # Update the reference data after deployments on the reference environment.
+  updateAfterDeployment: true
+
+  # The commands that is executed to export reference data.
   command: |
     if drush check-bootstrap; then
 
@@ -196,6 +195,10 @@ mariadb:
   master:
     persistence:
       size: 1G
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256M
 
 elasticsearch:
   enabled: false

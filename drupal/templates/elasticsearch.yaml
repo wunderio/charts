@@ -4,18 +4,18 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-elastic
   labels:
-    {{ include "drupal.release_labels" . | indent 4 }}
+    {{- include "drupal.release_labels" . | nindent 4 }}
     service: elasticsearch
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{ include "drupal.release_labels" . | indent 6 }}
+      {{- include "drupal.release_labels" . | nindent 6 }}
       service: elasticsearch
   template:
     metadata:
       labels:
-        {{ include "drupal.release_labels" . | indent 8 }}
+        {{- include "drupal.release_labels" . | nindent 8 }}
         service: elasticsearch
     #For pod updates, kill the current pod, stand up the new one
     strategy:
@@ -84,7 +84,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-elastic-data
   labels:
-    {{ include "drupal.release_labels" . | indent 4 }}
+    {{- include "drupal.release_labels" . | nindent 4 }}
     service: elasticsearch
 spec:
   storageClassName: {{ .Values.elasticsearch.persistence.storageClassName }}
@@ -99,7 +99,7 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-elastic
   labels:
-    {{ include "drupal.release_labels" . | indent 4 }}
+    {{- include "drupal.release_labels" . | nindent 4 }}
     service: elasticsearch
 spec:
   type: NodePort
@@ -107,6 +107,6 @@ spec:
   - name: elastic
     port: 9200
   selector:
-    {{ include "drupal.release_labels" . | indent 4 }}
+    {{- include "drupal.release_labels" . | nindent 4 }}
     service: elasticsearch
 {{- end }}

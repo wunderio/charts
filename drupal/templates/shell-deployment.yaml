@@ -4,27 +4,44 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-shell
   labels:
-    {{ include "drupal.release_labels" . | indent 4 }}
+    {{- include "drupal.release_labels" . | nindent 4 }}
     service: shell
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{ include "drupal.release_labels" . | indent 6 }}
+      {{- include "drupal.release_labels" . | nindent 6 }}
       service: shell
   template:
     metadata:
       labels:
-        {{ include "drupal.release_labels" . | indent 8 }}
+        {{- include "drupal.release_labels" . | nindent 8 }}
         service: shell
     spec:
       containers:
       - name: shell
-        {{ include "shell.ssh-container" . | indent 8 }}
+        image: {{ .Values.shell.image | quote }}
+        env:
+        {{- include "drupal.env" . | indent 8 }}
+        - name: GITAUTH_API_TOKEN
+          value: "{{ .Values.shell.gitAuth.apiToken }}"
+        - name: GITAUTH_REPOSITORY_URL
+          value: "{{ .Values.shell.gitAuth.repositoryUrl }}"
+        - name: DRUSH_OPTIONS_URI
+          value: "http://{{- template "drupal.domain" . }}"
+        ports:
+          - containerPort: 22
+        volumeMounts:
+        {{- include "drupal.volumeMounts" . | nindent 8 }}
+        - name: shell-keys
+          mountPath: /etc/ssh/keys
         resources:
-{{ .Values.php.resources | toYaml | indent 10 }}
+          {{- .Values.php.resources | toYaml | nindent 10 }}
       volumes:
-        {{ include "drupal.volumes" . | indent 8}}
-      {{ include "drupal.imagePullSecrets" . | indent 6 }}
+      {{- include "drupal.volumes" . | nindent 6 }}
+      - name: shell-keys
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-shell-keys
+      {{- include "drupal.imagePullSecrets" . | nindent 6 }}
 {{- end }}
 ---

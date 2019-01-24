@@ -3,25 +3,33 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-drupal
   labels:
-    {{ include "drupal.release_labels" . | indent 4 }}
+    {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      {{ include "drupal.release_labels" . | indent 6 }}
+      {{- include "drupal.release_labels" . | nindent 6 }}
       deployment: drupal
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        {{ include "drupal.release_labels" . | indent 8 }}
+        {{- include "drupal.release_labels" . | nindent 8 }}
         deployment: drupal
     spec:
+      initContainers:
+      - name: wait-for-db
+        {{ include "drupal.php-container" . | nindent 8 }}
+        command: ["/bin/sh", "-c"]
+        args:
+        - {{ include "drupal.wait-for-db-command" . | quote }}
       containers:
       # php-fpm container.
       - name: php
-        {{ include "drupal.php-container" . | indent 8}}
+        {{- include "drupal.php-container" . | nindent 8}}
+        volumeMounts:
+          {{- include "drupal.volumeMounts" . | nindent 10 }}
         livenessProbe:
           tcpSocket:
             port: 9000
@@ -30,9 +38,10 @@ spec:
             command:
             - /bin/sh
             - -c
-            - drush check-bootstrap
+            - if [ ! {{ include "drupal.deployment-in-progress-test" . }} ]; then timeout -t 3 drush check-bootstrap; else exit 1; fi
+          periodSeconds: 3
         resources:
-{{ .Values.php.resources | toYaml | indent 10 }}
+          {{- .Values.php.resources | toYaml | nindent 10 }}
 
       # Nginx container
       - name: nginx
@@ -67,13 +76,15 @@ spec:
             port: 80
         readinessProbe:
           httpGet:
-            path: /
+            path: /robots.txt
             port: 80
+          periodSeconds: 3
+          timeoutSeconds: 3
         resources:
-{{ .Values.nginx.resources | toYaml | indent 10 }}
+          {{- .Values.nginx.resources | toYaml | nindent 10 }}
 
       volumes:
-        {{ include "drupal.volumes" . | indent 8}}
+        {{- include "drupal.volumes" . | nindent 8}}
         - name: nginx-conf
           configMap:
             name: {{ .Release.Name }}-nginx-conf
@@ -90,4 +101,4 @@ spec:
               - key: .htaccess
                 path: .htaccess
         {{- end }}
-      {{ include "drupal.imagePullSecrets" . | indent 6 }}
+      {{- include "drupal.imagePullSecrets" . | nindent 6 }}
