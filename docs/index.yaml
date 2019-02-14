@@ -1,59 +1,65 @@
 apiVersion: v1
 entries:
   drupal:
-  - created: 2019-01-31T19:49:30.223823237+02:00
-    digest: 21ec268af27f8b32a3300b99c7c9467891267bc12ca180c7b02168a62d4523a2
+  - created: 2019-02-14T17:47:47.683415258+01:00
+    digest: 810b34d55036c9e41bc39f03a22e92630dbf96c3366d3e497dc4e8073d66f178
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.6.tgz
     version: 0.1.6
-  - created: 2019-01-31T19:49:30.222138751+02:00
+  - created: 2019-02-14T17:47:47.68175663+01:00
     digest: bc591b77084e73c12ee245a837d5c528f3a91a010254f86cc94e42470102fac5
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.5.tgz
     version: 0.1.5
-  - created: 2019-01-31T19:49:30.220493944+02:00
+  - created: 2019-02-14T17:47:47.679580394+01:00
     digest: c3074bb1daa48567db04ba5144076cf82207ab8900fe9f582bb6b60ac420af6d
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.4.tgz
     version: 0.1.4
-  - created: 2019-01-31T19:49:30.217809491+02:00
+  - created: 2019-02-14T17:47:47.676685794+01:00
     digest: c86f853eb190791102a8abfa477393f625073db8ec1f563e60f592bb450dcc3b
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.3.tgz
     version: 0.1.3
-  - created: 2019-01-31T19:49:30.21610295+02:00
+  - created: 2019-02-14T17:47:47.674556693+01:00
     digest: 4eb5e7a5c8bf3cd04f7e440510d86f863cef9576cf5f8f7316359e93d61c6cb5
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.2.tgz
     version: 0.1.2
-  - created: 2019-01-31T19:49:30.214841035+02:00
+  - created: 2019-02-14T17:47:47.673099598+01:00
     digest: b659e9f4620b9e67ce993e5498d6fd70c5632d97cf4e6490dd980c4a3ef78266
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.1.tgz
     version: 0.1.1
-  - created: 2019-01-31T19:49:30.213624091+02:00
+  - created: 2019-02-14T17:47:47.671486748+01:00
     digest: 2b31988b0e2573ba8e891b1b56a0179ad068624f6a659bc93a7df92016bf8685
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.0.tgz
     version: 0.1.0
   simple:
-  - created: 2019-01-31T19:49:30.224537672+02:00
+  - created: 2019-02-14T17:47:47.685181535+01:00
+    digest: a64e52a6a518cd33556f2f741afd3cffd2375d0ffa9e2add78f7e74871d27e34
+    name: simple
+    urls:
+    - https://wunderio.github.io/charts/simple-0.1.4.tgz
+    version: 0.1.4
+  - created: 2019-02-14T17:47:47.684783096+01:00
     digest: 2f34c30908f3ce5025bc20a36a19860bc35cbbf9612256ab1fa2eee54dc59a39
     name: simple
     urls:
     - https://wunderio.github.io/charts/simple-0.1.3.tgz
     version: 0.1.3
-  - created: 2019-01-31T19:49:30.224185079+02:00
+  - created: 2019-02-14T17:47:47.684092085+01:00
     digest: eeb577dbafdede528a39b57208e6155d0509f2d9b3660c67a3a22964e307f272
     name: simple
     urls:
     - https://wunderio.github.io/charts/simple-0.1.2.tgz
     version: 0.1.2
-generated: 2019-01-31T19:49:30.212331024+02:00
+generated: 2019-02-14T17:47:47.669495693+01:00
