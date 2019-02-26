@@ -1,0 +1,50 @@
+# Main domain of the cluster.
+clusterDomain: "silta.wdr.io"
+
+nfs-server-provisioner:
+  persistence:
+    enabled: true
+    storageClass: standard
+    size: 10Gi
+  storageClass:
+    defaultClass: false
+    name: silta-shared
+    parameters:
+      mountOptions:
+        - vers=4.1
+
+# SSH Jumphost settings
+gitAuth:
+  host: 'github.com'
+  organisation: ''
+  apiToken: ''
+
+# Deployment remover
+deploymentRemover:
+  # Github webhooks secret
+  webhooksSecret: ''
+
+# GKE Cluster settings
+gke:
+  keyJSON: ''
+  projectName: '' 
+  computeZone: ''
+  clusterName: ''
+
+# Redis DB for remover queue
+# https://github.com/helm/charts/tree/master/stable/redis
+redis:
+  password: ''
+  cluster:
+    enabled: 0
+    slaveCount: 0
+
+# Filebeat settings
+filebeat:
+  version: ''
+  elasticCloudId: ''
+  elasticsearchHost: ''
+  elasticsearchPort: ''
+  elasticsearchUsername: ''
+  elasticsearchPassword: ''
+  elasticsearchCloudAuth: ''
