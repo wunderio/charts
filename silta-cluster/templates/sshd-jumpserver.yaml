@@ -1,0 +1,36 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-jumpserver
+spec:
+  ports:
+    - name: ssh
+      port: 22
+  type: "LoadBalancer"
+  selector:
+    name: {{ .Release.Name }}-jumpserver
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-jumpserver
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: {{ .Release.Name }}-jumpserver
+    spec:
+      containers:
+      - name: {{ .Release.Name }}-jumpserver
+        image: wunderio/sshd-gitauth:v0.1
+        ports:
+          - containerPort: 22
+        env:
+          - name: GITAUTH_API_TOKEN
+            value: {{ required "A valid .Values.gitAuth.apiToken entry required!" .Values.gitAuth.apiToken | quote }}
+          - name: GITAUTH_HOST
+            value: {{ required "A valid .Values.gitAuth.apiToken entry required!" .Values.gitAuth.host | quote }}
+          - name: GITAUTH_ORGANISATION
+            value: {{ required "A valid .Values.gitAuth.apiToken entry required!" .Values.gitAuth.organisation | quote }}

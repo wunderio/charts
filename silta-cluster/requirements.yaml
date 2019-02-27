@@ -1,0 +1,10 @@
+dependencies:
+- name: nfs-server-provisioner
+  version: 0.1.x
+  repository: https://kubernetes-charts.storage.googleapis.com/
+- name: ambassador
+  version: 0.40.x
+  repository: https://www.getambassador.io
+- name: redis
+  version: 4.3.x
+  repository: https://kubernetes-charts.storage.googleapis.com/
