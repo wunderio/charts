@@ -35,7 +35,7 @@ spec:
       initContainers:
       - name: wait-redis
         image: busybox
-        command: ['sh', '-c', 'until echo -e "AUTH $REDIS_PASSWORD\nPING" | nc $REDIS_HOST 6379; do echo waiting for redis; sleep 2; done;']
+        command: ['sh', '-c', 'until echo -e "AUTH $REDIS_PASSWORD\nPING" | nc "$REDIS_HOST" 6379; do echo waiting for redis; sleep 2; done;']
         env:
           - name: REDIS_HOST
             value: {{ .Release.Name }}-redis-master
