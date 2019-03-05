@@ -7,9 +7,9 @@ This helm chart helps setting up resources for https://github.com/wunderio/silta
 Here is an example of how we instantiate this helm chart: 
 
 ```bash
-helm upgrade --install --wait  cluster-name silta-cluster \
+helm upgrade --install --wait cluster-name silta-cluster \
              --repo "https://wunderio.github.io/charts/" \
-             --values local-values.yml            
+             --values local-values.yaml            
 ```
 
 ## Components
