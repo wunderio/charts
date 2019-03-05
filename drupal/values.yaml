@@ -125,7 +125,7 @@ shell:
 
   # Persistent storage for SSH fingerprint keys
   storage: 1M
-  storageClassName: nfs
+  storageClassName: silta-shared
 
   # The docker image to be used. This is typically passed by your CI system using the --set parameter.
   image: 'you need to pass in a value for shell.image to your helm chart'
@@ -138,13 +138,13 @@ shell:
 # Configure the volume used for Drupal public files.
 publicFiles:
   storage: 1Gi
-  storageClassName: nfs
+  storageClassName: silta-shared
 
 # Configure an optional volume used for Drupal private files.
 privateFiles:
   enabled: false
   storage: 1G
-  storageClassName: nfs
+  storageClassName: silta-shared
 
 # Configure reference data that will be used when creating new environments.
 referenceData:
@@ -181,7 +181,7 @@ referenceData:
     fi
 
   storage: 1G
-  storageClassName: nfs
+  storageClassName: silta-shared
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
@@ -207,7 +207,7 @@ elasticsearch:
   heapSize: 256m
   persistence:
     size: 512Mi
-    storageClassName: nfs
+    storageClassName: silta-shared
   resources:
     requests:
       cpu: 25m

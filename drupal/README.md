@@ -61,7 +61,7 @@ values assume that certain things will be in place in the cluster. Our setup of 
 the cluster itself can be seen here: https://github.com/wunderio/silta-cluster
 
 The relevant dependencies we currently have are:
-- An NFS server that provides an `nfs` storageClass. You can replace that with any
+- An NFS server that provides an `silta-shared` storageClass. You can replace that with any
 storageClass that supports the `ReadWriteMany` access mode.
 - [Ambassador](https://getambassador.io) is running on the cluster with a wildcard DNS
 entry pointing to its load balancer. This makes it possible to have a dedicated
