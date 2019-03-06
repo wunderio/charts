@@ -1,75 +1,75 @@
 apiVersion: v1
 entries:
   drupal:
-  - created: 2019-02-27T13:03:33.249788853+02:00
-    digest: 21ec268af27f8b32a3300b99c7c9467891267bc12ca180c7b02168a62d4523a2
+  - created: 2019-03-06T09:11:24.32824158+02:00
+    digest: 0d5c8fd20354c2d752530339efdc088709dc4383893980c94ab2f11732238d2e
     name: drupal
     urls:
-    - drupal-0.1.6.tgz
+    - https://wunderio.github.io/charts/drupal-0.1.6.tgz
     version: 0.1.6
-  - created: 2019-02-27T13:03:33.247571706+02:00
+  - created: 2019-03-06T09:11:24.325824578+02:00
     digest: bc591b77084e73c12ee245a837d5c528f3a91a010254f86cc94e42470102fac5
     name: drupal
     urls:
-    - drupal-0.1.5.tgz
+    - https://wunderio.github.io/charts/drupal-0.1.5.tgz
     version: 0.1.5
-  - created: 2019-02-27T13:03:33.245354042+02:00
+  - created: 2019-03-06T09:11:24.320481615+02:00
     digest: c3074bb1daa48567db04ba5144076cf82207ab8900fe9f582bb6b60ac420af6d
     name: drupal
     urls:
-    - drupal-0.1.4.tgz
+    - https://wunderio.github.io/charts/drupal-0.1.4.tgz
     version: 0.1.4
-  - created: 2019-02-27T13:03:33.242937965+02:00
+  - created: 2019-03-06T09:11:24.315861757+02:00
     digest: c86f853eb190791102a8abfa477393f625073db8ec1f563e60f592bb450dcc3b
     name: drupal
     urls:
-    - drupal-0.1.3.tgz
+    - https://wunderio.github.io/charts/drupal-0.1.3.tgz
     version: 0.1.3
-  - created: 2019-02-27T13:03:33.23909465+02:00
+  - created: 2019-03-06T09:11:24.311453928+02:00
     digest: 4eb5e7a5c8bf3cd04f7e440510d86f863cef9576cf5f8f7316359e93d61c6cb5
     name: drupal
     urls:
-    - drupal-0.1.2.tgz
+    - https://wunderio.github.io/charts/drupal-0.1.2.tgz
     version: 0.1.2
-  - created: 2019-02-27T13:03:33.237186246+02:00
+  - created: 2019-03-06T09:11:24.307543173+02:00
     digest: b659e9f4620b9e67ce993e5498d6fd70c5632d97cf4e6490dd980c4a3ef78266
     name: drupal
     urls:
-    - drupal-0.1.1.tgz
+    - https://wunderio.github.io/charts/drupal-0.1.1.tgz
     version: 0.1.1
-  - created: 2019-02-27T13:03:33.23410331+02:00
+  - created: 2019-03-06T09:11:24.302579617+02:00
     digest: 2b31988b0e2573ba8e891b1b56a0179ad068624f6a659bc93a7df92016bf8685
     name: drupal
     urls:
-    - drupal-0.1.0.tgz
+    - https://wunderio.github.io/charts/drupal-0.1.0.tgz
     version: 0.1.0
   silta-cluster:
   - apiVersion: v1
     appVersion: "1.0"
-    created: 2019-02-27T13:03:33.252390696+02:00
+    created: 2019-03-06T09:11:24.330765727+02:00
     description: Setup a silta kubernetes cluster.
-    digest: 5ad6ad6afe25c15d34a5a37f44ebb45d3d7ef3fca8928e292a983a41fe0ba427
+    digest: 4cae16932c0324f01d95cf22efd86756eaabf9990607ae27a686c68b80591628
     name: silta-cluster
     urls:
-    - silta-cluster-0.1.0.tgz
+    - https://wunderio.github.io/charts/silta-cluster-0.1.0.tgz
     version: 0.1.0
   simple:
-  - created: 2019-02-27T13:03:33.255387442+02:00
-    digest: a64e52a6a518cd33556f2f741afd3cffd2375d0ffa9e2add78f7e74871d27e34
+  - created: 2019-03-06T09:11:24.336441601+02:00
+    digest: de3668348e64233fbbb39c84ccecc73aae25cdda41973d9a270469e6235275b9
     name: simple
     urls:
-    - simple-0.1.4.tgz
+    - https://wunderio.github.io/charts/simple-0.1.4.tgz
     version: 0.1.4
-  - created: 2019-02-27T13:03:33.254408418+02:00
+  - created: 2019-03-06T09:11:24.335377419+02:00
     digest: 2f34c30908f3ce5025bc20a36a19860bc35cbbf9612256ab1fa2eee54dc59a39
     name: simple
     urls:
-    - simple-0.1.3.tgz
+    - https://wunderio.github.io/charts/simple-0.1.3.tgz
     version: 0.1.3
-  - created: 2019-02-27T13:03:33.253296163+02:00
+  - created: 2019-03-06T09:11:24.33278582+02:00
     digest: eeb577dbafdede528a39b57208e6155d0509f2d9b3660c67a3a22964e307f272
     name: simple
     urls:
-    - simple-0.1.2.tgz
+    - https://wunderio.github.io/charts/simple-0.1.2.tgz
     version: 0.1.2
-generated: 2019-02-27T13:03:33.232428944+02:00
+generated: 2019-03-06T09:11:24.298602472+02:00
