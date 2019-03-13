@@ -8,3 +8,7 @@ dependencies:
 - name: redis
   version: 4.3.x
   repository: https://kubernetes-charts.storage.googleapis.com/
+- name: kube-state-metrics
+  version: 0.14.x
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: metrics.enabled

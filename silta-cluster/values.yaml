@@ -48,3 +48,13 @@ filebeat:
   elasticsearchUsername: ''
   elasticsearchPassword: ''
   elasticsearchCloudAuth: ''
+
+# Metricbeat settings
+metricbeat:
+  version: ''
+  elasticCloudId: ''
+  elasticsearchHost: ''
+  elasticsearchPort: ''
+  elasticsearchUsername: ''
+  elasticsearchPassword: ''
+  elasticsearchCloudAuth: ''
