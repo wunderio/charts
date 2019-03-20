@@ -9,7 +9,7 @@ tests:
       - contains:
           path: spec.template.spec.containers[0].env
           content:
-            name: ELASTIC_HOST
+            name: ELASTICSEARCH_HOST
             value: RELEASE-NAME-elastic
 
   - it: sets no elasticsearch hostname in drupal environment if elasticsearch is disabled
@@ -19,5 +19,5 @@ tests:
       - notContains:
           path: spec.template.spec.containers[0].env
           content:
-            name: ELASTIC_HOST
+            name: ELASTICSEARCH_HOST
             value: RELEASE-NAME-elastic

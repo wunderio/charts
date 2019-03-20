@@ -28,3 +28,24 @@ tests:
       - equal:
           path: "metadata.annotations.domain"
           value: "baz.foo.silta.example.com"
+
+  - it: adds the ambassador annotation by default
+    asserts:
+      - matchRegex:
+          path: metadata.annotations.getambassador\.io/config
+          pattern: 'apiVersion: ambassador/v0'
+
+  - it: adds ambassador config values
+    set:
+      ambassador.config.foo: 'bar'
+    asserts:
+      - matchRegex:
+          path: metadata.annotations.getambassador\.io/config
+          pattern: 'foo: bar'
+
+  - it: can disable ambassador
+    set:
+      ambassador.enabled: false
+    asserts:
+      - isNull:
+          path: metadata.annotations.getambassador\.io/config

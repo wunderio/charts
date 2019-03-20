@@ -31,6 +31,8 @@ spec:
             readOnly: true
             {{- end }}
           {{- end }}
+        resources:
+          {{- .Values.php.postinstall.resources | toYaml | nindent 10 }}
       {{- include "drupal.imagePullSecrets" . | nindent 6 }}
       volumes:
         {{- include "drupal.volumes" . | nindent 8 }}

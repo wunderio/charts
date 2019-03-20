@@ -35,11 +35,7 @@ spec:
             port: 9000
         readinessProbe:
           exec:
-            command:
-            - /bin/sh
-            - -c
-            - if [ ! {{ include "drupal.deployment-in-progress-test" . }} ]; then timeout -t 3 drush check-bootstrap; else exit 1; fi
-          periodSeconds: 3
+            command: ['/bin/sh', '-c', 'if [ {{ include "drupal.deployment-in-progress-test" . }} ]; then exit 1; fi']
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
 
@@ -74,12 +70,6 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 80
-        readinessProbe:
-          httpGet:
-            path: /robots.txt
-            port: 80
-          periodSeconds: 3
-          timeoutSeconds: 3
         resources:
           {{- .Values.nginx.resources | toYaml | nindent 10 }}
 

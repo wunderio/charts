@@ -28,7 +28,7 @@ nginx:
   # These values are optimised for development environments.
   resources:
     requests:
-      cpu: 10m
+      cpu: 5m
       memory: 10M
   
   # Set of values to enable and use http basic authentication
@@ -57,7 +57,7 @@ php:
   # These values are optimised for development environments.
   resources:
     requests:
-      cpu: 100m
+      cpu: 50m
       memory: 128M
 
   # Cron tasks, each of which will be run into a dedicated temporary pod.
@@ -95,6 +95,10 @@ php:
         echo "No configuration found, installing a plain drupal site"
         drush site-install -n standard
       fi
+    resources:
+      requests:
+        cpu: 500m
+        memory: 256M
 
   # Post-upgrade hook.
   # This is run every time a new environment is upgraded.
@@ -197,14 +201,16 @@ mariadb:
       size: 1G
     resources:
       requests:
-        cpu: 100m
-        memory: 256M
+        cpu: 50m
+        memory: 128M
 
 elasticsearch:
   enabled: false
   #Choose versions in https://www.docker.elastic.co/ from "Elasticsearch" list
   version: 6.5.0
   heapSize: 256m
+  xpack:
+    enabled: false
   persistence:
     size: 512Mi
     storageClassName: silta-shared
@@ -216,3 +222,13 @@ elasticsearch:
 memcached:
   enabled: false
   maxItemMemory: 128
+
+# Configure ambassador for routing inbound traffic. We typically enable ambassador on development 
+# environments, but disable it and instead use a dedicated ingress resource on production; some 
+# providers have limits on the number of dedicated ingress resources available in a cluster. 
+ambassador:
+  enabled: true
+  # Optional configuration arguments for ambassador. 
+  config:
+    prefix: /
+    timeout_ms: 30000

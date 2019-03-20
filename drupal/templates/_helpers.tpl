@@ -97,7 +97,7 @@ imagePullSecrets:
   value: {{ .Release.Name }}-memcached
 {{- end }}
 {{- if .Values.elasticsearch.enabled }}
-- name: ELASTIC_HOST
+- name: ELASTICSEARCH_HOST
   value: {{ .Release.Name }}-elastic
 {{- end }}
 - name: HASH_SALT
