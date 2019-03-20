@@ -125,7 +125,7 @@ shell:
 
   # Persistent storage for SSH fingerprint keys
   storage: 1M
-  storageClassName: silta-shared
+  storageClassName: standard
 
   # The docker image to be used. This is typically passed by your CI system using the --set parameter.
   image: 'you need to pass in a value for shell.image to your helm chart'
@@ -202,12 +202,12 @@ mariadb:
 
 elasticsearch:
   enabled: false
-  #Choose versions in https://www.docker.elastic.co/ from "Elasticsearch" list
+  # Choose versions in https://www.docker.elastic.co/ from "Elasticsearch" list
   version: 6.5.0
   heapSize: 256m
   persistence:
     size: 512Mi
-    storageClassName: silta-shared
+    storageClassName: standard
   resources:
     requests:
       cpu: 25m

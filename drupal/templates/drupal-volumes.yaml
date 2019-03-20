@@ -58,8 +58,8 @@ metadata:
 spec:
   storageClassName: {{ .Values.shell.storageClassName }}
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
-      storage: {{ .Values.referenceData.storage }}
+      storage: 50M
 {{- end }}
