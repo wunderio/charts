@@ -219,9 +219,14 @@ elasticsearch:
       cpu: 25m
       memory: 512Mi
 
+# Memcache service overrides
+# see: https://github.com/helm/charts/blob/master/stable/memcached/values.yaml
 memcached:
   enabled: false
-  maxItemMemory: 128
+  replicaCount: 1
+  pdbMinAvailable: 1
+  memcached:
+    maxItemMemory: 128
 
 # Configure ambassador for routing inbound traffic. We typically enable ambassador on development 
 # environments, but disable it and instead use a dedicated ingress resource on production; some 
