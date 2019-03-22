@@ -5,6 +5,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
   annotations:
+{{- if .Values.ambassador.enabled }}
     getambassador.io/config: |
       apiVersion: ambassador/v0
       kind:  Mapping
@@ -12,7 +13,8 @@ metadata:
       host: {{ template "drupal.domain" . }}
       prefix: /
       service: {{ .Release.Name }}-drupal.{{ .Release.Namespace }}.svc.cluster.local:80
-      timeout_ms: 30000
+      {{- .Values.ambassador.config | toYaml | nindent 6 }}
+{{- end }}
     domain: {{ template "drupal.domain" . }}
 spec:
   type: NodePort
