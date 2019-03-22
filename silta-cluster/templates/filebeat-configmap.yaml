@@ -40,3 +40,6 @@ data:
       hosts: ['{{ .Values.filebeat.elasticsearchHost }}:{{ .Values.filebeat.elasticsearchPort }}']
       username: {{ .Values.filebeat.elasticsearchUsername | quote }}
       password: {{ .Values.filebeat.elasticsearchPassword | quote }}
+
+    logging.metrics.enabled: false
+    
