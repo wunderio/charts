@@ -87,7 +87,6 @@ metadata:
     {{- include "drupal.release_labels" . | nindent 4 }}
     service: elasticsearch
 spec:
-  storageClassName: {{ .Values.elasticsearch.persistence.storageClassName }}
   accessModes:
     - ReadWriteMany
   resources:
