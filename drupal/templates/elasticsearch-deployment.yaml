@@ -70,6 +70,8 @@ spec:
           value: {{ .Release.Name }}-search
         - name: ES_JAVA_OPTS
           value: -Xms{{ .Values.elasticsearch.heapSize }} -Xmx{{ .Values.elasticsearch.heapSize }}
+        - name: xpack.security.enabled
+          value: {{ .Values.elasticsearch.xpack.enabled | default "false" | quote }}
         volumeMounts:
         - mountPath: "/usr/share/elasticsearch/data"
           name: {{ .Release.Name }}-elastic-volume

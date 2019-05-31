@@ -12,6 +12,13 @@ nfs-server-provisioner:
     parameters:
       mountOptions:
         - vers=4.1
+  resources:
+    limits:
+      cpu: 200m
+      memory: 1G
+    requests:
+      cpu: 200m
+      memory: 1G
 
 # SSH Jumphost settings
 gitAuth:
@@ -41,6 +48,16 @@ redis:
 
 # Filebeat settings
 filebeat:
+  version: ''
+  elasticCloudId: ''
+  elasticsearchHost: ''
+  elasticsearchPort: ''
+  elasticsearchUsername: ''
+  elasticsearchPassword: ''
+  elasticsearchCloudAuth: ''
+
+# Metricbeat settings
+metricbeat:
   version: ''
   elasticCloudId: ''
   elasticsearchHost: ''

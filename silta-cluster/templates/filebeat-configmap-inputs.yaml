@@ -10,7 +10,7 @@ data:
     - type: docker
       containers.ids:
       - "*"
-      processors: # this may not work 
+      processors:
         - drop_event.when.or:
           - contains:
               message: "kube-probe"

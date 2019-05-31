@@ -25,6 +25,7 @@ spec:
       containers:
       - name: {{ .Release.Name }}-jumpserver
         image: wunderio/sshd-gitauth:v0.1
+        imagePullPolicy: Always
         ports:
           - containerPort: 22
         env:
@@ -34,3 +35,25 @@ spec:
             value: {{ required "A valid .Values.gitAuth.apiToken entry required!" .Values.gitAuth.host | quote }}
           - name: GITAUTH_ORGANISATION
             value: {{ required "A valid .Values.gitAuth.apiToken entry required!" .Values.gitAuth.organisation | quote }}
+        volumeMounts:
+        - name: shell-keys
+          mountPath: /etc/ssh/keys
+      volumes:
+      - name: shell-keys
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-shell-keys
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Release.Name }}-shell-keys
+  labels:
+    name: {{ .Release.Name }}-jumpserver
+spec:
+  storageClassName: standard
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50M

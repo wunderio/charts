@@ -2,6 +2,12 @@
 
 This helm chart helps setting up resources for https://github.com/wunderio/silta-cluster
 
+## Requirements
+
+ServiceAccount and Roles for filebeat and metricbeat services. These have to be deployed manually.
+ - https://raw.githubusercontent.com/wunderio/silta-cluster/master/filebeat-roles.yaml
+ - https://raw.githubusercontent.com/wunderio/silta-cluster/master/metricbeat-roles.yaml
+
 ## Usage
 
 Here is an example of how we instantiate this helm chart: 
