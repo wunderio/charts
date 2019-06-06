@@ -1,3 +1,4 @@
+{{- if .Values.metricbeat.enabled }}
 # Deploy a Metricbeat instance per node for node metrics retrieval
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -153,3 +154,4 @@ spec:
         configMap:
           defaultMode: 0600
           name: metricbeat-deployment-modules
+{{- end }}

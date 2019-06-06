@@ -48,6 +48,7 @@ redis:
 
 # Filebeat settings
 filebeat:
+  enabled: false
   version: ''
   elasticCloudId: ''
   elasticsearchHost: ''
@@ -58,6 +59,7 @@ filebeat:
 
 # Metricbeat settings
 metricbeat:
+  enabled: false
   version: ''
   elasticCloudId: ''
   elasticsearchHost: ''

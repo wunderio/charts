@@ -1,3 +1,4 @@
+{{- if .Values.filebeat.enabled }}
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -73,3 +74,4 @@ spec:
         hostPath:
           path: /var/lib/filebeat-data
           type: DirectoryOrCreate
+{{- end }}
