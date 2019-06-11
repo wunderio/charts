@@ -8,4 +8,6 @@ helm package simple --destination docs
 helm dependency build silta-cluster
 helm package silta-cluster --destination docs
 
+helm package csi-rclone --destination docs
+
 helm repo index docs --url https://wunderio.github.io/charts/
