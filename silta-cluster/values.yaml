@@ -2,7 +2,7 @@
 clusterDomain: "silta.wdr.io"
 
 nfs-server-provisioner:
-  enabled: false
+  enabled: true
   persistence:
     enabled: true
     storageClass: standard
@@ -23,7 +23,7 @@ nfs-server-provisioner:
 
 # https://github.com/wunderio/charts/blob/master/csi-rclone/values.yaml
 csi-rclone:
-  enabled: true
+  enabled: false
   # Use silta cluster gke credentials. This is used when remote type is set to "google cloud storage".
   useGkeAuth: false
   # Do not allow csi-rclone subchart to install default secret because we want to generate it ourselves.
@@ -42,7 +42,7 @@ csi-rclone:
     s3-secret-access-key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
 
 minio:
-  enabled: true
+  enabled: false
 
 # SSH Jumphost settings
 gitAuth:
