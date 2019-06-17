@@ -30,3 +30,13 @@ You need to supply Github API Personal access token that will be used to get the
 
 This is an exposed webhook that listens for branch delete events, logs in to cluster and removes named deployments using helm. Project code can be inspected at [silta-deployment-remover](https://github.com/wunderio/silta-deployment-remover).
 
+#### Rclone storage
+
+Provides persistent volume storageClass `silta-shared`, that allows mounting wide range of remote storage options to cluster pods.
+Rclone project: https://rclone.org/
+Rclone CSI plugin: https://github.com/wunderio/csi-rclone
+
+#### MinIO server
+
+The 100% Open Source, Enterprise-Grade, Amazon S3 Compatible Object Storage. This is an optional component for csi-rclone storage plugin.
+MinIO project: https://min.io/  

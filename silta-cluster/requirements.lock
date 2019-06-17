@@ -11,5 +11,11 @@ dependencies:
 - name: kube-state-metrics
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 0.14.1
-digest: sha256:a0eee2c9474e18ec2e788c26aa6f2aa2b884b92487e8647bf7526bc9a9a26418
-generated: 2019-03-13T14:17:09.222247168Z
+- name: minio
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 2.4.16
+- name: csi-rclone
+  repository: https://wunderio.github.io/charts/
+  version: 0.1.0
+digest: sha256:1b1beab35186dfb47c90f5979a52dd769fa27e5585f82ba3f6122ced71d3b470
+generated: 2019-06-12T13:36:09.625004218Z

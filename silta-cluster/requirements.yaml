@@ -2,6 +2,7 @@ dependencies:
 - name: nfs-server-provisioner
   version: 0.1.x
   repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: nfs-server-provisioner.enabled
 - name: ambassador
   version: 0.40.x
   repository: https://www.getambassador.io
@@ -12,3 +13,11 @@ dependencies:
   version: 0.14.x
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: metrics.enabled
+- name: minio
+  version: 2.4.x
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: minio.enabled
+- name: csi-rclone
+  version: 0.1.x
+  repository: https://wunderio.github.io/charts/
+  condition: csi-rclone.enabled
