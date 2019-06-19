@@ -142,12 +142,14 @@ shell:
 publicFiles:
   storage: 1Gi
   storageClassName: silta-shared
+  csiDriverName: csi-rclone
 
 # Configure an optional volume used for Drupal private files.
 privateFiles:
   enabled: false
   storage: 1G
   storageClassName: silta-shared
+  csiDriverName: csi-rclone
 
 # Configure reference data that will be used when creating new environments.
 referenceData:
@@ -185,6 +187,7 @@ referenceData:
 
   storage: 1G
   storageClassName: silta-shared
+  csiDriverName: csi-rclone
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
