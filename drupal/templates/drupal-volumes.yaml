@@ -13,7 +13,7 @@ spec:
   {{- if .Values.publicFiles.csiDriverName }}
   csi:
     driver: {{ .Values.publicFiles.csiDriverName }}
-    volumeHandle: data-id
+    volumeHandle: {{ .Release.Name }}-public-files
     volumeAttributes:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/public-files
   {{- end }}
@@ -48,7 +48,7 @@ spec:
   {{- if .Values.privateFiles.csiDriverName }}
   csi:
     driver: {{ .Values.privateFiles.csiDriverName }}
-    volumeHandle: data-id
+    volumeHandle: {{ .Release.Name }}-private-files
     volumeAttributes:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/private-files
   {{- end }}
@@ -81,12 +81,12 @@ spec:
   accessModes:
     - ReadWriteMany
   capacity:
-    storage: {{ .Values.referenceEnvironment.storage }}
-  storageClassName: {{ .Values.referenceEnvironment.storageClassName }}
-  {{- if .Values.referenceEnvironment.csiDriverName }}
+    storage: {{ .Values.referenceData.storage }}
+  storageClassName: {{ .Values.referenceData.storageClassName }}
+  {{- if .Values.referenceData.csiDriverName }}
   csi:
-    driver: {{ .Values.referenceEnvironment.csiDriverName }}
-    volumeHandle: data-id
+    driver: {{ .Values.referenceData.csiDriverName }}
+    volumeHandle: {{ .Release.Name }}-reference-data
     volumeAttributes:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/reference-data
   {{- end }}
