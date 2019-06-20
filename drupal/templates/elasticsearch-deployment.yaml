@@ -90,7 +90,7 @@ metadata:
     service: elasticsearch
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: {{ .Values.elasticsearch.persistence.size }}
