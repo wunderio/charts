@@ -20,6 +20,9 @@ app: drupal
 # Multiple pods make sense for high availability.
 replicas: 1
 
+# Domain names that will be mapped to this deployment.
+exposeDomains: []
+
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
