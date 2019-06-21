@@ -88,7 +88,15 @@ data:
         include fastcgi.conf;
 
         {{ include "drupal.basicauth" . | indent 6}}
-                                              
+         
+        location = /robots.txt {
+          access_log off;
+          {{- if not .Values.nginx.robotsTxt.allow }}
+            add_header Content-Type text/plain;
+            return 200 'User-agent: *\nDisallow: /';
+          {{- end}}
+        } 
+
         location / {                                                                                                              
             ## Most sites won't have configured favicon
             ## and since its always grabbed, turn it off in access log

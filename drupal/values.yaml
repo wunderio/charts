@@ -48,6 +48,10 @@ nginx:
     noauthips:
       - 10.0.0.0/8 # GKE internal IPs
 
+  # Robots txt file blocked by default
+  robotsTxt:
+    allow: false
+
 # Configuration for everything that runs in php containers.
 php:
   # The docker image to be used. This is typically passed by your CI system using the --set parameter.

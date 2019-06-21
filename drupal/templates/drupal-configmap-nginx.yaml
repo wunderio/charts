@@ -310,10 +310,15 @@ data:
             fastcgi_param SCRIPT_FILENAME $document_root/update.php;                                                                                       
             fastcgi_pass php;                                                                                                                              
         }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
-                                                                                                                                                          
-        location = /robots.txt {                                                                        
-            access_log off;                                                                                                                                
-            try_files $uri @drupal-no-args;                                                                                                                
+
+        location = /robots.txt {
+          access_log off;
+          {{- if not .Values.nginx.robotsTxt.allow }}
+            add_header Content-Type text/plain;
+            return 200 'User-agent: *\nDisallow: /';
+          {{- else }}
+            try_files $uri @drupal-no-args;
+          {{- end}}
         } 
                                                                                                                                                                                                   
         location ~* ^/.well-known/ {                                                                                                                       
