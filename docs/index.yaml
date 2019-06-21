@@ -3,51 +3,51 @@ entries:
   csi-rclone:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2019-06-20T08:09:58.899742172Z"
+    created: "2019-06-21T15:21:34.459122393Z"
     description: CSI plugin for rclone mount
-    digest: 46456af5d7020412dfa77abdba9cb8aeee2978effd876e067a25f5bd168367cc
+    digest: a529c637510a15879e0b29c53b96e0b6de458f11daa24e5b20bbc288af14a05d
     name: csi-rclone
     urls:
     - https://wunderio.github.io/charts/csi-rclone-0.1.0.tgz
     version: 0.1.0
   drupal:
-  - created: "2019-06-20T08:09:58.916133621Z"
-    digest: 4f6d2cd688595c96617229ca088a4d7921ff00759eadd46f796e344b6f4e148a
+  - created: "2019-06-21T15:21:34.48682049Z"
+    digest: f30ced297fab3cca7cffe4cdabf4acac1be37fcfb3290f748b3d272da09c3b13
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.6.tgz
     version: 0.1.6
-  - created: "2019-06-20T08:09:58.913089077Z"
+  - created: "2019-06-21T15:21:34.480686306Z"
     digest: bc591b77084e73c12ee245a837d5c528f3a91a010254f86cc94e42470102fac5
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.5.tgz
     version: 0.1.5
-  - created: "2019-06-20T08:09:58.910116379Z"
+  - created: "2019-06-21T15:21:34.476846994Z"
     digest: c3074bb1daa48567db04ba5144076cf82207ab8900fe9f582bb6b60ac420af6d
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.4.tgz
     version: 0.1.4
-  - created: "2019-06-20T08:09:58.90812784Z"
+  - created: "2019-06-21T15:21:34.472452867Z"
     digest: c86f853eb190791102a8abfa477393f625073db8ec1f563e60f592bb450dcc3b
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.3.tgz
     version: 0.1.3
-  - created: "2019-06-20T08:09:58.906138585Z"
+  - created: "2019-06-21T15:21:34.468269157Z"
     digest: 4eb5e7a5c8bf3cd04f7e440510d86f863cef9576cf5f8f7316359e93d61c6cb5
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.2.tgz
     version: 0.1.2
-  - created: "2019-06-20T08:09:58.904658329Z"
+  - created: "2019-06-21T15:21:34.46655202Z"
     digest: b659e9f4620b9e67ce993e5498d6fd70c5632d97cf4e6490dd980c4a3ef78266
     name: drupal
     urls:
     - https://wunderio.github.io/charts/drupal-0.1.1.tgz
     version: 0.1.1
-  - created: "2019-06-20T08:09:58.902792634Z"
+  - created: "2019-06-21T15:21:34.46339947Z"
     digest: 2b31988b0e2573ba8e891b1b56a0179ad068624f6a659bc93a7df92016bf8685
     name: drupal
     urls:
@@ -56,30 +56,30 @@ entries:
   silta-cluster:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2019-06-20T08:09:58.920111416Z"
+    created: "2019-06-21T15:21:34.494174788Z"
     description: Setup a silta kubernetes cluster.
-    digest: 2fe1cdbc8534bf84d5348d0cb3909db32258385cef487a2ce69187ad92b24115
+    digest: 3c6055377572fe5637e187aff641ef0d2bc5264695ea1b23e289a0ac07849ba7
     name: silta-cluster
     urls:
     - https://wunderio.github.io/charts/silta-cluster-0.1.0.tgz
     version: 0.1.0
   simple:
-  - created: "2019-06-20T08:09:58.921550597Z"
-    digest: 161637c7091490a0264404c6e87783c9a4369b3080defa048a75a3d23f5f1bf9
+  - created: "2019-06-21T15:21:34.501444573Z"
+    digest: 7c44882e5b6f894cab5d71a6e6a945da5ff29c0dfcc766bf50c15cc29f58c0a1
     name: simple
     urls:
     - https://wunderio.github.io/charts/simple-0.1.4.tgz
     version: 0.1.4
-  - created: "2019-06-20T08:09:58.921184359Z"
+  - created: "2019-06-21T15:21:34.497400467Z"
     digest: 2f34c30908f3ce5025bc20a36a19860bc35cbbf9612256ab1fa2eee54dc59a39
     name: simple
     urls:
     - https://wunderio.github.io/charts/simple-0.1.3.tgz
     version: 0.1.3
-  - created: "2019-06-20T08:09:58.920665989Z"
+  - created: "2019-06-21T15:21:34.495842999Z"
     digest: eeb577dbafdede528a39b57208e6155d0509f2d9b3660c67a3a22964e307f272
     name: simple
     urls:
     - https://wunderio.github.io/charts/simple-0.1.2.tgz
     version: 0.1.2
-generated: "2019-06-20T08:09:58.898011035Z"
+generated: "2019-06-21T15:21:34.457790259Z"
