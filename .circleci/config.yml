@@ -21,6 +21,8 @@ jobs:
           command: |
             set -o xtrace
 
+            helm repo add wunder-charts https://wunderio.github.io/charts
+
             mkdir -p /tmp/charts
             for CHARTFILE in `find . -name Chart.yaml`
             do
