@@ -47,6 +47,6 @@ workflows:
       - validate
       - deploy:
           context: global_nonprod
-#          filters:
-#            branches:
-#              only: master
+          filters:
+            branches:
+              only: master
