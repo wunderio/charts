@@ -19,12 +19,7 @@ metadata:
       rewrite: /robots/deny/robots.txt
       service: {{ .Release.Name }}-splash:80
       precedence: 10
-      ---
-      apiVersion: ambassador/v0
-      kind: Module
-      name: ambassador
-      config:
-        use_remote_address: true
+
 spec:
   type: NodePort
   ports:

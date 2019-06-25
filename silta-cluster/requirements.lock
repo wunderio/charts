@@ -3,8 +3,8 @@ dependencies:
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 0.1.5
 - name: ambassador
-  repository: https://www.getambassador.io
-  version: 0.40.2
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 2.9.0
 - name: redis
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 4.3.1
@@ -17,5 +17,5 @@ dependencies:
 - name: csi-rclone
   repository: https://wunderio.github.io/charts/
   version: 0.1.0
-digest: sha256:1b1beab35186dfb47c90f5979a52dd769fa27e5585f82ba3f6122ced71d3b470
-generated: 2019-06-12T13:36:09.625004218Z
+digest: sha256:bc852752d651709a7621daacea85cf01171dc5d5e3cef483dc4492f7641ba1d2
+generated: "2019-06-24T15:53:57.649056+02:00"

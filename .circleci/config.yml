@@ -1,11 +1,52 @@
-version: 2
+version: 2.1
+
+orbs:
+  silta: silta/silta@0.1
+
 jobs:
-  build:
-    docker:
-      - image: wunderio/silta-circleci:v0.1
+  validate:
+    executor: silta/silta
 
     steps:
       - checkout
-
       - run: helm lint drupal/
 
+  deploy:
+    executor: silta/silta
+
+    steps:
+      - checkout
+      - run:
+          name: Build charts
+          command: |
+            set -o xtrace
+
+            helm repo add wunder-charts https://wunderio.github.io/charts
+
+            mkdir -p /tmp/charts
+            for CHARTFILE in `find . -name Chart.yaml`
+            do
+              CHART=`dirname $CHARTFILE`
+              helm dependency build $CHART
+              helm package $CHART --destination /tmp/charts
+
+              helm repo index /tmp/charts --url https://wunderio.github.io/charts/
+            done
+
+      - silta/gcloud-login
+
+      - run:
+          name: Deploy to Google Cloud Storage
+          command: |
+            gsutil -m rsync -d -r /tmp/charts gs://charts.wdr.io
+
+workflows:
+  version: 2
+  commit:
+    jobs:
+      - validate
+      - deploy:
+          context: global_nonprod
+          filters:
+            branches:
+              only: master
