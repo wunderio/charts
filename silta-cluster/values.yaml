@@ -1,6 +1,22 @@
 # Main domain of the cluster.
 clusterDomain: "silta.wdr.io"
 
+ambassador:
+  service:
+    https:
+      enabled: false
+    annotations:
+      getambassador.io/config: |
+        ---
+        apiVersion: ambassador/v1
+        kind: Module
+        name: ambassador
+        config:
+          service_port: 8080
+          use_remote_address: true
+  adminService:
+    create: true
+
 nfs-server-provisioner:
   enabled: true
   persistence:
