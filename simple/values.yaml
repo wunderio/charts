@@ -46,3 +46,6 @@ nginx:
     noauthips:
       - 10.0.0.0/8 # GKE internal IPs
 
+  # Robots txt file blocked by default
+  robotsTxt:
+    allow: false

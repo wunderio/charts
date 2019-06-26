@@ -11,15 +11,7 @@ metadata:
       name:  {{ .Release.Name }}-splash
       prefix: /
       service: {{ .Release.Name }}-splash:80
-      ---
-      apiVersion: ambassador/v0
-      kind:  Mapping
-      name:  {{ .Release.Name }}-no-robots
-      prefix: /robots.txt
-      rewrite: /robots/deny/robots.txt
-      service: {{ .Release.Name }}-splash:80
-      precedence: 10
-
+      
 spec:
   type: NodePort
   ports:
