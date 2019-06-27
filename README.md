@@ -3,5 +3,5 @@
 To add this repository to helm, use: 
 
 ```
-helm repo add wunderio https://wunderio.github.io/charts/
+helm repo add wunderio https://storage.googleapis.com/charts.wdr.io
 ```
