@@ -1,3 +1,4 @@
+{{- if eq .Values.publicFiles.storageClassName "silta-shared"}}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -16,8 +17,9 @@ spec:
     volumeHandle: {{ .Release.Name }}-public-files
     volumeAttributes:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/public-files
-  {{- end }}
+  {{- end }} 
 ---
+{{- end }} 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -33,6 +35,7 @@ spec:
       storage: {{ .Values.publicFiles.storage }}
 ---
 {{- if .Values.privateFiles.enabled }}
+{{- if eq .Values.privateFiles.storageClassName "silta-shared"}}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -53,6 +56,7 @@ spec:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/private-files
   {{- end }}
 ---
+{{- end }} 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
