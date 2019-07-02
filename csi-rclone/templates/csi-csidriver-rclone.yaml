@@ -1,0 +1,8 @@
+apiVersion: storage.k8s.io/v1beta1
+kind: CSIDriver
+metadata:
+  name: csi-rclone
+  namespace: {{ .Release.Namespace }}
+spec:
+  attachRequired: true
+  podInfoOnMount: false
