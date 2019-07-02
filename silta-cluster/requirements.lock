@@ -13,9 +13,9 @@ dependencies:
   version: 0.14.1
 - name: minio
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 2.4.16
+  version: 2.4.17
 - name: csi-rclone
-  repository: https://wunderio.github.io/charts/
-  version: 0.1.0
-digest: sha256:bc852752d651709a7621daacea85cf01171dc5d5e3cef483dc4492f7641ba1d2
-generated: "2019-06-24T15:53:57.649056+02:00"
+  repository: https://storage.googleapis.com/charts.wdr.io
+  version: 0.1.1
+digest: sha256:42fe7ffaa06b4b01a3efaaf02cc7fbfaa183b4b9e73d8c109df11660254fd3f3
+generated: "2019-07-02T07:13:00.355542821Z"

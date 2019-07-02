@@ -13,7 +13,7 @@ Here is an example of how we instantiate this helm chart:
 
 ```bash
 helm upgrade --install $RELEASE_NAME drupal \
-            --repo https://wunderio.github.io/charts/ \
+            --repo https://storage.googleapis.com/charts.wdr.io \
             --set environmentName=$CIRCLE_BRANCH \
             --set drupal.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-drupal:$CIRCLE_SHA1 \
             --set nginx.image=$DOCKER_REPO_HOST/$DOCKER_REPO_PROJ/${CIRCLE_PROJECT_REPONAME,,}-nginx:$CIRCLE_SHA1 \
@@ -28,7 +28,7 @@ What's happening above:
 
 1. We use `upgrade --install` to upgrade an existing release, or create one if there is no release with that name.
 2. `RELEASE_NAME` is based on the name of the repository and the name of the branch. This automatically gives us a dedicated environment for each branch.
-3. The `drupal` chart is pulled from our helm repository located at `https://wunderio.github.io/charts`
+3. The `drupal` chart is pulled from our helm repository located at `https://storage.googleapis.com/charts.wdr.io`
 4. We set the `environmentName` to match our branch name. This is used to have nicer URLs for branch-specific environments.
 5. We pass references to the docker images that were created earlier in the build process and tagged with the ID of the commit being deployed.
 6. We explicitly specify the MariaDB passwords. If these are not set, the MariaDB chart will set a random password on each deployment, which will result in a broken database. This applies to all Helm charts that store encrypted data, and won't be solved until Helm 3.
@@ -42,7 +42,7 @@ To override these options for your project, specify a file when creating/upgradi
 
 ```bash
 $ helm upgrade --install drupal
-  --repo https://wunderio.github.io/charts/ \
+  --repo https://storage.googleapis.com/charts.wdr.io \
   --values silta.yml
     
 ```

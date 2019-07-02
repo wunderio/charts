@@ -14,7 +14,7 @@ Here is an example of how we instantiate this helm chart:
 
 ```bash
 helm upgrade --install --wait cluster-name silta-cluster \
-             --repo "https://wunderio.github.io/charts/" \
+             --repo "https://storage.googleapis.com/charts.wdr.io" \
              --values local-values.yaml            
 ```
 

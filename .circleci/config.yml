@@ -21,7 +21,7 @@ jobs:
           command: |
             set -o xtrace
 
-            helm repo add wunder-charts https://wunderio.github.io/charts
+            helm repo add wunderio https://storage.googleapis.com/charts.wdr.io
 
             mkdir -p /tmp/charts
             for CHARTFILE in `find . -name Chart.yaml`
@@ -30,7 +30,7 @@ jobs:
               helm dependency build $CHART
               helm package $CHART --destination /tmp/charts
 
-              helm repo index /tmp/charts --url https://wunderio.github.io/charts/
+              helm repo index /tmp/charts --url https://storage.googleapis.com/charts.wdr.io
             done
 
       - silta/gcloud-login

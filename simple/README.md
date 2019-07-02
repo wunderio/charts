@@ -13,7 +13,7 @@ Here is an example of how we instantiate this helm chart:
 
 ```bash
 helm upgrade --install $RELEASE_NAME simple \
-            --repo https://wunderio.github.io/charts/ \
+            --repo https://storage.googleapis.com/charts.wdr.io \
             --set environmentName=$CIRCLE_BRANCH \
             --namespace=${CIRCLE_PROJECT_REPONAME,,} \
             --values silta.yml \
@@ -35,7 +35,7 @@ To override these options for your project, specify a file when creating/upgradi
 
 ```bash
 $ helm upgrade --install drupal
-  --repo https://wunderio.github.io/charts/ \
+  --repo https://storage.googleapis.com/charts.wdr.io \
   --values silta.yml
     
 ```

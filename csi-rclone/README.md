@@ -19,7 +19,7 @@ Here is an example of how we instantiate this helm chart:
 
 ```bash
 helm upgrade --install --wait release-name csi-rclone \
-             --repo "https://wunderio.github.io/charts/" \
+             --repo "https://storage.googleapis.com/charts.wdr.io" \
              --values values.yaml            
 ```
 
@@ -27,7 +27,7 @@ and this is how we include it in another chart (via `requirements.yaml`)
 ```
 - name: csi-rclone
   version: 0.1.x
-  repository: https://wunderio.github.io/charts/
+  repository: https://storage.googleapis.com/charts.wdr.io
 ```
 
 ## Components

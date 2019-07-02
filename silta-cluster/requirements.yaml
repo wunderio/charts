@@ -19,5 +19,5 @@ dependencies:
   condition: minio.enabled
 - name: csi-rclone
   version: 0.1.x
-  repository: https://wunderio.github.io/charts/
+  repository: https://storage.googleapis.com/charts.wdr.io
   condition: csi-rclone.enabled
