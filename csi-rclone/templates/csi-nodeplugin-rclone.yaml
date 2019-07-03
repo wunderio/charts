@@ -14,7 +14,6 @@ spec:
       labels:
         app: csi-nodeplugin-rclone
     spec:
-      priorityClassName: system-node-critical
       serviceAccountName: csi-nodeplugin-rclone
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
