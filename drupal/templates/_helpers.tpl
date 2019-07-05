@@ -28,11 +28,9 @@ ports:
 {{- end }}
 
 {{- define "drupal.volumeMounts" -}}
-- name: drupal-public-files
-  mountPath: /var/www/html/web/sites/default/files
-{{- if .Values.privateFiles.enabled }}
-- name: drupal-private-files
-  mountPath: /var/www/html/private
+{{- range $index, $mount := $.Values.mounts }}
+- name: drupal-{{ $mount.name }}
+  mountPath: {{ $mount.mountPath }}
 {{- end }}
 - name: php-conf
   mountPath: /etc/php7/php.ini
@@ -49,13 +47,10 @@ ports:
 {{- end }}
 
 {{- define "drupal.volumes" -}}
-- name: drupal-public-files
+{{- range $index, $mount := $.Values.mounts }}
+- name: drupal-{{ $mount.name }}
   persistentVolumeClaim:
-    claimName: {{ .Release.Name }}-public-files
-{{- if .Values.privateFiles.enabled }}
-- name: drupal-private-files
-  persistentVolumeClaim:
-    claimName: {{ .Release.Name }}-private-files
+    claimName: {{ $.Release.Name }}-{{ $mount.name }}
 {{- end }}
 - name: php-conf
   configMap:
@@ -109,9 +104,9 @@ imagePullSecrets:
 - name: {{ $key }}
   value: {{ $val | quote }}
 {{- end }}
-{{- if .Values.privateFiles.enabled }}
-- name: PRIVATE_FILES_PATH
-  value: '/var/www/html/private'
+{{- range $index, $mount := $.Values.mounts }}
+- name: {{ regexReplaceAll "[^[:alnum:]]" $mount.name "_" | upper }}_PATH
+  value: {{ $mount.mountPath }}
 {{- end }}
 {{- end }}
 

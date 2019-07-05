@@ -30,6 +30,12 @@ tests:
             value: bar
 
   - it: has public files mounted
+    set:
+      mounts:
+        - name: public-files
+          storage: 123Gi
+          storageClassName: foo
+          mountPath: /foo/bar/files
     asserts:
       - contains:
           path: spec.jobTemplate.spec.template.spec.volumes

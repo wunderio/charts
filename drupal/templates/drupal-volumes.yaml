@@ -1,74 +1,43 @@
+{{- range $index, $mount := .Values.mounts }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Release.Name }}-public-files
+  name: {{ $.Release.Name }}-{{ $mount.name }}
   labels:
-    name: {{ .Release.Name }}-public-files
+    name: {{ $.Release.Name }}-{{ $mount.name }}
 spec:
   accessModes:
     - ReadWriteMany
   capacity:
-    storage: {{ .Values.publicFiles.storage }}
-  storageClassName: {{ .Values.publicFiles.storageClassName }}
-  {{- if .Values.publicFiles.csiDriverName }}
+    storage: {{ $mount.storage }}
+  storageClassName: {{ $mount.storageClassName }}
+  {{- if $mount.csiDriverName }}
   csi:
-    driver: {{ .Values.publicFiles.csiDriverName }}
-    volumeHandle: {{ .Release.Name }}-public-files
+    driver: {{ $mount.csiDriverName }}
+    volumeHandle: {{ $.Release.Name }}-{{ $mount.name }}
     volumeAttributes:
-      remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/public-files
+      remotePathSuffix: /{{ $.Release.Namespace }}/{{ $.Values.environmentName }}/{{ $mount.name }}
   {{- end }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-public-files
+  name: {{ $.Release.Name }}-{{ $mount.name }}
   labels:
-    {{- include "drupal.release_labels" . | nindent 4 }}
+    {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
-  storageClassName: {{ .Values.publicFiles.storageClassName }}
+  storageClassName: {{ $mount.storageClassName }}
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: {{ .Values.publicFiles.storage }}
+      storage: {{ $mount.storage }}
+  selector:
+    matchLabels:
+      name: {{ $.Release.Name }}-{{ $mount.name }}
 ---
-{{- if .Values.privateFiles.enabled }}
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: {{ .Release.Name }}-private-files
-  labels:
-    name: {{ .Release.Name }}-private-files
-spec:
-  accessModes:
-    - ReadWriteMany
-  capacity:
-    storage: {{ .Values.privateFiles.storage }}
-  storageClassName: {{ .Values.privateFiles.storageClassName }}
-  {{- if .Values.privateFiles.csiDriverName }}
-  csi:
-    driver: {{ .Values.privateFiles.csiDriverName }}
-    volumeHandle: {{ .Release.Name }}-private-files
-    volumeAttributes:
-      remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/private-files
-  {{- end }}
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: {{ .Release.Name }}-private-files
-  labels:
-    app: {{ .Values.app | quote }}
-    release: {{ .Release.Name }}
-spec:
-  storageClassName: {{ .Values.privateFiles.storageClassName }}
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: {{ .Values.privateFiles.storage }}
 {{- end }}
----
+
 {{- if .Values.referenceData.enabled }}
 {{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
 apiVersion: v1
@@ -105,6 +74,9 @@ spec:
   resources:
     requests:
       storage: {{ .Values.referenceData.storage }}
+  selector:
+    matchLabels:
+      name: {{ .Release.Name }}-reference-data
 {{- end }}
 {{- end }}
 ---
