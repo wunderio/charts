@@ -50,9 +50,11 @@ spec:
         - containerPort: 80
           name: drupal
         volumeMounts:
-        - name: drupal-public-files
-          mountPath: /var/www/html/web/sites/default/files
+        {{- range $index, $mount := $.Values.mounts }}
+        - name: drupal-{{ $mount.name }}
+          mountPath: {{ $mount.mountPath }}
           readOnly: true
+        {{- end }}
         - name: nginx-conf
           mountPath: /etc/nginx/nginx.conf # mount nginx-conf configmap volume to /etc/nginx
           readOnly: true

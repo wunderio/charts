@@ -145,19 +145,19 @@ shell:
     repositoryUrl: 'you need to pass in a value for repositoryUrl to your helm chart'
     apiToken: 'you need to pass in a value for shell.gitAuth.apiToken to your helm chart'
 
-# Configure the volume used for Drupal public files.
-publicFiles:
-  storage: 1Gi
-  storageClassName: silta-shared
-  csiDriverName: csi-rclone
-
-# Configure an optional volume used for Drupal private files.
-privateFiles:
-  enabled: false
-  storage: 1G
-  storageClassName: silta-shared
-  csiDriverName: csi-rclone
-
+# Configure the dynamically mounted volumes
+mounts:
+  - name: public-files
+    storage: 1G
+    mountPath: /var/www/html/web/sites/default/files
+    storageClassName: silta-shared
+    csiDriverName: csi-rclone
+  # - name: private-files
+  #   storage: 1G
+  #   mountPath: /var/www/html/private
+  #   storageClassName: silta-shared
+  #   csiDriverName: csi-rclone
+  
 # Configure reference data that will be used when creating new environments.
 referenceData:
   enabled: true
