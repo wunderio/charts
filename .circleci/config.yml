@@ -11,7 +11,7 @@ jobs:
       - checkout
       - run: helm lint drupal/
 
-  deploy:
+  build:
     executor: silta/silta
 
     steps:
@@ -41,6 +41,10 @@ jobs:
 
             helm repo index /tmp/charts --url https://storage.googleapis.com/charts.wdr.io
 
+  deploy:
+    executor: silta/silta
+
+    steps:
       - run:
           name: Deploy to Google Cloud Storage
           command: |
@@ -51,8 +55,14 @@ workflows:
   commit:
     jobs:
       - validate
+      - build:
+          context: global_nonprod
+          requires:
+            - validate
       - deploy:
           context: global_nonprod
+          requires:
+            - build
           filters:
             branches:
               only: master
