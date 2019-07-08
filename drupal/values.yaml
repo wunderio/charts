@@ -149,12 +149,12 @@ shell:
 mounts:
   - name: public-files
     storage: 1G
-    mountPath: /var/www/html/web/sites/default/files
+    mountPath: /app/web/sites/default/files
     storageClassName: silta-shared
     csiDriverName: csi-rclone
   # - name: private-files
   #   storage: 1G
-  #   mountPath: /var/www/html/private
+  #   mountPath: /app/private
   #   storageClassName: silta-shared
   #   csiDriverName: csi-rclone
   

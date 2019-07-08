@@ -8,7 +8,7 @@ tests:
         - name: public-files
           storage: 123Gi
           storageClassName: foo
-          mountPath: /var/www/html/web/sites/default/files
+          mountPath: /app/web/sites/default/files
 
     asserts:
       - documentIndex: 1
