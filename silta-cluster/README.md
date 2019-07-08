@@ -40,3 +40,8 @@ Rclone CSI plugin: https://github.com/wunderio/csi-rclone
 
 The 100% Open Source, Enterprise-Grade, Amazon S3 Compatible Object Storage. This is an optional component for csi-rclone storage plugin.
 MinIO project: https://min.io/  
+
+#### Newrelic infrastructure monitoring
+Monitoring Kubernetes deployments with newrelic:
+ - [A Complete Introduction to Monitoring Kubernetes with New Relic](https://newrelic.com/platform/kubernetes/monitoring-guide)
+ - [newrelic-infrastructure chart](https://github.com/helm/charts/tree/master/stable/newrelic-infrastructure)

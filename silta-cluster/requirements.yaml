@@ -13,6 +13,10 @@ dependencies:
   version: 0.14.x
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: metrics.enabled
+- name: newrelic-infrastructure
+  version: 0.13.x
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: newrelic-infrastructure.enabled
 - name: minio
   version: 2.4.x
   repository: https://kubernetes-charts.storage.googleapis.com/
