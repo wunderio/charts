@@ -86,7 +86,7 @@ data:
         server_name drupal;                          
         listen 80;          
                                         
-        root /var/www/html/web;                                     
+        root /app/web;
         index index.php;
                                                                               
         include fastcgi.conf;

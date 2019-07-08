@@ -26,7 +26,7 @@ spec:
           {{- include "drupal.volumeMounts" . | nindent 10 }}
           {{- if .Values.referenceData.enabled }}
           - name: reference-data-volume
-            mountPath: /var/www/html/reference-data
+            mountPath: /app/reference-data
             {{- if ne .Values.referenceData.referenceEnvironment .Values.environmentName }}
             readOnly: true
             {{- end }}

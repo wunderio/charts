@@ -56,11 +56,11 @@ tests:
           count: 2
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
-          value: 'if [ ! -f /var/www/html/web/sites/default/files/_deployment ]; then foo; else exit 1; fi'
+          value: 'if [ ! -f /app/web/sites/default/files/_deployment ]; then foo; else exit 1; fi'
         documentIndex: 0
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
-          value: 'if [ ! -f /var/www/html/web/sites/default/files/_deployment ]; then bar; else exit 1; fi'
+          value: 'if [ ! -f /app/web/sites/default/files/_deployment ]; then bar; else exit 1; fi'
         documentIndex: 1
       - equal:
           path: spec.schedule
