@@ -16,6 +16,7 @@ jobs:
 
     steps:
       - checkout
+
       - silta/gcloud-login
 
       - run:
@@ -52,6 +53,8 @@ jobs:
     steps:
       - restore_cache:
           key: v1-{{ .Revision }}
+
+      - silta/gcloud-login
 
       - run:
           name: Deploy to Google Cloud Storage
