@@ -41,10 +41,18 @@ jobs:
 
             helm repo index /tmp/charts --url https://storage.googleapis.com/charts.wdr.io
 
+      - save_cache:
+          key: v1-{{ .Revision }}
+          paths:
+            - /tmp/charts
+
   deploy:
     executor: silta/silta
 
     steps:
+      - restore_cache:
+          key: v1-{{ .Revision }}
+
       - run:
           name: Deploy to Google Cloud Storage
           command: |
