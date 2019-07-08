@@ -16,6 +16,14 @@ jobs:
 
     steps:
       - checkout
+      - silta/gcloud-login
+
+      - run:
+          name: Copy index locally
+          command: |
+            mkdir -p /tmp/charts
+            gsutil -m rsync -d -r gs://charts.wdr.io /tmp/charts
+
       - run:
           name: Build charts
           command: |
@@ -29,11 +37,9 @@ jobs:
               CHART=`dirname $CHARTFILE`
               helm dependency build $CHART
               helm package $CHART --destination /tmp/charts
-
-              helm repo index /tmp/charts --url https://storage.googleapis.com/charts.wdr.io
             done
 
-      - silta/gcloud-login
+            helm repo index /tmp/charts --url https://storage.googleapis.com/charts.wdr.io
 
       - run:
           name: Deploy to Google Cloud Storage
