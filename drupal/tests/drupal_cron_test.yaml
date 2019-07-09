@@ -34,7 +34,7 @@ tests:
       mounts:
         - name: public-files
           storage: 123Gi
-          storageClassName: foo
+          storageClassName: silta-shared
           mountPath: /foo/bar/files
     asserts:
       - contains:

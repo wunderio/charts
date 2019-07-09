@@ -13,7 +13,7 @@ tests:
       mounts:
         - name: public-files
           storage: 123Gi
-          storageClassName: foo
+          storageClassName: silta-shared
           mountPath: /foo/bar/files
     asserts:
     # Only public files PVC is defined.
@@ -60,7 +60,7 @@ tests:
       referenceData:
         referenceEnvironment: 'feature/FOO'
         storage: 123Gi
-        storageClassName: foo
+        storageClassName: silta-shared
         schedule: '0 1 2 3 *'
         command: "echo Hello World"
       php.env:
@@ -68,7 +68,7 @@ tests:
       mounts:
         - name: public-files
           storage: 123Gi
-          storageClassName: foo
+          storageClassName: silta-shared
           mountPath: /foo/bar/files
     asserts:
     - hasDocuments:
@@ -78,7 +78,7 @@ tests:
       documentIndex: 3
       equal:
         path: spec.storageClassName
-        value: foo
+        value: silta-shared
     - template: drupal-volumes.yaml
       documentIndex: 3
       equal:
@@ -129,7 +129,7 @@ tests:
       mounts:
         - name: public-files
           storage: 123Gi
-          storageClassName: foo
+          storageClassName: silta-shared
           mountPath: /foo/bar/files
     asserts:
     - template: drupal-volumes.yaml
