@@ -32,9 +32,9 @@ spec:
           - name: GITAUTH_API_TOKEN
             value: {{ required "A valid .Values.gitAuth.apiToken entry required!" .Values.gitAuth.apiToken | quote }}
           - name: GITAUTH_HOST
-            value: {{ required "A valid .Values.gitAuth.apiToken entry required!" .Values.gitAuth.host | quote }}
+            value: {{ required "A valid .Values.gitAuth.host entry required!" .Values.gitAuth.host | quote }}
           - name: GITAUTH_ORGANISATION
-            value: {{ required "A valid .Values.gitAuth.apiToken entry required!" .Values.gitAuth.organisation | quote }}
+            value: {{ required "A valid .Values.gitAuth.organisation entry required!" .Values.gitAuth.organisation | quote }}
         volumeMounts:
         - name: shell-keys
           mountPath: /etc/ssh/keys
