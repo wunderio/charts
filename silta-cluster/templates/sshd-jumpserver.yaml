@@ -8,6 +8,10 @@ spec:
     - name: ssh
       port: 22
   type: "LoadBalancer"
+{{- if .Values.gitAuth.allowedIps }}
+  loadBalancerSourceRanges:
+    {{ .Values.gitAuth.allowedIps | toYaml }}
+{{- end }}
   selector:
     name: {{ .Release.Name }}-jumpserver
 ---
