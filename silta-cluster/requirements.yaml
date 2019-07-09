@@ -1,8 +1,4 @@
 dependencies:
-- name: nfs-server-provisioner
-  version: 0.1.x
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  condition: nfs-server-provisioner.enabled
 - name: ambassador
   version: 2.9.x
   repository: https://kubernetes-charts.storage.googleapis.com/
