@@ -17,26 +17,6 @@ ambassador:
   adminService:
     create: true
 
-nfs-server-provisioner:
-  enabled: true
-  persistence:
-    enabled: true
-    storageClass: standard
-    size: 10Gi
-  storageClass:
-    defaultClass: false
-    name: silta-shared
-    parameters:
-      mountOptions:
-        - vers=4.1
-  resources:
-    limits:
-      cpu: 200m
-      memory: 1G
-    requests:
-      cpu: 200m
-      memory: 1G
-
 # https://github.com/wunderio/charts/blob/master/csi-rclone/values.yaml
 csi-rclone:
   enabled: false

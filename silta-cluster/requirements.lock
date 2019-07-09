@@ -1,7 +1,4 @@
 dependencies:
-- name: nfs-server-provisioner
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 0.1.5
 - name: ambassador
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 2.9.0
@@ -20,5 +17,5 @@ dependencies:
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 0.1.4
-digest: sha256:25730f3d09ab37514a640574a4cda855be1cf1d019ea341f15de3b40ac2f9463
-generated: "2019-07-08T13:28:56.121143+02:00"
+digest: sha256:51533616b641f154acfb9c051c421a20164716b5cbe91d35a4d0f3dd8bcdfcd9
+generated: "2019-07-09T10:19:30.469169+02:00"
