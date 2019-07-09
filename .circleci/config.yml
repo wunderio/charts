@@ -9,7 +9,14 @@ jobs:
 
     steps:
       - checkout
-      - run: helm lint drupal/
+      - run:
+          name: Lint Helm charts
+          command: |
+            for CHARTFILE in `find . -name Chart.yaml`
+            do
+              CHART=`dirname $CHARTFILE`
+              helm lint $CHART
+            done
 
   build:
     executor: silta/silta
