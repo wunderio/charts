@@ -62,3 +62,10 @@ spec:
             value: {{ required "A valid .Values.gke.computeZone entry required!" .Values.gke.computeZone | quote }}
           - name: GCLOUD_CLUSTER_NAME
             value: {{ required "A valid .Values.gke.clusterName entry required!" .Values.gke.clusterName | quote }}
+        resources:
+          limits:
+            cpu: 100m
+            memory: 100M
+          requests:
+            cpu: 100m
+            memory: 100M
