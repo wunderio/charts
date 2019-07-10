@@ -89,18 +89,18 @@ php:
         tar xf reference-data/public_files.tar.gz
 
         drush cr
-        drush updatedb -n
+        drush updatedb -y
         if [ -f config/sync/core.extension.yml ]; then
-          drush config-import -n
+          drush config-import -y
         fi
 
       elif [ -f config/sync/core.extension.yml ]; then
         echo "Installing Drupal from existing configuration"
-        drush site-install -n config_installer
+        drush site-install -y config_installer
 
       else
         echo "No configuration found, installing a plain drupal site"
-        drush site-install -n standard
+        drush site-install -y standard
       fi
     resources:
       requests:
@@ -111,9 +111,9 @@ php:
   # This is run every time a new environment is upgraded.
   postupgrade:
     command: |
-      drush updatedb -n
+      drush updatedb -y
       if [ -f config/sync/core.extension.yml ]; then
-        drush config-import -n
+        drush config-import -y
       fi
 
   # Pass additional environment variables to all php containers as key-value pairs.
