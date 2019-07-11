@@ -171,5 +171,3 @@ data:
     access.log = /proc/self/fd/2
     catch_workers_output = yes
     clear_env = no
-
-    
