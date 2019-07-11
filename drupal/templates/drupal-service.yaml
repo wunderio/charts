@@ -11,7 +11,6 @@ metadata:
       kind:  Mapping
       name:  {{ .Release.Name }}-drupal
       host: {{ template "drupal.domain" . }}
-      prefix: /
       service: {{ .Release.Name }}-drupal.{{ .Release.Namespace }}.svc.cluster.local:80
       {{- .Values.ambassador.config | toYaml | nindent 6 }}
 {{- end }}
