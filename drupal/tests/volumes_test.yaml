@@ -7,14 +7,14 @@ tests:
       mounts:
         - name: public-files
           storage: 123Gi
-          storageClassName: foo
+          storageClassName: silta-shared
           mountPath: /app/web/sites/default/files
 
     asserts:
       - documentIndex: 1
         equal:
           path: spec.storageClassName
-          value: foo
+          value: silta-shared
       - documentIndex: 1
         equal:
           path: spec.resources.requests.storage

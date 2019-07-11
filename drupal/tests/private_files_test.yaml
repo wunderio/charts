@@ -10,7 +10,7 @@ tests:
       mounts:
         - name: public-files
           storage: 123Gi
-          storageClassName: foo
+          storageClassName: silta-shared
           mountPath: /foo/bar/files
     asserts:
       # No private files volume is mounted.
@@ -30,11 +30,11 @@ tests:
       mounts:
         - name: private-files
           storage: 123Gi
-          storageClassName: foo
+          storageClassName: silta-shared
           mountPath: /foo/bar/private
         - name: public-files
           storage: 123Gi
-          storageClassName: foo
+          storageClassName: silta-shared
           mountPath: /foo/bar/files
     asserts:
       # A private files volume is mounted
@@ -79,7 +79,7 @@ tests:
         documentIndex: 3
         equal:
           path: spec.storageClassName
-          value: foo
+          value: silta-shared
       - template: drupal-volumes.yaml
         documentIndex: 3
         equal:
