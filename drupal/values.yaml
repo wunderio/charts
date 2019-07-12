@@ -93,14 +93,8 @@ php:
         if [ -f config/sync/core.extension.yml ]; then
           drush config-import -y
         fi
-
-      elif [ -f config/sync/core.extension.yml ]; then
-        echo "Installing Drupal from existing configuration"
-        drush site-install -y config_installer
-
       else
-        echo "No configuration found, installing a plain drupal site"
-        drush site-install -y standard
+        printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
       fi
     resources:
       requests:

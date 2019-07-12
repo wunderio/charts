@@ -10,12 +10,19 @@ Basicauth username: {{ .Values.nginx.basicauth.credentials.username }}
 Basicauth password: {{ .Values.nginx.basicauth.credentials.password }}
 {{- end }}
 
-{{- if .Values.shell.enabled }}
+{{ if .Values.shell.enabled }}
 SSH connection:
 
-  ssh www-admin@{{ template "drupal.environment.hostname" . }}-shell.{{ .Release.Namespace }} -J www-admin@ssh.{{ .Values.clusterDomain }}
+  ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }}
 
-SSH connection (alternative):
+Importing a database dump:
 
-  ssh www-admin@{{ template "drupal.environment.hostname" . }}-shell.{{ .Release.Namespace }} -o ProxyCommand="ssh -W %h:%p www-admin@ssh.{{ .Values.clusterDomain }}"
-{{- end }}
+  ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-cli" < my_database_dump.sql
+
+{{ range $index, $mount := .Values.mounts -}}
+Importing files to {{ $mount.name }}:
+
+  rsync -azv -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' local_folder {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }}
+
+{{ end -}}
+{{- end -}}
