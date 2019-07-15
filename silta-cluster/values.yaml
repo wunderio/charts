@@ -45,6 +45,7 @@ gitAuth:
   host: 'github.com'
   organisation: ''
   apiToken: ''
+  allowedIps: []
 
 # Deployment remover
 deploymentRemover:
