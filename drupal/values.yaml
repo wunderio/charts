@@ -72,7 +72,7 @@ php:
   cron:
     - schedule: '0 * * * *'
       command: |
-        if drush check-bootstrap; then
+        if [[ `drush status --fields=bootstrap` = *'Successful'* ]] ; then
           drush cron;
         fi
 
@@ -167,7 +167,7 @@ referenceData:
 
   # The commands that is executed to export reference data.
   command: |
-    if drush check-bootstrap; then
+    if [[ `drush status --fields=bootstrap` = *'Successful'* ]] ; then
 
       if [ -d vendor/machbarmacher/gdpr-dump ] && [ -f gdpr.json ]; then
 
