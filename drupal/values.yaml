@@ -192,6 +192,9 @@ referenceData:
   storageClassName: silta-shared
   csiDriverName: csi-rclone
 
+  # Skips mounting the volume outside of the reference environment, only used programmatically.
+  skipMounting: false
+
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
 mariadb:
