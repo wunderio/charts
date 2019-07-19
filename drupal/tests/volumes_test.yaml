@@ -5,10 +5,9 @@ tests:
   - it: public files volume should be configurable
     set:
       mounts:
-        - name: public-files
+        public-files:
           storage: 123Gi
           storageClassName: silta-shared
-          mountPath: /app/web/sites/default/files
 
     asserts:
       - documentIndex: 1

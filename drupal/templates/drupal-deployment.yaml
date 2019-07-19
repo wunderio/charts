@@ -48,9 +48,11 @@ spec:
           name: drupal
         volumeMounts:
         {{- range $index, $mount := $.Values.mounts }}
-        - name: drupal-{{ $mount.name }}
+        {{- if eq $mount.enabled true }}
+        - name: drupal-{{ $index }}
           mountPath: {{ $mount.mountPath }}
           readOnly: true
+        {{- end }}
         {{- end }}
         - name: nginx-conf
           mountPath: /etc/nginx/nginx.conf # mount nginx-conf configmap volume to /etc/nginx

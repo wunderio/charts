@@ -23,7 +23,13 @@ spec:
               {{- include "drupal.volumeMounts" $ | nindent 14 }}
             command: ["/bin/sh", "-c"]
             args:
-              - "if [ ! {{ include "drupal.deployment-in-progress-test" . }} ]; then {{ $job.command }}; else exit 1; fi"
+              - |
+                 if [ ! {{ include "drupal.deployment-in-progress-test" . }} ]
+                 then
+                  {{ $job.command | nindent 18 -}}
+                 else
+                   exit 1
+                 fi
             resources:
               {{- $.Values.php.resources | toYaml | nindent 14 }}
           restartPolicy: OnFailure

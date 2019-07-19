@@ -10,11 +10,6 @@ tests:
     set:
       referenceData:
         referenceEnvironment: 'FOO'
-      mounts:
-        - name: public-files
-          storage: 123Gi
-          storageClassName: silta-shared
-          mountPath: /foo/bar/files
     asserts:
     # Only public files PVC is defined.
     - hasDocuments:
@@ -65,11 +60,6 @@ tests:
         command: "echo Hello World"
       php.env:
         foo: bar
-      mounts:
-        - name: public-files
-          storage: 123Gi
-          storageClassName: silta-shared
-          mountPath: /foo/bar/files
     asserts:
     - hasDocuments:
         count: 5
@@ -126,11 +116,6 @@ tests:
       referenceData:
         enabled: false
         referenceEnvironment: 'FOO'
-      mounts:
-        - name: public-files
-          storage: 123Gi
-          storageClassName: silta-shared
-          mountPath: /foo/bar/files
     asserts:
     - template: drupal-volumes.yaml
       hasDocuments:
@@ -145,6 +130,53 @@ tests:
           persistentVolumeClaim:
             claimName: foo-reference-data  
     - notContains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: "reference-data-volume"
+          mountPath: "/app/reference-data"
+
+  - it: can skip mounting on non-reference environments
+    set:
+      environmentName: 'BAR'
+      referenceData:
+        skipMount: true
+        referenceEnvironment: 'FOO'
+    asserts:
+    - template: drupal-volumes.yaml
+      hasDocuments:
+        count: 3
+    - template: reference-data-cron.yaml
+      hasDocuments:
+        count: 0
+    - notContains:
+        path: spec.template.spec.volumes
+        content:
+          name: "reference-data-volume"
+          persistentVolumeClaim:
+            claimName: foo-reference-data
+    - notContains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: "reference-data-volume"
+          mountPath: "/app/reference-data"
+
+  - it: does not skip mounting on the reference environments
+    set:
+      environmentName: 'FOO'
+      referenceData:
+        skipMount: true
+        referenceEnvironment: 'FOO'
+    asserts:
+    - template: drupal-volumes.yaml
+      hasDocuments:
+        count: 5
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: "reference-data-volume"
+          persistentVolumeClaim:
+            claimName: foo-reference-data
+    - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:
           name: "reference-data-volume"

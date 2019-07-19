@@ -6,12 +6,6 @@ templates:
   - drupal-cron.yaml
 tests:
   - it: private files should be disabled by default
-    set:
-      mounts:
-        - name: public-files
-          storage: 123Gi
-          storageClassName: silta-shared
-          mountPath: /foo/bar/files
     asserts:
       # No private files volume is mounted.
       - notContains:
@@ -28,14 +22,11 @@ tests:
   - it: private files should work when enabled
     set:
       mounts:
-        - name: private-files
+        private-files:
+          enabled: true
           storage: 123Gi
           storageClassName: silta-shared
           mountPath: /foo/bar/private
-        - name: public-files
-          storage: 123Gi
-          storageClassName: silta-shared
-          mountPath: /foo/bar/files
     asserts:
       # A private files volume is mounted
       - contains:
@@ -81,7 +72,8 @@ tests:
           path: spec.storageClassName
           value: silta-shared
       - template: drupal-volumes.yaml
-        documentIndex: 3
+        # Note that object attributes are iterated alphabetically, so "private-files" comes before "public-files"
+        documentIndex: 1
         equal:
           path: spec.resources.requests.storage
           value: 123Gi

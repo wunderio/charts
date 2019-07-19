@@ -30,12 +30,6 @@ tests:
             value: bar
 
   - it: has public files mounted
-    set:
-      mounts:
-        - name: public-files
-          storage: 123Gi
-          storageClassName: silta-shared
-          mountPath: /foo/bar/files
     asserts:
       - contains:
           path: spec.jobTemplate.spec.template.spec.volumes
@@ -47,20 +41,22 @@ tests:
   - it: runs multiple jobs
     set:
       php.cron:
-        - command: foo
+        drupal-cron:
+          command: foo
           schedule: "0 * * * *"
-        - command: bar
+        project-cron:
+          command: bar
           schedule: "30 * * * *"
     asserts:
       - hasDocuments:
           count: 2
-      - equal:
+      - matchRegex:
           path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
-          value: 'if [ ! -f /app/web/sites/default/files/_deployment ]; then foo; else exit 1; fi'
+          pattern: 'foo'
         documentIndex: 0
-      - equal:
+      - matchRegex:
           path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
-          value: 'if [ ! -f /app/web/sites/default/files/_deployment ]; then bar; else exit 1; fi'
+          pattern: 'bar'
         documentIndex: 1
       - equal:
           path: spec.schedule

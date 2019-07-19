@@ -13,8 +13,10 @@ ports:
 
 {{- define "drupal.volumeMounts" -}}
 {{- range $index, $mount := $.Values.mounts }}
-- name: drupal-{{ $mount.name }}
+{{- if eq $mount.enabled true }}
+- name: drupal-{{ $index }}
   mountPath: {{ $mount.mountPath }}
+{{- end }}
 {{- end }}
 - name: php-conf
   mountPath: /etc/php7/php.ini
@@ -28,13 +30,19 @@ ports:
   mountPath: /etc/php7/php-fpm.d/www.conf
   readOnly: true
   subPath: www_conf
+- name: gdpr-dump
+  mountPath: /etc/my.cnf.d/gdpr-dump.cnf
+  readOnly: true
+  subPath: gdpr-dump
 {{- end }}
 
 {{- define "drupal.volumes" -}}
 {{- range $index, $mount := $.Values.mounts }}
-- name: drupal-{{ $mount.name }}
+{{- if eq $mount.enabled true }}
+- name: drupal-{{ $index }}
   persistentVolumeClaim:
-    claimName: {{ $.Release.Name }}-{{ $mount.name }}
+    claimName: {{ $.Release.Name }}-{{ $index }}
+{{- end }}
 {{- end }}
 - name: php-conf
   configMap:
@@ -46,6 +54,12 @@ ports:
         path: php-fpm_conf
       - key: www_conf
         path: www_conf
+- name: gdpr-dump
+  configMap:
+    name: {{ .Release.Name }}-gdpr-dump
+    items:
+      - key: gdpr-dump
+        path: gdpr-dump
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}
@@ -89,7 +103,7 @@ imagePullSecrets:
   value: {{ $val | quote }}
 {{- end }}
 {{- range $index, $mount := $.Values.mounts }}
-- name: {{ regexReplaceAll "[^[:alnum:]]" $mount.name "_" | upper }}_PATH
+- name: {{ regexReplaceAll "[^[:alnum:]]" $index "_" | upper }}_PATH
   value: {{ $mount.mountPath }}
 {{- end }}
 {{- end }}
