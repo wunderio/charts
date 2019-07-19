@@ -65,12 +65,6 @@ tests:
             value: bar
 
   - it: has public files mounted
-    set:
-      mounts:
-        - name: public-files
-          storage: 123Gi
-          storageClassName: silta-shared
-          mountPath: /foo/bar/files
     asserts:
       - contains:
           path: spec.template.spec.volumes

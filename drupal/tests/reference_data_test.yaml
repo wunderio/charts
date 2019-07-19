@@ -60,11 +60,6 @@ tests:
         command: "echo Hello World"
       php.env:
         foo: bar
-      mounts:
-        - name: public-files
-          storage: 123Gi
-          storageClassName: silta-shared
-          mountPath: /foo/bar/files
     asserts:
     - hasDocuments:
         count: 5

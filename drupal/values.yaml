@@ -21,7 +21,12 @@ app: drupal
 replicas: 1
 
 # Domain names that will be mapped to this deployment.
-exposeDomains: []
+#
+# Note that the key is only used for documentation purposes, for example:
+#
+#   production: example.com
+#   www:        www.example.com
+exposeDomains: {}
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
@@ -47,9 +52,10 @@ nginx:
     # Trust X-Forwarded-For from these hosts for getting external IP 
     realipfrom: 10.0.0.0/8
 
-    # Add IP addresses that should be excluded from basicauth
+    # Add IP addresses that should be excluded from basicauth.
+    # Note that the key is only used for documentation purposes.
     noauthips:
-      - 10.0.0.0/8 # GKE internal IPs
+      gke-internal: 10.0.0.0/8
 
   # Robots txt file blocked by default
   robotsTxt:
@@ -70,7 +76,8 @@ php:
   # Cron tasks, each of which will be run into a dedicated temporary pod.
   # When overriding this value, make sure to include the `drush cron` command.
   cron:
-    - schedule: '0 * * * *'
+    drupal-cron:
+      schedule: '0 * * * *'
       command: |
         if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
           drush cron;
@@ -143,16 +150,18 @@ shell:
 
 # Configure the dynamically mounted volumes
 mounts:
-  - name: public-files
+  public-files:
+    enabled: true
     storage: 1G
     mountPath: /app/web/sites/default/files
     storageClassName: silta-shared
     csiDriverName: csi-rclone
-  # - name: private-files
-  #   storage: 1G
-  #   mountPath: /app/private
-  #   storageClassName: silta-shared
-  #   csiDriverName: csi-rclone
+  private-files:
+    enabled: false
+    storage: 1G
+    mountPath: /app/private
+    storageClassName: silta-shared
+    csiDriverName: csi-rclone
 
 # Configure reference data that will be used when creating new environments.
 referenceData:

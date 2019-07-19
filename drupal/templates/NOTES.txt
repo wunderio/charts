@@ -20,7 +20,7 @@ Importing a database dump:
   ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-cli" < my_database_dump.sql
 
 {{ range $index, $mount := .Values.mounts -}}
-Importing files to {{ $mount.name }}:
+Importing files to {{ $index }}:
 
   rsync -azv -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' local_folder {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }}
 

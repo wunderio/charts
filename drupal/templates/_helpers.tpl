@@ -13,8 +13,10 @@ ports:
 
 {{- define "drupal.volumeMounts" -}}
 {{- range $index, $mount := $.Values.mounts }}
-- name: drupal-{{ $mount.name }}
+{{- if eq $mount.enabled true }}
+- name: drupal-{{ $index }}
   mountPath: {{ $mount.mountPath }}
+{{- end }}
 {{- end }}
 - name: php-conf
   mountPath: /etc/php7/php.ini
@@ -36,9 +38,11 @@ ports:
 
 {{- define "drupal.volumes" -}}
 {{- range $index, $mount := $.Values.mounts }}
-- name: drupal-{{ $mount.name }}
+{{- if eq $mount.enabled true }}
+- name: drupal-{{ $index }}
   persistentVolumeClaim:
-    claimName: {{ $.Release.Name }}-{{ $mount.name }}
+    claimName: {{ $.Release.Name }}-{{ $index }}
+{{- end }}
 {{- end }}
 - name: php-conf
   configMap:
@@ -99,7 +103,7 @@ imagePullSecrets:
   value: {{ $val | quote }}
 {{- end }}
 {{- range $index, $mount := $.Values.mounts }}
-- name: {{ regexReplaceAll "[^[:alnum:]]" $mount.name "_" | upper }}_PATH
+- name: {{ regexReplaceAll "[^[:alnum:]]" $index "_" | upper }}_PATH
   value: {{ $mount.mountPath }}
 {{- end }}
 {{- end }}

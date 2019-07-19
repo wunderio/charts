@@ -30,12 +30,6 @@ tests:
             value: bar
 
   - it: has public files mounted
-    set:
-      mounts:
-        - name: public-files
-          storage: 123Gi
-          storageClassName: silta-shared
-          mountPath: /foo/bar/files
     asserts:
       - contains:
           path: spec.jobTemplate.spec.template.spec.volumes
@@ -47,9 +41,11 @@ tests:
   - it: runs multiple jobs
     set:
       php.cron:
-        - command: foo
+        drupal-cron:
+          command: foo
           schedule: "0 * * * *"
-        - command: bar
+        project-cron:
+          command: bar
           schedule: "30 * * * *"
     asserts:
       - hasDocuments:
