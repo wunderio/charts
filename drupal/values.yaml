@@ -171,7 +171,7 @@ referenceData:
   command: |
     if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
 
-      if [ -d vendor/machbarmacher/gdpr-dump ] && [ -f gdpr.json ]; then
+      if [ -d vendor/machbarmacher/gdpr-dump ]; then
 
         # NFS doesn't support replacing files, so we delete them instead.
         rm -f reference-data/*
@@ -182,7 +182,7 @@ referenceData:
         # Export public files.
         tar cz --exclude=css --exclude=js --exclude=styles -f reference-data/public_files.tar.gz web/sites/default/files/
       else
-        echo "Reference dumps are only enabled with proper sanitization. Make sure machbarmacher/gdpr-dump is installed and gdpr.json is present in the project root."
+        echo "Reference dumps are only enabled with proper sanitization. Make sure machbarmacher/gdpr-dump is installed."
       fi
     else
       echo "Drupal is not installed, skipping reference database dump."
@@ -194,6 +194,19 @@ referenceData:
 
   # Skips mounting the volume outside of the reference environment, only used programmatically.
   skipMounting: false
+
+# Parameters for sanitizing reference data with gdpr-dump.
+# Uses formatters from https://packagist.org/packages/fzaninotto/faker.
+gdprDump:
+  users_field_data:
+    name:
+      formatter: name
+    pass:
+      formatter: password
+    mail:
+      formatter: email
+    init:
+      formatter: clear
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.

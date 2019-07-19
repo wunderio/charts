@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-gdpr-dump
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+data:
+  gdpr-dump: |
+    [mysqldump]
+    gdpr-replacements='{{ .Values.gdprDump | toJson }}'

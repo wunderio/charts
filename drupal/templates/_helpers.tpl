@@ -28,6 +28,10 @@ ports:
   mountPath: /etc/php7/php-fpm.d/www.conf
   readOnly: true
   subPath: www_conf
+- name: gdpr-dump
+  mountPath: /etc/my.cnf.d/gdpr-dump.cnf
+  readOnly: true
+  subPath: gdpr-dump
 {{- end }}
 
 {{- define "drupal.volumes" -}}
@@ -46,6 +50,12 @@ ports:
         path: php-fpm_conf
       - key: www_conf
         path: www_conf
+- name: gdpr-dump
+  configMap:
+    name: {{ .Release.Name }}-gdpr-dump
+    items:
+      - key: gdpr-dump
+        path: gdpr-dump
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}
