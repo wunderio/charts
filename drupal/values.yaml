@@ -72,7 +72,7 @@ php:
   cron:
     - schedule: '0 * * * *'
       command: |
-        if [[ `drush status --fields=bootstrap` = *'Successful'* ]] ; then
+        if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
           drush cron;
         fi
 
@@ -105,9 +105,11 @@ php:
   # This is run every time a new environment is upgraded.
   postupgrade:
     command: |
-      drush updatedb -y
-      if [ -f config/sync/core.extension.yml ]; then
-        drush config-import -y
+      if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
+        drush updatedb -y
+        if [ -f config/sync/core.extension.yml ]; then
+          drush config-import -y
+        fi
       fi
 
   # Pass additional environment variables to all php containers as key-value pairs.
@@ -151,11 +153,11 @@ mounts:
   #   mountPath: /app/private
   #   storageClassName: silta-shared
   #   csiDriverName: csi-rclone
-  
+
 # Configure reference data that will be used when creating new environments.
 referenceData:
   enabled: true
-  
+
   # The name of the environment from which reference data will be copied.
   referenceEnvironment: 'master'
 
@@ -167,7 +169,7 @@ referenceData:
 
   # The commands that is executed to export reference data.
   command: |
-    if [[ `drush status --fields=bootstrap` = *'Successful'* ]] ; then
+    if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
 
       if [ -d vendor/machbarmacher/gdpr-dump ] && [ -f gdpr.json ]; then
 

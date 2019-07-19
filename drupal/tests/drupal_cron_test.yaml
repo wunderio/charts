@@ -54,13 +54,13 @@ tests:
     asserts:
       - hasDocuments:
           count: 2
-      - equal:
+      - matchRegex:
           path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
-          value: 'if [ ! -f /app/web/sites/default/files/_deployment ]; then foo; else exit 1; fi'
+          pattern: 'foo'
         documentIndex: 0
-      - equal:
+      - matchRegex:
           path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
-          value: 'if [ ! -f /app/web/sites/default/files/_deployment ]; then bar; else exit 1; fi'
+          pattern: 'bar'
         documentIndex: 1
       - equal:
           path: spec.schedule
