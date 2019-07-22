@@ -76,7 +76,7 @@ php:
   # Cron tasks, each of which will be run into a dedicated temporary pod.
   # When overriding this value, make sure to include the `drush cron` command.
   cron:
-    drupal-cron:
+    drupal:
       schedule: '0 * * * *'
       command: |
         if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then

@@ -41,7 +41,7 @@ tests:
   - it: runs multiple jobs
     set:
       php.cron:
-        drupal-cron:
+        drupal:
           command: foo
           schedule: "0 * * * *"
         project-cron:
