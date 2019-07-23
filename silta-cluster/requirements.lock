@@ -1,13 +1,13 @@
 dependencies:
 - name: ambassador
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 2.12.4
+  version: 2.12.5
 - name: redis
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 8.1.4
+  version: 8.1.5
 - name: kube-state-metrics
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 2.0.0
+  version: 0.14.1
 - name: newrelic-infrastructure
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 0.13.0
@@ -17,5 +17,5 @@ dependencies:
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 0.1.4
-digest: sha256:211fbc2ba6cc3ba6c0f6f79f7e96d5be1fbb6036a822a7373b5d3c1aeb15ca9f
-generated: "2019-07-18T16:36:36.030667+02:00"
+digest: sha256:90b7cdd25d6ee350c6dbe0a85f68fa7d04abd8b39feb3ddd10572ad7e5e60d32
+generated: "2019-07-22T11:14:45.410717788Z"
