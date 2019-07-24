@@ -5,6 +5,7 @@ ambassador:
   service:
     https:
       enabled: false
+    externalTrafficPolicy: Local
     annotations:
       getambassador.io/config: |
         ---
