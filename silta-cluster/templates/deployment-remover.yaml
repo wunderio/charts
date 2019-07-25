@@ -62,3 +62,5 @@ spec:
             value: {{ required "A valid .Values.gke.computeZone entry required!" .Values.gke.computeZone | quote }}
           - name: GCLOUD_CLUSTER_NAME
             value: {{ required "A valid .Values.gke.clusterName entry required!" .Values.gke.clusterName | quote }}
+        resources:
+          {{- .Values.deploymentRemover.resources | toYaml | nindent 10 }}

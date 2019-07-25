@@ -61,6 +61,8 @@ gitAuth:
 deploymentRemover:
   # Github webhooks secret
   webhooksSecret: ''
+  # Kubernetes resource allocation.
+  resources: {}
 
 # GKE Cluster settings
 gke:
