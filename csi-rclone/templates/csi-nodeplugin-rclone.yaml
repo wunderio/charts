@@ -38,6 +38,8 @@ spec:
               mountPath: /plugin
             - name: registration-dir
               mountPath: /registration
+          resources:
+            {{- .Values.nodePlugin.registrar.resources | toYaml | nindent 12 }}
         - name: rclone
           securityContext:
             privileged: true
@@ -68,6 +70,8 @@ spec:
             - name: pods-mount-dir
               mountPath: /var/lib/kubelet/pods
               mountPropagation: "Bidirectional"
+          resources:
+            {{- .Values.nodePlugin.rclone.resources | toYaml | nindent 12 }}
       volumes:
         - name: plugin-dir
           hostPath:

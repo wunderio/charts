@@ -23,6 +23,12 @@ params:
   s3-access-key-id: "AKIAIOSFODNN7EXAMPLE"
   s3-secret-access-key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
 
+nodePlugin:
+  registrar:
+    resources: {}
+  rclone:
+    resources: {}
+
 controller:
   attacher:
     resources: {}
