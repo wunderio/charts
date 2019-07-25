@@ -54,6 +54,8 @@ gitAuth:
   organisation: ''
   apiToken: ''
   allowedIps: []
+  # Kubernetes resource allocation.
+  resources: {}
 
 # Deployment remover
 deploymentRemover:
