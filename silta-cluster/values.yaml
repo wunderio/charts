@@ -40,6 +40,14 @@ csi-rclone:
 minio:
   enabled: false
 
+# Splash page.
+splash:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 10M
+
+
 # SSH Jumphost settings
 gitAuth:
   host: 'github.com'

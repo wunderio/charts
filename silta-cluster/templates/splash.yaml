@@ -11,7 +11,7 @@ metadata:
       name:  {{ .Release.Name }}-splash
       prefix: /
       service: {{ .Release.Name }}-splash:80
-      
+
 spec:
   type: NodePort
   ports:
@@ -38,6 +38,4 @@ spec:
       - image: "wunderio/silta-splash"
         name: nginx
         resources:
-          requests:
-            cpu: 10m
-            memory: 10M
+          {{- .Values.splash.resources | toYaml | nindent 10 }}
