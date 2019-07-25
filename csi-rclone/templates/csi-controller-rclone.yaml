@@ -31,6 +31,8 @@ spec:
           volumeMounts:
             - name: socket-dir
               mountPath: /csi
+          resources:
+            {{- .Values.controller.attacher.resources | toYaml | nindent 12 }}
         - name: csi-cluster-driver-registrar
           image: quay.io/k8scsi/csi-cluster-driver-registrar:v1.0.1
           args:
@@ -43,6 +45,8 @@ spec:
           volumeMounts:
             - name: socket-dir
               mountPath: /csi
+          resources:
+            {{- .Values.controller.registrar.resources | toYaml | nindent 12 }}
         - name: rclone
           image: wunderio/csi-rclone:{{- .Values.version }}
           imagePullPolicy: Always
@@ -61,6 +65,8 @@ spec:
           volumeMounts:
             - name: socket-dir
               mountPath: /plugin
+          resources:
+            {{- .Values.controller.rclone.resources | toYaml | nindent 12 }}
       volumes:
         - name: socket-dir
           emptyDir: {}
