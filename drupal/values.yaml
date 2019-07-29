@@ -202,7 +202,7 @@ referenceData:
   csiDriverName: csi-rclone
 
   # Skips mounting the volume outside of the reference environment, only used programmatically.
-  skipMounting: false
+  skipMount: false
 
 # Parameters for sanitizing reference data with gdpr-dump.
 # Uses formatters from https://packagist.org/packages/fzaninotto/faker.
