@@ -20,7 +20,7 @@ spec:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
               - name: reference-data-volume
                 mountPath: /app/reference-data
-            command: ["/bin/sh", "-c"]
+            command: ["/bin/bash", "-c"]
             args:
               - {{ .Values.referenceData.command | quote }}
             resources:

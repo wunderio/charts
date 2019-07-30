@@ -21,7 +21,7 @@ spec:
             {{- include "drupal.php-container" $ | nindent 12 }}
             volumeMounts:
               {{- include "drupal.volumeMounts" $ | nindent 14 }}
-            command: ["/bin/sh", "-c"]
+            command: ["/bin/bash", "-c"]
             args:
               - |
                  if [ ! {{ include "drupal.deployment-in-progress-test" . }} ]

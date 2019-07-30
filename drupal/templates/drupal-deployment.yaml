@@ -21,7 +21,7 @@ spec:
       initContainers:
       - name: wait-for-db
         {{ include "drupal.php-container" . | nindent 8 }}
-        command: ["/bin/sh", "-c"]
+        command: ["/bin/bash", "-c"]
         args:
         - {{ include "drupal.wait-for-db-command" . | quote }}
       containers:
@@ -35,7 +35,7 @@ spec:
             port: 9000
         readinessProbe:
           exec:
-            command: ['/bin/sh', '-c', 'if [ {{ include "drupal.deployment-in-progress-test" . }} ]; then exit 1; fi']
+            command: ['/bin/bash', '-c', 'if [ {{ include "drupal.deployment-in-progress-test" . }} ]; then exit 1; fi']
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
 
