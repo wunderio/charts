@@ -36,9 +36,11 @@ spec:
   resources:
     requests:
       storage: {{ $mount.storage }}
+{{- if eq $mount.storageClassName "silta-shared" }}
   selector:
     matchLabels:
       name: {{ $.Release.Name }}-{{ $index }}
+{{- end }}
 ---
 {{- end -}}
 {{- end }}
@@ -79,9 +81,11 @@ spec:
   resources:
     requests:
       storage: {{ .Values.referenceData.storage }}
+{{- if eq .Values.referenceData.storageClassName "silta-shared" }}
   selector:
     matchLabels:
       name: {{ .Release.Name }}-reference-data
+{{- end }}
 {{- end }}
 {{- end }}
 ---
