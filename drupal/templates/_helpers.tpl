@@ -98,6 +98,8 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ .Release.Name }}-secrets-drupal
       key: hashsalt
+- name: DRUPAL_CONFIG_PATH
+  value: {{ .Values.php.drupalConfigPath }}
 {{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}

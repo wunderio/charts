@@ -112,7 +112,7 @@ php:
 
         drush cr
         drush updatedb -y
-        if [ -f config/sync/core.extension.yml ]; then
+        if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
           drush config-import -y
         fi
       else
@@ -129,7 +129,7 @@ php:
     command: |
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
         drush updatedb -y
-        if [ -f config/sync/core.extension.yml ]; then
+        if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
           drush config-import -y
         fi
       fi
@@ -146,6 +146,10 @@ php:
     loglevel: notice # Possible Values: alert, error, warning, notice, debug
     upload_max_filesize: 60M
     post_max_size: 60M
+
+  # Define the location of the Drupal config files relative to the composer root.
+  # This variable is exposed as $DRUPAL_CONFIG_PATH in the container.
+  drupalConfigPath: "config/sync"
 
 
 # Configuration for everything that runs in shell container.
