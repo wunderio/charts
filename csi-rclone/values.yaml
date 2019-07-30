@@ -22,3 +22,17 @@ params:
   # Default credentials of minio chart https://github.com/helm/charts/tree/master/stable/minio
   s3-access-key-id: "AKIAIOSFODNN7EXAMPLE"
   s3-secret-access-key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+
+nodePlugin:
+  registrar:
+    resources: {}
+  rclone:
+    resources: {}
+
+controller:
+  attacher:
+    resources: {}
+  registrar:
+    resources: {}
+  rclone:
+    resources: {}

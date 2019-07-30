@@ -16,6 +16,7 @@ jobs:
             do
               CHART=`dirname $CHARTFILE`
               helm lint $CHART
+              helm unittest $CHART
             done
 
   build:

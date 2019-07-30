@@ -46,6 +46,8 @@ spec:
       - name: shell-keys
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-shell-keys
+      resources:
+        {{- .Values.gitAuth.resources | toYaml | nindent 8 }}
 
 ---
 apiVersion: v1

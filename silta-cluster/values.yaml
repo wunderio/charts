@@ -41,17 +41,29 @@ csi-rclone:
 minio:
   enabled: false
 
+# Splash page.
+splash:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 10M
+
+
 # SSH Jumphost settings
 gitAuth:
   host: 'github.com'
   organisation: ''
   apiToken: ''
   allowedIps: []
+  # Kubernetes resource allocation.
+  resources: {}
 
 # Deployment remover
 deploymentRemover:
   # Github webhooks secret
   webhooksSecret: ''
+  # Kubernetes resource allocation.
+  resources: {}
 
 # GKE Cluster settings
 gke:

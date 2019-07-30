@@ -1,0 +1,27 @@
+suite: CSI Node Plugin
+templates:
+  - csi-nodeplugin-rclone.yaml
+tests:
+  - it: is a daemon
+    asserts:
+      - isKind:
+          of: DaemonSet
+
+  - it: can set resources
+    set:
+      nodePlugin:
+        registrar:
+          resources:
+            requests:
+              cpu: 123m
+        rclone:
+          resources:
+            requests:
+              cpu: 456m
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: 123m
+      - equal:
+          path: spec.template.spec.containers[1].resources.requests.cpu
+          value: 456m
