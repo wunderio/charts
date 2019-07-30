@@ -20,6 +20,21 @@ app: drupal
 # Multiple pods make sense for high availability.
 replicas: 1
 
+# Enable autoscaling using HorizontalPodAutoscaler
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: 80
+
 # Domain names that will be mapped to this deployment.
 #
 # Note that the key is only used for documentation purposes, for example:
