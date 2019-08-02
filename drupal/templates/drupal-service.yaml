@@ -7,7 +7,7 @@ metadata:
   annotations:
 {{- if .Values.ambassador.enabled }}
     getambassador.io/config: |
-      apiVersion: ambassador/v0
+      apiVersion: ambassador/v1
       kind:  Mapping
       name:  {{ .Release.Name }}-drupal
       host: {{ template "drupal.domain" . }}

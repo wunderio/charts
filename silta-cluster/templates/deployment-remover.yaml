@@ -5,7 +5,7 @@ metadata:
   name: {{ .Release.Name }}-deployment-remover
   annotations:
     getambassador.io/config: |
-      apiVersion: ambassador/v0
+      apiVersion: ambassador/v1
       kind:  Mapping
       name:  {{ .Release.Name }}-deployment-remover
       host: webhooks.{{ .Values.clusterDomain }}

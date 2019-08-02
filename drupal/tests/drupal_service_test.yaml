@@ -33,7 +33,7 @@ tests:
     asserts:
       - matchRegex:
           path: metadata.annotations.getambassador\.io/config
-          pattern: 'apiVersion: ambassador/v0'
+          pattern: 'apiVersion: ambassador/v1'
 
   - it: adds ambassador config values
     set:
