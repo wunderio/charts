@@ -7,15 +7,15 @@ dependencies:
   version: 8.1.5
 - name: kube-state-metrics
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 0.14.1
+  version: 2.2.1
 - name: newrelic-infrastructure
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 0.13.0
+  version: 0.13.4
 - name: minio
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 2.5.1
+  version: 2.5.4
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 0.1.4
-digest: sha256:90b7cdd25d6ee350c6dbe0a85f68fa7d04abd8b39feb3ddd10572ad7e5e60d32
-generated: "2019-07-22T11:14:45.410717788Z"
+digest: sha256:ec3c23896b378e1f0fdb2d15ebf673909aec4f5161b62758740a766217fa4e77
+generated: "2019-08-02T14:55:24.982393+02:00"

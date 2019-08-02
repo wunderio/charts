@@ -6,7 +6,7 @@ dependencies:
   version: 8.1.x
   repository: https://kubernetes-charts.storage.googleapis.com/
 - name: kube-state-metrics
-  version: 0.14.x
+  version: 2.2.x
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: kube-state-metrics.enabled
 - name: newrelic-infrastructure
