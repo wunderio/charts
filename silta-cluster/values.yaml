@@ -102,6 +102,9 @@ metricbeat:
   elasticsearchPassword: ''
   elasticsearchCloudAuth: ''
 
+kube-state-metrics:
+  enabled: false
+
 # Newrelic monitoring
 # https://github.com/helm/charts/tree/master/stable/newrelic-infrastructure
 newrelic-infrastructure:
