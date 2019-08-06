@@ -1,0 +1,38 @@
+suite: reference data
+templates:
+  - backup-cron.yaml
+  - backup-volume.yaml
+tests:
+
+  - it: By default no backup cron job or volume is created
+    asserts:
+    - hasDocuments:
+        count: 0
+    - hasDocuments:
+        count: 0
+      template: backup-volume.yaml
+
+  - it: creates a backup cron job and volume
+    set:
+      backup:
+        enabled: true
+    asserts:
+    - hasDocuments:
+        count: 1
+    - isKind:
+        of: CronJob
+    - hasDocuments:
+        count: 2
+      template: backup-volume.yaml
+
+  - it: has no gdpr-dump configuration
+    set:
+      backup.enabled: true
+    asserts:
+    - notContains:
+        path: spec.jobTemplate.spec.template.spec.containers[0].volumeMounts
+        content:
+          name: gdpr-dump
+          mountPath: /etc/my.cnf.d/gdpr-dump.cnf
+          readOnly: true
+          subPath: gdpr-dump

@@ -6,7 +6,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
-  schedule: {{ $job.schedule | quote }}
+  schedule: {{ $job.schedule | replace "~" (randNumeric 1) | quote }}
   concurrencyPolicy: Forbid
   backOffLimit: 3
   jobTemplate:

@@ -1,0 +1,72 @@
+{{- if .Values.backup.enabled }}
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-backup
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.backup.schedule | replace "~" (randNumeric 1) | quote }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            {{- include "drupal.php-container" . | nindent 12 }}
+            volumeMounts:
+              {{- include "drupal.volumeMounts" . | nindent 14 }}
+              - name: backup
+                mountPath: /backups
+            command: ["/bin/bash", "-c"]
+            args:
+              - |
+                # Generate the id of the backup.
+                BACKUP_ID=`date +%Y-%m-%d`
+                BACKUP_LOCATION="/backups/$BACKUP_ID-{{ .Values.environmentName }}"
+
+                # Create a folder for the backup
+                mkdir -p $BACKUP_LOCATION
+
+                # Figure out which tables to skip.
+                IGNORE_TABLES=""
+                for TABLE in `drush sql-query "show tables;" | grep -E '{{ .Values.backup.ignoreTableContent }}'` ;
+                do
+                  IGNORE_TABLES="$IGNORE_TABLES --ignore-table=$DB_NAME.$TABLE";
+                done
+
+                # Take a database dump. We use the full path to bypass gdpr-dump
+                /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $DB_NAME $IGNORE_TABLES > /tmp/db.sql
+                /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORE_TABLES >> /tmp/db.sql
+
+                # Compress the database dump and copy it into the backup folder.
+                # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
+                gzip -9 /tmp/db.sql
+                cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
+
+                {{ range $index, $mount := .Values.mounts -}}
+                {{- if eq $mount.enabled true -}}
+                # File backup for {{ $index }} volume.
+                tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
+                {{- end -}}
+                {{- end }}
+
+                # Delete old backups
+                find /backups/ -mtime +{{ .Values.backup.retention }} -exec rm -r {} \;
+
+                # List content of backup folder
+                ls -lh /backups/*
+            resources:
+              {{- .Values.php.resources | toYaml | nindent 14 }}
+          restartPolicy: OnFailure
+          volumes:
+            {{- include "drupal.volumes" . | nindent 12 }}
+            - name: backup
+              persistentVolumeClaim:
+                claimName: backup
+
+
+          {{- include "drupal.imagePullSecrets" . | nindent 10 }}
+{{- end }}
+---

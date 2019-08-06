@@ -92,7 +92,8 @@ php:
   # When overriding this value, make sure to include the `drush cron` command.
   cron:
     drupal:
-      schedule: '0 * * * *'
+      # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
+      schedule: '~ * * * *'
       command: |
         if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
           drush cron;
@@ -229,6 +230,31 @@ gdprDump:
       formatter: email
     init:
       formatter: clear
+
+backup:
+  # Whether backups should be taken for the current environment.
+  enabled: false
+
+  # Cron schedule when backups should be taken, this is expected to take place daily.
+  # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
+  schedule: '~ 2 * * *'
+
+  # How many daily backups to preserve.
+  retention: 7
+
+  # If specified, replace environment content with the given backup.
+  restoreId: null
+
+  # Specify how to restore a backup.
+  restoreCommand: |
+    # figure out how to restore
+
+  storage: 10G
+  storageClassName: silta-shared
+  csiDriverName: csi-rclone
+
+  # These tables will have their content ignored from the backups.
+  ignoreTableContent: '(cache|cache_.*)'
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.

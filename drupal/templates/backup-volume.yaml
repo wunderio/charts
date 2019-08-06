@@ -1,0 +1,41 @@
+{{- if .Values.backup.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: backup
+  labels:
+    name: backup
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: {{ .Values.backup.storage }}
+  storageClassName: {{ .Values.backup.storageClassName }}
+  {{- if .Values.backup.csiDriverName }}
+  csi:
+    driver: {{ .Values.backup.csiDriverName }}
+    volumeHandle: {{ .Release.Namespace }}-backup
+    volumeAttributes:
+      remotePathSuffix: /{{ .Release.Namespace }}/backup
+  {{- end }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backup
+  labels:
+    app: {{ .Values.app | quote }}
+    release: {{ .Release.Name }}
+spec:
+  storageClassName: {{ .Values.backup.storageClassName }}
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.backup.storage }}
+{{- if eq .Values.backup.storageClassName "silta-shared" }}
+  selector:
+    matchLabels:
+      name: backup
+{{- end }}
+{{- end }}
