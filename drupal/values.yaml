@@ -198,20 +198,14 @@ referenceData:
   # The commands that is executed to export reference data.
   command: |
     if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
+      # NFS doesn't support replacing files, so we delete them instead.
+      rm -f reference-data/*
 
-      if [ -d vendor/machbarmacher/gdpr-dump ]; then
+      # Export database dump.
+      drush sql-dump --gzip --result-file ../reference-data/db.sql
 
-        # NFS doesn't support replacing files, so we delete them instead.
-        rm -f reference-data/*
-
-        # Export database dump.
-        drush sql-dump --gzip --result-file ../reference-data/db.sql
-
-        # Export public files.
-        tar cz --exclude=css --exclude=js --exclude=styles -f reference-data/public_files.tar.gz web/sites/default/files/
-      else
-        echo "Reference dumps are only enabled with proper sanitization. Make sure machbarmacher/gdpr-dump is installed."
-      fi
+      # Export public files.
+      tar cz --exclude=css --exclude=js --exclude=styles -f reference-data/public_files.tar.gz web/sites/default/files/
     else
       echo "Drupal is not installed, skipping reference database dump."
     fi
