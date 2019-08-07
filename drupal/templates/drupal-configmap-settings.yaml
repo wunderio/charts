@@ -5,5 +5,4 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 data:
-  settings_silta_php: |
-    {{ .Files.Get "files/settings.silta.php" | nindent 4 }}
+  settings_silta_php: |{{ .Files.Get "files/settings.silta.php" | nindent 4 }}
