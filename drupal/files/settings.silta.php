@@ -47,3 +47,11 @@ $settings['php_storage']['twig']['directory'] = '../generated-php';
  * Other hostnames wouldn't reach the pod in silta anyway.
  */
 $settings['trusted_host_patterns'][] = '^.*$';
+
+/**
+ * Show all error messages, with backtrace information.
+ *
+ * In case the error level could not be fetched from the database, as for
+ * example the database connection failed, we rely only on this value.
+ */
+$config['system.logging']['error_level'] = getenv('ERROR_LEVEL');

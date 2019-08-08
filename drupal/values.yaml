@@ -142,6 +142,10 @@ php:
   # users to log in. If not provided, a random value will be used.
   hashsalt: "template-hash-salt"
 
+  # Set whether Drupal errors are displayed.
+  # This is a useful override for development environments.
+  errorLevel: "verbose"
+
   # Custom php settings.
   php_ini:
     loglevel: notice # Possible Values: alert, error, warning, notice, debug

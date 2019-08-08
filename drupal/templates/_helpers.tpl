@@ -86,6 +86,8 @@ imagePullSecrets:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
 {{- end }}
+- name: ERROR_LEVEL
+  value: {{ .Values.php.errorLevel }}
 {{- if .Values.memcached.enabled }}
 - name: MEMCACHED_HOST
   value: {{ .Release.Name }}-memcached
