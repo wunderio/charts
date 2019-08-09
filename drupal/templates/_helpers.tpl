@@ -140,8 +140,8 @@ TIME_WAITING=0
 done
 {{- end }}
 
-{{- define "drupal.deployment-in-progress-test" -}}
--f /app/web/sites/default/files/_deployment
+{{- define "drupal.installation-in-progress-test" -}}
+-f /app/web/sites/default/files/_installing
 {{- end -}}
 
 {{- define "drupal.post-release-command" -}}
@@ -150,9 +150,9 @@ set -e
 {{ include "drupal.wait-for-db-command" . }}
 
 {{ if .Release.IsInstall }}
-touch /app/web/sites/default/files/_deployment
+touch /app/web/sites/default/files/_installing
 {{ .Values.php.postinstall.command}}
-rm /app/web/sites/default/files/_deployment
+rm /app/web/sites/default/files/_installing
 {{ else }}
 {{ .Values.php.postupgrade.command}}
 {{ end }}

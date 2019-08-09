@@ -18,12 +18,6 @@ spec:
         {{- include "drupal.release_labels" . | nindent 8 }}
         deployment: drupal
     spec:
-      initContainers:
-      - name: wait-for-db
-        {{ include "drupal.php-container" . | nindent 8 }}
-        command: ["/bin/bash", "-c"]
-        args:
-        - {{ include "drupal.wait-for-db-command" . | quote }}
       containers:
       # php-fpm container.
       - name: php
@@ -35,7 +29,8 @@ spec:
             port: 9000
         readinessProbe:
           exec:
-            command: ['/bin/bash', '-c', 'if [ {{ include "drupal.deployment-in-progress-test" . }} ]; then exit 1; fi']
+            # Prevent coming in during the installation process.
+            command: ['/bin/bash', '-c', 'if [ {{ include "drupal.installation-in-progress-test" . }} ]; then exit 1; fi']
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
 

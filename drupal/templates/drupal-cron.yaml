@@ -24,7 +24,7 @@ spec:
             command: ["/bin/bash", "-c"]
             args:
               - |
-                 if [ ! {{ include "drupal.deployment-in-progress-test" . }} ]
+                 if [ ! {{ include "drupal.installation-in-progress-test" . }} ]
                  then
                   {{ $job.command | nindent 18 -}}
                  else
