@@ -22,17 +22,13 @@ replicas: 1
 
 # Enable autoscaling using HorizontalPodAutoscaler
 autoscaling:
-  enabled: true
+  enabled: false
   minReplicas: 1
   maxReplicas: 3
   metrics:
     - type: Resource
       resource:
         name: cpu
-        targetAverageUtilization: 80
-    - type: Resource
-      resource:
-        name: memory
         targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
