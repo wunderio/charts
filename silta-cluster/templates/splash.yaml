@@ -9,13 +9,15 @@ metadata:
       apiVersion: ambassador/v1
       kind:  Mapping
       name:  {{ .Release.Name }}-splash
+      host: {{ .Values.clusterDomain }}
       prefix: /
       service: {{ .Release.Name }}-splash:80
 
 spec:
   type: NodePort
   ports:
-    - port: 80
+    - name: http
+      port: 80
   selector:
     name: {{ .Release.Name }}-splash
 ---
