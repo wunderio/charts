@@ -5,7 +5,7 @@ storageClass:
   name: "rclone"
 
 # rclone CSI plugin image release version. https://cloud.docker.com/u/wunderio/repository/docker/wunderio/csi-rclone
-version: v1.2.1
+version: v1.2.3
 
 # use default parameters. You might want set this to false when using as subchart.
 defaultParams: true
