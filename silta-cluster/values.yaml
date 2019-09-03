@@ -3,8 +3,15 @@ clusterDomain: "silta.wdr.io"
 
 ambassador:
   service:
+    ports:
+      - name: http
+        port: 80
+        targetPort: 8080
+      - name: https
+        port: 443
+        targetPort: 8080
     https:
-      enabled: false
+      enabled: true
     externalTrafficPolicy: Local
     annotations:
       getambassador.io/config: |
@@ -13,10 +20,20 @@ ambassador:
         kind: Module
         name: ambassador
         config:
-          service_port: 8080
+          service_port: 8443
           use_remote_address: true
+        ---
+        apiVersion: getambassador.io/v1
+        kind: Module
+        name: tls
+        config:
+          server:
+            enabled: true
+            redirect_cleartext_from: 8080
   adminService:
     create: true
+  replicaCount: 1
+
 
 # https://github.com/wunderio/charts/blob/master/csi-rclone/values.yaml
 csi-rclone:
@@ -114,3 +131,6 @@ newrelic-infrastructure:
   cluster: "silta"
   # kube-state-metrics are set up at "{{ .Release.Name }}-kube-state-metrics:8080"
   kubeStateMetricsUrl: silta-cluster-kube-state-metrics:8080
+
+cert-manager:
+  enabled: true
