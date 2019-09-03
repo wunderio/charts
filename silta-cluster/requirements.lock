@@ -16,6 +16,6 @@ dependencies:
   version: 2.5.4
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
-  version: 0.1.4
+  version: 0.1.5
 digest: sha256:ec3c23896b378e1f0fdb2d15ebf673909aec4f5161b62758740a766217fa4e77
 generated: "2019-08-02T14:55:24.982393+02:00"
