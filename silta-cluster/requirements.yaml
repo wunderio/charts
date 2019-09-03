@@ -22,3 +22,7 @@ dependencies:
   version: 0.1.x
   repository: https://storage.googleapis.com/charts.wdr.io
   condition: csi-rclone.enabled
+- name: cert-manager
+  version: 0.8.x
+  repository: https://charts.jetstack.io/
+  condition: cert-manager.enabled
