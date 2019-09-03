@@ -60,6 +60,7 @@ gitAuth:
 
 # Deployment remover
 deploymentRemover:
+  enabled: true
   # Github webhooks secret
   webhooksSecret: ''
   # Kubernetes resource allocation.

@@ -1,3 +1,4 @@
+{{- if .Values.deploymentRemover.enabled }}
 ---
 apiVersion: v1
 kind: Service
@@ -64,3 +65,4 @@ spec:
             value: {{ required "A valid .Values.gke.clusterName entry required!" .Values.gke.clusterName | quote }}
         resources:
           {{- .Values.deploymentRemover.resources | toYaml | nindent 10 }}
+{{- end }}
