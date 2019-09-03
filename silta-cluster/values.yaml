@@ -22,14 +22,6 @@ ambassador:
         config:
           service_port: 8443
           use_remote_address: true
-        ---
-        apiVersion: getambassador.io/v1
-        kind: Module
-        name: tls
-        config:
-          server:
-            enabled: true
-            redirect_cleartext_from: 8080
   adminService:
     create: true
   replicaCount: 1
