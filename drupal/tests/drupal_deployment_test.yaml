@@ -41,6 +41,57 @@ tests:
             name: SILTA_CLUSTER
             value: '1'
 
+  - it: sets smtp environment variables correctly
+    set:
+      mailhog:
+        enabled: false
+      smtp:
+        enabled: true
+        address: examplehost
+        username: foo
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SMTP_ADDRESS
+            value: examplehost
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SMTP_USERNAME
+            value: foo
+  - it: sets mailhog smtp environment variables correctly
+    set:
+      mailhog:
+        enabled: true
+      smtp:
+        enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SMTP_ADDRESS
+            value: RELEASE-NAME-mailhog:1025
+  - it: sets ssmtp environment variables correctly
+    set:
+      mailhog:
+        enabled: false
+      smtp:
+        enabled: true
+        address: examplehost
+        username: foo
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SSMTP_MAILHUB
+            value: examplehost
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SSMTP_AUTHUSER
+            value: foo
+
   - it: sets the replica count correctly
     set:
       replicas: 3

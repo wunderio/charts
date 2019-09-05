@@ -70,6 +70,44 @@ imagePullSecrets:
 {{- end }}
 {{- end }}
 
+{{- define "smtp.env" }}
+- name: SMTP_ADDRESS
+  {{- if .Values.mailhog.enabled }}
+  value: "{{ .Release.Name }}-mailhog:1025"
+  {{ else }}
+  value: {{ .Values.smtp.address | quote }}
+  {{- end }}
+- name: SMTP_TLS
+  value: {{ .Values.smtp.tls | default false | quote }}
+- name: SMTP_STARTTLS
+  value: {{ .Values.smtp.starttls | default false | quote }}
+- name: SMTP_USERNAME
+  value: {{ .Values.smtp.username | quote }}
+- name: SMTP_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets-smtp
+      key: password
+# Duplicate SMTP env variables for ssmtp bundled with amazee php image 
+- name: SSMTP_MAILHUB
+  {{- if .Values.mailhog.enabled }}
+  value: "{{ .Release.Name }}-mailhog:1025"
+  {{ else }}
+  value: {{ .Values.smtp.address | quote }}
+  {{- end }}
+- name: SSMTP_USETLS
+  value: {{ .Values.smtp.tls | default false | quote }}
+- name: SSMTP_USESTARTTLS
+  value: {{ .Values.smtp.starttls | default false | quote }}
+- name: SSMTP_AUTHUSER
+  value: {{ .Values.smtp.username | quote }}
+- name: SSMTP_AUTHPASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets-smtp
+      key: password
+{{- end }}
+
 {{- define "drupal.env" }}
 - name: SILTA_CLUSTER
   value: "1"
@@ -96,6 +134,9 @@ imagePullSecrets:
 - name: ELASTICSEARCH_HOST
   value: {{ .Release.Name }}-elastic
 {{- end }}
+{{- if or .Values.mailhog.enabled .Values.smtp.enabled }}
+{{ include "smtp.env" . }}
+{{- end}}
 {{- if .Values.varnish.enabled }}
 - name: VARNISH_ADMIN_HOST
   value: {{ .Release.Name }}-varnish

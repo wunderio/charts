@@ -5,5 +5,8 @@ dependencies:
 - name: memcached
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 2.3.1
-digest: sha256:fa461d4a18989ac09f4b956a570eb145f156a5207d1eb894ecb9686e5f274201
-generated: 2018-11-21T15:49:00.515486879Z
+- name: mailhog
+  repository: https://codecentric.github.io/helm-charts
+  version: 3.0.1
+digest: sha256:812d2cf12daf5a640afa04af2092d63ff49b64631aee9411efaf61c19debffba
+generated: "2019-08-29T11:52:57.8913672Z"
