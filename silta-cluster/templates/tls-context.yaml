@@ -1,3 +1,4 @@
+{{- if .Values.ambassador.service.https.enabled }}
 apiVersion: getambassador.io/v1
 kind: TLSContext
 metadata:
@@ -7,3 +8,4 @@ spec:
   hosts: 
   - {{ .Values.clusterDomain }}
   secret: {{ .Release.Name }}-tls-cert-default
+{{- end }}

@@ -39,6 +39,7 @@ jobs:
             set -o xtrace
 
             helm repo add wunderio https://storage.googleapis.com/charts.wdr.io
+            helm repo add jetstack https://charts.jetstack.io
 
             mkdir -p /tmp/charts
             for CHARTFILE in `find . -name Chart.yaml`

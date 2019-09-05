@@ -22,10 +22,16 @@ ambassador:
         config:
           service_port: 8443
           use_remote_address: true
+        ---
+        apiVersion: ambassador/v1
+        kind: Module
+        name: tls
+        config:
+          server:
+            redirect_cleartext_from: 8080
   adminService:
     create: true
   replicaCount: 1
-
 
 # https://github.com/wunderio/charts/blob/master/csi-rclone/values.yaml
 csi-rclone:
@@ -126,3 +132,5 @@ newrelic-infrastructure:
 
 cert-manager:
   enabled: true
+  email: ''
+
