@@ -1,0 +1,87 @@
+{{- if .Values.varnish.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-varnish
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+    service: varnish
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "drupal.release_labels" . | nindent 6 }}
+      service: varnish
+  template:
+    metadata:
+      labels:
+        {{- include "drupal.release_labels" . | nindent 8 }}
+        service: varnish
+    strategy:
+      type: Recreate
+    spec:
+      containers:
+      - name: varnish
+        image: wunderio/drupal-varnish:v0.1.5
+        ports:
+        - containerPort: 80
+          name: web
+        - containerPort: 6082
+          name: admin
+        livenessProbe:
+          tcpSocket:
+            port: 80
+        env:
+        - name: VARNISH_STORAGE_BACKEND
+          value: {{ .Values.varnish.storageBackend | quote }}
+        resources:
+{{ .Values.varnish.resources | toYaml | indent 10 }}
+        volumeMounts:
+        - name: varnish-vcl
+          mountPath: /etc/varnish/default.vcl
+          subPath: default.vcl
+          readOnly: true
+        - name: varnish-vcl
+          mountPath: /etc/varnish/includes/vcl_recv.vcl
+          subPath: vcl_recv.vcl
+          readOnly: true
+        - name: varnish-vcl
+          mountPath: /etc/varnish/includes/vcl_deliver.vcl
+          subPath: vcl_deliver.vcl
+          readOnly: true
+        - name: varnish-vcl
+          mountPath: /etc/varnish/includes/vcl_synth_500.vcl
+          subPath: vcl_synth_500.vcl
+          readOnly: true
+        - name: varnish-secret
+          mountPath: "/etc/varnish/secret"
+          subPath: control_key
+          readOnly: true
+      volumes:
+      - name: varnish-vcl
+        configMap:
+          name: {{ .Release.Name }}-varnish-vcl
+      - name: varnish-secret
+        secret:
+          secretName: {{ .Release.Name }}-secrets-varnish
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-varnish
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+    service: varnish
+spec:
+  type: NodePort
+  externalTrafficPolicy: Local
+  ports:
+  - name: web
+    port: 80
+  - name: admin
+    port: 6082 
+  selector:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+    service: varnish
+{{- end }}

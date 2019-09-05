@@ -1,0 +1,553 @@
+{{- if .Values.varnish.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-varnish-vcl
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+data:
+  default.vcl: |
+    vcl 4.1;
+
+    import std;
+    import directors;
+
+    backend prod1_http1 {
+      .host = "{{ .Release.Name }}-drupal";
+      .port = "80";
+      .max_connections = 300;
+
+      .probe = {
+        .interval  = 30s; # check the health of each backend every n seconds
+        .timeout   = 2s; # timing out after n seconds
+        .window    = 5;  # If 3 out of the last 5 polls succeeded the backend is
+        .threshold = 3;  # considered healthy, otherwise it will be marked as sick
+      }
+
+      .first_byte_timeout     = 300s;    # How long to wait before we receive a first byte from our backend?
+      .connect_timeout        = 10s;     # How long to wait for a backend connection?
+      .between_bytes_timeout  = 10s;     # How long to wait between bytes received from our backend?
+    }
+ 
+    # Define the internal network access.
+    # These are used below to allow internal access to certain files
+    # from trusted locations while not allowing access from the public internet.
+    acl internal {
+      {{- range .Values.nginx.noauthips }}
+      {{ . | quote }};
+      {{- end }}
+    }
+
+    # Define the purge network access.
+    # These are used below to allow cache purging via BAN.
+    # acl purge {
+    #   "127.0.0.1";
+    # }
+
+    # List of upstream proxies we trust to set X-Forwarded-For correctly.
+    acl upstream_proxy {
+      {{ .Values.nginx.realipfrom | quote }};
+    }
+
+    sub vcl_init {
+      # Called when VCL is loaded, before any requests pass through it.
+      # Typically used to initialize VMODs.
+      new prod1 = directors.hash();
+      prod1.add_backend(prod1_http1, 1);
+    }
+
+    include "includes/vcl_recv.vcl";
+
+    sub vcl_pipe {
+      # Called upon entering pipe mode.
+      # In this mode, the request is passed on to the backend, and any further data from both the client
+      # and backend is passed on unaltered until either end closes the connection. Basically, Varnish will
+      # degrade into a simple TCP proxy, shuffling bytes back and forth. For a connection in pipe mode,
+      # no other VCL subroutine will ever get called after vcl_pipe.
+
+      # Note that only the first request to the backend will have
+      # X-Forwarded-For set.  If you use X-Forwarded-For and want to
+      # have it set for all requests, make sure to have:
+      # set bereq.http.connection = "close";
+      # here.  It is not set by default as it might break some broken web
+      # applications, like IIS with NTLM authentication.
+      set bereq.http.Connection = "Close";
+
+      # Implementing websocket support (https://www.varnish-cache.org/docs/4.0/users-guide/vcl-example-websockets.html)
+      if (req.http.upgrade) {
+        set bereq.http.upgrade = req.http.upgrade;
+      }
+
+      return (pipe);
+    }
+
+    sub vcl_pass {
+      # Called upon entering pass mode. In this mode, the request is passed on to the backend, and the
+      # backend's response is passed on to the client, but is not entered into the cache. Subsequent
+      # requests submitted over the same client connection are handled normally.
+
+      # return (pass);
+    }
+
+    # The data on which the hashing will take place
+    sub vcl_hash {
+      # Called after vcl_recv to create a hash value for the request. This is used as a key
+      # to look up the object in Varnish.
+
+      hash_data(req.url);
+
+      if (req.http.host) {
+        hash_data(req.http.host);
+      } else {
+        hash_data(server.ip);
+      }
+
+      # Make sure HTTPS request (X-Forwarded-Proto=https) are cached separately
+      if (req.http.HTTPS) {
+        hash_data(req.http.HTTPS);
+      }
+
+      # hash cookies for requests that have them
+      if (req.http.Cookie) {
+        hash_data(req.http.Cookie);
+      }
+    }
+
+    sub vcl_hit {
+        if (obj.ttl >= 0s) {
+            # normal hit
+            return (deliver);
+        }
+        # We have no fresh fish. Lets look at the stale ones.
+        if (std.healthy(req.backend_hint)) {
+            # Backend is healthy. If the object is not older then 30secs, deliver it to the client
+            # and automatically create a separate backend request to warm the cache for this request.
+            if (obj.ttl + 30s > 0s) {
+                set req.http.grace = "normal(limited)";
+                return (deliver);
+            } else {
+                # No candidate for grace. Fetch a fresh object.
+                return(miss);
+            }
+        } else {
+            # backend is sick - use full grace
+            if (obj.ttl + obj.grace > 0s) {
+                set req.http.grace = "full";
+                return (deliver);
+            } else {
+                # no graced object.
+                return (miss);
+            }
+        }
+    }
+
+    sub vcl_miss {
+      # Called after a cache lookup if the requested document was not found in the cache. Its purpose
+      # is to decide whether or not to attempt to retrieve the document from the backend, and which
+      # backend to use.
+
+      return (fetch);
+    }
+
+    # Handle the HTTP request coming from our backend
+    sub vcl_backend_response {
+      # Called after the response headers has been successfully retrieved from the backend.
+
+      # Pause ESI request and remove Surrogate-Control header
+      if (beresp.http.Surrogate-Control ~ "ESI/1.0") {
+        unset beresp.http.Surrogate-Control;
+        set beresp.do_esi = true;
+      }
+
+      # Store the request url in cached item
+      # See "Smart banning" https://www.varnish-software.com/static/book/Cache_invalidation.html
+      set beresp.http.x-url = bereq.url;
+      set beresp.http.x-host = bereq.http.host;
+
+      # gzip is by default on for (easily) compressable transfer types
+      if (beresp.http.content-type ~ "text/html" || beresp.http.content-type ~ "css" || beresp.http.content-type ~ "javascript") {
+        set beresp.do_gzip = true;
+      }
+
+      # If Drupal page cache is enabled, it will send a X-Drupal-Cache header, and for anonymous "Cache-Control: public, max-age=x."-headers.
+      # In those cases, Varnish normally  uses the max-age value directly for do determine how long it is cached (ttl).
+      # We can set the TTL for all content to 12h. Lets do it only if Varnish already thinks it is cacheable, and not a page-cache-item.
+      if(beresp.status == 200 && beresp.ttl > 0s && !beresp.http.X-Drupal-Cache){
+        # Default TTL for all content is 10m
+        set beresp.ttl = 10m;
+        set beresp.http.x-ttl = "10m";
+      }
+
+      if (bereq.url ~ "\.(jpg|jpeg|gif|png|svg|ico|css|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|flv|swf|html|htm|otf)\??.*$") {
+        # Strip any cookies before static files are inserted into cache.
+        unset beresp.http.set-cookie;
+        if(beresp.status == 200){
+          set beresp.ttl = 7d;
+          set beresp.http.isstatic = "1";
+        } else{
+          # Dont cache broken images etc for more than 30s, and not at all clientside.
+          set beresp.ttl = 30s;
+          set beresp.http.Cache-control = "max-age=0, must-revalidate";
+        }
+      }
+
+      # Large static files are delivered directly to the end-user without
+      # waiting for Varnish to fully read the file first.
+      # Varnish 4 fully supports Streaming, so use streaming here to avoid locking.
+      if (bereq.url ~ "^[^?]*\.(mp[34]|rar|tar|tgz|gz|pdf|wav|zip|bz2|xz|7z|avi|mov|ogm|mpe?g|mk[av]|webm)(\?.*)?$") {
+        unset beresp.http.set-cookie;
+        set beresp.do_stream = true;  # Check memory usage it'll grow in fetch_chunksize blocks (128k by default) if the backend doesn't send a Content-Length header, so only enable it for big objects
+        set beresp.do_gzip = false;   # Don't try to compress it for storage
+      }
+
+      if (beresp.status == 404) {
+        if (beresp.http.isstatic) {
+          /*
+          * 404s for static files might include profile data since they're actually Drupal pages.
+          * See sites/default/settings.php for how 404s are implemented "the fast way"
+          */
+          set beresp.ttl = 0s;
+        }
+      }
+
+      // Making theme development a bit faster on local envs.
+      if (bereq.url ~ "\.(css|js)\??.*$" && bereq.http.host ~ "^local") {
+        set beresp.ttl = 0s;
+        set beresp.http.X-Noncached-Static = 1;
+        set beresp.http.Cache-control = "no-cache, max-age=0, must-revalidate";
+      }
+
+      if(beresp.status >= 500){
+        // Cache (public) internal errors, but for only 1s. Never cache client side.
+        set beresp.ttl = 1s;
+        set beresp.http.Cache-control = "no-cache, max-age=0, must-revalidate";
+      }
+
+      # Allow items to be stale if needed.
+      set beresp.grace = 2h;
+
+      return (deliver);
+    }
+
+    sub vcl_backend_error {
+      return(retry);
+    }
+
+
+    include "includes/vcl_deliver.vcl";
+
+    sub vcl_purge {
+      # Only handle actual PURGE HTTP methods, everything else is discarded
+      if (req.method != "PURGE") {
+        # restart request
+        set req.http.X-Purge = "Yes";
+        return(restart);
+      }
+    }
+
+    sub vcl_synth {
+      if (resp.status == 720) {
+        # We use this special error status 720 to force redirects with 301 (permanent) redirects
+        # To use this, call the following from anywhere in vcl_recv: return (synth(720, "http://host/new.html"));
+        set resp.http.Location = resp.reason;
+        set resp.status = 301;
+        return (deliver);
+      } elseif (resp.status == 721) {
+        # And we use error status 721 to force redirects with a 302 (temporary) redirect
+        # To use this, call the following from anywhere in vcl_recv: return (synth(720, "http://host/new.html"));
+        set resp.http.Location = resp.reason;
+        set resp.status = 302;
+        return (deliver);
+      } elseif (resp.status == 722) {
+        # Use special error status when hotlinking to resource is forbidden.
+        # This is used in hotlink sub
+
+        # Do no cache
+        set resp.http.Cache-control = "max-age=0, must-revalidate";
+        set resp.status = 403;
+        return (deliver);
+      } elseif(resp.status >= 500) {
+        include "includes/vcl_synth_500.vcl";
+      }
+
+      return (deliver);
+    }
+
+    sub vcl_fini {
+      # Called when VCL is discarded only after all requests have exited the VCL.
+      # Typically used to clean up VMODs.
+
+      return (ok);
+    }
+
+  vcl_recv.vcl: |
+    sub vcl_recv {
+      # Called at the beginning of a request, after the complete request has been received and parsed.
+      # Its purpose is to decide whether or not to serve the request, how to do it, and, if applicable,
+      # which backend to use.
+      # also used to modify the request
+
+      if (req.url == "/monit-check-url-happy") {
+        return (synth(200, "Varnish up"));
+      }
+
+      # Only allow BAN requests from IP addresses in the 'purge' ACL.
+      if (req.method == "BAN") {
+        # Admin port is only exposed to internal network
+        #     if (!client.ip ~ purge) {
+        #     return (synth(403, "Not allowed."));
+        # }
+        
+        # Logic for the ban, using the cache tags headers. For more info
+        # see https://github.com/geerlingguy/drupal-vm/issues/397.
+        if (req.http.X-Drupal-Cache-Tags) {
+            ban("obj.http.X-Drupal-Cache-Tags ~ " + req.http.X-Drupal-Cache-Tags);
+        }
+        elseif (req.http.Cache-Tags) {
+            ban("obj.http.Cache-Tags ~ " + req.http.Cache-Tags);
+        }
+        else {
+            return (synth(403, "Cache tags headers not present."));
+        }
+        # Throw a synthetic page so the request won't go to the backend.
+        return (synth(200, "Ban added."));
+      }
+      
+      # Add a unique header containing the client address
+      if (client.ip ~ upstream_proxy && req.http.X-Envoy-External-Address) {
+        set req.http.X-Forwarded-For = req.http.X-Envoy-External-Address;
+      } 
+      elseif (client.ip ~ upstream_proxy && req.http.X-Forwarded-For) {
+        set req.http.X-Forwarded-For = req.http.X-Real-IP;
+      } 
+      else {
+        set req.http.X-Forwarded-For = client.ip;
+      }
+      
+      # Only deal with "normal" types
+      if (req.method != "GET" &&
+          req.method != "HEAD" &&
+          req.method != "PUT" &&
+          req.method != "POST" &&
+          req.method != "TRACE" &&
+          req.method != "OPTIONS" &&
+          req.method != "PATCH" &&
+          req.method != "DELETE") {
+        /* Non-RFC2616 or CONNECT which is weird. */
+        return (pipe);
+      }
+
+      # Implementing websocket support (https://www.varnish-cache.org/docs/4.0/users-guide/vcl-example-websockets.html)
+      if (req.http.Upgrade ~ "(?i)websocket") {
+        return (pipe);
+      }
+
+      # Slow connections with big file uploads may lead to 503 errors, regardless of timeout
+      # settings. We can avoid problems by piping those POST uploads.
+      # More info: https://www.varnish-cache.org/lists/pipermail/varnish-bugs/2011-April/003684.html
+      # Unresolved ticket : https://www.varnish-cache.org/trac/ticket/849
+      if (req.method == "POST" && req.http.Content-Type ~ "multipart/form-data") {
+        return (pipe);
+      }
+
+      # Only cache GET or HEAD requests. This makes sure the POST requests are always passed.
+      if (req.method != "GET" && req.method != "HEAD") {
+        return (pass);
+      }
+
+      // No varnish for ping file (for monitoring tools)
+      if (req.url ~ "_ping.php") {
+        return (pass);
+      }
+
+      if (req.url ~ "^/(?:user|admin|cart|checkout|logout|abuse|flag|.*\?rate=)" && req.http.user-agent ~ "(?:crawl|goog|yahoo|spider|bot|Yandex|bing|tracker|click|parser|ltx71|urllib)") {
+        return (synth( 403, "Forbidden"));
+      }
+
+      if (req.url ~ "\.(png|gif|jpg|tif|tiff|ico|swf|css|js|pdf|doc|xls|ppt|zip)(\?.*)?$") {
+        // Forcing a lookup with static file requests
+        return (hash);
+      }
+
+      # Do not allow public access to cron.php , update.php or install.php.
+      if (req.url ~ "^(|/core)/(cron|install|update)\.php$" && !client.ip ~ internal) {
+        # Have Varnish throw the error directly.
+        return (synth( 404, "Page not found."));
+      }
+
+      # Do not cache these paths.
+      if (req.url ~ "^/update\.php$" ||
+          req.url ~ "^/install\.php$" ||
+          req.url ~ "^/cron\.php$" ||
+          req.url ~ "^/ooyala/ping$" ||
+          req.url ~ "^/admin/build/features" ||
+          req.url ~ "^/info/.*$" ||
+          req.url ~ "^/flag/.*$" ||
+          //req.url ~ "^.*/ajax/.*$" ||
+          //req.url ~ "^.*/ahah/.*$" ||
+          req.url ~ "^/radioactivity_node.php$") {
+          return (pass);
+      }
+
+      if (req.http.Cookie) {
+        if (req.url ~ "\.(png|gif|jpg|svg|tif|tiff|ico|swf|css|js|pdf|doc|xls|ppt|zip|woff|eot|ttf|bmp|bz2)$") {
+          # Static file request do not vary on cookies
+          unset req.http.Cookie;
+          return (hash);
+        }
+        elseif (req.http.Cookie ~ "(SESS[a-z0-9]+|SSESS[a-z0-9]+)") {
+          # Authenticated users should not be cached
+          return (pass);
+        }
+            else {
+          # Non-authenticated requests do not vary on cookies
+          unset req.http.Cookie;
+        }
+      }
+
+      if (req.http.Accept-Encoding) {
+        if (req.url ~ "\.(jpg|png|gif|svg|tif|tiff|ico|gz|tgz|bz2|tbz|mp3|ogg|swf|zip|pdf|woff|eot|ttf)(\?.*)?$") {
+            # No point in compressing these
+            unset req.http.Accept-Encoding;
+        } elsif (req.http.Accept-Encoding ~ "gzip") {
+            set req.http.Accept-Encoding = "gzip";
+        } elsif (req.http.Accept-Encoding ~ "deflate") {
+            set req.http.Accept-Encoding = "deflate";
+        } else {
+            # unkown algorithm
+            unset req.http.Accept-Encoding;
+        }
+      }
+
+      // Keep multiple cache objects to a minimum
+      # -> NOT. We dont Vary cache per these headers.
+      #unset req.http.Accept-Language;
+      #unset req.http.user-agent;
+
+      if (req.http.host == "docs.local.ansibleref.com") {
+        return (pass);
+      }
+
+      # Large static files are delivered directly to the end-user without
+      # waiting for Varnish to fully read the file first.
+      # Varnish 4 fully supports Streaming, so set do_stream in vcl_backend_response()
+      if (req.url ~ "^[^?]*\.(mp[34]|rar|tar|tgz|gz|wav|zip|bz2|xz|7z|avi|mov|ogm|mpe?g|mk[av]|webm)(\?.*)?$") {
+        unset req.http.Cookie;
+        return (hash);
+      }
+
+      # Send Surrogate-Capability headers to announce ESI support to backend
+      set req.http.Surrogate-Capability = "key=ESI/1.0";
+
+      if (req.http.Authorization) {
+        # Not cacheable by default
+        return (pass);
+      }
+
+      // Allow pasing custom rules
+      {{- if .Values.varnish.vcl_recv_extra }}
+{{ .Values.varnish.vcl_recv_extra | indent 6 }}
+      {{- end }}
+      
+      return (hash);
+    }
+    
+  vcl_deliver.vcl: |
+
+    # The routine when we deliver the HTTP request to the user
+    # Last chance to modify headers that are sent to the client
+    sub vcl_deliver {
+      # Called before a cached object is delivered to the client.
+
+      if (obj.hits > 0) { # Add debug header to see if it's a HIT/MISS and the number of hits, disable when not needed
+        set resp.http.X-W-Cache = "HIT";
+      } else {
+        set resp.http.X-W-Cache = "MISS";
+      }
+
+      # Please note that obj.hits behaviour changed in 4.0, now it counts per objecthead, not per object
+      # and obj.hits may not be reset in some cases where bans are in use. See bug 1492 for details.
+      # So take hits with a grain of salt
+      set resp.http.X-W-Cache-Hits = obj.hits;
+
+      # Remove some headers: PHP version
+      unset resp.http.X-Powered-By;
+
+      # Remove some headers: Apache version & OS
+      unset resp.http.Server;
+      unset resp.http.X-Varnish;
+      unset resp.http.Via;
+      unset resp.http.Link;
+      unset resp.http.X-Generator;
+      unset resp.http.X-Proxy;
+      unset resp.http.X-Powered-By;
+      unset resp.http.x-do-esi;
+      unset resp.http.X-Forced-Gzip;
+
+      # deliver can return synth, but we must avoid a potential loop.
+      # This GET-param can be used to see the real backend error:
+      # error-debug=randomvar (used for convenient debugging).
+      if(resp.status >= 500 && req.url !~ "error-debug=randomvar"){
+        return (synth(resp.status, "Internal Error"));
+      }
+
+      # Remove the request url from the cached item's headers
+      # See "Smart banning" https://www.varnish-software.com/static/book/Cache_invalidation.html
+      unset resp.http.x-url;
+      unset resp.http.x-host;
+
+      # Comment these for easier Drupal cache tag debugging in development.
+      unset resp.http.cache-tags;
+      unset resp.http.X-Drupal-Cache-Tags;
+      unset resp.http.X-Drupal-Cache-Contexts;
+
+      return (deliver);
+    }
+
+  vcl_synth_500.vcl: |
+    // Custom error
+    set resp.http.Cache-Control = "no-cache, max-age: 0, must-revalidate";
+    set resp.http.x-sitename = "silta";
+    set resp.http.x-sitetitle = "silta";
+
+    synthetic( {"
+      <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+      <html xmlns="http://www.w3.org/1999/xhtml">
+      <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <style>
+        body {
+          background-color: #ffffff;
+          font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;
+          text-align: center;
+          color: #656669;
+        }
+        #error-box {
+          margin-top: 100px;
+        }
+        #emoji {
+          font-size: 100px;
+        }
+      </style>
+      <title>"} + resp.http.x-sitetitle + {" - Something went wrong</title>
+
+      </head>
+
+      <body>
+        <div id="error-box">
+          <div id="error-message">
+            <span id="emoji">🤔</span>
+
+            <h1>Something went wrong, but it's not your fault.</h1>
+            <h2>We are working on it, please check back shortly.</h2>
+
+          </div>
+        </div>
+
+        <!--"} + resp.status + {"-->
+
+      </body>
+      </html>
+    "} );
+    return (deliver);
+{{- end }}

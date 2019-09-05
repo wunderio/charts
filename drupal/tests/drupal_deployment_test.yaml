@@ -91,3 +91,49 @@ tests:
       - equal:
           path: spec.template.spec.containers[1].resources.limits.memory
           value: 2G
+ 
+  - it: sets varnish environment variables if varnish is enabled
+    set:
+      varnish.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VARNISH_ADMIN_HOST
+            value: RELEASE-NAME-varnish
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VARNISH_ADMIN_PORT
+            value: "6082"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VARNISH_CONTROL_KEY
+            valueFrom:
+              secretKeyRef:
+                key: control_key
+                name: RELEASE-NAME-secrets-varnish
+  
+  - it: does not have varnish environment variables if varnish is disabled
+    set:
+      varnish.enabled: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VARNISH_ADMIN_HOST
+            value: RELEASE-NAME-varnish
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VARNISH_ADMIN_PORT
+            value: "6082"
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: VARNISH_CONTROL_KEY
+            valueFrom:
+              secretKeyRef:
+                key: control_key
+                name: RELEASE-NAME-secrets-varnish

@@ -9,18 +9,18 @@ metadata:
     getambassador.io/config: |
       apiVersion: ambassador/v1
       kind:  Mapping
-      name:  {{ .Release.Name }}-drupal
+      name:  {{ include "drupal.endpoint" . }}
       host: {{ template "drupal.domain" . }}
-      service: {{ .Release.Name }}-drupal.{{ .Release.Namespace }}.svc.cluster.local:80
+      service: {{ include "drupal.endpoint" . }}
       {{- .Values.ambassador.config | toYaml | nindent 6 }}
 {{- end }}
 {{- range $index, $domain := .Values.exposeDomains }}
       ---
-      apiVersion: ambassador/v0
+      apiVersion: ambassador/v1
       kind: Mapping
       name: {{ $.Release.Name }}-drupal-{{ $index }}
       host: {{ $domain }}
-      service: {{ $.Release.Name }}-drupal.{{ $.Release.Namespace }}.svc.cluster.local:80
+      service: {{- include "drupal.endpoint" $ }}
       {{- $.Values.ambassador.config | toYaml | nindent 6 }}
 {{- end }}
     domain: {{ template "drupal.domain" . }}
