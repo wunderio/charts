@@ -2,7 +2,7 @@ Your site is available here:
 
   http://{{- template "drupal.domain" . }}
   {{- range $index, $domain := .Values.exposeDomains }}
-  {{ $domain }}
+  http://{{ $domain.hostname }}
   {{- end }}
 
 {{ if .Values.mailhog.enabled -}}
@@ -10,7 +10,7 @@ Mailhog available at:
 
   http://{{- template "drupal.domain" . }}/mailhog
   {{- range $index, $domain := .Values.exposeDomains }}
-  {{ $domain }}/mailhog
+  http://{{ $domain.hostname }}/mailhog
   {{- end }}
 {{- end }}
 

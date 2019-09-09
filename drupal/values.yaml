@@ -32,11 +32,13 @@ autoscaling:
         targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
-#
-# Note that the key is only used for documentation purposes, for example:
-#
-#   production: example.com
-#   www:        www.example.com
+# Example of exposing 2 additional domains for this deployment, each with its own certificate
+# Note that the key is only used for documentation purposes.
+# exposeDomains:
+#   production:
+#     hostname: example.com
+#   www:
+#     hostname: www.example.com
 exposeDomains: {}
 
 # These variables are build-specific and should be passed via the --set parameter.
