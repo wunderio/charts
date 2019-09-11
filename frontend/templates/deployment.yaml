@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-deployment
+  labels:
+    {{ include "frontend.release_labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      {{ include "frontend.release_labels" . | indent 6 }}
+      deployment: frontend
+  template:
+    metadata:
+      labels:
+        {{ include "frontend.release_labels" . | indent 8 }}
+        deployment: frontend
+    spec:
+      containers:
+      # Nginx container
+      - name: nginx
+        image: wunderio/drupal-nginx:v0.1.2
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: nginx-conf
+          mountPath: /etc/nginx/nginx.conf # mount nginx-conf configmap volume to /etc/nginx
+          readOnly: true
+          subPath: nginx_conf
+        - name: nginx-conf
+          mountPath: /etc/nginx/conf.d/frontend.conf # mount nginx-conf configmap volume to /etc/nginx
+          readOnly: true
+          subPath: frontend_conf
+        {{- if .Values.nginx.basicauth.enabled }}
+        - name: nginx-basicauth
+          mountPath: /etc/nginx/.htaccess
+          readOnly: true
+          subPath: .htaccess
+        {{- end }}
+        livenessProbe:
+          tcpSocket:
+            port: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+        resources:
+{{ .Values.nginx.resources | toYaml | indent 10 }}
+
+      - name: node
+        image: {{ .Values.frontend.image | quote }}
+        ports:
+        - containerPort: {{ .Values.frontend.port }}
+          name: node
+        volumeMounts:
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.frontend.port }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.frontend.port }}
+        env:
+        {{- range $key, $val := .Values.frontend.env }}
+        - name: {{ $key }}
+          value: {{ $val | quote }}
+        {{- end }}
+        resources:
+{{ .Values.frontend.resources | toYaml | indent 10 }}
+
+      volumes:
+        - name: nginx-conf
+          configMap:
+            name: {{ .Release.Name }}-nginx-conf
+            items:
+              - key: nginx_conf
+                path: nginx_conf
+              - key: frontend_conf
+                path: frontend_conf
+        {{- if .Values.nginx.basicauth.enabled }}
+        - name: nginx-basicauth
+          secret:
+            secretName: {{ .Release.Name }}-secrets-frontend
+            items:
+              - key: .htaccess
+                path: .htaccess
+        {{- end }}

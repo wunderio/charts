@@ -1,0 +1,29 @@
+suite: Site ConfigMaps
+templates:
+  - configmap.yaml
+tests:
+  - it: is a ConfigMap
+    asserts:
+      - isKind:
+          of: ConfigMap
+
+  - it: injects the nginx configuration
+    set:
+      nginx:
+        loglevel: 'debug'
+        basicauth:
+          enabled: true
+        realipfrom: '1.2.3.4'
+    asserts:
+    - template: configmap.yaml
+      matchRegex:
+        path: data.nginx_conf
+        pattern: '/proc/self/fd/2 debug;'
+    - template: configmap.yaml
+      matchRegex:
+        path: data.nginx_conf
+        pattern: 'set_real_ip_from *1.2.3.4'
+    - template: configmap.yaml
+      matchRegex:
+        path: data.frontend_conf
+        pattern: 'auth_basic "Restricted";'

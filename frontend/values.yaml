@@ -1,0 +1,71 @@
+
+# Main domain of the cluster.
+# If using ambassador, subdomains of this domain will be created automatically for each environment.
+clusterDomain: "silta.wdr.io"
+
+# An optional human-readable label for the environment, defaults to the release name.
+# We typically pass the branch name when we build dedicated environments per branch.
+# This name is mainly used to create nice subdomains for each environment.
+environmentName: ""
+
+# The app label added to our Kubernetes resources.
+app: frontend
+
+# How many instances of the Frontend pod should be in our Kubernetes deployment.
+# A single pod (the default value) is good for development environments to minimise resource usage.
+# Multiple pods make sense for high availability.
+replicas: 1
+
+# Example of exposing 2 additional domains for this deployment, each with its own certificate
+# Note that the key is only used for documentation purposes, for example:
+# Note that the key is only used for documentation purposes.
+#
+# exposeDomains:
+#   production: example.com
+#   production:
+#   www:        www.example.com
+#     hostname: example.com
+#   www:
+#     hostname: www.example.com
+exposeDomains: {}
+
+# These variables are build-specific and should be passed via the --set parameter.
+nginx:
+  # The Kubernetes resources for the nginx container.
+  # These values are optimised for development environments.
+  resources:
+    requests:
+      cpu: 5m
+      memory: 10M
+
+  loglevel: error 
+
+  # Trust X-Forwarded-For from these hosts for getting external IP 
+  realipfrom: 10.0.0.0/8
+
+  # Add IP addresses that should be excluded from basicauth.
+  # Note that the key is only used for documentation purposes.
+  noauthips:
+    gke-internal: 10.0.0.0/8
+  
+  # Set of values to enable and use http basic authentication
+  # It is implemented only for very basic protection (like web crawlers)
+  basicauth:
+    enabled: true
+
+    # Define username and password
+    credentials:
+      username: silta
+      password: simplepass
+
+  # Robots txt file blocked by default
+  robotsTxt:
+    allow: false
+
+  extra_headers: {}
+
+frontend:
+  image: 'you need to pass in a value for nginx.image to your helm chart'
+  
+  port: 3000
+  env: {}
