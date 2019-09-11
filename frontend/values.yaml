@@ -31,6 +31,9 @@ exposeDomains: {}
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
+
+  image: 'wunderio/drupal-nginx:v0.1'
+
   # The Kubernetes resources for the nginx container.
   # These values are optimised for development environments.
   resources:
@@ -69,3 +72,5 @@ frontend:
   
   port: 3000
   env: {}
+
+  resources: {}
