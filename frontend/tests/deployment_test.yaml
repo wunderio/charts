@@ -11,7 +11,7 @@ tests:
           value: 1
       - equal:
           path: metadata.labels.app
-          value: simple
+          value: frontend
 
   - it: uses the right docker images
     set:
