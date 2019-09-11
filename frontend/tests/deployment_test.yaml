@@ -1,0 +1,54 @@
+suite: Site deployment
+templates:
+  - deployment.yaml
+tests:
+  - it: is a deployment with default values
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: spec.replicas
+          value: 1
+      - equal:
+          path: metadata.labels.app
+          value: frontend
+
+  - it: uses the right docker images
+    set:
+      nginx.image: 'nginx-12345'
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: 'nginx-12345'
+
+  - it: sets the replica count correctly
+    set:
+      replicas: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+
+  - it: takes resource requests and limits
+    set:
+      nginx.resources:
+        requests:
+          cpu: 123m
+          memory: 1G
+        limits:
+          cpu: 234m
+          memory: 2G
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: 123m
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: 1G
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: 234m
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: 2G
+
