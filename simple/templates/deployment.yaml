@@ -18,9 +18,6 @@ spec:
       # Nginx container
       - name: nginx
         image: {{ .Values.nginx.image | quote }}
-        resources:
-          requests:
-            cpu: "50m"
         env:
         ports:
         - containerPort: 80
