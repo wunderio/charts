@@ -77,6 +77,9 @@ nginx:
   robotsTxt:
     allow: false
 
+  # Extra configuration to pass to nginx as a file
+  extraConfig: |
+
 # Configuration for everything that runs in php containers.
 php:
   # The docker image to be used. This is typically passed by your CI system using the --set parameter.

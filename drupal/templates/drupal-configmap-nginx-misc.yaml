@@ -1,0 +1,11 @@
+{{- if .Values.nginx.extraConfig }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-nginx-extra-conf
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+data:
+  config: | 
+  {{ .Values.nginx.extraConfig | nindent 4 }}
+{{- end }}

@@ -97,7 +97,7 @@ data:
 
     fastcgi_param  REDIRECT_STATUS    200;
 
-    fastcgi_param  HTTPS              $fe_https;
+    fastcgi_param  HTTPS              $fastcgi_https;
 
     ## Nginx FCGI specific directives.
     fastcgi_buffer_size 32k;
@@ -130,10 +130,11 @@ data:
                                               
     map $http_x_forwarded_proto $fastcgi_https {                                                        
         default $https;                                            
-        http '';                          
+        http '';
         https on;                          
     }                                      
-                                          
+
+
     server {                               
         server_name drupal;                          
         listen 80;          
