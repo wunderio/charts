@@ -20,7 +20,8 @@ Basicauth password: {{ .Values.nginx.basicauth.credentials.password }}
 {{- end }}
 
 {{ if .Values.shell.enabled }}
-SSH connection:
+
+SSH connection (limited access through VPN):
 
   ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }}
 
