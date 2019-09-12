@@ -72,6 +72,15 @@ deploymentRemover:
   webhooksSecret: ''
   # Kubernetes resource allocation.
   resources: {}
+  ssl:
+    enabled: true
+    email: admin@example.com
+    # Available issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
+    issuer: letsencrypt
+    # Used when certificate type is custom
+    # ca: ""
+    # key: ""
+    # crt: ""
 
 # GKE Cluster settings
 gke:
