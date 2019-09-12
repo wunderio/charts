@@ -9,8 +9,6 @@ spec:
   selector:
     matchLabels:
       {{ include "drupal.release_labels" . | indent 6 }}
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
