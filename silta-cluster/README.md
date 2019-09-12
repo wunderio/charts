@@ -8,6 +8,12 @@ ServiceAccount and Roles for filebeat and metricbeat services. These have to be 
  - https://raw.githubusercontent.com/wunderio/silta-cluster/master/filebeat-roles.yaml
  - https://raw.githubusercontent.com/wunderio/silta-cluster/master/metricbeat-roles.yaml
 
+Custom resource definitions for cert-manager (from https://github.com/helm/charts/tree/master/stable/cert-manager):
+```
+kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.6/deploy/manifests/00-crds.yaml
+kubectl label namespace silta-cluster certmanager.k8s.io/disable-validation="true"
+```
+
 ## Usage
 
 Here is an example of how we instantiate this helm chart: 

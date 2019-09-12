@@ -1,7 +1,7 @@
 dependencies:
-- name: ambassador
+- name: traefik
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 2.12.5
+  version: 1.77.5
 - name: redis
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 8.1.5
@@ -20,5 +20,5 @@ dependencies:
 - name: cert-manager
   repository: https://charts.jetstack.io/
   version: v0.9.1
-digest: sha256:db0c8643a38eb7b48ca33b049f8a8ab1f3433029db06d556045309eab900e06f
-generated: "2019-09-03T20:58:03.996358097+03:00"
+digest: sha256:53513c23be901362620eb3802ee9f3da3f603a4c09b70a0ea5673aefdafc0b8f
+generated: "2019-09-12T16:42:09.004295972Z"

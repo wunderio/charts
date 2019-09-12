@@ -1,38 +1,30 @@
 # Main domain of the cluster.
 clusterDomain: "silta.wdr.io"
 
-ambassador:
-  service:
-    ports:
-      - name: http
-        port: 80
-        targetPort: 8080
-      - name: https
-        port: 443
-        targetPort: 8080
-    https:
-      enabled: true
-    externalTrafficPolicy: Local
-    annotations:
-      getambassador.io/config: |
-        ---
-        apiVersion: ambassador/v1
-        kind: Module
-        name: ambassador
-        config:
-          service_port: 8443
-          use_remote_address: true
-        ---
-        apiVersion: ambassador/v1
-        kind: Module
-        name: tls
-        config:
-          server:
-            redirect_cleartext_from: 8080
-  adminService:
-    create: true
-  replicaCount: 1
-
+traefik:
+  externalTrafficPolicy: Local
+  rbac:
+    enabled: true
+  ssl:
+    enabled: true
+    enforced: false
+  dashboard:
+    enabled: false
+    serviceType: "NodePort"
+    #auth:
+    #  basic: 
+    #    # htpasswd -nb someuser somepass
+    #    someuser: htpass_hash
+ssl:
+  enabled: true
+  email: admin@example.com
+  # Available issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
+  issuer: letsencrypt
+  # Used when certificate type is custom
+  # ca: ""
+  # key: ""
+  # crt: ""
+  
 # https://github.com/wunderio/charts/blob/master/csi-rclone/values.yaml
 csi-rclone:
   enabled: false

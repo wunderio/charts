@@ -1,6 +1,6 @@
 dependencies:
-- name: ambassador
-  version: 2.12.x
+- name: traefik
+  version: 1.77.x
   repository: https://kubernetes-charts.storage.googleapis.com/
 - name: redis
   version: 8.1.x
