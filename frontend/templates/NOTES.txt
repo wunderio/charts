@@ -1,0 +1,11 @@
+Deployed {{ .Release.Name }} successfully, your site is available here:
+
+  http://{{- template "frontend.domain" . }}
+  {{- range $index, $domain := .Values.exposeDomains }}
+  {{ $domain.hostname }}
+  {{- end }}
+
+{{ if .Values.nginx.basicauth.enabled -}}
+Basicauth username: {{ .Values.nginx.basicauth.credentials.username }}
+Basicauth password: {{ .Values.nginx.basicauth.credentials.password }}
+{{- end }}

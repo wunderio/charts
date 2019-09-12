@@ -49,3 +49,18 @@ tests:
     asserts:
       - isNull:
           path: metadata.annotations.getambassador\.io/config
+
+  - it: directs ambassador traffic to drupal service by default
+    asserts:
+      - matchRegex:
+          path: metadata.annotations.getambassador\.io/config
+          pattern: 'service: RELEASE-NAME-drupal.NAMESPACE.svc.cluster.local:80'
+
+  - it: directs ambassador traffic to varnish service when varnish is enabled
+    set:
+      varnish.enabled: true
+    asserts:
+      - matchRegex:
+          path: metadata.annotations.getambassador\.io/config
+          pattern: 'service: RELEASE-NAME-varnish.NAMESPACE.svc.cluster.local:80'
+  

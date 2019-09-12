@@ -32,9 +32,9 @@ tests:
     set:
       nginx:
         loglevel: 'debug'
+        realipfrom: '1.2.3.4'
         basicauth:
           enabled: true
-          realipfrom: '1.2.3.4'
     asserts:
     - template: drupal-configmap-nginx.yaml
       matchRegex:

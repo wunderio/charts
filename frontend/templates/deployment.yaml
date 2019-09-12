@@ -1,36 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-drupal
+  name: {{ .Release.Name }}-deployment
   labels:
-    {{ include "drupal.release_labels" . | indent 4 }}
+    {{ include "frontend.release_labels" . | indent 4 }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      {{ include "drupal.release_labels" . | indent 6 }}
+      {{ include "frontend.release_labels" . | indent 6 }}
+      deployment: frontend
   template:
     metadata:
       labels:
-        {{ include "drupal.release_labels" . | indent 8 }}
+        {{ include "frontend.release_labels" . | indent 8 }}
+        deployment: frontend
     spec:
       containers:
       # Nginx container
       - name: nginx
         image: {{ .Values.nginx.image | quote }}
-        env:
         ports:
         - containerPort: 80
-          name: drupal
+          name: web
         volumeMounts:
         - name: nginx-conf
           mountPath: /etc/nginx/nginx.conf # mount nginx-conf configmap volume to /etc/nginx
           readOnly: true
           subPath: nginx_conf
         - name: nginx-conf
-          mountPath: /etc/nginx/conf.d/drupal.conf # mount nginx-conf configmap volume to /etc/nginx
+          mountPath: /etc/nginx/conf.d/frontend.conf # mount nginx-conf configmap volume to /etc/nginx
           readOnly: true
-          subPath: drupal_conf
+          subPath: frontend_conf
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
           mountPath: /etc/nginx/.htaccess
@@ -47,6 +48,27 @@ spec:
         resources:
 {{ .Values.nginx.resources | toYaml | indent 10 }}
 
+      - name: node
+        image: {{ .Values.frontend.image | quote }}
+        ports:
+        - containerPort: {{ .Values.frontend.port }}
+          name: node
+        volumeMounts:
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.frontend.port }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: {{ .Values.frontend.port }}
+        env:
+        {{- range $key, $val := .Values.frontend.env }}
+        - name: {{ $key }}
+          value: {{ $val | quote }}
+        {{- end }}
+        resources:
+{{ .Values.frontend.resources | toYaml | indent 10 }}
+
       volumes:
         - name: nginx-conf
           configMap:
@@ -54,12 +76,12 @@ spec:
             items:
               - key: nginx_conf
                 path: nginx_conf
-              - key: drupal_conf
-                path: drupal_conf
+              - key: frontend_conf
+                path: frontend_conf
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
           secret:
-            secretName: {{ .Release.Name }}-secrets-drupal
+            secretName: {{ .Release.Name }}-secrets-frontend
             items:
               - key: .htaccess
                 path: .htaccess

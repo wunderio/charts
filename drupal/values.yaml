@@ -32,11 +32,13 @@ autoscaling:
         targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
-#
-# Note that the key is only used for documentation purposes, for example:
-#
-#   production: example.com
-#   www:        www.example.com
+# Example of exposing 2 additional domains for this deployment, each with its own certificate
+# Note that the key is only used for documentation purposes.
+# exposeDomains:
+#   production:
+#     hostname: example.com
+#   www:
+#     hostname: www.example.com
 exposeDomains: {}
 
 # These variables are build-specific and should be passed via the --set parameter.
@@ -60,17 +62,23 @@ nginx:
       username: silta
       password: demo
 
-    # Trust X-Forwarded-For from these hosts for getting external IP 
-    realipfrom: 10.0.0.0/8
+  # Trust X-Forwarded-For from these hosts for getting external IP 
+  realipfrom: 10.0.0.0/8
 
-    # Add IP addresses that should be excluded from basicauth.
-    # Note that the key is only used for documentation purposes.
-    noauthips:
-      gke-internal: 10.0.0.0/8
+  # Define the internal network access.
+  # These are used below to allow internal access to certain files
+  # from trusted locations while not allowing access from the public internet.
+  # These addreses are also excluded from basicauth.
+  # Note that the key is only used for documentation purposes.
+  noauthips:
+    gke-internal: 10.0.0.0/8
 
   # Robots txt file blocked by default
   robotsTxt:
     allow: false
+
+  # Extra configuration to pass to nginx as a file
+  extraConfig: |
 
 # Configuration for everything that runs in php containers.
 php:
@@ -273,6 +281,17 @@ mariadb:
         cpu: 50m
         memory: 128M
 
+varnish:
+  enabled: false
+  resources:
+    requests:
+      cpu: 50m
+      memory: 32Mi
+  # https://varnish-cache.org/docs/trunk/users-guide/storage-backends.html
+  storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
+  # Inject custom code into vcl_recv subroutine
+  vcl_recv_extra: |
+
 elasticsearch:
   enabled: false
   # Choose versions in https://www.docker.elastic.co/ from "Elasticsearch" list
@@ -305,3 +324,22 @@ ambassador:
   config:
     prefix: /
     timeout_ms: 30000
+    use_websocket: true
+
+# TODO: Add codecentric repo for mailhog. https://github.com/helm/helm/issues/6005
+mailhog:
+  enabled: false
+  resources:
+    requests:
+      cpu: 5m
+      memory: 10M
+
+# SMTP configuration passed to containers as environment variables (SMTP_ADDRESS, SMTP_PORT, ..)
+smtp:
+  enabled: false
+  # How to Setup SparkPost as your SMTP Relay: https://www.sparkpost.com/blog/setup-sparkpost-smtp-relay/
+  # address: smtp.example.com:25
+  # tls: false
+  # starttls: false
+  # username: ""
+  # password: ""

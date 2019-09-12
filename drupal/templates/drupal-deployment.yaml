@@ -57,6 +57,13 @@ spec:
           mountPath: /etc/nginx/conf.d/drupal.conf # mount nginx-conf configmap volume to /etc/nginx
           readOnly: true
           subPath: drupal_conf
+        {{- if .Values.nginx.extraConfig }}
+        - name: nginx-extra-conf
+          # provide empty configuration file in /etc/nginx/conf.d for users to populate
+          mountPath: /etc/nginx/conf.d/misc.conf
+          readOnly: true
+          subPath: 'misc.conf'
+        {{- end }}  
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
           mountPath: /etc/nginx/.htaccess
@@ -79,6 +86,14 @@ spec:
                 path: nginx_conf
               - key: drupal_conf
                 path: drupal_conf
+        {{- if .Values.nginx.extraConfig }}
+        - name: nginx-extra-conf
+          configMap:
+            name: {{ .Release.Name }}-nginx-extra-conf
+            items:
+            - key: config
+              path: misc.conf
+        {{- end }}
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
           secret:

@@ -1,0 +1,31 @@
+suite: additional nginx configuration file
+templates:
+  - drupal-deployment.yaml
+tests:
+  - it: populates extraConfig variable and check if its configmap gets mad
+    set:
+      nginx.extraConfig: |
+        server {
+          server_name exists.test;
+        }  
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[1].volumeMounts
+          content:
+            mountPath: /etc/nginx/conf.d/misc.conf
+            name: nginx-extra-conf
+            readOnly: true
+            subPath: misc.conf
+  - it: empty extraConfig renders no conf-misc volume
+    set:
+      nginx.extraConfig: |
+    asserts:
+      - notContains:
+          path: spec.template.spec.volumes
+          content:
+            configMap:
+              items:
+              - key: config
+                path: misc.conf
+              name: RELEASE-NAME-nginx-extra-conf
+            name: nginx-extra-conf
