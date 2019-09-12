@@ -1,6 +1,7 @@
 # Main domain of the cluster.
 clusterDomain: "silta.wdr.io"
 
+# https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
 traefik:
   externalTrafficPolicy: Local
   rbac:
