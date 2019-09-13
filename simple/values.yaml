@@ -1,6 +1,6 @@
 
 # Main domain of the cluster.
-# If using ambassador, subdomains of this domain will be created automatically for each environment.
+# Subdomains of this domain will be created automatically for each environment.
 clusterDomain: "silta.wdr.io"
 
 # An optional human-readable label for the environment, defaults to the release name.
@@ -15,6 +15,27 @@ app: simple
 # A single pod (the default value) is good for development environments to minimise resource usage.
 # Multiple pods make sense for high availability.
 replicas: 1
+
+# Domain names that will be mapped to this deployment.
+# Example of exposing 2 additional domains for this deployment, each with its own certificate
+# Note that the key is only used for documentation purposes.
+# exposeDomains:
+#   - hostname: example.com
+#   - hostname: www.example.com
+#   -   ssl:
+#   -     enabled: true
+#   -     issuer: letsencrypt-staging
+exposeDomains: {}
+
+ssl:
+  # Enable HTTPS for this deployment
+  enabled:  true
+  # Possible issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
+  issuer: letsencrypt
+  # Only when certificate type is custom
+  # ca: ""
+  # key: ""
+  # crt: ""
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
