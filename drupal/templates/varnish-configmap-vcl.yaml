@@ -360,6 +360,13 @@ data:
         return (pass);
       }
 
+      {{- if .Values.mailhog.enabled }}
+      // No varnish for mailhog
+      if (req.url ~ "^/mailhog$") {
+        return (pass);
+      }
+      {{- end }}
+
       if (req.url ~ "^/(?:user|admin|cart|checkout|logout|abuse|flag|.*\?rate=)" && req.http.user-agent ~ "(?:crawl|goog|yahoo|spider|bot|Yandex|bing|tracker|click|parser|ltx71|urllib)") {
         return (synth( 403, "Forbidden"));
       }

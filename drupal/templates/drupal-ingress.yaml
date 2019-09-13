@@ -1,0 +1,62 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-drupal
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    {{- if .Values.ssl.enabled }}
+    traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
+    ingress.kubernetes.io/ssl-redirect: "true"
+    {{- else }}
+    traefik.ingress.kubernetes.io/frontend-entry-points: "http"
+    ingress.kubernetes.io/ssl-redirect: "false"
+    {{- end }}
+spec:
+  {{- if .Values.ssl.enabled }}
+  tls:
+  - secretName: {{ .Release.Name }}-tls
+  {{- end }}
+  rules:
+  - host: {{ template "drupal.domain" . }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ include "drupal.servicename" . }}
+          servicePort: 80
+---
+
+{{- range $index, $domain := .Values.exposeDomains }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ $.Release.Name }}-drupal-{{ $index }}
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    {{- if $domain.ssl }}
+    {{- if $domain.ssl.enabled }}
+    traefik.ingress.kubernetes.io/frontend-entry-points: http,https
+    ingress.kubernetes.io/ssl-redirect: "true"
+    {{- end }}
+    {{- else }}
+    traefik.ingress.kubernetes.io/frontend-entry-points: http
+    ingress.kubernetes.io/ssl-redirect: "false"
+    {{- end }}
+spec:
+  {{- if $domain.ssl }}
+  {{- if $domain.ssl.enabled }}
+  tls:
+  - secretName: {{ $.Release.Name }}-tls-{{ $index }}
+  {{- end }}
+  {{- end }}
+  rules:
+  - host: {{ $domain.hostname }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ include "drupal.servicename" $ }}
+          servicePort: 80
+
+---
+{{- end }}

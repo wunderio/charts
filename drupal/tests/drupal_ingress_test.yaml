@@ -1,0 +1,37 @@
+suite: drupal ingress
+templates:
+  - drupal-ingress.yaml
+tests:
+  - it: is a ingress
+    asserts:
+      - isKind:
+          of: Ingress
+
+  - it: uses traefik ingress class
+    asserts:
+      - equal:
+          path: 'metadata.annotations.kubernetes\.io/ingress\.class'
+          value: 'traefik'
+
+  - it: sets correct hostname for deployment
+    set:
+      environmentName: 'foo'
+      clusterDomain: 'bar' 
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: 'foo.NAMESPACE.bar'
+
+  - it: directs traefik requests to drupal  service by default
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.serviceName
+          value: 'RELEASE-NAME-drupal'
+
+  - it: directs traefik requests to varnish service when varnish is enabled
+    set:
+      varnish.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.serviceName
+          value: 'RELEASE-NAME-varnish'

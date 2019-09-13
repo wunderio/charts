@@ -1,6 +1,6 @@
 
 # Main domain of the cluster.
-# If using ambassador, subdomains of this domain will be created automatically for each environment.
+# Subdomains of this domain will be created automatically for each environment.
 clusterDomain: "silta.wdr.io"
 
 # An optional human-readable label for the environment, defaults to the release name.
@@ -21,6 +21,7 @@ app: drupal
 replicas: 1
 
 # Enable autoscaling using HorizontalPodAutoscaler
+# see: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
 autoscaling:
   enabled: false
   minReplicas: 1
@@ -35,11 +36,22 @@ autoscaling:
 # Example of exposing 2 additional domains for this deployment, each with its own certificate
 # Note that the key is only used for documentation purposes.
 # exposeDomains:
-#   production:
-#     hostname: example.com
-#   www:
-#     hostname: www.example.com
+#   - hostname: example.com
+#   - hostname: www.example.com
+#   -   ssl:
+#   -     enabled: true
+#   -     issuer: letsencrypt-staging
 exposeDomains: {}
+
+ssl:
+  # Enable HTTPS for this deployment
+  enabled:  true
+  # Possible issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
+  issuer: letsencrypt
+  # Only when certificate type is custom
+  # ca: ""
+  # key: ""
+  # crt: ""
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
@@ -266,6 +278,7 @@ backup:
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
+# see: https://github.com/helm/charts/blob/master/stable/mariadb/values.yaml
 mariadb:
   enabled: true
   replication:
@@ -315,18 +328,8 @@ memcached:
   memcached:
     maxItemMemory: 128
 
-# Configure ambassador for routing inbound traffic. We typically enable ambassador on development 
-# environments, but disable it and instead use a dedicated ingress resource on production; some 
-# providers have limits on the number of dedicated ingress resources available in a cluster. 
-ambassador:
-  enabled: true
-  # Optional configuration arguments for ambassador. 
-  config:
-    prefix: /
-    timeout_ms: 30000
-    use_websocket: true
-
-# TODO: Add codecentric repo for mailhog. https://github.com/helm/helm/issues/6005
+# Mailhog service overrides
+# see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
 mailhog:
   enabled: false
   resources:
