@@ -13,6 +13,12 @@ Configure static resource allocation for tiller:
 set resources deployment tiller-deploy --limits=cpu=30m,memory=160Mi --requests=cpu=30m,memory=128Mi -n kube-system
 ``` 
 
+Custom resource definitions for cert-manager (from https://github.com/helm/charts/tree/master/stable/cert-manager):
+```
+kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.6/deploy/manifests/00-crds.yaml
+kubectl label namespace silta-cluster certmanager.k8s.io/disable-validation="true"
+```
+
 ## Usage
 
 Here is an example of how we instantiate this helm chart: 

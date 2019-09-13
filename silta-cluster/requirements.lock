@@ -1,7 +1,7 @@
 dependencies:
-- name: ambassador
+- name: traefik
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 2.12.5
+  version: 1.77.5
 - name: redis
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 8.1.5
@@ -17,5 +17,8 @@ dependencies:
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 0.1.5
-digest: sha256:c39789c86596be2778875115117c7bde4c23490d029ec29df9832ceedf0685ae
-generated: "2019-09-09T08:40:21.580100891Z"
+- name: cert-manager
+  repository: https://charts.jetstack.io/
+  version: v0.9.1
+digest: sha256:53513c23be901362620eb3802ee9f3da3f603a4c09b70a0ea5673aefdafc0b8f
+generated: "2019-09-12T16:42:09.004295972Z"
