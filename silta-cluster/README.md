@@ -8,9 +8,9 @@ ServiceAccount and Roles for filebeat and metricbeat services. These have to be 
  - https://raw.githubusercontent.com/wunderio/silta-cluster/master/filebeat-roles.yaml
  - https://raw.githubusercontent.com/wunderio/silta-cluster/master/metricbeat-roles.yaml
 
-Configure static resource allocation for tiller:
+Configure static resource allocation for tiller (change this if tiller is unstable):
 ```
-set resources deployment tiller-deploy --limits=cpu=30m,memory=160Mi --requests=cpu=30m,memory=128Mi -n kube-system
+kubectl set resources deployment tiller-deploy --limits=cpu=500m,memory=512Mi --requests=cpu=100m,memory=256Mi -n kube-system
 ``` 
 
 Custom resource definitions for cert-manager (from https://github.com/helm/charts/tree/master/stable/cert-manager):
