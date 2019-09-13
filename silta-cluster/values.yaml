@@ -16,6 +16,14 @@ traefik:
     #  basic: 
     #    # htpasswd -nb someuser somepass
     #    someuser: htpass_hash
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32M
+    limits:
+      cpu: 10m
+      memory: 32M
+
 ssl:
   enabled: true
   email: admin@example.com
