@@ -30,3 +30,11 @@ www-admin@{{ template "drupal.environment.hostname" . }}-shell.{{ .Release.Names
 {{ .Release.Name }}-drupal.{{ .Release.Namespace }}.svc.cluster.local:80
 {{- end -}}
 {{- end -}}
+
+{{- define "drupal.servicename" -}}
+{{- if .Values.varnish.enabled -}}
+{{ .Release.Name }}-varnish
+{{- else -}}
+{{ .Release.Name }}-drupal
+{{- end -}}
+{{- end -}}

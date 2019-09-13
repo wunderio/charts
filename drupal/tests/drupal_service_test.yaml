@@ -7,60 +7,8 @@ tests:
       - isKind:
           of: Service
 
-  - it: sets the right domain with a custom environment name
-    set:
-      environmentName: 'bar'
-      clusterDomain: 'silta.example.com'
-    release:
-      namespace: 'foo'
+  - it: externalTrafficPolicy is Local by default
     asserts:
       - equal:
-          path: "metadata.annotations.domain"
-          value: "bar.foo.silta.example.com"
-
-  - it: uses the release name as a fallback
-    set:
-      clusterDomain: 'silta.example.com'
-    release:
-      name: baz
-      namespace: 'foo'
-    asserts:
-      - equal:
-          path: "metadata.annotations.domain"
-          value: "baz.foo.silta.example.com"
-
-  - it: adds the ambassador annotation by default
-    asserts:
-      - matchRegex:
-          path: metadata.annotations.getambassador\.io/config
-          pattern: 'apiVersion: ambassador/v1'
-
-  - it: adds ambassador config values
-    set:
-      ambassador.config.foo: 'bar'
-    asserts:
-      - matchRegex:
-          path: metadata.annotations.getambassador\.io/config
-          pattern: 'foo: bar'
-
-  - it: can disable ambassador
-    set:
-      ambassador.enabled: false
-    asserts:
-      - isNull:
-          path: metadata.annotations.getambassador\.io/config
-
-  - it: directs ambassador traffic to drupal service by default
-    asserts:
-      - matchRegex:
-          path: metadata.annotations.getambassador\.io/config
-          pattern: 'service: RELEASE-NAME-drupal.NAMESPACE.svc.cluster.local:80'
-
-  - it: directs ambassador traffic to varnish service when varnish is enabled
-    set:
-      varnish.enabled: true
-    asserts:
-      - matchRegex:
-          path: metadata.annotations.getambassador\.io/config
-          pattern: 'service: RELEASE-NAME-varnish.NAMESPACE.svc.cluster.local:80'
-  
+          path: "spec.externalTrafficPolicy"
+          value: "Local"

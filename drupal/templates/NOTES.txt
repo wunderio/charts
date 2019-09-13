@@ -1,8 +1,18 @@
 Your site is available here:
 
+  {{- if .Values.ssl.enabled }}
+  https://{{- template "drupal.domain" . }}
+  {{- else }}
   http://{{- template "drupal.domain" . }}
+  {{- end }}
   {{- range $index, $domain := .Values.exposeDomains }}
+  {{- if $domain.ssl }}
+  {{- if $domain.ssl.enabled }}
+  https://{{ $domain.hostname }}
+  {{- end }}
+  {{- else }}
   http://{{ $domain.hostname }}
+  {{- end }}
   {{- end }}
 
 {{ if .Values.mailhog.enabled -}}

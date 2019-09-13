@@ -1,0 +1,121 @@
+{{- if .Values.ssl.enabled }}
+{{- if has .Values.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-crt
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+spec:
+  secretName: {{ .Release.Name }}-tls
+  dnsNames:
+  - {{ template "drupal.domain" . }}
+  issuerRef:
+    name: {{ .Values.ssl.issuer }}
+    kind: ClusterIssuer
+  acme:
+    config:
+      - http01:
+          ingress: {{ .Release.Name }}-drupal
+        domains:
+          - {{ template "drupal.domain" . }}
+---
+
+{{- else if eq .Values.ssl.issuer "selfsigned" }}
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-crt
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+spec:
+  secretName: {{ .Release.Name }}-tls
+  duration: 2160h
+  renewBefore: 150h 
+  commonName: {{ template "drupal.domain" . }}
+  dnsNames:
+  - {{ template "drupal.domain" . }}
+  issuerRef:
+    name: {{ .Values.ssl.issuer }}
+    kind: ClusterIssuer
+---
+
+{{- else if eq .Values.ssl.issuer "custom" }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-tls
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+type: kubernetes.io/tls
+data:
+  tls.crt: {{ .Values.ssl.crt | b64enc }}
+  tls.key: {{ .Values.ssl.key | b64enc }}
+---
+{{- end }}
+
+# Certificates for exposeDomains 
+
+{{- range $index, $domain := .Values.exposeDomains }}
+{{- if $domain.ssl }}
+{{- if $domain.ssl.enabled }}
+{{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-crt-{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+spec:
+  secretName: {{ $.Release.Name }}-tls-{{ $index }}
+  dnsNames:
+  - {{ $domain.hostname }}
+  issuerRef:
+    name: {{ $domain.ssl.issuer }}
+    kind: ClusterIssuer
+  acme:
+    config:
+      - http01:
+          ingress: {{ $.Release.Name }}-drupal
+        domains:
+          - {{ $domain.hostname }}
+---
+
+{{- else if eq $domain.ssl.issuer "selfsigned" }}
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-crt-{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+  # namespace: silta-cluster
+spec:
+  secretName: {{ $.Release.Name }}-tls-{{ $index }}
+  duration: 2160h
+  renewBefore: 150h 
+  commonName: {{ $domain.hostname }}
+  dnsNames:
+  - {{ $domain.hostname }}
+  issuerRef:
+    name: {{ $domain.ssl.issuer }}
+    kind: ClusterIssuer
+---
+
+{{- else if eq $domain.ssl.issuer "custom" }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $.Release.Name }}-tls-{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+type: kubernetes.io/tls
+data:
+  ca.crt: {{ $domain.ssl.ca | default "" | b64enc }}
+  tls.crt: {{ $domain.ssl.crt | default "" | b64enc }}
+  tls.key: {{ $domain.ssl.key | default "" | b64enc }}
+---
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
