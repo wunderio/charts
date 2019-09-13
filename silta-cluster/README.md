@@ -8,6 +8,11 @@ ServiceAccount and Roles for filebeat and metricbeat services. These have to be 
  - https://raw.githubusercontent.com/wunderio/silta-cluster/master/filebeat-roles.yaml
  - https://raw.githubusercontent.com/wunderio/silta-cluster/master/metricbeat-roles.yaml
 
+Configure static resource allocation for tiller:
+```
+set resources deployment tiller-deploy --limits=cpu=30m,memory=160Mi --requests=cpu=30m,memory=128Mi -n kube-system
+``` 
+
 ## Usage
 
 Here is an example of how we instantiate this helm chart: 
