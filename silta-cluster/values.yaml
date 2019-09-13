@@ -6,6 +6,7 @@ traefik:
   externalTrafficPolicy: Local
   rbac:
     enabled: true
+  replicas: 2
   ssl:
     enabled: true
     enforced: false
@@ -18,11 +19,11 @@ traefik:
     #    someuser: htpass_hash
   resources:
     requests:
-      cpu: 10m
-      memory: 32M
+      cpu: 50m
+      memory: 128M
     limits:
-      cpu: 10m
-      memory: 32M
+      cpu: 50m
+      memory: 128M
 
 ssl:
   enabled: true
