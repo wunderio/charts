@@ -4,26 +4,6 @@ metadata:
   name: {{ .Release.Name }}-nginx
   labels:
     {{ include "frontend.release_labels" . | indent 4 }}
-  annotations:
-    getambassador.io/config: |
-      apiVersion: ambassador/v1
-      kind:  Mapping
-      name:  {{ .Release.Name }}-nginx
-      host: {{ template "frontend.domain" . }}
-      prefix: /
-      service: {{ .Release.Name }}-nginx.{{ .Release.Namespace }}.svc.cluster.local:80
-      timeout_ms: 30000
-{{- range $index, $domain := .Values.exposeDomains }}
-      ---
-      apiVersion: ambassador/v1
-      kind:  Mapping
-      name:  {{ $.Release.Name }}-nginx-{{ $index }}
-      host: {{ $domain.hostname }}
-      prefix: /
-      service: {{ $.Release.Name }}-nginx.{{ $.Release.Namespace }}.svc.cluster.local:80
-      timeout_ms: 30000
-{{- end }}
-    domain: {{ template "frontend.domain" . }}
 spec:
   type: NodePort
   externalTrafficPolicy: Local
