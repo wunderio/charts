@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ .Release.Name }}-nginx
+  name: {{ .Release.Name }}-drupal
   annotations:
     kubernetes.io/ingress.class: traefik
     {{- if .Values.ssl.enabled }}
@@ -24,14 +24,14 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: {{ .Release.Name }}-nginx
+          serviceName: {{ .Release.Name }}-drupal
           servicePort: 80
 ---
 {{- range $index, $domain := .Values.exposeDomains }}
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $.Release.Name }}-nginx-{{ $index }}
+  name: {{ $.Release.Name }}-drupal-{{ $index }}
   annotations:
     kubernetes.io/ingress.class: traefik
     {{- if $domain.ssl }}
@@ -58,7 +58,7 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: {{ $.Release.Name }}-nginx
+          serviceName: {{ $.Release.Name }}-drupal
           servicePort: 80
 ---
 {{- end }}

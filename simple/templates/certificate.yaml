@@ -16,7 +16,7 @@ spec:
   acme:
     config:
       - http01:
-          ingress: {{ .Release.Name }}-nginx
+          ingress: {{ .Release.Name }}-drupal
         domains:
           - {{ template "drupal.domain" . }}
 ---
@@ -76,7 +76,7 @@ spec:
   acme:
     config:
       - http01:
-          ingress: {{ $.Release.Name }}-nginx
+          ingress: {{ $.Release.Name }}-drupal
         domains:
           - {{ $domain.hostname }}
 ---
