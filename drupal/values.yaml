@@ -21,6 +21,7 @@ app: drupal
 replicas: 1
 
 # Enable autoscaling using HorizontalPodAutoscaler
+# see: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
 autoscaling:
   enabled: false
   minReplicas: 1
@@ -277,6 +278,7 @@ backup:
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
+# see: https://github.com/helm/charts/blob/master/stable/mariadb/values.yaml
 mariadb:
   enabled: true
   replication:
@@ -328,7 +330,6 @@ memcached:
 
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
-# TODO: Add codecentric repo for mailhog. https://github.com/helm/helm/issues/6005
 mailhog:
   enabled: false
   resources:

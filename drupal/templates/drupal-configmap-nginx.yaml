@@ -152,12 +152,12 @@ data:
             # Auth / whitelist always enabled
             satisfy any;
             allow 127.0.0.1;
-            {{- range .Values.nginx.basicauth.noauthips }}
+            {{- range .Values.nginx.noauthips }}
             allow {{ . }};
             {{- end }}
             deny all;
             
-            {{- if gt (len .Values.nginx.basicauth.noauthips) 1 -}}
+            {{- if gt (len .Values.nginx.noauthips) 1 -}}
             # Basic auth only offered when at least one extra ip is whitelisted. Prevents using default credentials.
             auth_basic "Restricted";
             auth_basic_user_file /etc/nginx/.htaccess;
