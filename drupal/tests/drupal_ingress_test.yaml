@@ -16,11 +16,21 @@ tests:
   - it: sets correct hostname for deployment
     set:
       environmentName: 'foo'
-      clusterDomain: 'bar' 
+      projectName: 'bar' 
+      clusterDomain: 'baz' 
     asserts:
       - equal:
           path: spec.rules[0].host
-          value: 'foo.NAMESPACE.bar'
+          value: 'foo.bar.baz'
+  
+  - it: sets correct hostname for deployment when projectName is absent
+    set:
+      environmentName: 'foo'
+      clusterDomain: 'baz' 
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: 'foo.namespace.baz'
 
   - it: directs traefik requests to drupal  service by default
     asserts:
