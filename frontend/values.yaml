@@ -3,6 +3,10 @@
 # Subdomains of this domain will be created automatically for each environment.
 clusterDomain: "silta.wdr.io"
 
+# An optional human-readable label for the project, defaults to the repository name.
+# This name is mainly used to create nice subdomains for each environment.
+projectName: ""
+
 # An optional human-readable label for the environment, defaults to the release name.
 # We typically pass the branch name when we build dedicated environments per branch.
 # This name is mainly used to create nice subdomains for each environment.

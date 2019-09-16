@@ -4,7 +4,7 @@ release: {{ .Release.Name }}
 {{- end }}
 
 {{- define "frontend.domain" -}}
-{{ include "frontend.environmentName" . }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
+{{ include "frontend.environmentName" . }}.{{ regexReplaceAll "[^[:alnum:]]" (.Values.projectName | default .Release.Namespace) "-" | trunc 30 | trimSuffix "-" | lower }}.{{ .Values.clusterDomain }}
 {{- end -}}
 
 {{- define "frontend.environmentName" -}}
