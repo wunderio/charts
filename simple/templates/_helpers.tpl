@@ -4,7 +4,7 @@ release: {{ .Release.Name }}
 {{- end }}
 
 {{- define "drupal.domain" -}}
-{{ include "drupal.environmentName" . }}.{{ .Release.Namespace }}.{{ .Values.clusterDomain }}
+{{ include "drupal.environmentName" . }}.{{ regexReplaceAll "[^[:alnum:]]" (.Values.projectName | default .Release.Namespace) "-" | trunc 30 | trimSuffix "-" | lower }}.{{ .Values.clusterDomain }}
 {{- end -}}
 
 {{- define "drupal.environmentName" -}}
