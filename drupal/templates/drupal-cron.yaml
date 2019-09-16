@@ -2,7 +2,7 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ $.Release.Name }}-cron-{{ $index }}
+  name: {{ $.Release.Name }}-{{ $index }}
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
