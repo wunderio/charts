@@ -15,7 +15,7 @@ kubectl set resources deployment tiller-deploy --limits=cpu=500m,memory=512Mi --
 
 Custom resource definitions for cert-manager (from https://github.com/helm/charts/tree/master/stable/cert-manager):
 ```
-kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.6/deploy/manifests/00-crds.yaml
+kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.10/deploy/manifests/00-crds.yaml
 kubectl label namespace silta-cluster certmanager.k8s.io/disable-validation="true"
 ```
 

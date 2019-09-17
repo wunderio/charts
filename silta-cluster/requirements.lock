@@ -13,12 +13,12 @@ dependencies:
   version: 0.13.8
 - name: minio
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 2.5.13
+  version: 2.5.14
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 0.1.5
 - name: cert-manager
   repository: https://charts.jetstack.io/
-  version: v0.9.1
-digest: sha256:53513c23be901362620eb3802ee9f3da3f603a4c09b70a0ea5673aefdafc0b8f
-generated: "2019-09-12T16:42:09.004295972Z"
+  version: v0.10.0
+digest: sha256:c7c7d43e5cb23ca3bb120a22c2bfb8af3642f69c01b05fae46b433f6a76d2ed5
+generated: "2019-09-17T13:05:54.588338061Z"
