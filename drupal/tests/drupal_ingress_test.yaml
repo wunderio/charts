@@ -45,3 +45,28 @@ tests:
       - equal:
           path: spec.rules[0].http.paths[0].backend.serviceName
           value: 'RELEASE-NAME-varnish'
+
+  - it: shortens long project names
+    set:
+      projectName: 'client-fi-longclient-longproject-backend'
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: 'release-name.client-fi-longclient-longpra6b.silta.wdr.io'
+
+  - it: shortens long branch names
+    set:
+      environmentName: 'feature/my-project-shortname-12345-with-additional-description'
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: 'feature-my-project-shortname-12345-witdb6.namespace.silta.wdr.io'
+
+  - it: shortens branch names more when project name is already long
+    set:
+      projectName: 'client-fi-longclient-longproject-backend'
+      environmentName: 'feature/my-project-shortname-12345-with-additional-description'
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: 'feature-my-projecdb6.client-fi-longclient-longpra6b.silta.wdr.io'
