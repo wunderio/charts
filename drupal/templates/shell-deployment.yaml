@@ -12,6 +12,8 @@ spec:
     matchLabels:
       {{- include "drupal.release_labels" . | nindent 6 }}
       service: shell
+  strategy:
+    type: Recreate
   template:
     metadata:
       labels:
