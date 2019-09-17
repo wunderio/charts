@@ -42,8 +42,7 @@ spec:
           tcpSocket:
             port: 80
         readinessProbe:
-          httpGet:
-            path: /
+          tcpSocket:
             port: 80
         resources:
 {{ .Values.nginx.resources | toYaml | indent 10 }}
@@ -58,8 +57,7 @@ spec:
           tcpSocket:
             port: {{ .Values.frontend.port }}
         readinessProbe:
-          httpGet:
-            path: /
+          tcpSocket:
             port: {{ .Values.frontend.port }}
         env:
         {{- range $key, $val := .Values.frontend.env }}
