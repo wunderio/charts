@@ -320,7 +320,7 @@ elasticsearch:
   xpack:
     enabled: false
   persistence:
-    size: 512Mi
+    size: 1Gi
   resources:
     requests:
       cpu: 200m
