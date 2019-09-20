@@ -8,5 +8,8 @@ dependencies:
 - name: mailhog
   repository: https://codecentric.github.io/helm-charts
   version: 3.0.1
-digest: sha256:812d2cf12daf5a640afa04af2092d63ff49b64631aee9411efaf61c19debffba
-generated: "2019-08-29T11:52:57.8913672Z"
+- name: elasticsearch
+  repository: https://storage.googleapis.com/charts.wdr.io
+  version: 7.3.2
+digest: sha256:78fa8147fe35f0423e708d24933048c6a7f29c653cf9e323fef901dd4a0ec99a
+generated: "2019-09-20T21:44:51.737295+02:00"

@@ -134,7 +134,7 @@ imagePullSecrets:
 {{- end }}
 {{- if .Values.elasticsearch.enabled }}
 - name: ELASTICSEARCH_HOST
-  value: {{ .Release.Name }}-elastic
+  value: {{ .Release.Name }}-es
 {{- end }}
 {{- if or .Values.mailhog.enabled .Values.smtp.enabled }}
 {{ include "smtp.env" . }}

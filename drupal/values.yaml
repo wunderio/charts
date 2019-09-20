@@ -314,13 +314,14 @@ varnish:
 
 elasticsearch:
   enabled: false
-  # Choose versions in https://www.docker.elastic.co/ from "Elasticsearch" list
-  version: 6.5.0
-  heapSize: 256m
+  replicas: 1
+  # The elasticsearch version to use.
+  # imageTag: 7.3.2
+  esJavaOpts: -Xmx256m -Xms256m
   xpack:
     enabled: false
-  persistence:
-    size: 1Gi
+  volumeClaimTemplate:
+    resources.requests.storage: 1Gi
   resources:
     requests:
       cpu: 200m
