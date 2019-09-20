@@ -315,6 +315,7 @@ varnish:
 elasticsearch:
   enabled: false
   replicas: 1
+  minimumMasterNodes: 1
   # The elasticsearch version to use.
   # imageTag: 7.3.2
   esJavaOpts: -Xmx256m -Xms256m
