@@ -111,6 +111,8 @@ imagePullSecrets:
 {{- define "drupal.env" }}
 - name: SILTA_CLUSTER
   value: "1"
+- name: ENVIRONMENT_NAME
+  value: "{{ .Values.environmentName }}"
 {{- if .Values.mariadb.enabled }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"

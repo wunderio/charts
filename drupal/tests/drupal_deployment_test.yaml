@@ -29,6 +29,7 @@ tests:
     set:
       php.env:
         foo: bar
+      environmentName: baz
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -40,6 +41,11 @@ tests:
           content:
             name: SILTA_CLUSTER
             value: '1'
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: ENVIRONMENT_NAME
+            value: baz
 
   - it: sets smtp environment variables correctly
     set:
