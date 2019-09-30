@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: backup
+  name: {{ .Release.Name }}-backup
   labels:
-    name: backup
+    name: {{ .Release.Name }}-backup
 spec:
   accessModes:
     - ReadWriteMany
@@ -22,7 +22,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: backup
+  name: {{ .Release.Name }}-backup
   labels:
     app: {{ .Values.app | quote }}
     release: {{ .Release.Name }}
@@ -36,6 +36,6 @@ spec:
 {{- if eq .Values.backup.storageClassName "silta-shared" }}
   selector:
     matchLabels:
-      name: backup
+      name: {{ .Release.Name }}-backup
 {{- end }}
 {{- end }}
