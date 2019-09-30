@@ -64,6 +64,9 @@ nginx:
     requests:
       cpu: 5m
       memory: 10M
+    limits:
+      cpu: 5m
+      memory: 10M
 
   loglevel: error 
 
@@ -97,4 +100,11 @@ frontend:
   port: 3000
   env: {}
 
-  resources: {}
+  resources: 
+    requests:
+      cpu: 200m
+      memory: 128Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+    

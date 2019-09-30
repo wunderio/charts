@@ -1,0 +1,64 @@
+suite: Site ingress
+templates:
+  - ingress.yaml
+tests:
+  - it: is a ingress
+    asserts:
+      - isKind:
+          of: Ingress
+
+  - it: uses traefik ingress class
+    asserts:
+      - equal:
+          path: 'metadata.annotations.kubernetes\.io/ingress\.class'
+          value: 'traefik'
+
+  - it: sets correct hostname for deployment
+    set:
+      environmentName: 'foo'
+      projectName: 'bar' 
+      clusterDomain: 'baz' 
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: 'foo.bar.baz'
+  
+  - it: sets correct hostname for deployment when projectName is absent
+    set:
+      environmentName: 'foo'
+      clusterDomain: 'baz' 
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: 'foo.namespace.baz'
+
+  - it: directs traefik requests to nginx service by default
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.serviceName
+          value: 'RELEASE-NAME-nginx'
+
+  - it: shortens long project names
+    set:
+      projectName: 'client-fi-longclient-longproject-backend'
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: 'release-name.client-fi-longclient-longpra6b.silta.wdr.io'
+
+  - it: shortens long branch names
+    set:
+      environmentName: 'feature/my-project-shortname-12345-with-additional-description'
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: 'feature-my-project-shortname-12345-witdb6.namespace.silta.wdr.io'
+
+  - it: shortens branch names more when project name is already long
+    set:
+      projectName: 'client-fi-longclient-longproject-backend'
+      environmentName: 'feature/my-project-shortname-12345-with-additional-description'
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: 'feature-my-projecdb6.client-fi-longclient-longpra6b.silta.wdr.io'
