@@ -17,7 +17,7 @@ spec:
             {{- include "drupal.php-container" . | nindent 12 }}
             volumeMounts:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
-              - name: backup
+              - name: {{ .Release.Name }}-backup
                 mountPath: /backups
             command: ["/bin/bash", "-c"]
             args:
