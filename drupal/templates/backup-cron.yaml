@@ -64,9 +64,9 @@ spec:
           restartPolicy: OnFailure
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}
-            - name: backup
+            - name: {{ .Release.Name }}-backup
               persistentVolumeClaim:
-                claimName: backup
+                claimName: {{ .Release.Name }}-backup
 
 
           {{- include "drupal.imagePullSecrets" . | nindent 10 }}
