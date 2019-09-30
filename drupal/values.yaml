@@ -298,7 +298,7 @@ mariadb:
         cpu: 50m
         memory: 128M
       limits:
-        cpu: 200m
+        cpu: 1000m
         memory: 512M
 
 varnish:
