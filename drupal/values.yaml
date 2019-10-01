@@ -296,10 +296,10 @@ mariadb:
     resources:
       requests:
         cpu: 50m
-        memory: 256M
+        memory: 512M
       limits:
         cpu: 1000m
-        memory: 256M
+        memory: 512M
 
 varnish:
   enabled: false
