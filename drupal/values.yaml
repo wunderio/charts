@@ -314,10 +314,13 @@ varnish:
 
 elasticsearch:
   enabled: false
+
+  # The elasticsearch version to use.
+  # It's a good idea to tag this in your silta.yml
+  imageTag: 6.8.3
+
   replicas: 1
   minimumMasterNodes: 1
-  # The elasticsearch version to use.
-  # imageTag: 7.3.2
 
   # This value should be slightly less than 50% of the requested memory.
   esJavaOpts: -Xmx220m -Xms220m
