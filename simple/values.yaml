@@ -62,7 +62,7 @@ nginx:
     # Define username and password
     credentials:
       username: silta
-      password: simplepass
+      password: demo
 
     # Trust X-Forwarded-For from these hosts for getting external IP 
     realipfrom: 10.0.0.0/8
