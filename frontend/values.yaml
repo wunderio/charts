@@ -1,4 +1,3 @@
-
 # Main domain of the cluster.
 # Subdomains of this domain will be created automatically for each environment.
 clusterDomain: "silta.wdr.io"
@@ -14,23 +13,6 @@ environmentName: ""
 
 # The app label added to our Kubernetes resources.
 app: frontend
-
-# How many instances of the Frontend pod should be in our Kubernetes deployment.
-# A single pod (the default value) is good for development environments to minimise resource usage.
-# Multiple pods make sense for high availability.
-replicas: 1
-
-# Enable autoscaling using HorizontalPodAutoscaler
-# see: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 3
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
 # Example of exposing 2 additional domains for this deployment, each with its own certificate
@@ -79,7 +61,7 @@ nginx:
     gke-internal: 10.0.0.0/8
   
   # Set of values to enable and use http basic authentication
-  # It is implemented only for very basic protection (like web crawlers)
+  # It is implemented only for very basic protection (like web crawlers)
   basicauth:
     enabled: true
 
@@ -94,17 +76,63 @@ nginx:
 
   extra_headers: {}
 
-frontend:
-  image: 'you need to pass in a value for nginx.image to your helm chart'
-  
-  port: 3000
-  env: {}
-
-  resources: 
-    requests:
-      cpu: 200m
-      memory: 128Mi
-    limits:
-      cpu: 1000m
-      memory: 512Mi
+services:
+  # frontend:
+  #   image: 'you need to pass in a value for frontend.image to your helm chart'
+  #   port: 3000
+  #   env: {}
+  #   #exposedRoute: '/'
     
+  #   # How many instances of the Frontend pod should be in our Kubernetes deployment.
+  #   # A single pod (the default value) is good for development environments to minimise resource usage.
+  #   # Multiple pods make sense for high availability.
+  #   replicas: 1
+
+  #   # Enable autoscaling using HorizontalPodAutoscaler
+  #   # see: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
+  #   autoscaling:
+  #     enabled: false
+  #     minReplicas: 1
+  #     maxReplicas: 3
+  #     metrics:
+  #       - type: Resource
+  #         resource:
+  #           name: cpu
+  #           targetAverageUtilization: 80
+
+  #   resources: 
+  #     requests:
+  #       cpu: 200m
+  #       memory: 128Mi
+  #     limits:
+  #       cpu: 1000m
+  #       memory: 512Mi    
+
+# This will be deprecated in favour of services
+replicas: 1
+
+# This will be deprecated in favour of services
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 80
+
+# This will be deprecated in favour of services
+# frontend:
+#   image: 'you need to pass in a value for nginx.image to your helm chart'
+  
+#   port: 3000
+#   env: {}
+
+#   resources: 
+#     requests:
+#       cpu: 200m
+#       memory: 128Mi
+#     limits:
+#       cpu: 1000m
+#       memory: 512Mi

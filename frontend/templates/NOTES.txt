@@ -1,8 +1,17 @@
 Deployed {{ .Release.Name }} successfully, your site is available here:
 
-  http://{{- template "frontend.domain" . }}
+  {{- range $index, $service := .Values.services }}
+  {{- if $service.exposedRoute }}
+  http://{{- template "frontend.domain" $ }}{{ $service.exposedRoute }}
+  {{- end }}
+  {{- end }}
+
   {{- range $index, $domain := .Values.exposeDomains }}
-  {{ $domain.hostname }}
+  {{- range $index, $service := $.Values.services }}
+  {{- if $service.exposedRoute }}
+  http://{{ $domain.hostname }}{{ $service.exposedRoute }}
+  {{- end }}
+  {{- end }}
   {{- end }}
 
 {{ if .Values.nginx.basicauth.enabled -}}

@@ -1,0 +1,17 @@
+{{- range $index, $service := .Values.services }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.Release.Name }}-{{ $index }}
+  labels:
+    {{ include "frontend.release_labels" $ | indent 4 }}
+spec:
+  type: NodePort
+  externalTrafficPolicy: Local
+  ports:
+    - port: {{ default 3000 $service.port }}
+  selector:
+    {{ include "frontend.release_labels" $ | indent 4 }}
+    deployment: frontend-{{ $index }}
+---
+{{- end }}
