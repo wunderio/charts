@@ -1,5 +1,12 @@
 Deployed {{ .Release.Name }} successfully, your site is available here:
 
+  {{- if .Values.frontend }}
+  http://{{- template "frontend.domain" . }}
+  {{- range $index, $domain := .Values.exposeDomains }}
+  {{ $domain.hostname }}
+  {{- end }}
+  {{- end }}
+
   {{- range $index, $service := .Values.services }}
   {{- if $service.exposedRoute }}
   http://{{- template "frontend.domain" $ }}{{ $service.exposedRoute }}

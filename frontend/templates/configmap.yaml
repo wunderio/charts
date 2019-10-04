@@ -96,7 +96,7 @@ data:
             return 200 'User-agent: *\nDisallow: /';
           {{- end}}
         } 
-        
+
         ## Most sites won't have configured favicon
         ## and since its always grabbed, turn it off in access log
         ## and turn off it's not-found error in the error log
@@ -154,7 +154,7 @@ data:
             
             # Pass the request on to frontend.
             # proxy_pass http://{{ .Release.Name }}-frontend:3000/;
-            proxy_pass http://127.0.0.1:3000/;
+            proxy_pass http://127.0.0.1:{{ default 3000 .Values.frontend.port }}/;
 
             # We expect the downsteam servers to redirect to the
             # right hostname, so don't do any rewrites here.
