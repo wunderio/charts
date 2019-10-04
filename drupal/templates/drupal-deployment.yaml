@@ -103,6 +103,38 @@ spec:
                 path: .htaccess
         {{- end }}
       {{- include "drupal.imagePullSecrets" . | nindent 6 }}
+
+      affinity:
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: release
+                  operator: In
+                  values:
+                  - "{{ .Release.Name }}"
+                - key: mariadb
+                  operator: In
+                  values:
+                  - mariadb
+              topologyKey: kubernetes.io/hostname
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 10
+            podAffinityTerm:
+              topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchExpressions:
+                - key: release
+                  operator: In
+                  values:
+                  - "{{ .Release.Name }}"
+                - key: deployment
+                  operator: In
+                  values:
+                  - drupal
 ---
 {{- if .Values.autoscaling.enabled }}
 apiVersion: autoscaling/v2beta1
