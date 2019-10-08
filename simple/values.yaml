@@ -49,8 +49,8 @@ nginx:
   # These values are optimised for development environments.
   resources:
     requests:
-      cpu: 5m
-      memory: 10M
+      cpu: 1m
+      memory: 5M
 
   loglevel: error 
   
