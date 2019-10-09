@@ -1,0 +1,68 @@
+{{- range $index, $service := .Values.services }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $.Release.Name }}-{{ $index }}
+  labels:
+    {{ include "frontend.release_labels" $ | indent 4 }}
+spec:
+  replicas: {{ default 1 $service.replicas }}
+  selector:
+    matchLabels:
+      {{ include "frontend.release_labels" $ | indent 6 }}
+      deployment: frontend-{{ $index }}
+  template:
+    metadata:
+      labels:
+        {{ include "frontend.release_labels" $ | indent 8 }}
+        deployment: frontend-{{ $index }}
+    spec:
+      containers:
+      - name: {{ $index }}
+        image: {{ $service.image | quote }}
+        ports:
+        - containerPort: {{ default 3000 $service.port }}
+          name: {{ $index }}
+        volumeMounts:
+        livenessProbe:
+          tcpSocket:
+            port: {{ default 3000 $service.port }}
+        readinessProbe:
+          tcpSocket:
+            port: {{ default 3000 $service.port }}
+        env:
+        {{- range $key, $val := $service.env }}
+        - name: {{ $key }}
+          value: {{ $val | quote }}
+        {{- end }}
+        - name: 'PORT'
+          value: {{ default 3000 $service.port | quote }}
+        {{- range $index, $service := $.Values.services }}
+        - name: "{{ $index }}_HOST"
+          value: "{{ $.Release.Name }}-{{ $index }}:{{ default 3000 $service.port }}"
+        {{- end }}
+        resources:
+{{ $service.resources | toYaml | indent 10 }}
+
+{{- if $service.autoscaling }}
+{{- if $service.autoscaling.enabled }}
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ $.Release.Name }}-{{ $index }}
+  labels:
+    {{- include "frontend.release_labels" $ | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ $.Release.Name }}-{{ $index }}
+  minReplicas: {{ default 1 $service.autoscaling.minReplicas }}
+  maxReplicas: {{ default 3 $service.autoscaling.maxReplicas }}
+  metrics:
+    {{- toYaml $service.autoscaling.metrics | nindent 4 }}
+{{- end }}
+{{- end }}
+---
+{{- end }}
