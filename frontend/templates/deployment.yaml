@@ -50,24 +50,24 @@ spec:
       {{- if .Values.frontend }}
       # This will be deprecated
       - name: node
-        image: {{ default .Values.services.node.image .Values.frontend.image | quote }}
+        image: {{ .Values.frontend.image | quote }}
         ports:
-        - containerPort: {{ default .Values.services.node.port .Values.frontend.port }}
+        - containerPort: {{ .Values.frontend.port }}
           name: node
         volumeMounts:
         livenessProbe:
           tcpSocket:
-            port: {{ default .Values.services.node.port .Values.frontend.port }}
+            port: {{ .Values.frontend.port }}
         readinessProbe:
           tcpSocket:
-            port: {{ default .Values.services.node.port .Values.frontend.port }}
+            port: {{ .Values.frontend.port }}
         env:
-        {{- range $key, $val := default .Values.services.node.env .Values.frontend.env }}
+        {{- range $key, $val := .Values.frontend.env }}
         - name: {{ $key }}
           value: {{ $val | quote }}
         {{- end }}
         resources:
-{{ default .Values.services.node.resources .Values.frontend.resources | toYaml | indent 10 }}
+{{ .Values.frontend.resources | toYaml | indent 10 }}
       {{- end }}
 
       volumes:
