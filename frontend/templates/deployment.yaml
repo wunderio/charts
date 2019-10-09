@@ -52,15 +52,15 @@ spec:
       - name: node
         image: {{ .Values.frontend.image | quote }}
         ports:
-        - containerPort: {{ .Values.frontend.port }}
+        - containerPort: {{ .Values.frontend.port | default 3000 }}
           name: node
         volumeMounts:
         livenessProbe:
           tcpSocket:
-            port: {{ .Values.frontend.port }}
+            port: {{ .Values.frontend.port | default 3000 }}
         readinessProbe:
           tcpSocket:
-            port: {{ .Values.frontend.port }}
+            port: {{ .Values.frontend.port | default 3000 }}
         env:
         {{- range $key, $val := .Values.frontend.env }}
         - name: {{ $key }}
