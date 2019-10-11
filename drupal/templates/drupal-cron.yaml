@@ -33,6 +33,12 @@ spec:
             resources:
               {{- $.Values.php.resources | toYaml | nindent 14 }}
           restartPolicy: OnFailure
+          nodeSelector:
+            {{ if $job.nodeSelector }}
+            {{- $job.nodeSelector | toYaml | nindent 12 }}
+            {{ else }}
+            {{- $.Values.php.nodeSelector | toYaml | nindent 12 }}
+            {{- end }}
           volumes:
             {{- include "drupal.volumes" $ | nindent 12 }}
 

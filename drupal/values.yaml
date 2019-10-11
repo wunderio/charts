@@ -119,6 +119,9 @@ php:
           drush cron;
         fi
 
+      # Set a nodeSelector specifically for cron jobs.
+      nodeSelector: {}
+
   # Post-installation hook.
   # This is run every time a new environment is created.
   postinstall:
@@ -176,6 +179,9 @@ php:
   # This variable is exposed as $DRUPAL_CONFIG_PATH in the container.
   drupalConfigPath: "config/sync"
 
+  # Set a restriction on where the php pod are provisioned.
+  # This can be used for example to get a static IP for egress traffic.
+  nodeSelector: {}
 
 # Configuration for everything that runs in shell container.
 shell:

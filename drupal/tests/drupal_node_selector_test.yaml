@@ -1,0 +1,41 @@
+suite: node selector test
+templates:
+  - drupal-deployment.yaml
+  - drupal-cron.yaml
+  - shell-deployment.yaml
+tests:
+  - it: has no node selector by default
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value: {}
+
+  - it: can set a node selector
+    set:
+      php.nodeSelector:
+        foo: bar
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector.foo
+          value: bar
+      - template: shell-deployment.yaml
+        equal:
+          path: spec.template.spec.nodeSelector.foo
+          value: bar
+      - template: drupal-cron.yaml
+        equal:
+          path: spec.jobTemplate.spec.template.spec.nodeSelector.foo
+          value: bar
+
+  - it: can set a node selector just for cron
+    set:
+      php.cron.drupal.nodeSelector:
+        foo: bar
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value: {}
+      - template: drupal-cron.yaml
+        equal:
+          path: spec.jobTemplate.spec.template.spec.nodeSelector.foo
+          value: bar

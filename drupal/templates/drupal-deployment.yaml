@@ -103,7 +103,8 @@ spec:
                 path: .htaccess
         {{- end }}
       {{- include "drupal.imagePullSecrets" . | nindent 6 }}
-
+      nodeSelector:
+        {{- .Values.php.nodeSelector | toYaml | nindent 8 }}
       affinity:
         podAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
