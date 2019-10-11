@@ -4,12 +4,12 @@ dependencies:
   version: 4.4.2
 - name: memcached
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 2.3.1
+  version: 3.0.1
 - name: mailhog
   repository: https://codecentric.github.io/helm-charts
   version: 3.0.1
 - name: elasticsearch
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 7.3.2
-digest: sha256:78fa8147fe35f0423e708d24933048c6a7f29c653cf9e323fef901dd4a0ec99a
-generated: "2019-09-20T21:44:51.737295+02:00"
+digest: sha256:c20b625a94057df7dae501922e81081a1b52f1b57db7aea0f19b3d62e67b3da0
+generated: "2019-10-04T16:51:16.719958+02:00"

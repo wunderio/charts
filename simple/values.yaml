@@ -49,8 +49,8 @@ nginx:
   # These values are optimised for development environments.
   resources:
     requests:
-      cpu: 5m
-      memory: 10M
+      cpu: 1m
+      memory: 5M
 
   loglevel: error 
   
@@ -62,7 +62,7 @@ nginx:
     # Define username and password
     credentials:
       username: silta
-      password: simplepass
+      password: demo
 
     # Trust X-Forwarded-For from these hosts for getting external IP 
     realipfrom: 10.0.0.0/8
