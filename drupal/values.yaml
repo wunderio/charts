@@ -105,7 +105,7 @@ php:
   # These values are optimised for development environments.
   resources:
     requests:
-      cpu: 50m
+      cpu: 25m
       memory: 128M
 
   # Cron tasks, each of which will be run into a dedicated temporary pod.
