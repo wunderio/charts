@@ -53,15 +53,15 @@ spec:
       - name: node
         image: {{ default .Values.services.node.image .Values.frontend.image | quote }}
         ports:
-        - containerPort: {{ default .Values.services.node.port .Values.frontend.port }}
+        - containerPort: {{ default 3000 .Values.frontend.port }}
           name: node
         volumeMounts:
         livenessProbe:
           tcpSocket:
-            port: {{ default .Values.services.node.port .Values.frontend.port }}
+            port: {{ default 3000 .Values.frontend.port }}
         readinessProbe:
           tcpSocket:
-            port: {{ default .Values.services.node.port .Values.frontend.port }}
+            port: {{ default 3000 .Values.frontend.port }}
         env:
         {{- range $key, $val := default .Values.services.node.env .Values.frontend.env }}
         - name: {{ $key }}
