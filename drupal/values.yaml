@@ -306,6 +306,15 @@ mariadb:
       limits:
         cpu: 1000m
         memory: 512M
+    nodeAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: cloud.google.com/gke-nodepool
+            operator: NotIn
+            values:
+            - static-ip
 
 varnish:
   enabled: false
@@ -327,7 +336,6 @@ elasticsearch:
 
   replicas: 1
   minimumMasterNodes: 1
-  maxUnavailable: 0
 
   # This value should be slightly less than 50% of the requested memory.
   esJavaOpts: -Xmx220m -Xms220m
@@ -342,6 +350,16 @@ elasticsearch:
     limits:
       cpu: 1000m
       memory: 512Mi
+
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 1
+      preference:
+        matchExpressions:
+        - key: cloud.google.com/gke-nodepool
+          operator: NotIn
+          values:
+          - static-ip
 
 # Memcache service overrides
 # see: https://github.com/helm/charts/blob/master/stable/memcached/values.yaml
