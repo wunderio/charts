@@ -308,7 +308,7 @@ mariadb:
         memory: 512M
     nodeAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 1
+      - weight: 100
         preference:
           matchExpressions:
           - key: cloud.google.com/gke-nodepool
@@ -353,7 +353,7 @@ elasticsearch:
 
   nodeAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
-    - weight: 1
+    - weight: 100
       preference:
         matchExpressions:
         - key: cloud.google.com/gke-nodepool
