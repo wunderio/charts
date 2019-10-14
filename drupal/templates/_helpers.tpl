@@ -183,12 +183,25 @@ imagePullSecrets:
 
 {{- define "drupal.wait-for-db-command" }}
 TIME_WAITING=0
-  until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --silent; do
+until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --silent; do
   echo "Waiting for database..."; sleep 5
   TIME_WAITING=$((TIME_WAITING+5))
 
   if [ $TIME_WAITING -gt 90 ]; then
     echo "Database connection timeout"
+    exit 1
+  fi
+done
+{{- end }}
+
+{{- define "drupal.wait-for-elasticsearch-command" }}
+TIME_WAITING=0
+until curl --silent --connect-timeout 2 "$ELASTICSEARCH_HOST:9200" ; do
+  echo "Waiting for Elasticsearch..."; sleep 5
+  TIME_WAITING=$((TIME_WAITING+5))
+
+  if [ $TIME_WAITING -gt 90 ]; then
+    echo "Elasticsearch connection timeout"
     exit 1
   fi
 done
@@ -202,6 +215,9 @@ done
 set -e
 
 {{ include "drupal.wait-for-db-command" . }}
+{{ if .Values.elasticsearch.enabled }}
+{{ include "drupal.wait-for-elasticsearch-command" . }}
+{{ end }}
 
 {{ if .Release.IsInstall }}
 touch /app/web/sites/default/files/_installing
