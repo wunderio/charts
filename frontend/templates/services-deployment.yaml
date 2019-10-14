@@ -1,3 +1,4 @@
+{{ if not .Values.frontend }}
 {{- range $index, $service := .Values.services }}
 apiVersion: apps/v1
 kind: Deployment
@@ -65,4 +66,5 @@ spec:
 {{- end }}
 {{- end }}
 ---
+{{- end }}
 {{- end }}
