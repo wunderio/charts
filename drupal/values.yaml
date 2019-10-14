@@ -301,7 +301,7 @@ mariadb:
       size: 1G
     resources:
       requests:
-        cpu: 50m
+        cpu: 25m
         memory: 512M
       limits:
         cpu: 1000m
@@ -320,7 +320,7 @@ varnish:
   enabled: false
   resources:
     requests:
-      cpu: 50m
+      cpu: 25m
       memory: 32Mi
   # https://varnish-cache.org/docs/trunk/users-guide/storage-backends.html
   storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
@@ -345,7 +345,7 @@ elasticsearch:
     resources.requests.storage: 1Gi
   resources:
     requests:
-      cpu: 200m
+      cpu: 100m
       memory: 512Mi
     limits:
       cpu: 1000m
