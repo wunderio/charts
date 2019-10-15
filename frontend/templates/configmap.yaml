@@ -110,6 +110,7 @@ data:
         ## access to all .invisible files
         location ~ /\. { return 404; access_log off; log_not_found off; }
 
+        {{ if not .Values.frontend }}
         {{- range $index, $service := .Values.services }}
         {{ if default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }}
         location {{ default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }} {
@@ -148,12 +149,13 @@ data:
         }    
         {{- end }}
         {{- end }}
+        {{- end }}
 
         {{- if .Values.frontend }}
         location / {                                                                                                              
             
             # Pass the request on to frontend.
-            # proxy_pass http://{{ .Release.Name }}-frontend:.Values.serviceDefaults.port/;
+            # proxy_pass http://{{ .Release.Name }}-frontend:{{ .Values.serviceDefaults.port }}/;
             proxy_pass http://127.0.0.1:{{ default .Values.serviceDefaults.port .Values.frontend.port }}/;
 
             # We expect the downsteam servers to redirect to the
