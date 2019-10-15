@@ -43,7 +43,11 @@ spec:
           value: "{{ $.Release.Name }}-{{ $index }}:{{ default 3000 $service.port }}"
         {{- end }}
         resources:
-{{ $service.resources | toYaml | indent 10 }}
+          {{ if $service.resources }}
+          {{ $service.resources | toYaml | nindent 10 }}
+          {{ else }}
+          {{ $.Values.serviceDefaults.resources | toYaml | nindent 10 }}
+          {{ end }}
 
 {{- if $service.autoscaling }}
 {{- if $service.autoscaling.enabled }}

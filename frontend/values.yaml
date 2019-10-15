@@ -106,7 +106,18 @@ services:
   #       memory: 128Mi
   #     limits:
   #       cpu: 1000m
-  #       memory: 512Mi    
+  #       memory: 512Mi
+
+# Provide defaults for all services.
+# Note that only keys used here can be overridden.
+serviceDefaults:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 128Mi
+    limits:
+      cpu: 1000m
+      memory: 128Mi
 
 # This will be deprecated in favour of services
 replicas: 1
