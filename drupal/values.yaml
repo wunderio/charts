@@ -106,7 +106,10 @@ php:
   resources:
     requests:
       cpu: 25m
-      memory: 128M
+      memory: 256M
+    limits:
+      cpu: 1000m
+      memory: 256M
 
   # Cron tasks, each of which will be run into a dedicated temporary pod.
   # When overriding this value, make sure to include the `drush cron` command.
@@ -145,7 +148,10 @@ php:
     resources:
       requests:
         cpu: 500m
-        memory: 256M
+        memory: 512M
+      limits:
+        cpu: 1000m
+        memory: 512M
 
   # Post-upgrade hook.
   # This is run every time a new environment is upgraded.
