@@ -1,6 +1,7 @@
 suite: Site deployment
 templates:
   - services-deployment.yaml
+  - configmap.yaml
 tests:
   - it: is a deployment with default values
     set:
@@ -36,6 +37,39 @@ tests:
       - equal:
           path: spec.replicas
           value: 3
+
+  - it: uses the default port and exposed route
+    set:
+      services:
+        foo:
+          image: 'bar'
+      serviceDefaults:
+        port: 12345
+        exposedRoute: '/bar'
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 12345
+      - template: configmap.yaml
+        matchRegex:
+          path: data.frontend_conf
+          pattern: 'location /bar'
+
+  - it: uses the port and exposed route of the service
+    set:
+      services:
+        foo:
+          image: 'bar'
+          port: 12345
+          exposedRoute: '/bar'
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].ports[0].containerPort
+          value: 12345
+      - template: configmap.yaml
+        matchRegex:
+          path: data.frontend_conf
+          pattern: 'location /bar'
 
   - it: uses default requests and limits
     set:

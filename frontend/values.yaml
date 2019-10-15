@@ -111,6 +111,8 @@ services:
 # Provide defaults for all services.
 # Note that only keys used here can be overridden.
 serviceDefaults:
+  exposedRoute: '/'
+  port: 3000
   resources:
     requests:
       cpu: 10m

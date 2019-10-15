@@ -5,7 +5,7 @@ Deployed {{ .Release.Name }} successfully, your site is available here:
   {{- range $index, $domain := .Values.exposeDomains }}
   {{ $domain.hostname }}
   {{- end }}
-  {{- end }}
+  {{- else -}}
 
   {{- range $index, $service := .Values.services }}
   {{- if $service.exposedRoute }}
@@ -17,6 +17,7 @@ Deployed {{ .Release.Name }} successfully, your site is available here:
   {{- range $index, $service := $.Values.services }}
   {{- if $service.exposedRoute }}
   http://{{ $domain.hostname }}{{ $service.exposedRoute }}
+  {{- end }}
   {{- end }}
   {{- end }}
   {{- end }}

@@ -22,25 +22,25 @@ spec:
       - name: {{ $index }}
         image: {{ $service.image | quote }}
         ports:
-        - containerPort: {{ default 3000 $service.port }}
+        - containerPort: {{ default $.Values.serviceDefaults.port $service.port }}
           name: {{ $index }}
         volumeMounts:
         livenessProbe:
           tcpSocket:
-            port: {{ default 3000 $service.port }}
+            port: {{ default $.Values.serviceDefaults.port $service.port }}
         readinessProbe:
           tcpSocket:
-            port: {{ default 3000 $service.port }}
+            port: {{ default $.Values.serviceDefaults.port $service.port }}
         env:
         {{- range $key, $val := $service.env }}
         - name: {{ $key }}
           value: {{ $val | quote }}
         {{- end }}
         - name: 'PORT'
-          value: {{ default 3000 $service.port | quote }}
+          value: {{ default $.Values.serviceDefaults.port $service.port | quote }}
         {{- range $index, $service := $.Values.services }}
         - name: "{{ $index }}_HOST"
-          value: "{{ $.Release.Name }}-{{ $index }}:{{ default 3000 $service.port }}"
+          value: "{{ $.Release.Name }}-{{ $index }}:{{ default $.Values.serviceDefaults.port $service.port }}"
         {{- end }}
         resources:
           {{ if $service.resources }}
