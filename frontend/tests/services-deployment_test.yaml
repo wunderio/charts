@@ -38,6 +38,19 @@ tests:
           path: spec.replicas
           value: 3
 
+  - it: sets environment variables correctly
+    set:
+      services:
+        foo:
+          env:
+            bar: baz
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: bar
+            value: baz
+
   - it: uses the default port and exposed route
     set:
       services:
