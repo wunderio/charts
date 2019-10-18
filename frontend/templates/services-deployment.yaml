@@ -43,11 +43,11 @@ spec:
           value: "{{ $.Release.Name }}-{{ $index }}:{{ default $.Values.serviceDefaults.port $service.port }}"
         {{- end }}
         resources:
-          {{ if $service.resources }}
-          {{ $service.resources | toYaml | nindent 10 }}
-          {{ else }}
+          {{ if $service.resources -}}
+          {{ merge $service.resources $.Values.serviceDefaults.resources | toYaml | nindent 10 }}
+          {{ else -}}
           {{ $.Values.serviceDefaults.resources | toYaml | nindent 10 }}
-          {{ end }}
+          {{- end }}
 
 {{- if $service.autoscaling }}
 {{- if $service.autoscaling.enabled }}

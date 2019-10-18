@@ -133,3 +133,30 @@ tests:
           path: spec.template.spec.containers[0].resources.limits.memory
           value: 2G
 
+  - it: merges resource requests and limits
+    set:
+      serviceDefaults.resources:
+        requests:
+          cpu: 123m
+          memory: 1G
+        limits:
+          cpu: 234m
+          memory: 2G
+      services.foo.resources:
+        requests:
+          cpu: 234m
+        limits:
+          memory: 4G
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.cpu
+          value: 234m
+      - equal:
+          path: spec.template.spec.containers[0].resources.requests.memory
+          value: 1G
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.cpu
+          value: 234m
+      - equal:
+          path: spec.template.spec.containers[0].resources.limits.memory
+          value: 4G
