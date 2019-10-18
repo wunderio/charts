@@ -134,8 +134,10 @@ php:
         echo "Importing reference database dump"
         cat reference-data/db.sql.gz | gunzip | drush sql-cli
 
-        echo "Importing public files"
-        tar xf reference-data/public_files.tar.gz
+        if [ -f reference-data/public_files.tar.gz ]; then
+          echo "Importing public files"
+          tar xf reference-data/public_files.tar.gz
+        ]
 
         drush cr
         drush updatedb -y
