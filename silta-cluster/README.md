@@ -10,7 +10,7 @@ ServiceAccount and Roles for filebeat and metricbeat services. These have to be 
 
 Configure static resource allocation for tiller (change this if tiller is unstable):
 ```
-kubectl set resources deployment tiller-deploy --limits=cpu=500m,memory=512Mi --requests=cpu=100m,memory=256Mi -n kube-system
+kubectl set resources deployment tiller-deploy --requests=cpu=100m,memory=1Gi --limits=cpu=500m,memory=1Gi -n kube-system
 ``` 
 
 Custom resource definitions for cert-manager (from https://github.com/helm/charts/tree/master/stable/cert-manager):
