@@ -137,7 +137,7 @@ php:
         if [ -f reference-data/public_files.tar.gz ]; then
           echo "Importing public files"
           tar xf reference-data/public_files.tar.gz
-        ]
+        fi
 
         drush cr
         drush updatedb -y
