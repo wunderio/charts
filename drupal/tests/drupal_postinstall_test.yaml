@@ -35,11 +35,10 @@ tests:
       # Simulate a deployment on the reference environment
       environmentName: reference-environment
       referenceData.referenceEnvironment: reference-environment
-      referenceData.command: baz
     asserts:
       - matchRegex:
           path: spec.template.spec.containers[0].args[0]
-          pattern: 'baz'
+          pattern: 'REFERENCE_DATA_LOCATION'
 
   - it: doesn't exports reference data after deployments if disabled
     set:
@@ -47,11 +46,10 @@ tests:
       environmentName: reference-environment
       referenceData.referenceEnvironment: reference-environment
       referenceData.updateAfterDeployment: false
-      referenceData.command: baz
     asserts:
       - notMatchRegex:
           path: spec.template.spec.containers[0].args[0]
-          pattern: 'baz'
+          pattern: 'REFERENCE_DATA_LOCATION'
 
   - it: sets environment variables correctly
     set:
