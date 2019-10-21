@@ -30,12 +30,6 @@ ports:
   mountPath: /etc/php7/php-fpm.d/www.conf
   readOnly: true
   subPath: www_conf
-{{ if ne $.Template.Name "drupal/templates/backup-cron.yaml" -}}
-- name: gdpr-dump
-  mountPath: /etc/my.cnf.d/gdpr-dump.cnf
-  readOnly: true
-  subPath: gdpr-dump
-{{- end }}
 - name: settings
   mountPath: /app/web/sites/default/settings.silta.php
   readOnly: true
@@ -53,11 +47,6 @@ ports:
 - name: php-conf
   configMap:
     name: {{ .Release.Name }}-php-conf
-{{ if ne $.Template.Name "drupal/templates/backup-cron.yaml" -}}
-- name: gdpr-dump
-  configMap:
-    name: {{ .Release.Name }}-gdpr-dump
-{{- end }}
 - name: settings
   configMap:
     name: {{ .Release.Name }}-settings
@@ -233,7 +222,60 @@ rm /app/web/sites/default/files/_installing
 
 {{- if and .Values.referenceData.enabled .Values.referenceData.updateAfterDeployment }}
 {{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
-{{ .Values.referenceData.command }}
+{{ include "drupal.extract-reference-data" . }}
 {{- end }}
 {{- end }}
+{{- end }}
+
+
+{{- define "drupal.extract-reference-data" -}}
+set -e
+if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
+
+  REFERENCE_DATA_LOCATION="/app/reference-data"
+
+  # Clean up existing reference data.
+  rm -f $REFERENCE_DATA_LOCATION/*
+
+  # Figure out which tables to skip.
+  IGNORE_TABLES=""
+  IGNORED_TABLES=""
+  for TABLE in `drush sql-query "show tables;" | grep -E '{{ .Values.referenceData.ignoreTableContent }}'` ;
+  do
+    IGNORE_TABLES="$IGNORE_TABLES --ignore-table=$DB_NAME.$TABLE";
+    IGNORED_TABLES="$IGNORED_TABLES $TABLE";
+  done
+
+  echo "Dump reference database."
+  mysqldump -u $DB_USER --password=$DB_PASS --host=$DB_HOST $IGNORE_TABLES $DB_NAME > /tmp/db.sql
+  mysqldump -u $DB_USER --password=$DB_PASS --host=$DB_HOST --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
+
+  # Compress the database dump and copy it into the backup folder.
+  # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
+  gzip -9 /tmp/db.sql
+  cp /tmp/db.sql.gz $REFERENCE_DATA_LOCATION/db.sql.gz
+
+  {{ range $index, $mount := .Values.mounts -}}
+  {{- if eq $mount.enabled true -}}
+  # File backup for {{ $index }} volume.
+  echo "Dump reference files for {{ $index }} volume."
+
+  # We need relative path to create a tarball.
+  relativeMountPath=$(realpath --relative-base . "{{ $mount.mountPath }}")
+
+  # Get a list of matching files, and put them in a tarball.
+  find "$relativeMountPath" \
+    -regextype posix-extended \
+    -type f \
+    -size -"{{ $.Values.referenceData.maxFileSize }}" \
+    -not -regex "{{ $.Values.referenceData.ignoreFiles }}" \
+    -exec echo '"{}"' \; | xargs tar cvPf $REFERENCE_DATA_LOCATION/{{ $index }}.tar
+  {{- end -}}
+  {{- end }}
+
+  # List content of reference data folder
+  ls -lh $REFERENCE_DATA_LOCATION/*
+else
+  echo "Drupal is not installed, skipping reference database dump."
+fi
 {{- end }}

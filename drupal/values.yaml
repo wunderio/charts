@@ -135,8 +135,14 @@ php:
         cat reference-data/db.sql.gz | gunzip | drush sql-cli
 
         if [ -f reference-data/public_files.tar.gz ]; then
+          # Deprecated location, only there for backward compatibility.
           echo "Importing public files"
           tar xf reference-data/public_files.tar.gz
+        else
+          if [ -f reference-data/public-files.tar ]; then
+            echo "Importing public files"
+            tar xf reference-data/public-files.tar
+          fi
         fi
 
         drush cr
@@ -234,20 +240,13 @@ referenceData:
   # Update the reference data after deployments on the reference environment.
   updateAfterDeployment: true
 
-  # The commands that is executed to export reference data.
-  command: |
-    if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-      # NFS doesn't support replacing files, so we delete them instead.
-      rm -f reference-data/*
+  ignoreTableContent: '(cache|cache_.*|sessions|watchdog)'
 
-      # Export database dump.
-      drush sql-dump --gzip --result-file ../reference-data/db.sql
+  # Matching files will not be included in reference data.
+  ignoreFiles: '.*/(css|js|styles)/.*'
 
-      # Export public files.
-      tar cz --exclude=css --exclude=js --exclude=styles -f reference-data/public_files.tar.gz web/sites/default/files/
-    else
-      echo "Drupal is not installed, skipping reference database dump."
-    fi
+  # Files larger than this will not be included in reference data.
+  maxFileSize: '5M'
 
   storage: 1G
   storageClassName: silta-shared

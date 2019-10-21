@@ -20,9 +20,15 @@ spec:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
               - name: reference-data-volume
                 mountPath: /app/reference-data
+              - name: gdpr-dump
+                mountPath: /etc/my.cnf.d/gdpr-dump.cnf
+                readOnly: true
+                subPath: gdpr-dump
             command: ["/bin/bash", "-c"]
             args:
-              - {{ .Values.referenceData.command | quote }}
+              - |
+                {{ include "drupal.extract-reference-data" . | nindent 16 }}
+
             resources:
               {{- .Values.php.resources | toYaml | nindent 14 }}
           restartPolicy: OnFailure
@@ -31,6 +37,9 @@ spec:
             - name: reference-data-volume
               persistentVolumeClaim:
                 claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
+            - name: gdpr-dump
+              configMap:
+                name: {{ .Release.Name }}-gdpr-dump
 
 
           {{- include "drupal.imagePullSecrets" . | nindent 10 }}

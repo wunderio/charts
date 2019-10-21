@@ -57,7 +57,6 @@ tests:
         storage: 123Gi
         storageClassName: silta-shared
         schedule: '0 1 2 3 *'
-        command: "echo Hello World"
       php.env:
         foo: bar
     asserts:
@@ -99,10 +98,6 @@ tests:
       equal:
         path: spec.schedule
         value: '0 1 2 3 *'
-    - template: reference-data-cron.yaml
-      equal:
-        path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
-        value: "echo Hello World"
 
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
