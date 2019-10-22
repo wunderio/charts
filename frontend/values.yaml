@@ -119,7 +119,7 @@ serviceDefaults:
       memory: 128Mi
     limits:
       cpu: 1000m
-      memory: 128Mi
+      memory: 256Mi
 
 # This will be deprecated in favour of services
 replicas: 1
