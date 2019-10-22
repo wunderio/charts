@@ -65,7 +65,7 @@ nginx:
   # These values are optimised for development environments.
   resources:
     requests:
-      cpu: 5m
+      cpu: 1m
       memory: 10M
   
   # Set of values to enable and use http basic authentication
@@ -105,7 +105,7 @@ php:
   # These values are optimised for development environments.
   resources:
     requests:
-      cpu: 25m
+      cpu: 10m
       memory: 256M
     limits:
       cpu: 1000m
@@ -384,7 +384,7 @@ mailhog:
   enabled: false
   resources:
     requests:
-      cpu: 5m
+      cpu: 1m
       memory: 10M
 
 # SMTP configuration passed to containers as environment variables (SMTP_ADDRESS, SMTP_PORT, ..)
