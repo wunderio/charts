@@ -109,7 +109,7 @@ php:
       memory: 256M
     limits:
       cpu: 1000m
-      memory: 256M
+      memory: 512M
 
   # Cron tasks, each of which will be run into a dedicated temporary pod.
   # When overriding this value, make sure to include the `drush cron` command.
