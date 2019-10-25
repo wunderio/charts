@@ -9,6 +9,7 @@ jobs:
 
     steps:
       - checkout
+      - silta/gcloud-login
       - run:
           name: Lint Helm charts
           command: |
@@ -17,6 +18,7 @@ jobs:
               CHART=`dirname $CHARTFILE`
               helm lint $CHART
               helm unittest $CHART
+              helm install --dry-run $CHART
             done
 
   build:
@@ -76,7 +78,8 @@ workflows:
   version: 2
   commit:
     jobs:
-      - validate
+      - validate:
+          context: global_nonprod
       - build:
           context: global_nonprod
           requires:
