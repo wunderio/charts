@@ -158,7 +158,7 @@ php:
         cpu: 500m
         memory: 512M
       limits:
-        cpu: 1000m
+        cpu: 2000m
         memory: 512M
 
   # Post-upgrade hook.
