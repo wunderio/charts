@@ -151,8 +151,10 @@ imagePullSecrets:
   value: {{ $val | quote }}
 {{- end }}
 {{- range $index, $mount := $.Values.mounts }}
+{{- if eq $mount.enabled true }}
 - name: {{ regexReplaceAll "[^[:alnum:]]" $index "_" | upper }}_PATH
   value: {{ $mount.mountPath }}
+{{- end }}
 {{- end }}
 {{- end }}
 
