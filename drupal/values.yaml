@@ -313,15 +313,16 @@ mariadb:
       limits:
         cpu: 1000m
         memory: 512M
-    nodeAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        preference:
-          matchExpressions:
-          - key: cloud.google.com/gke-nodepool
-            operator: NotIn
-            values:
-            - static-ip
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          preference:
+            matchExpressions:
+            - key: cloud.google.com/gke-nodepool
+              operator: NotIn
+              values:
+              - static-ip
 
 varnish:
   enabled: false
