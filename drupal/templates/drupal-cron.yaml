@@ -27,7 +27,7 @@ spec:
               - |
                  if [ ! {{ include "drupal.installation-in-progress-test" . }} ]
                  then
-                  {{ $job.command | nindent 18 -}}
+                  {{ $job.command | nindent 18 }}
                  else
                    exit 1
                  fi
