@@ -22,6 +22,8 @@ spec:
             command: ["/bin/bash", "-c"]
             args:
               - |
+                set -e
+
                 # Generate the id of the backup.
                 BACKUP_ID=`date +%Y-%m-%d`
                 BACKUP_LOCATION="/backups/$BACKUP_ID-{{ .Values.environmentName }}"
