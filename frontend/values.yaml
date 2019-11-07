@@ -81,6 +81,8 @@ services:
   #   image: 'you need to pass in a value for frontend.image to your helm chart'
   #   port: 3000
   #   env: {}
+  #   # When you use exposedRoute, nginx proxies request to service:[/exposedRoute] path.
+  #   # This means, you have to implement this path in your application.
   #   #exposedRoute: '/'
     
   #   # How many instances of the Frontend pod should be in our Kubernetes deployment.
