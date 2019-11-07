@@ -39,17 +39,21 @@ spec:
                 done
 
                 # Take a database dump. We use the full path to bypass gdpr-dump
+                echo "Starting database backup."
                 /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
                 /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
+                echo "Database backup complete."
 
                 # Compress the database dump and copy it into the backup folder.
                 # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
+                echo "Compressing database backup."
                 gzip -9 /tmp/db.sql
                 cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
 
                 {{ range $index, $mount := .Values.mounts -}}
                 {{- if eq $mount.enabled true -}}
                 # File backup for {{ $index }} volume.
+                echo "Starting {{ $index }} volume backup."
                 tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
                 {{- end -}}
                 {{- end }}
