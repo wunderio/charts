@@ -1,6 +1,6 @@
 # Silta Cluster Chart
 
-This helm chart helps setting up resources for https://github.com/wunderio/silta-cluster
+This helm chart helps setting up resources for https://github.com/wunderio/silta-cluster-tf
 
 ## Requirements
 
