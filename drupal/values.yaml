@@ -309,7 +309,7 @@ mariadb:
     resources:
       requests:
         cpu: 25m
-        memory: 512M
+        memory: 384M
       limits:
         cpu: 1000m
         memory: 512M
