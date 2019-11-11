@@ -37,8 +37,19 @@ ssl:
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
-
   image: 'wunderio/drupal-nginx:v0.1'
+
+  replicas: 1
+
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          targetAverageUtilization: 80
 
   # The Kubernetes resources for the nginx container.
   # These values are optimised for development environments.
@@ -122,32 +133,3 @@ serviceDefaults:
     limits:
       cpu: 1000m
       memory: 256Mi
-
-# This will be deprecated in favour of services
-replicas: 1
-
-# This will be deprecated in favour of services
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 3
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        targetAverageUtilization: 80
-
-# This will be deprecated in favour of services
-# frontend:
-#   image: 'you need to pass in a value for nginx.image to your helm chart'
-  
-#   port: 3000
-#   env: {}
-
-#   resources: 
-#     requests:
-#       cpu: 200m
-#       memory: 128Mi
-#     limits:
-#       cpu: 1000m
-#       memory: 512Mi
