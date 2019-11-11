@@ -121,6 +121,12 @@ services:
   #       cpu: 1000m
   #       memory: 512Mi
 
+cron:
+#  example:
+#    service: node # This is a reference to a key in the `services` configuration.
+#    command: echo "hello world"
+#    schedule: "~ 1 * * *"
+
 # Provide defaults for all services.
 # Note that only keys used here can be overridden.
 serviceDefaults:
