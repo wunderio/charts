@@ -87,6 +87,17 @@ nginx:
 
   extra_headers: {}
 
+  extra_conditions: ""
+    # |
+    # # need this for node OPTIONS requests to work while site has bauth
+    # add_header 'Access-Control-Allow-Methods' 'GET,OPTIONS,PUT,DELETE,POST' always;
+    # add_header 'Access-Control-Allow-Credentials' 'true' always;
+    # add_header 'Access-Control-Allow-Origin' '$http_origin' always;
+    # add_header 'Access-Control-Allow-Headers' 'Authorization,DNT,User-Agent,Keep-Alive,Content-Type,accept,origin,X-Requested-With,Access-Control-Allow-Origin' always;
+    # if ($request_method = OPTIONS ) {
+    #   return 204;
+    # }
+
 services:
   # frontend:
   #   image: 'you need to pass in a value for frontend.image to your helm chart'
