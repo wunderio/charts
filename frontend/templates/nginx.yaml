@@ -4,8 +4,11 @@ metadata:
   name: {{ .Release.Name }}-nginx
   labels:
     {{ include "frontend.release_labels" . | indent 4 }}
+  annotations:
+    # We use a checksum to redeploy the pods when the configMap changes.
+    configMap-checksum: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
 spec:
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.nginx.replicas }}
   selector:
     matchLabels:
       {{ include "frontend.release_labels" . | indent 6 }}
@@ -46,31 +49,7 @@ spec:
           tcpSocket:
             port: 80
         resources:
-{{ .Values.nginx.resources | toYaml | indent 10 }}
-
-      {{- if .Values.frontend }}
-      # This will be deprecated
-      - name: node
-        image: {{ default .Values.services.node.image .Values.frontend.image | quote }}
-        ports:
-        - containerPort: {{ default .Values.serviceDefaults.port .Values.frontend.port }}
-          name: node
-        volumeMounts:
-        livenessProbe:
-          tcpSocket:
-            port: {{ default .Values.serviceDefaults.port .Values.frontend.port }}
-        readinessProbe:
-          tcpSocket:
-            port: {{ default .Values.serviceDefaults.port .Values.frontend.port }}
-        env:
-        {{- range $key, $val := default .Values.services.node.env .Values.frontend.env }}
-        - name: {{ $key }}
-          value: {{ $val | quote }}
-        {{- end }}
-        resources:
-{{ default .Values.services.node.resources .Values.frontend.resources | toYaml | indent 10 }}
-      {{- end }}
-
+          {{ .Values.nginx.resources | toYaml | nindent 10 }}
       volumes:
         - name: nginx-conf
           configMap:
@@ -89,11 +68,11 @@ spec:
                 path: .htaccess
         {{- end }}
 ---
-{{- if .Values.autoscaling.enabled }}
+{{- if .Values.nginx.autoscaling.enabled }}
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ .Release.Name }}-frontend
+  name: {{ .Release.Name }}-nginx
   labels:
     {{- include "frontend.release_labels" . | nindent 4 }}
 spec:
@@ -101,8 +80,8 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ .Release.Name }}-deployment
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  minReplicas: {{ .Values.nginx.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.nginx.autoscaling.maxReplicas }}
   metrics:
-    {{- toYaml .Values.autoscaling.metrics | nindent 4 }}
+    {{- toYaml .Values.nginx.autoscaling.metrics | nindent 4 }}
 {{- end }}

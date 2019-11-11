@@ -1,0 +1,22 @@
+suite: Cron Jobs
+templates:
+  - services-cron.yaml
+tests:
+  - it: is a CronJob with default values
+    set:
+      services.foo.image: 'bar'
+      cron:
+        foo:
+          command: echo "Hello world"
+          service: foo
+          schedule: '1 2 3 * *'
+
+    asserts:
+      - isKind:
+          of: CronJob
+      - equal:
+          path: metadata.labels.app
+          value: frontend
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].image
+          value: 'bar'

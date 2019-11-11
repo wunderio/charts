@@ -1,12 +1,5 @@
 Deployed {{ .Release.Name }} successfully, your site is available here:
 
-  {{- if .Values.frontend }}
-  http://{{- template "frontend.domain" . }}
-  {{- range $index, $domain := .Values.exposeDomains }}
-  {{ $domain.hostname }}
-  {{- end }}
-  {{- else -}}
-
   {{- range $index, $service := .Values.services }}
   {{- if default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }}
   http://{{- template "frontend.domain" $ }}{{ default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }}
@@ -17,7 +10,6 @@ Deployed {{ .Release.Name }} successfully, your site is available here:
   {{- range $index, $service := $.Values.services }}
   {{- if default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }}
   http://{{ $domain.hostname }}{{ default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }}
-  {{- end }}
   {{- end }}
   {{- end }}
   {{- end }}

@@ -1,6 +1,7 @@
 suite: Site deployment
 templates:
-  - deployment.yaml
+  - nginx.yaml
+  - configmap.yaml
 tests:
   - it: is a deployment with default values
     asserts:
@@ -23,7 +24,7 @@ tests:
 
   - it: sets the replica count correctly
     set:
-      replicas: 3
+      nginx.replicas: 3
     asserts:
       - equal:
           path: spec.replicas
