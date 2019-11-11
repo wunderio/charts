@@ -4,6 +4,9 @@ metadata:
   name: {{ .Release.Name }}-nginx
   labels:
     {{ include "frontend.release_labels" . | indent 4 }}
+  annotations:
+    # We use a checksum to redeploy the pods when the configMap changes.
+    configMap-checksum: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
