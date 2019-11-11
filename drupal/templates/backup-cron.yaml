@@ -8,6 +8,7 @@ metadata:
 spec:
   schedule: {{ .Values.backup.schedule | replace "~" (randNumeric 1) | quote }}
   concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 3600
   jobTemplate:
     spec:
       template:
