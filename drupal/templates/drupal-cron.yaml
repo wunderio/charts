@@ -9,7 +9,6 @@ spec:
   schedule: {{ $job.schedule | replace "~" (randNumeric 1) | quote }}
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 3600
-  backOffLimit: 3
   jobTemplate:
     spec:
       template:
