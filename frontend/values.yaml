@@ -55,7 +55,7 @@ nginx:
   # These values are optimised for development environments.
   resources:
     requests:
-      cpu: 5m
+      cpu: 1m
       memory: 10M
     limits:
       cpu: 5m
@@ -145,7 +145,7 @@ serviceDefaults:
   port: 3000
   resources:
     requests:
-      cpu: 10m
+      cpu: 1m
       memory: 128Mi
     limits:
       cpu: 1000m

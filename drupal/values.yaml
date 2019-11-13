@@ -105,8 +105,8 @@ php:
   # These values are optimised for development environments.
   resources:
     requests:
-      cpu: 10m
-      memory: 256M
+      cpu: 1m
+      memory: 128M
     limits:
       cpu: 1000m
       memory: 512M
