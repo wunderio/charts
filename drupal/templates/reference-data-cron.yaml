@@ -32,7 +32,7 @@ spec:
 
             resources:
               {{- .Values.php.resources | toYaml | nindent 14 }}
-          restartPolicy: OnFailure
+          restartPolicy: Never
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}
             - name: reference-data-volume

@@ -34,7 +34,7 @@ spec:
                  fi
             resources:
               {{- $.Values.php.resources | toYaml | nindent 14 }}
-          restartPolicy: OnFailure
+          restartPolicy: Never
           nodeSelector:
             {{ if $job.nodeSelector }}
             {{- $job.nodeSelector | toYaml | nindent 12 }}
