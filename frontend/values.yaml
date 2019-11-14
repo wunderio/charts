@@ -79,7 +79,7 @@ nginx:
     # Define username and password
     credentials:
       username: silta
-      password: simplepass
+      password: demo
 
   # Robots txt file blocked by default
   robotsTxt:
