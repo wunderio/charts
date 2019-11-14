@@ -159,3 +159,38 @@ serviceDefaults:
     limits:
       cpu: 1000m
       memory: 256Mi
+
+elasticsearch:
+  enabled: false
+
+  # The elasticsearch version to use.
+  # It's a good idea to tag this in your silta.yml
+  imageTag: 7.4.1
+
+  replicas: 1
+  minimumMasterNodes: 1
+  clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
+
+  # This value should be slightly less than 50% of the requested memory.
+  esJavaOpts: -Xmx220m -Xms220m
+  xpack:
+    enabled: false
+  volumeClaimTemplate:
+    resources.requests.storage: 1Gi
+  resources:
+    requests:
+      cpu: 200m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      preference:
+        matchExpressions:
+        - key: cloud.google.com/gke-nodepool
+          operator: NotIn
+          values:
+          - static-ip
