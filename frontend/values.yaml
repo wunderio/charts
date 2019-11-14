@@ -138,6 +138,15 @@ cron:
 #    command: echo "hello world"
 #    schedule: "~ 1 * * *"
 
+# Configure the dynamically mounted volumes
+mounts:
+#  files:
+#    enabled: true
+#    storage: 1G
+#    mountPath: /app/files
+#    storageClassName: silta-shared
+#    csiDriverName: csi-rclone
+
 # Provide defaults for all services.
 # Note that only keys used here can be overridden.
 serviceDefaults:

@@ -1,0 +1,46 @@
+{{- range $index, $mount := .Values.mounts }}
+{{- if $mount.enabled }}
+{{- if eq $mount.storageClassName "silta-shared" }}
+# Mount-enabled: {{ $mount.enabled  }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ $.Release.Name }}-{{ $index }}
+  labels:
+    name: {{ $.Release.Name }}-{{ $index }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: {{ $mount.storage }}
+  storageClassName: {{ $mount.storageClassName }}
+  {{- if $mount.csiDriverName }}
+  csi:
+    driver: {{ $mount.csiDriverName }}
+    volumeHandle: {{ $.Release.Name }}-{{ $index }}
+    volumeAttributes:
+      remotePathSuffix: /{{ $.Release.Namespace }}/{{ $.Values.environmentName }}/{{ $index }}
+  {{- end }}
+---
+{{- end }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $.Release.Name }}-{{ $index }}
+  labels:
+    {{- include "frontend.release_labels" $ | nindent 4 }}
+spec:
+  storageClassName: {{ $mount.storageClassName }}
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ $mount.storage }}
+{{- if eq $mount.storageClassName "silta-shared" }}
+  selector:
+    matchLabels:
+      name: {{ $.Release.Name }}-{{ $index }}
+{{- end }}
+---
+{{- end -}}
+{{- end }}

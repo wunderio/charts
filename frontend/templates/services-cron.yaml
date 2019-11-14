@@ -21,6 +21,16 @@ spec:
           containers:
           - name: {{ $index }}-cron
             image: {{ $service.image | quote }}
+            volumeMounts:
+              {{ if $service.mounts }}
+              {{- range $index, $mountName := $service.mounts -}}
+              {{ $mount := (index $.Values.mounts $mountName) }}
+              {{- if eq $mount.enabled true }}
+              - name: frontend-{{ $mountName }}
+                mountPath: {{ $mount.mountPath }}
+              {{- end }}
+              {{- end }}
+              {{- end }}
             env:
             {{- range $key, $val := $service.env }}
             - name: {{ $key }}
@@ -37,6 +47,17 @@ spec:
               {{ else -}}
               {{ $.Values.serviceDefaults.resources | toYaml | nindent 14 }}
               {{- end }}
+          volumes:
+            {{ if $service.mounts }}
+            {{- range $index, $mountName := $service.mounts -}}
+            {{ $mount := (index $.Values.mounts $mountName) }}
+            {{- if eq $mount.enabled true }}
+            - name: frontend-{{ $mountName }}
+              persistentVolumeClaim:
+                claimName: {{ $.Release.Name }}-{{ $mountName }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
           restartPolicy: OnFailure
 ---
 {{- end }}

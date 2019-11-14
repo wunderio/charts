@@ -24,6 +24,15 @@ spec:
         - containerPort: {{ default $.Values.serviceDefaults.port $service.port }}
           name: {{ $index }}
         volumeMounts:
+          {{ if $service.mounts }}
+          {{- range $index, $mountName := $service.mounts -}}
+          {{ $mount := (index $.Values.mounts $mountName) }}
+          {{- if eq $mount.enabled true }}
+          - name: frontend-{{ $mountName }}
+            mountPath: {{ $mount.mountPath }}
+          {{- end }}
+          {{- end }}
+          {{- end }}
         livenessProbe:
           tcpSocket:
             port: {{ default $.Values.serviceDefaults.port $service.port }}
@@ -47,6 +56,17 @@ spec:
           {{ else -}}
           {{ $.Values.serviceDefaults.resources | toYaml | nindent 10 }}
           {{- end }}
+      volumes:
+        {{ if $service.mounts }}
+        {{- range $index, $mountName := $service.mounts -}}
+        {{ $mount := (index $.Values.mounts $mountName) }}
+        {{- if eq $mount.enabled true }}
+        - name: frontend-{{ $mountName }}
+          persistentVolumeClaim:
+            claimName: {{ $.Release.Name }}-{{ $mountName }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
 
 {{- if $service.autoscaling }}
 {{- if $service.autoscaling.enabled }}
