@@ -4,12 +4,12 @@ templates:
 tests:
   - it: is a CronJob with default values
     set:
-      services.foo.image: 'bar'
-      cron:
-        foo:
-          command: echo "Hello world"
-          service: foo
-          schedule: '1 2 3 * *'
+      services.foo:
+        image: 'bar'
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
 
     asserts:
       - isKind:

@@ -1,9 +1,11 @@
-{{- range $index, $job := .Values.cron }}
-{{ $service := (index $.Values.services $job.service) }}
+{{- range $serviceName, $service := .Values.services }}
+{{ if $service.cron }}
+{{- range $jobName, $job := $service.cron }}
+
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: {{ $.Release.Name }}-{{ $index }}
+  name: {{ $.Release.Name }}-{{ $jobName }}
   labels:
     {{- include "frontend.release_labels" $ | nindent 4 }}
 spec:
@@ -19,7 +21,7 @@ spec:
             {{- include "frontend.release_labels" $ | nindent 12 }}
         spec:
           containers:
-          - name: {{ $index }}-cron
+          - name: {{ $jobName }}-cron
             image: {{ $service.image | quote }}
             volumeMounts:
               {{ if $service.mounts }}
@@ -64,4 +66,6 @@ spec:
             {{- end }}
           restartPolicy: OnFailure
 ---
+{{- end }}
+{{- end }}
 {{- end }}
