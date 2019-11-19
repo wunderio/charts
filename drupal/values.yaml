@@ -127,6 +127,9 @@ php:
     command: |
       if [ -f reference-data/db.sql.gz ]; then
 
+        echo "Dropping old database"
+        drush sql-drop -y
+
         echo "Importing reference database dump"
         cat reference-data/db.sql.gz | gunzip | drush sql-cli
 

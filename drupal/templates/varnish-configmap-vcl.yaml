@@ -18,8 +18,9 @@ data:
       .max_connections = 300;
 
       .probe = {
-        .interval  = 30s; # check the health of each backend every n seconds
-        .timeout   = 2s; # timing out after n seconds
+        .url       = "/robots.txt"; 
+        .interval  = 5s; # check the health of each backend every n seconds
+        .timeout   = 1s; # timing out after n seconds
         .window    = 5;  # If 3 out of the last 5 polls succeeded the backend is
         .threshold = 3;  # considered healthy, otherwise it will be marked as sick
       }
