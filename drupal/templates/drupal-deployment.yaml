@@ -4,6 +4,9 @@ metadata:
   name: {{ .Release.Name }}-drupal
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
+  annotations:
+    # We use a checksum to redeploy the pods when the configMap changes.
+    configMap-checksum: {{ include (print $.Template.BasePath "/drupal-configmap.yaml") . | sha256sum }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
@@ -49,20 +52,20 @@ spec:
           readOnly: true
         {{- end }}
         {{- end }}
-        - name: nginx-conf
-          mountPath: /etc/nginx/nginx.conf # mount nginx-conf configmap volume to /etc/nginx
+        - name: config
+          mountPath: /etc/nginx/nginx.conf
           readOnly: true
           subPath: nginx_conf
-        - name: nginx-conf
-          mountPath: /etc/nginx/conf.d/drupal.conf # mount nginx-conf configmap volume to /etc/nginx
+        - name: config
+          mountPath: /etc/nginx/conf.d/drupal.conf
           readOnly: true
           subPath: drupal_conf
         {{- if .Values.nginx.extraConfig }}
-        - name: nginx-extra-conf
+        - name: config
           # provide empty configuration file in /etc/nginx/conf.d for users to populate
           mountPath: /etc/nginx/conf.d/misc.conf
           readOnly: true
-          subPath: 'misc.conf'
+          subPath: extraConfig
         {{- end }}  
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
@@ -78,22 +81,6 @@ spec:
 
       volumes:
         {{- include "drupal.volumes" . | nindent 8}}
-        - name: nginx-conf
-          configMap:
-            name: {{ .Release.Name }}-nginx-conf
-            items:
-              - key: nginx_conf
-                path: nginx_conf
-              - key: drupal_conf
-                path: drupal_conf
-        {{- if .Values.nginx.extraConfig }}
-        - name: nginx-extra-conf
-          configMap:
-            name: {{ .Release.Name }}-nginx-extra-conf
-            items:
-            - key: config
-              path: misc.conf
-        {{- end }}
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
           secret:

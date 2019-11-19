@@ -1,6 +1,7 @@
 suite: drupal memcached
 templates:
   - drupal-deployment.yaml
+  - drupal-configmap.yaml
 tests:
   - it: sets memcached hostname in drupal environment if memcached is enabled
     set:

@@ -1,6 +1,7 @@
 suite: drupal mariadb
 templates:
   - drupal-deployment.yaml
+  - drupal-configmap.yaml
 tests:
   - it: sets mariadb user
     set:

@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Release.Name }}-settings
-  labels:
-    {{- include "drupal.release_labels" . | nindent 4 }}
-data:
-  settings_silta_php: |{{ .Files.Get "files/settings.silta.php" | nindent 4 }}

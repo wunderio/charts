@@ -3,6 +3,7 @@ templates:
   - drupal-deployment.yaml
   - drupal-cron.yaml
   - shell-deployment.yaml
+  - drupal-configmap.yaml
 tests:
   - it: has no node selector by default
     asserts:

@@ -4,6 +4,7 @@ templates:
   - drupal-volumes.yaml
   - post-release.yaml
   - drupal-cron.yaml
+  - drupal-configmap.yaml
 tests:
   - it: private files should be disabled by default
     asserts:

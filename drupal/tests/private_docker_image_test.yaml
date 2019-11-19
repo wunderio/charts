@@ -3,6 +3,7 @@ templates:
   - drupal-deployment.yaml
   - drupal-cron.yaml
   - post-release.yaml
+  - drupal-configmap.yaml
 tests:
   - it: has no image pull secret by default
     asserts:

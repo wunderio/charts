@@ -23,7 +23,7 @@ spec:
         args:
         - {{ include "drupal.post-release-command" . | quote }}
         volumeMounts:
-          - name: gdpr-dump
+          - name: config
             mountPath: /etc/my.cnf.d/gdpr-dump.cnf
             readOnly: true
             subPath: gdpr-dump
@@ -42,9 +42,6 @@ spec:
       {{- include "drupal.imagePullSecrets" . | nindent 6 }}
       volumes:
         {{- include "drupal.volumes" . | nindent 8 }}
-        - name: gdpr-dump
-          configMap:
-            name: {{ .Release.Name }}-gdpr-dump
         {{- if .Values.referenceData.enabled -}}
         {{- if or (eq .Values.referenceData.referenceEnvironment .Values.environmentName) (not .Values.referenceData.skipMount) }}
         - name: reference-data-volume
