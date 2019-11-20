@@ -57,9 +57,6 @@ nginx:
     requests:
       cpu: 1m
       memory: 10M
-    limits:
-      cpu: 5m
-      memory: 10M
 
   loglevel: error 
 
