@@ -180,7 +180,7 @@ elasticsearch:
       memory: 512Mi
     limits:
       cpu: 1000m
-      memory: 512Mi
+      memory: 1Gi
 
   nodeAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
