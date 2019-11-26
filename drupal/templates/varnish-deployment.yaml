@@ -17,8 +17,6 @@ spec:
       labels:
         {{- include "drupal.release_labels" . | nindent 8 }}
         service: varnish
-    strategy:
-      type: Recreate
     spec:
       containers:
       - name: varnish
