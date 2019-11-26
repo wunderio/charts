@@ -14,4 +14,21 @@ spec:
     {{ include "frontend.release_labels" $ | indent 4 }}
     deployment: frontend-{{ $index }}
 ---
+{{ if $.Values.shell.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "frontend.environment.hostname" $ }}-shell-{{ $index }}
+  labels:
+    {{ include "frontend.release_labels" $ | indent 4 }}
+spec:
+  type: NodePort
+  externalTrafficPolicy: Local
+  ports:
+    - port: 22
+  selector:
+    {{ include "frontend.release_labels" $ | indent 4 }}
+    deployment: frontend-{{ $index }}
+---
+{{- end }}
 {{- end }}

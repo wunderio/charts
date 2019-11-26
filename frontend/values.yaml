@@ -143,6 +143,16 @@ mounts:
 #    storageClassName: silta-shared
 #    csiDriverName: csi-rclone
 
+# Provide SSH access based on GitHub public keys and repository access.
+shell:
+  enabled: false
+  gitAuth:
+    apiToken: ''
+    repositoryURL: ''
+  mount:
+    storageClassName: silta-shared
+    csiDriverName: csi-rclone
+
 # Provide defaults for all services.
 # Note that only keys used here can be overridden.
 serviceDefaults:

@@ -1,0 +1,49 @@
+suite: Shell
+templates:
+  - services-deployment.yaml
+  - configmap.yaml
+tests:
+  - it: has no shell enabled by default
+    set:
+      services:
+        foo:
+          image: 'bar'
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GITAUTH_API_TOKEN
+            value: foo
+
+  - it: can enable shell
+    set:
+      services:
+        foo:
+          image: 'bar'
+      shell:
+        enabled: true
+        gitAuth:
+          apiToken: foo
+          repositoryUrl: bar
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GITAUTH_API_TOKEN
+            value: foo
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GITAUTH_REPOSITORY_URL
+            value: bar
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: shell-keys
+            mountPath: /etc/ssh/keys
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: shell-keys
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-shell-keys
