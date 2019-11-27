@@ -30,9 +30,6 @@ spec:
                 BACKUP_ID=`date +%Y-%m-%d`
                 BACKUP_LOCATION="/backups/$BACKUP_ID-{{ .Values.environmentName }}"
 
-                # Create a folder for the backup
-                mkdir -p $BACKUP_LOCATION
-
                 # Figure out which tables to skip.
                 IGNORE_TABLES=""
                 IGNORED_TABLES=""
@@ -52,6 +49,9 @@ spec:
                 # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
                 echo "Compressing database backup."
                 gzip -9 /tmp/db.sql
+
+                # Create a folder for the backup
+                mkdir -p $BACKUP_LOCATION
                 cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
 
                 {{ range $index, $mount := .Values.mounts -}}
