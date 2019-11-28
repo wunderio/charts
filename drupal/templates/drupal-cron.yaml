@@ -41,6 +41,13 @@ spec:
             {{ else }}
             {{- $.Values.php.nodeSelector | toYaml | nindent 12 }}
             {{- end }}
+          tolerations:
+            {{ if $job.nodeSelector }}
+            {{- include "drupal.tolerations" $job.nodeSelector | nindent 12 }}
+            {{ else }}
+            {{- include "drupal.tolerations" $.Values.php.nodeSelector | nindent 12 }}
+            {{- end }}
+
           volumes:
             {{- include "drupal.volumes" $ | nindent 12 }}
 

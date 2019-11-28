@@ -155,6 +155,14 @@ imagePullSecrets:
 {{- end }}
 {{- end }}
 
+{{- define "drupal.tolerations" -}}
+{{- range $key, $label := $ }}
+- key: {{ $key }}
+  operator: Equal
+  value: {{ $label }}
+{{- end }}
+{{- end }}
+
 {{- define "drupal.basicauth" }}
   {{- if .Values.nginx.basicauth.enabled }}
   satisfy any;

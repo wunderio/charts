@@ -41,6 +41,8 @@ spec:
           {{- .Values.php.resources | toYaml | nindent 10 }}
       nodeSelector:
         {{- .Values.php.nodeSelector | toYaml | nindent 8 }}
+      tolerations:
+        {{- include "drupal.tolerations" .Values.php.nodeSelector | nindent 8 }}
       volumes:
       {{- include "drupal.volumes" . | nindent 6 }}
       - name: shell-keys

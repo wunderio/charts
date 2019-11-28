@@ -92,6 +92,8 @@ spec:
       {{- include "drupal.imagePullSecrets" . | nindent 6 }}
       nodeSelector:
         {{- .Values.php.nodeSelector | toYaml | nindent 8 }}
+      tolerations:
+        {{- include "drupal.tolerations" .Values.php.nodeSelector | nindent 8 }}
       affinity:
         podAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
