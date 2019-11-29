@@ -88,3 +88,8 @@ spec:
             path: /var/lib/kubelet/plugins_registry
             type: DirectoryOrCreate
           name: registration-dir
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
