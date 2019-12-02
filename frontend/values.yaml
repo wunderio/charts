@@ -182,8 +182,11 @@ elasticsearch:
   esJavaOpts: -Xmx220m -Xms220m
   xpack:
     enabled: false
-  volumeClaimTemplate:
-    resources.requests.storage: 1Gi
+# TODO: downsize existing volumes and set lower default.
+#  volumeClaimTemplate:
+#    resources:
+#      requests:
+#        storage: 30Gi
   resources:
     requests:
       cpu: 200m
