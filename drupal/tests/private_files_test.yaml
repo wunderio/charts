@@ -17,7 +17,7 @@ tests:
               claimName: RELEASE-NAME-private-files
       # Only one volume is defined.
       - hasDocuments:
-          count: 3
+          count: 2
         template: drupal-volumes.yaml
 
   - it: private files should work when enabled
@@ -47,7 +47,7 @@ tests:
       # There are two volumes defined.
       - template: drupal-volumes.yaml
         hasDocuments:
-          count: 5
+          count: 4
 
       # Private files are available for cron jobs.
       - template: drupal-cron.yaml

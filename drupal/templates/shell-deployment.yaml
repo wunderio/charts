@@ -35,7 +35,7 @@ spec:
           - containerPort: 22
         volumeMounts:
         {{- include "drupal.volumeMounts" . | nindent 8 }}
-        - name: shell-keys
+        - name: ssh-keys
           mountPath: /etc/ssh/keys
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
@@ -45,9 +45,9 @@ spec:
         {{- include "drupal.tolerations" .Values.php.nodeSelector | nindent 8 }}
       volumes:
       {{- include "drupal.volumes" . | nindent 6 }}
-      - name: shell-keys
+      - name: ssh-keys
         persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-shell-keys
+          claimName: {{ .Release.Name }}-ssh-keys
       {{- include "drupal.imagePullSecrets" . | nindent 6 }}
 {{- end }}
 ---

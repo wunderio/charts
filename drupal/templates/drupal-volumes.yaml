@@ -89,17 +89,3 @@ spec:
 {{- end }}
 {{- end }}
 ---
-{{- if .Values.shell.enabled }}
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: {{ .Release.Name }}-shell-keys
-  labels:
-    {{- include "drupal.release_labels" . | nindent 4 }}
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 50M
-{{- end }}
