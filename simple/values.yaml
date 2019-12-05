@@ -74,3 +74,6 @@ nginx:
   # Robots txt file blocked by default
   robotsTxt:
     allow: false
+
+  # Extra configuration block in server context. 
+  serverExtraConfig: |

@@ -7,6 +7,18 @@ tests:
       - isKind:
           of: ConfigMap
 
+  - it: injects custom nginx configuration into server context
+    set:
+      nginx:
+        serverExtraConfig: |
+          location = /randomlocation {
+            return 418; 
+          }
+    asserts:
+    - matchRegex:
+        path: data.drupal_conf
+        pattern: "location = /randomlocation"
+
   - it: injects the nginx configuration
     set:
       nginx:

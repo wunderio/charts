@@ -88,6 +88,9 @@ data:
         include fastcgi.conf;
 
         {{ include "drupal.basicauth" . | indent 6}}
+
+        # Custom configuration gets included here
+        {{- .Values.nginx.serverExtraConfig | nindent 8 -}}
          
         location = /robots.txt {
           access_log off;
