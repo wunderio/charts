@@ -161,7 +161,7 @@ serviceDefaults:
   resources:
     requests:
       cpu: 1m
-      memory: 128Mi
+      memory: 64Mi
     limits:
       cpu: 1000m
       memory: 256Mi
