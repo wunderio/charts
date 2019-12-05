@@ -70,3 +70,20 @@ tests:
       - equal:
           path: spec.rules[0].host
           value: 'feature-my-projecdb6.client-fi-longclient-longpra6b.silta.wdr.io'
+
+  - it: takes a hostname prefix
+    set:
+      domainPrefixes: ['qux', 'quux']
+      environmentName: 'foo'
+      projectName: 'bar'
+      clusterDomain: 'baz'
+    asserts:
+      - equal:
+          path: spec.rules[0].host
+          value: 'foo.bar.baz'
+      - equal:
+         path: spec.rules[1].host
+         value: 'qux.foo.bar.baz'
+      - equal:
+         path: spec.rules[2].host
+         value: 'quux.foo.bar.baz'
