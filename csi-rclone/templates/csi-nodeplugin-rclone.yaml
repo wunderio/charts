@@ -15,6 +15,9 @@ spec:
         app: csi-nodeplugin-rclone
     spec:
       serviceAccountName: csi-nodeplugin-rclone
+      {{- if .Values.priorityClassName }}
+      priorityClassName: "{{ .Values.priorityClassName }}"
+      {{- end }}
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       containers:
@@ -61,9 +64,6 @@ spec:
               value: unix://plugin/csi.sock
           imagePullPolicy: "Always"
           lifecycle:
-            #preStop:
-            #  exec:
-            #    command: ["/bin/sh", "-c", "mount -t fuse.rclone | while read -r mount; do umount $(echo $mount | awk '{print $3}') ; done"]
             preStart:
               exec:
                 command: ["/bin/sh", "-c", "mount -t fuse.rclone | while read -r mount; do umount $(echo $mount | awk '{print $3}') ; done"]
