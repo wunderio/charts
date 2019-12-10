@@ -50,6 +50,8 @@ spec:
         {{- end }}
         - name: 'PORT'
           value: {{ default $.Values.serviceDefaults.port $service.port | quote }}
+        - name: 'ENVIRONMENT_DOMAIN'
+          value: {{ template "frontend.domain" $ }}
         {{- range $index, $service := $.Values.services }}
         - name: "{{ $index }}_HOST"
           value: "{{ $.Release.Name }}-{{ $index }}:{{ default $.Values.serviceDefaults.port $service.port }}"

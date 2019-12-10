@@ -50,6 +50,16 @@ tests:
           content:
             name: bar
             value: baz
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PORT
+            value: "3000"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: ENVIRONMENT_DOMAIN
+            value: release-name.namespace.silta.wdr.io
 
   - it: uses the default port and exposed route
     set:
@@ -160,3 +170,4 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].resources.limits.memory
           value: 4G
+
