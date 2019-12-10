@@ -1,9 +1,9 @@
+{{ $protocol := .Values.ssl.enabled | ternary "https" "http" -}}
 Your site is available here:
 
-  {{- if .Values.ssl.enabled }}
-  https://{{- template "drupal.domain" . }}
-  {{- else }}
-  http://{{- template "drupal.domain" . }}
+  {{ $protocol }}://{{- template "drupal.domain" . }}
+  {{- range $index, $prefix := .Values.domainPrefixes }}
+  {{ $protocol}}://{{$prefix}}.{{ template "drupal.domain" $ }}
   {{- end }}
   {{- range $index, $domain := .Values.exposeDomains }}
   {{- if $domain.ssl }}
