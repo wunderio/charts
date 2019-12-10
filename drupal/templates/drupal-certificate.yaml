@@ -20,6 +20,28 @@ spec:
         domains:
           - {{ template "drupal.domain" . }}
 ---
+{{- range $index, $prefix := .Values.domainPrefixes }}
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-crt-{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+spec:
+  secretName: {{ $.Release.Name }}-tls-{{ $index }}
+  dnsNames:
+  - {{$prefix}}.{{ template "drupal.domain" $ }}
+  issuerRef:
+    name: {{ $.Values.ssl.issuer }}
+    kind: ClusterIssuer
+  acme:
+    config:
+      - http01:
+          ingress: {{ $.Release.Name }}-drupal
+        domains:
+          - {{$prefix}}.{{ template "drupal.domain" $ }}
+---
+{{- end }}
 
 {{- else if eq .Values.ssl.issuer "selfsigned" }}
 apiVersion: certmanager.k8s.io/v1alpha1
