@@ -15,6 +15,9 @@ spec:
   {{- if .Values.ssl.enabled }}
   tls:
   - secretName: {{ .Release.Name }}-tls
+  {{- range $index, $prefix := .Values.domainPrefixes }}
+  - secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+  {{- end }}
   {{- end }}
   rules:
   - host: {{ template "drupal.domain" . }}
@@ -24,6 +27,15 @@ spec:
         backend:
           serviceName: {{ include "drupal.servicename" . }}
           servicePort: 80
+{{- range $index, $prefix := .Values.domainPrefixes }}
+  - host: {{$prefix}}.{{ template "drupal.domain" $ }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ include "drupal.servicename" $ }}
+          servicePort: 80
+{{- end }}
 ---
 
 {{- range $index, $domain := .Values.exposeDomains }}
