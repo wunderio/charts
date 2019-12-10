@@ -319,6 +319,9 @@ data:
 
         {{ include "drupal.basicauth" . | indent 6}}
 
+        # Custom configuration gets included here
+        {{- .Values.nginx.serverExtraConfig | nindent 8 -}}
+
         {{- if .Values.mailhog.enabled }}
         location /mailhog {
 

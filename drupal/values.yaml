@@ -89,6 +89,9 @@ nginx:
   noauthips:
     gke-internal: 10.0.0.0/8
 
+  # Extra configuration block in server context. 
+  serverExtraConfig: |
+
   # Extra configuration to pass to nginx as a file
   extraConfig: |
 
