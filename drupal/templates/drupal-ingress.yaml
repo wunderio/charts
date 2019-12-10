@@ -15,6 +15,9 @@ spec:
   {{- if .Values.ssl.enabled }}
   tls:
   - secretName: {{ .Release.Name }}-tls
+  {{- range $index, $prefix := .Values.domainPrefixes }}
+  - secretName: {{ $.Release.Name }}-tls-{{ $index }}
+  {{- end }}
   {{- end }}
   rules:
   - host: {{ template "drupal.domain" . }}
