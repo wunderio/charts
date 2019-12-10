@@ -16,7 +16,7 @@ spec:
   tls:
   - secretName: {{ .Release.Name }}-tls
   {{- range $index, $prefix := .Values.domainPrefixes }}
-  - secretName: {{ $.Release.Name }}-tls-{{ $index }}
+  - secretName: {{ $.Release.Name }}-tls-p{{ $index }}
   {{- end }}
   {{- end }}
   rules:

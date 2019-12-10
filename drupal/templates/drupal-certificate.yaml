@@ -24,11 +24,11 @@ spec:
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
-  name: {{ $.Release.Name }}-crt-{{ $index }}
+  name: {{ $.Release.Name }}-crt-p{{ $index }}
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
-  secretName: {{ $.Release.Name }}-tls-{{ $index }}
+  secretName: {{ $.Release.Name }}-tls-p{{ $index }}
   dnsNames:
   - {{$prefix}}.{{ template "drupal.domain" $ }}
   issuerRef:
