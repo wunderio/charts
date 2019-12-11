@@ -207,6 +207,10 @@ php:
   # This can be used for example to get a static IP for egress traffic.
   nodeSelector: {}
 
+  # Newrelic module is disabled unless APM license number is provided
+  newrelic:
+    license: ''
+
 # Configuration for everything that runs in shell container.
 shell:
   enabled: true
@@ -277,7 +281,7 @@ gdprDump:
     pass:
       formatter: password
     mail:
-      formatter: email
+      formatter: safeEmailDomain
     init:
       formatter: clear
 
