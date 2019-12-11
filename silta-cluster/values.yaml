@@ -4,6 +4,7 @@ clusterDomain: "silta.wdr.io"
 # https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
 traefik:
   externalTrafficPolicy: Local
+  priorityClassName: "high-priority"
   rbac:
     enabled: true
   replicas: 2
@@ -38,6 +39,7 @@ ssl:
 # https://github.com/wunderio/charts/blob/master/csi-rclone/values.yaml
 csi-rclone:
   enabled: false
+  priorityClassName: "high-priority"
   # Use silta cluster gke credentials. This is used when remote type is set to "google cloud storage".
   useGkeAuth: false
   # Do not allow csi-rclone subchart to install default secret because we want to generate it ourselves.

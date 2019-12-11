@@ -10,6 +10,9 @@ version: v1.2.4
 # use default parameters. You might want set this to false when using as subchart.
 defaultParams: true
 
+# Pod priority
+priorityClassName: ""
+
 # Rclone mount parameters. Anything except for remote and remotePath will be prefixed with dashes and passed into mounter. 
 params:
 
