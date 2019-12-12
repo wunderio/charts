@@ -55,7 +55,7 @@ spec:
                 cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
 
                 {{ range $index, $mount := .Values.mounts -}}
-                {{- if eq $mount.enabled true -}}
+                {{- if eq $mount.enabled true }}
                 # File backup for {{ $index }} volume.
                 echo "Starting {{ $index }} volume backup."
                 tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
