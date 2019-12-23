@@ -9,12 +9,15 @@ tests:
 
   - it: injects the nginx configuration
     set:
+      services:
+        foo:
+          image: 'bar'
+          exposedRoute: '/'
       nginx:
         loglevel: 'debug'
         basicauth:
           enabled: true
         realipfrom: '1.2.3.4'
-      services.foo.image: 'bar'
     asserts:
     - template: configmap.yaml
       matchRegex:
