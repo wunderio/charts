@@ -16,3 +16,11 @@ release: {{ .Release.Name }}
   auth_basic_user_file /etc/nginx/.htaccess;
   {{- end }}
 {{- end }}
+
+{{- define "frontend.tolerations" -}}
+{{- range $key, $label := $ }}
+- key: {{ $key }}
+  operator: Equal
+  value: {{ $label }}
+{{- end }}
+{{- end }}

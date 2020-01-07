@@ -134,6 +134,9 @@ services:
   #       command: echo "hello world"
   #       schedule: "~ 1 * * *"
 
+  #   nodeSelector:
+  #     cloud.google.com/gke-nodepool: static-ip
+
 # Configure the dynamically mounted volumes
 mounts:
 #  files:
