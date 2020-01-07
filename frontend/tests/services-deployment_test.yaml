@@ -61,14 +61,14 @@ tests:
             name: ENVIRONMENT_DOMAIN
             value: release-name.namespace.silta.wdr.io
 
-  - it: uses the default port and exposed route
+  - it: uses the default port
     set:
       services:
         foo:
+          exposedRoute: '/bar'
           image: 'bar'
       serviceDefaults:
         port: 12345
-        exposedRoute: '/bar'
     asserts:
       - equal:
           path: spec.template.spec.containers[0].ports[0].containerPort

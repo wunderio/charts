@@ -1,9 +1,9 @@
 Deployed {{ .Release.Name }} successfully, your site is available here:
 {{ range $index, $service := .Values.services -}}
-  {{ if default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }}
-  http://{{- template "frontend.domain" $ }}{{ default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }}
+  {{ if $service.exposedRoute }}
+  http://{{- template "frontend.domain" $ }}{{ $service.exposedRoute }}
   {{- range $index, $domain := $.Values.exposeDomains }}
-  http://{{ $domain.hostname }}{{ default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }}
+  http://{{ $domain.hostname }}{{ $service.exposedRoute }}
   {{- end -}}
   {{- end -}}
 {{- end }}

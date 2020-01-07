@@ -96,8 +96,8 @@ data:
         } 
 
         {{- range $index, $service := .Values.services }}
-        {{ if default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }}
-        location {{ default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }} {
+        {{ if $service.exposedRoute }}
+        location {{ $service.exposedRoute }} {
             
           {{ if $.Values.nginx.extra_conditions }}
           {{ $.Values.nginx.extra_conditions | nindent 10 }}
@@ -108,18 +108,18 @@ data:
           ## Most sites won't have configured favicon
           ## and since its always grabbed, turn it off in access log
           ## and turn off it's not-found error in the error log
-          location = {{ default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }}/favicon.ico { access_log off; log_not_found off;  }
+          location = {{ $service.exposedRoute }}/favicon.ico { access_log off; log_not_found off;  }
 
           ## Same for apple-touch-icon files
-          location = {{ default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }}/apple-touch-icon.png { access_log off; log_not_found off; }
-          location = {{ default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }}/apple-touch-icon-precomposed.png { access_log off; log_not_found off; }
+          location = {{ $service.exposedRoute }}/apple-touch-icon.png { access_log off; log_not_found off; }
+          location = {{ $service.exposedRoute }}/apple-touch-icon-precomposed.png { access_log off; log_not_found off; }
 
           ## Rather than just denying .ht* in the config, why not deny
           ## access to all .invisible files
           location ~ /\. { return 404; access_log off; log_not_found off; }
 
           # Pass the request on to frontend.
-          proxy_pass http://{{ $.Release.Name }}-{{ $index }}:{{ default $.Values.serviceDefaults.port $service.port }}{{ default $.Values.serviceDefaults.exposedRoute $service.exposedRoute }};
+          proxy_pass http://{{ $.Release.Name }}-{{ $index }}:{{ default $.Values.serviceDefaults.port $service.port }}{{ $service.exposedRoute }};
 
           # We expect the downsteam servers to redirect to the
           # right hostname, so don't do any rewrites here.
