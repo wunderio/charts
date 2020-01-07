@@ -88,6 +88,12 @@ spec:
           persistentVolumeClaim:
             claimName: {{ $.Release.Name }}-shell-keys
         {{- end }}
+      {{ if $service.nodeSelector -}}
+      nodeSelector:
+        {{- $service.nodeSelector | toYaml | nindent 8 }}
+      tolerations:
+        {{- include "frontend.tolerations" $service.nodeSelector | nindent 8 }}
+      {{- end }}
 
 {{- if $service.autoscaling }}
 {{- if $service.autoscaling.enabled }}

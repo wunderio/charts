@@ -171,3 +171,20 @@ tests:
           path: spec.template.spec.containers[0].resources.limits.memory
           value: 4G
 
+  - it: can set nodeSelectors
+    set:
+      services.foo:
+        image: 'bar'
+        nodeSelector:
+          bar: baz
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            bar: baz
+      - contains:
+          path: spec.template.spec.tolerations
+          content:
+            key: bar
+            operator: Equal
+            value: baz
