@@ -5,7 +5,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ $.Release.Name }}-{{ $index }}
+  name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
   labels:
     name: {{ $.Release.Name }}-{{ $index }}
 spec:
@@ -17,7 +17,7 @@ spec:
   {{- if $mount.csiDriverName }}
   csi:
     driver: {{ $mount.csiDriverName }}
-    volumeHandle: {{ $.Release.Name }}-{{ $index }}
+    volumeHandle: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
     volumeAttributes:
       remotePathSuffix: /{{ $.Release.Namespace }}/{{ $.Values.environmentName }}/{{ $index }}
   {{- end }}
@@ -50,7 +50,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ $.Release.Name }}-shell-keys
+  name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-shell-keys
   labels:
     name: {{ $.Release.Name }}-shell-keys
 spec:
@@ -62,7 +62,7 @@ spec:
   {{- if $.Values.shell.mount.csiDriverName }}
   csi:
     driver: {{ $.Values.shell.mount.csiDriverName }}
-    volumeHandle: {{ $.Release.Name }}-shell-keys
+    volumeHandle: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-shell-keys
     volumeAttributes:
       remotePathSuffix: /{{ $.Release.Namespace }}/{{ $.Values.environmentName }}/shell-keys
       umask: "077"
