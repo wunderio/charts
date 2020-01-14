@@ -20,6 +20,18 @@ app: simple
 # Multiple pods make sense for high availability.
 replicas: 1
 
+# Enable autoscaling using HorizontalPodAutoscaler
+# see: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 80
+
 # Domain names that will be mapped to this deployment.
 # Example of exposing 2 additional domains for this deployment, each with its own certificate
 # Note that the key is only used for documentation purposes.
