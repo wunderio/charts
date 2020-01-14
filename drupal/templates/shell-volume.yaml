@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Release.Name }}-ssh-keys
+  name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-ssh-keys
   labels:
     name: {{ .Release.Name }}-ssh-keys
 spec:
@@ -14,7 +14,7 @@ spec:
   {{- if .Values.shell.mount.csiDriverName }}
   csi:
     driver: {{ .Values.shell.mount.csiDriverName }}
-    volumeHandle: {{ .Release.Name }}-reference-data
+    volumeHandle: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-reference-data
     volumeAttributes:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/ssh-keys
       umask: "077"
