@@ -4,7 +4,7 @@ kind: PersistentVolume
 metadata:
   name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
   labels:
-    name: {{ .Release.Name }}-backup
+    name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
 spec:
   accessModes:
     - ReadWriteMany
@@ -36,6 +36,6 @@ spec:
 {{- if eq .Values.backup.storageClassName "silta-shared" }}
   selector:
     matchLabels:
-      name: {{ .Release.Name }}-backup
+      name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
 {{- end }}
 {{- end }}

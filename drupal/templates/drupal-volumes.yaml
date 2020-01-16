@@ -7,7 +7,7 @@ kind: PersistentVolume
 metadata:
   name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
   labels:
-    name: {{ $.Release.Name }}-{{ $index }}
+    name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
 spec:
   accessModes:
     - ReadWriteMany
@@ -39,7 +39,7 @@ spec:
 {{- if eq $mount.storageClassName "silta-shared" }}
   selector:
     matchLabels:
-      name: {{ $.Release.Name }}-{{ $index }}
+      name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
 {{- end }}
 ---
 {{- end -}}
@@ -50,9 +50,9 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-reference-data
+  name: {{ .Release.Name }}-{{ .Release.Namespace | sha256sum | trunc 7 }}-reference-data
   labels:
-    name: {{ .Release.Name }}-reference-data
+    name: {{ .Release.Name }}-{{ .Release.Namespace | sha256sum | trunc 7 }}-reference-data
 spec:
   accessModes:
     - ReadWriteMany
@@ -62,7 +62,7 @@ spec:
   {{- if .Values.referenceData.csiDriverName }}
   csi:
     driver: {{ .Values.referenceData.csiDriverName }}
-    volumeHandle: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-reference-data
+    volumeHandle: {{ .Release.Name }}-{{ .Release.Namespace | sha256sum | trunc 7 }}-reference-data
     volumeAttributes:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/reference-data
   {{- end }}
@@ -84,7 +84,7 @@ spec:
 {{- if eq .Values.referenceData.storageClassName "silta-shared" }}
   selector:
     matchLabels:
-      name: {{ .Release.Name }}-reference-data
+      name: {{ .Release.Name }}-{{ .Release.Namespace | sha256sum | trunc 7 }}-reference-data
 {{- end }}
 {{- end }}
 {{- end }}
