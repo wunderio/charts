@@ -7,7 +7,7 @@ kind: PersistentVolume
 metadata:
   name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
   labels:
-    name: {{ $.Release.Name }}-{{ $index }}
+    name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
 spec:
   accessModes:
     - ReadWriteMany
@@ -39,7 +39,7 @@ spec:
 {{- if eq $mount.storageClassName "silta-shared" }}
   selector:
     matchLabels:
-      name: {{ $.Release.Name }}-{{ $index }}
+      name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
 {{- end }}
 ---
 {{- end -}}
@@ -52,7 +52,7 @@ kind: PersistentVolume
 metadata:
   name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-shell-keys
   labels:
-    name: {{ $.Release.Name }}-shell-keys
+    name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-shell-keys
 spec:
   accessModes:
     - ReadWriteMany
@@ -82,5 +82,10 @@ spec:
   resources:
     requests:
       storage: 50M
+{{- if eq $.Values.shell.mount.storageClassName "silta-shared" }}
+  selector:
+    matchLabels:
+      name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-shell-keys
+{{- end }}
 ---
 {{- end }}
