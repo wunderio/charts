@@ -10,15 +10,15 @@ dependencies:
   version: 2.2.3
 - name: newrelic-infrastructure
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 0.13.8
+  version: 0.13.17
 - name: minio
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 2.5.14
+  version: 2.5.18
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
-  version: 0.1.5
+  version: 0.1.7
 - name: cert-manager
   repository: https://charts.jetstack.io/
-  version: v0.10.0
-digest: sha256:c7c7d43e5cb23ca3bb120a22c2bfb8af3642f69c01b05fae46b433f6a76d2ed5
-generated: "2019-09-17T13:05:54.588338061Z"
+  version: 0.10.x
+digest: sha256:54a62083525672e8aefc2d4ad6a5bb72529d63667b5c0c154c5954b90ab9a220
+generated: "2020-01-20T16:45:44.461642+01:00"
