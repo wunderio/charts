@@ -37,6 +37,9 @@ function generateSchema(data, path = '') {
   else if (_.isString(data)){
     schema.type = 'string';
   }
+  else if (_.isNumber(data)){
+    schema.type = 'number';
+  }
   else if (_.isArray(data)) {
     schema.type = 'array';
 
