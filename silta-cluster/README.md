@@ -19,6 +19,8 @@ kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release
 kubectl label namespace silta-cluster certmanager.k8s.io/disable-validation="true"
 ```
 
+ - PriorityClass resources `scheduling.k8s.io/v1beta1` `scheduling.k8s.io/v1alpha1` requires at least kubernetes v1.14. `scheduling.k8s.io/v1` API requires kubernetes v1.17.
+
 ## Usage
 
 Here is an example of how we instantiate this helm chart: 
