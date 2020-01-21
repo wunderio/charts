@@ -10,8 +10,6 @@ spec:
     matchLabels:
       {{- include "drupal.release_labels" . | nindent 6 }}
       deployment: drupal
-  strategy:
-    type: Recreate
   template:
     metadata:
       labels:
