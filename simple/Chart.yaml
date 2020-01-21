@@ -1,3 +1,4 @@
+apiVersion: v1
 name: simple
 version: 0.2.3
 
