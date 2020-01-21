@@ -14,7 +14,7 @@ spec:
   {{- if .Values.shell.mount.csiDriverName }}
   csi:
     driver: {{ .Values.shell.mount.csiDriverName }}
-    volumeHandle: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-reference-data
+    volumeHandle: {{ .Release.Name }}-{{ .Release.Namespace | sha256sum | trunc 7 }}-ssh-keys
     volumeAttributes:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/ssh-keys
       umask: "077"
