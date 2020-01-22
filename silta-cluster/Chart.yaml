@@ -1,5 +1,33 @@
-apiVersion: v1
+apiVersion: v2
 appVersion: "1.0"
 description: Setup a silta kubernetes cluster.
 name: silta-cluster
 version: 0.2.1
+dependencies:
+- name: traefik
+  version: 1.77.5
+  repository: https://kubernetes-charts.storage.googleapis.com/
+- name: redis
+  version: 8.1.5
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: deploymentRemover.enabled
+- name: kube-state-metrics
+  version: 2.2.3
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: kube-state-metrics.enabled
+- name: newrelic-infrastructure
+  version: 0.13.8
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: newrelic-infrastructure.enabled
+- name: minio
+  version: 2.5.14
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: minio.enabled
+- name: csi-rclone
+  version: 0.1.5
+  repository: https://storage.googleapis.com/charts.wdr.io
+  condition: csi-rclone.enabled
+- name: cert-manager
+  version: 0.10.0
+  repository: https://charts.jetstack.io/
+  condition: cert-manager.enabled
