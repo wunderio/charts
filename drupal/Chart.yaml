@@ -8,7 +8,7 @@ dependencies:
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: mariadb.enabled,drupal.mariadb.enabled,global.mariadb.enabled
 - name: memcached
-  version: 3.2.0
+  version: 3.0.2
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: memcached.enabled
 - name: mailhog

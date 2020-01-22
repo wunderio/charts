@@ -16,18 +16,18 @@ dependencies:
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: kube-state-metrics.enabled
 - name: newrelic-infrastructure
-  version: 0.13.17
+  version: 0.13.8
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: newrelic-infrastructure.enabled
 - name: minio
-  version: 2.5.18
+  version: 2.5.14
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: minio.enabled
 - name: csi-rclone
-  version: 0.1.7
+  version: 0.1.5
   repository: https://storage.googleapis.com/charts.wdr.io
   condition: csi-rclone.enabled
 - name: cert-manager
-  version: 0.12.0
+  version: 0.10.0
   repository: https://charts.jetstack.io/
   condition: cert-manager.enabled
