@@ -3,11 +3,11 @@ version: 0.3.0
 apiVersion: v2
 dependencies:
 - name: mariadb
-  version: 4.x.x
+  version: 4.4.2
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: mariadb.enabled,drupal.mariadb.enabled,global.mariadb.enabled
 - name: memcached
-  version: 3.x.x
+  version: 3.2.0
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: memcached.enabled
 - name: mailhog
@@ -15,6 +15,6 @@ dependencies:
   repository: https://codecentric.github.io/helm-charts
   condition: mailhog.enabled
 - name: elasticsearch
-  version: 7.4.x
+  version: 7.4.1
   repository: https://helm.elastic.co
   condition: elasticsearch.enabled

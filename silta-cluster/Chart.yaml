@@ -5,29 +5,29 @@ name: silta-cluster
 version: 0.2.1
 dependencies:
 - name: traefik
-  version: 1.77.x
+  version: 1.77.5
   repository: https://kubernetes-charts.storage.googleapis.com/
 - name: redis
-  version: 8.1.x
+  version: 8.1.5
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: deploymentRemover.enabled
 - name: kube-state-metrics
-  version: 2.2.x
+  version: 2.2.3
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: kube-state-metrics.enabled
 - name: newrelic-infrastructure
-  version: 0.13.x
+  version: 0.13.17
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: newrelic-infrastructure.enabled
 - name: minio
-  version: 2.5.x
+  version: 2.5.18
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: minio.enabled
 - name: csi-rclone
-  version: 0.1.x
+  version: 0.1.7
   repository: https://storage.googleapis.com/charts.wdr.io
   condition: csi-rclone.enabled
 - name: cert-manager
-  version: 0.12.x
+  version: 0.12.0
   repository: https://charts.jetstack.io/
   condition: cert-manager.enabled
