@@ -126,7 +126,6 @@ services: {}
   #       cpu: 200m
   #       memory: 128Mi
   #     limits:
-  #       cpu: 1000m
   #       memory: 512Mi
 
   #   cron:
@@ -165,7 +164,6 @@ serviceDefaults:
       cpu: 1m
       memory: 64Mi
     limits:
-      cpu: 1000m
       memory: 256Mi
 
 elasticsearch:
@@ -194,7 +192,6 @@ elasticsearch:
       cpu: 200m
       memory: 512Mi
     limits:
-      cpu: 1000m
       memory: 1Gi
 
   nodeAffinity:
