@@ -95,7 +95,7 @@ nginx:
     #   return 204;
     # }
 
-services:
+services: {}
   # node:
   #   image: 'you need to pass in a value for frontend.image to your helm chart'
   #   port: 3000
@@ -138,7 +138,7 @@ services:
   #     cloud.google.com/gke-nodepool: static-ip
 
 # Configure the dynamically mounted volumes
-mounts:
+mounts: {}
 #  files:
 #    enabled: true
 #    storage: 1G
