@@ -112,7 +112,6 @@ php:
       cpu: 1m
       memory: 128M
     limits:
-      cpu: 1000m
       memory: 512M
 
   # Cron tasks, each of which will be run into a dedicated temporary pod.
@@ -166,7 +165,6 @@ php:
         cpu: 500m
         memory: 512M
       limits:
-        cpu: 1000m
         memory: 512M
 
   # Post-upgrade hook.
@@ -330,7 +328,6 @@ mariadb:
         cpu: 25m
         memory: 384M
       limits:
-        cpu: 1000m
         memory: 512M
     affinity:
       nodeAffinity:
@@ -379,7 +376,6 @@ elasticsearch:
       cpu: 200m
       memory: 512Mi
     limits:
-      cpu: 1000m
       memory: 1Gi
 
   nodeAffinity:
