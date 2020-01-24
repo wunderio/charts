@@ -15,7 +15,7 @@ jobs:
             for CHARTFILE in `find . -name Chart.yaml`
             do
               CHART=`dirname $CHARTFILE`
-              # helm lint $CHART
+              helm lint $CHART
               helm unittest $CHART
             done
 
