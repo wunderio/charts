@@ -130,6 +130,7 @@ php:
 
   # Post-installation hook.
   # This is run every time a new environment is created.
+  # The drush cache-clear is to avoid potential issues if updated code introduces new custom entities
   postinstall:
     command: |
       if [ -f reference-data/db.sql.gz ]; then
@@ -170,6 +171,7 @@ php:
 
   # Post-upgrade hook.
   # This is run every time a new environment is upgraded.
+  # The drush cache-clear is to avoid potential upgrade issues if updated code introduces new custom entities
   postupgrade:
     command: |
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
