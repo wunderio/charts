@@ -172,7 +172,6 @@ php:
   postupgrade:
     command: |
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-        drush cr
         drush updatedb -y
         if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
           drush config-import -y
