@@ -24,7 +24,7 @@ dependencies:
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: minio.enabled
 - name: csi-rclone
-  version: 0.1.5
+  version: 0.1.x
   repository: https://storage.googleapis.com/charts.wdr.io
   condition: csi-rclone.enabled
 - name: cert-manager

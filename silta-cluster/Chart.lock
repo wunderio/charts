@@ -16,9 +16,9 @@ dependencies:
   version: 2.5.14
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
-  version: 0.1.5
+  version: 0.1.9
 - name: cert-manager
   repository: https://charts.jetstack.io/
   version: v0.10.0
-digest: sha256:1ff8056a5c25a734ec671488e737c579c4a2bcc353f1ede9eb6628b7fca2f653
-generated: "2020-01-22T10:30:59.487913+01:00"
+digest: sha256:374509d58e2a549506c33e050612ae39326f108edce3456dcd005c6543d990b0
+generated: "2020-01-31T15:18:57.604544+01:00"
