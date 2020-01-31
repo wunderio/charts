@@ -177,6 +177,7 @@ php:
         drush updatedb -y
         if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
           drush config-import -y
+          drush cc drush
           drush cr
         fi
       fi
