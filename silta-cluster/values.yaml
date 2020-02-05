@@ -76,6 +76,9 @@ gitAuth:
   # Kubernetes resource allocation.
   resources: {}
 
+  # The static IP to be used for the exposed endpoint.
+  loadBalancerIP: null
+
 # Deployment remover
 deploymentRemover:
   enabled: true

@@ -8,6 +8,9 @@ spec:
     - name: ssh
       port: 22
   type: "LoadBalancer"
+{{- if .Values.gitAuth.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.gitAuth.loadBalancerIP }}
+{{- end }}
 {{- if .Values.gitAuth.allowedIps }}
   loadBalancerSourceRanges:
     {{- .Values.gitAuth.allowedIps | toYaml | nindent 2 -}}
