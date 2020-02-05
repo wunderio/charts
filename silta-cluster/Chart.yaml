@@ -5,10 +5,10 @@ name: silta-cluster
 version: 0.2.1
 dependencies:
 - name: traefik
-  version: 1.77.5
+  version: 1.86.x
   repository: https://kubernetes-charts.storage.googleapis.com/
 - name: redis
-  version: 8.1.5
+  version: 10.4.x
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: deploymentRemover.enabled
 - name: kube-state-metrics

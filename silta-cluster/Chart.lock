@@ -1,10 +1,10 @@
 dependencies:
 - name: traefik
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 1.77.5
+  version: 1.86.1
 - name: redis
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 8.1.5
+  version: 10.4.1
 - name: kube-state-metrics
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 2.2.3
@@ -20,5 +20,5 @@ dependencies:
 - name: cert-manager
   repository: https://charts.jetstack.io/
   version: v0.10.1
-digest: sha256:1df531d42e3cfe47c6b2b75a029a49ce1c0a659403101ff82d46745fd79ff646
-generated: "2020-01-31T15:27:56.896992+01:00"
+digest: sha256:00bf10e65d3e87c7ad8b0ba15e1e0db3beb2bb1331e6a9b5aa8f838833d24346
+generated: "2020-02-03T16:22:19.509465+01:00"
