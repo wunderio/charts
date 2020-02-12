@@ -165,6 +165,15 @@ serviceDefaults:
       memory: 64Mi
     limits:
       memory: 256Mi
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          targetAverageUtilization: 80
 
 elasticsearch:
   enabled: false

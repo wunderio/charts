@@ -188,3 +188,64 @@ tests:
             key: bar
             operator: Equal
             value: baz
+
+  - it: can autoscale with default values
+    set:
+      services.foo:
+        image: 'bar'
+        autoscaling:
+          enabled: true
+    asserts:
+      - documentIndex: 1
+        isKind:
+          of: HorizontalPodAutoscaler
+      - documentIndex: 1
+        equal:
+          path: spec.minReplicas
+          value: 1
+      - documentIndex: 1
+        equal:
+          path: spec.maxReplicas
+          value: 3
+      - documentIndex: 1
+        contains:
+          path: spec.metrics
+          content:
+            type: Resource
+            resource:
+              name: cpu
+              targetAverageUtilization: 80
+
+  - it: can override autoscale values
+    set:
+      services.foo:
+        image: 'bar'
+        autoscaling:
+          enabled: true
+          minReplicas: 5
+          maxReplicas: 7
+          metrics:
+            - type: Resource
+              resource:
+                name: cpu
+                targetAverageUtilization: 100
+    asserts:
+      - documentIndex: 1
+        isKind:
+          of: HorizontalPodAutoscaler
+      - documentIndex: 1
+        equal:
+          path: spec.minReplicas
+          value: 5
+      - documentIndex: 1
+        equal:
+          path: spec.maxReplicas
+          value: 7
+      - documentIndex: 1
+        contains:
+          path: spec.metrics
+          content:
+            type: Resource
+            resource:
+              name: cpu
+              targetAverageUtilization: 100

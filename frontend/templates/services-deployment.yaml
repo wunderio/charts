@@ -111,10 +111,14 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ $.Release.Name }}-{{ $index }}
-  minReplicas: {{ default 1 $service.autoscaling.minReplicas }}
-  maxReplicas: {{ default 3 $service.autoscaling.maxReplicas }}
+  minReplicas: {{ default $.Values.serviceDefaults.autoscaling.minReplicas $service.autoscaling.minReplicas }}
+  maxReplicas: {{ default $.Values.serviceDefaults.autoscaling.maxReplicas $service.autoscaling.maxReplicas }}
   metrics:
+    {{ if $service.autoscaling.metrics }}
     {{- toYaml $service.autoscaling.metrics | nindent 4 }}
+    {{ else }}
+    {{- toYaml $.Values.serviceDefaults.autoscaling.metrics | nindent 4 }}
+    {{- end }}
 {{- end }}
 {{- end }}
 ---
