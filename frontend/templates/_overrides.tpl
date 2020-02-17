@@ -17,3 +17,10 @@ we make it compatible by overriding the following templates.
 {{- define "endpoints" -}}
 {{ .Release.Name }}-es-0
 {{- end -}}
+
+{{/*
+The rabbitmq chart has some unconventional naming logic, we prefer to keep things simple.
+*/}}
+{{- define "rabbitmq.fullname" -}}
+{{ .Release.Name }}-rabbitmq
+{{- end -}}

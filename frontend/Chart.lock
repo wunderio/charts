@@ -2,5 +2,8 @@ dependencies:
 - name: elasticsearch
   repository: https://helm.elastic.co
   version: 7.4.1
-digest: sha256:325cb5a7f3f6d8744d1ea707f8d4e990e55876dd746b211411f2a187576e1f6a
-generated: "2020-01-22T07:59:25.120052263Z"
+- name: rabbitmq
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 6.17.1
+digest: sha256:042983a78f238a063fc031859831a2f6ef6170012f73cc637370596ef674da67
+generated: "2020-02-11T20:53:05.47621+02:00"

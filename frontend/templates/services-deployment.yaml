@@ -62,6 +62,10 @@ spec:
         - name: ELASTICSEARCH_HOST
           value: {{ $.Release.Name }}-es
         {{- end }}
+        {{- if $.Values.rabbitmq.enabled }}
+        - name: RABBITMQ_HOST
+          value: {{ $.Release.Name }}-rabbitmq
+        {{- end }}
         {{ if $.Values.shell.enabled -}}
         - name: GITAUTH_API_TOKEN
           value: "{{ $.Values.shell.gitAuth.apiToken }}"
