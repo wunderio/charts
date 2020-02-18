@@ -1,15 +1,15 @@
 dependencies:
 - name: mariadb
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 4.4.2
+  version: 7.3.9
 - name: memcached
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 3.0.2
+  version: 3.2.2
 - name: mailhog
   repository: https://codecentric.github.io/helm-charts
-  version: 3.0.1
+  version: 3.1.2
 - name: elasticsearch
   repository: https://helm.elastic.co
-  version: 7.4.1
-digest: sha256:be9ac822ffbfd2bbc81594e113698a8911f9ea89f285aff7d7444845b5e8f7fc
-generated: "2020-01-22T10:29:48.720252+01:00"
+  version: 7.5.2
+digest: sha256:b8c48670627f34073aabce0990d42061aa098536ed20690adfd2d516591ea502
+generated: "2020-02-18T15:44:12.480172+01:00"
