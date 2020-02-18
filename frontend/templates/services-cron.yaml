@@ -38,9 +38,23 @@ spec:
             - name: {{ $key }}
               value: {{ $val | quote }}
             {{- end }}
+            - name: 'PORT'
+              value: {{ default $.Values.serviceDefaults.port $service.port | quote }}
+            - name: 'ENVIRONMENT_DOMAIN'
+              value: {{ template "frontend.domain" $ }}
+            - name: 'RELEASE_NAME'
+              value: {{ $.Release.Name | quote }}
+            {{- range $index, $service := $.Values.services }}
+            - name: "{{ $index }}_HOST"
+              value: "{{ $.Release.Name }}-{{ $index }}:{{ default $.Values.serviceDefaults.port $service.port }}"
+            {{- end }}
             {{- if $.Values.elasticsearch.enabled }}
             - name: ELASTICSEARCH_HOST
               value: {{ $.Release.Name }}-es
+            {{- end }}
+            {{- if $.Values.rabbitmq.enabled }}
+            - name: RABBITMQ_HOST
+              value: {{ $.Release.Name }}-rabbitmq
             {{- end }}
             command: ["/bin/sh", "-c"]
             args:
