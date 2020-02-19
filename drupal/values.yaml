@@ -392,7 +392,7 @@ elasticsearch:
 memcached:
   enabled: false
   replicaCount: 1
-  pdbMinAvailable: 1
+  pdbMinAvailable: 0
   memcached:
     maxItemMemory: 128
 
