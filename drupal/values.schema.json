@@ -8,6 +8,32 @@
       "mailhog": {
         "$comment": "Mailhog should not be enabled in production",
         "properties": { "enabled": { "const": false }}
+      },
+      "php": {
+        "properties": {
+          "resources": {
+            "properties": {
+              "requests": {
+                "properties": {
+                  "cpu": { "type": "string", "not": { "const": "1m"}}
+                }
+              }
+            }
+          }
+        }
+      },
+      "nginx": {
+        "properties": {
+          "resources": {
+            "properties": {
+              "requests": {
+                "properties": {
+                  "cpu": { "type": "string", "not": { "const": "1m"}}
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
