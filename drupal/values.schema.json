@@ -1,5 +1,16 @@
 {
   "type": "object",
+  "if": {
+    "properties": { "environmentName": { "const": "production" }}
+  },
+  "then": {
+    "properties": {
+      "mailhog": {
+        "$comment": "Mailhog should not be enabled in production",
+        "properties": { "enabled": { "const": false }}
+      }
+    }
+  },
   "additionalProperties": false,
   "properties": {
     "clusterDomain": { "type": "string" },
