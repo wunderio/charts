@@ -81,7 +81,7 @@ spec:
             {{- end }}
             {{- end }}
             {{- end }}
-          restartPolicy: Never
+          restartPolicy: OnFailure
 ---
 {{- end }}
 {{- end }}
