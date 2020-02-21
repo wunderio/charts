@@ -132,6 +132,7 @@ services: {}
   #     example:
   #       command: echo "hello world"
   #       schedule: "~ 1 * * *"
+  #       parallelism: 1
 
   #   nodeSelector:
   #     cloud.google.com/gke-nodepool: static-ip
