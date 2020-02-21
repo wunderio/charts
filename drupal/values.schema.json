@@ -1,0 +1,105 @@
+{
+  "type": "object",
+  "if": {
+    "properties": { "environmentName": { "const": "production" }}
+  },
+  "then": {
+    "properties": {
+      "mailhog": {
+        "$comment": "Mailhog should not be enabled in production",
+        "properties": { "enabled": { "const": false }}
+      },
+      "php": {
+        "properties": {
+          "resources": {
+            "properties": {
+              "requests": {
+                "properties": {
+                  "cpu": { "type": "string", "not": { "const": "1m"}}
+                }
+              }
+            }
+          }
+        }
+      },
+      "nginx": {
+        "properties": {
+          "resources": {
+            "properties": {
+              "requests": {
+                "properties": {
+                  "cpu": { "type": "string", "not": { "const": "1m"}}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "clusterDomain": { "type": "string" },
+    "projectName": { "type": "string" },
+    "environmentName": { "type": "string" },
+    "imagePullSecrets": { "type": "array" },
+    "app": { "type": "string" },
+
+    "replicas": { "type": "integer" },
+    "autoscaling": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "exposeDomains": { "type": "array", "items": { "type": "object"}},
+    "domainPrefixes": { "type": "array", "items": { "type": "string"}},
+    "ssl": { "type": "object" },
+
+    "nginx": { "type": "object" },
+    "php": { "type": "object" },
+    "shell": { "type": "object" },
+    "mounts": { "type": "object" },
+
+    "referenceData": { "type": "object" },
+    "gdprDump": { "type": "object" },
+    "backup": { "type": "object" },
+
+    "mariadb": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "varnish": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "elasticsearch": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "memcached": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "mailhog": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "smtp": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    }
+  }
+}
