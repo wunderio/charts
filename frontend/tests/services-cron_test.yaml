@@ -20,3 +20,21 @@ tests:
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].image
           value: 'bar'
+      - equal:
+          path: spec.jobTemplate.spec.parallelism
+          value: 1
+
+  - it: can override parallelism
+    set:
+      services.foo:
+        image: 'bar'
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+            parallelism: 3
+
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.parallelism
+          value: 3

@@ -10,11 +10,12 @@ metadata:
     {{- include "frontend.release_labels" $ | nindent 4 }}
 spec:
   schedule: {{ $job.schedule | replace "~" (randNumeric 1) | quote }}
-  concurrencyPolicy: Forbid
+  concurrencyPolicy: Allow
   startingDeadlineSeconds: 3600
   successfulJobsHistoryLimit: 0
   jobTemplate:
     spec:
+      parallelism: {{ default 1 $job.parallelism }}
       template:
         metadata:
           labels:
