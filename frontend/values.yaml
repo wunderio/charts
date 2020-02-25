@@ -162,7 +162,7 @@ serviceDefaults:
   port: 3000
   resources:
     requests:
-      cpu: 1m
+      cpu: 2m
       memory: 64Mi
     limits:
       memory: 256Mi

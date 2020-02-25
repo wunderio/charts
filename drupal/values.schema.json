@@ -15,7 +15,7 @@
             "properties": {
               "requests": {
                 "properties": {
-                  "cpu": { "type": "string", "not": { "const": "1m"}}
+                  "cpu": { "type": "string", "not": { "const": "3m"}}
                 }
               }
             }
@@ -28,7 +28,7 @@
             "properties": {
               "requests": {
                 "properties": {
-                  "cpu": { "type": "string", "not": { "const": "1m"}}
+                  "cpu": { "type": "string", "not": { "const": "3m"}}
                 }
               }
             }
