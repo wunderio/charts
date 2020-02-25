@@ -52,7 +52,7 @@
         "enabled": { "type": "boolean" }
       }
     },
-    "exposeDomains": { "type": "array", "items": { "type": "object"}},
+    "exposeDomains": { "type": ["array","object"], "items": { "type": "object"}},
     "domainPrefixes": { "type": "array", "items": { "type": "string"}},
     "ssl": { "type": "object" },
 
