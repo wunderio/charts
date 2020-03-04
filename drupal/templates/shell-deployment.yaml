@@ -20,6 +20,7 @@ spec:
         {{- include "drupal.release_labels" . | nindent 8 }}
         service: shell
     spec:
+      enableServiceLinks: {{ default false .Values.shell.enableServiceLinks }}
       containers:
       - name: shell
         image: {{ .Values.shell.image | quote }}

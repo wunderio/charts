@@ -17,6 +17,7 @@ spec:
         {{ include "frontend.release_labels" $ | indent 8 }}
         deployment: frontend-{{ $index }}
     spec:
+      enableServiceLinks: {{ default false  $service.enableServiceLinks }}
       containers:
       - name: {{ $index }}
         image: {{ $service.image | quote }}
