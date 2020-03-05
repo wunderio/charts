@@ -69,13 +69,18 @@ tests:
 
   - it: uses default resource requests and limits
     set:
-      php.resources:
-        requests:
-          cpu: 123m
-          memory: 1G
-        limits:
-          cpu: 234m
-          memory: 2G
+      php:
+        # Unset cron-specific resources.
+        cron:
+          drupal:
+            resources: null
+        resources:
+          requests:
+            cpu: 123m
+            memory: 1G
+          limits:
+            cpu: 234m
+            memory: 2G
     asserts:
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu
