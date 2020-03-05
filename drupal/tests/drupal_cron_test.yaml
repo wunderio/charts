@@ -67,15 +67,20 @@ tests:
           value: "30 * * * *"
         documentIndex: 1
 
-  - it: takes resource requests and limits
+  - it: uses default resource requests and limits
     set:
-      php.resources:
-        requests:
-          cpu: 123m
-          memory: 1G
-        limits:
-          cpu: 234m
-          memory: 2G
+      php:
+        # Unset cron-specific resources.
+        cron:
+          drupal:
+            resources: null
+        resources:
+          requests:
+            cpu: 123m
+            memory: 1G
+          limits:
+            cpu: 234m
+            memory: 2G
     asserts:
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu
@@ -90,3 +95,25 @@ tests:
           path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.memory
           value: 2G
 
+  - it: takes custom resource requests and limits
+    set:
+      php.cron.drupal.resources:
+        requests:
+          cpu: 1230m
+          memory: 10G
+        limits:
+          cpu: 2340m
+          memory: 20G
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu
+          value: 1230m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.memory
+          value: 10G
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.cpu
+          value: 2340m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.memory
+          value: 20G
