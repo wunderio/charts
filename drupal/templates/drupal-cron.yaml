@@ -33,7 +33,11 @@ spec:
                    exit 1
                  fi
             resources:
+              {{ if $job.resources }}
+              {{- $job.resources | toYaml | nindent 14 }}
+              {{ else }}
               {{- $.Values.php.resources | toYaml | nindent 14 }}
+              {{- end }}
           restartPolicy: Never
           nodeSelector:
             {{ if $job.nodeSelector }}
