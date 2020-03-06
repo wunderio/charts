@@ -1,0 +1,5 @@
+apiVersion: v2
+appVersion: "1.0"
+description: Automatically scale unused helm releases to zero
+name: downscaler
+version: 0.1.0

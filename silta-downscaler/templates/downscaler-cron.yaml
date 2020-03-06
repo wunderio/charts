@@ -1,0 +1,27 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-downscale-cron
+spec:
+  schedule: "*/5 * * * *"
+  startingDeadlineSeconds: 3600
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          serviceAccountName: downscaler
+          containers:
+          - name: downscaler-cron
+            image: wunderio/silta-downscaler
+            command: ["/bin/sh", "-c"]
+            args:
+              - node downscale
+            resources: {}
+            env:
+              - name: PLACEHOLDER_SERVICE_NAME
+                value: {{ .Release.Name }}-placeholder
+              - name: PLACEHOLDER_SERVICE_NAMESPACE
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.namespace
