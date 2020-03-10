@@ -87,17 +87,17 @@ data:
                                                                               
         include fastcgi.conf;
 
-        location = /robots.txt {
-          access_log off;
-          {{- if not .Values.nginx.robotsTxt.allow }}
-            add_header Content-Type text/plain;
-            return 200 'User-agent: *\nDisallow: /';
-          {{- end}}
-        } 
-
         {{- range $index, $service := .Values.services }}
         {{ if $service.exposedRoute }}
         location {{ $service.exposedRoute }} {
+        
+          location = {{ $service.exposedRoute }}/robots.txt {
+            access_log off;
+            {{- if not $.Values.nginx.robotsTxt.allow }}
+              add_header Content-Type text/plain;
+              return 200 'User-agent: *\nDisallow: /';
+            {{- end}}
+          }  
             
           {{ if $.Values.nginx.extra_conditions }}
           {{ $.Values.nginx.extra_conditions | nindent 10 }}
