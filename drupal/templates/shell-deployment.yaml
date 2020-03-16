@@ -41,7 +41,11 @@ spec:
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
       nodeSelector:
+        {{ if .Values.shell.nodeSelector }}
+        {{- .Values.shell.nodeSelector | toYaml | nindent 8 }}
+        {{ else }}
         {{- .Values.php.nodeSelector | toYaml | nindent 8 }}
+        {{- end }}
       tolerations:
         {{- include "drupal.tolerations" .Values.php.nodeSelector | nindent 8 }}
       volumes:

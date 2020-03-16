@@ -40,3 +40,16 @@ tests:
         equal:
           path: spec.jobTemplate.spec.template.spec.nodeSelector.foo
           value: bar
+
+  - it: can set a node selector just for the shell
+    set:
+      shell.nodeSelector:
+        foo: bar
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value: {}
+      - template: shell-deployment.yaml
+        equal:
+          path: spec.template.spec.nodeSelector.foo
+          value: bar

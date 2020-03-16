@@ -234,6 +234,10 @@ shell:
     csiDriverName: csi-rclone
     storage: 1M
 
+  # Set a restriction on where the shell pod are provisioned.
+  # This can be used for example to get a static IP for egress traffic.
+  nodeSelector: {}
+
 # Configure the dynamically mounted volumes
 mounts:
   public-files:
