@@ -47,7 +47,11 @@ spec:
         {{- .Values.php.nodeSelector | toYaml | nindent 8 }}
         {{- end }}
       tolerations:
+        {{ if .Values.shell.nodeSelector }}
+        {{- include "drupal.tolerations" .Values.shell.nodeSelector | nindent 8 }}
+        {{ else }}
         {{- include "drupal.tolerations" .Values.php.nodeSelector | nindent 8 }}
+        {{- end }}
       volumes:
       {{- include "drupal.volumes" . | nindent 6 }}
       - name: ssh-keys

@@ -16,6 +16,32 @@ tests:
       php.nodeSelector:
         foo: bar
     asserts:
+      - contains:
+          path: spec.template.spec.tolerations
+          content:
+            key: foo
+            operator: Equal
+            value: bar
+      - template: shell-deployment.yaml
+        contains:
+          path: spec.template.spec.tolerations
+          content:
+            key: foo
+            operator: Equal
+            value: bar
+      - template: drupal-cron.yaml
+        contains:
+          path: spec.jobTemplate.spec.template.spec.tolerations
+          content:
+            key: foo
+            operator: Equal
+            value: bar
+
+  - it: also sets matching tolerations
+    set:
+      php.nodeSelector:
+        foo: bar
+    asserts:
       - equal:
           path: spec.template.spec.nodeSelector.foo
           value: bar
@@ -40,6 +66,13 @@ tests:
         equal:
           path: spec.jobTemplate.spec.template.spec.nodeSelector.foo
           value: bar
+      - template: drupal-cron.yaml
+        contains:
+          path: spec.jobTemplate.spec.template.spec.tolerations
+          content:
+            key: foo
+            operator: Equal
+            value: bar
 
   - it: can set a node selector just for the shell
     set:
@@ -53,3 +86,10 @@ tests:
         equal:
           path: spec.template.spec.nodeSelector.foo
           value: bar
+      - template: shell-deployment.yaml
+        contains:
+          path: spec.template.spec.tolerations
+          content:
+            key: foo
+            operator: Equal
+            value: bar
