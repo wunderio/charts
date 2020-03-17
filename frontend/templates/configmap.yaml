@@ -91,19 +91,19 @@ data:
         {{ if $service.exposedRoute }}
         location {{ $service.exposedRoute }} {
         
+          {{ if $.Values.nginx.extra_conditions }}
+          {{ $.Values.nginx.extra_conditions | nindent 10 }}
+          {{- end}}
+
+          {{ include "frontend.basicauth" $ | indent 6}}
+          
           location = {{ $service.exposedRoute }}/robots.txt {
             access_log off;
             {{- if not $.Values.nginx.robotsTxt.allow }}
               add_header Content-Type text/plain;
               return 200 'User-agent: *\nDisallow: /';
             {{- end}}
-          }  
-            
-          {{ if $.Values.nginx.extra_conditions }}
-          {{ $.Values.nginx.extra_conditions | nindent 10 }}
-          {{- end}}
-
-          {{ include "frontend.basicauth" $ | indent 6}}
+          } 
           
           ## Most sites won't have configured favicon
           ## and since its always grabbed, turn it off in access log
