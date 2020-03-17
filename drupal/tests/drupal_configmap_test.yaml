@@ -13,14 +13,9 @@ tests:
   - it: injects the php.ini values
     set:
       php.php_ini:
-        loglevel: 'debug'
         upload_max_filesize: '123M'
         post_max_size: '321M'
     asserts:
-    - matchRegex:
-        path: data.php-fpm_conf
-        pattern: 'log_level = debug'
-    - matchRegex:
         path: data.php_ini
         pattern: 'post_max_size = 321M'
     - matchRegex:
