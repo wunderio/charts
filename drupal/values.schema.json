@@ -1,7 +1,7 @@
 {
   "type": "object",
   "if": {
-    "properties": { "environmentName": { "const": "production" }}
+    "properties": { "branchName": { "const": "production" }}
   },
   "then": {
     "properties": {
@@ -42,6 +42,7 @@
     "clusterDomain": { "type": "string" },
     "projectName": { "type": "string" },
     "environmentName": { "type": "string" },
+    "branchName": { "type": "string" },
     "imagePullSecrets": { "type": "array" },
     "app": { "type": "string" },
 
