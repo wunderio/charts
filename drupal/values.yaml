@@ -139,35 +139,9 @@ php:
   # Post-installation hook.
   # This is run every time a new environment is created.
   postinstall:
-    command: |
-      if [ -f reference-data/db.sql.gz ]; then
-
-        echo "Dropping old database"
-        drush sql-drop -y
-
-        echo "Importing reference database dump"
-        cat reference-data/db.sql.gz | gunzip | drush sql-cli
-
-        if [ -f reference-data/public_files.tar.gz ]; then
-          # Deprecated location, only there for backward compatibility.
-          echo "Importing public files"
-          tar xf reference-data/public_files.tar.gz
-        else
-          if [ -f reference-data/public-files.tar ]; then
-            echo "Importing public files"
-            tar xf reference-data/public-files.tar
-          fi
-        fi
-
-        drush cr
-        drush updatedb -y
-        if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
-          drush config-import -y
-          drush cr
-        fi
-      else
-        printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
-      fi
+    # Specify any particular commands to be executed after an environment is installed.
+    # If referenced data is enabled, it gets imported before this step.
+    command: ""
     resources:
       requests:
         cpu: 500m
@@ -268,8 +242,12 @@ referenceData:
 
   ignoreTableContent: '(cache|cache_.*|sessions|watchdog)'
 
-  # Matching files will not be included in reference data.
-  ignoreFiles: '.*/(css|js|styles)/.*'
+  # Matching folders will not be included in reference data.
+  ignoreFolders:
+    - css
+    - js
+    - styles
+    - languages
 
   # Files larger than this will not be included in reference data.
   maxFileSize: '5M'

@@ -221,11 +221,13 @@ set -e
 
 {{ if .Release.IsInstall }}
 touch /app/web/sites/default/files/_installing
+{{- if .Values.referenceData.enabled }}
+{{ include "drupal.import-reference-data" . }}
+{{- end }}
 {{ .Values.php.postinstall.command}}
 rm /app/web/sites/default/files/_installing
-{{ else }}
-{{ .Values.php.postupgrade.command}}
 {{ end }}
+{{ .Values.php.postupgrade.command}}
 
 {{- if and .Values.referenceData.enabled .Values.referenceData.updateAfterDeployment }}
 {{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
@@ -238,12 +240,6 @@ rm /app/web/sites/default/files/_installing
 {{- define "drupal.extract-reference-data" -}}
 set -e
 if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-
-  REFERENCE_DATA_LOCATION="/app/reference-data"
-
-  # Clean up existing reference data.
-  rm -f $REFERENCE_DATA_LOCATION/*
-
   # Figure out which tables to skip.
   IGNORE_TABLES=""
   IGNORED_TABLES=""
@@ -260,29 +256,46 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   # Compress the database dump and copy it into the backup folder.
   # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
   gzip -9 /tmp/db.sql
-  cp /tmp/db.sql.gz $REFERENCE_DATA_LOCATION/db.sql.gz
+  cp /tmp/db.sql.gz /app/reference-data/db.sql.gz
 
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
   # File backup for {{ $index }} volume.
   echo "Dump reference files for {{ $index }} volume."
 
-  # We need relative path to create a tarball.
-  relativeMountPath=$(realpath --relative-base . "{{ $mount.mountPath }}")
-
-  # Get a list of matching files, and put them in a tarball.
-  find "$relativeMountPath" \
-    -regextype posix-extended \
-    -type f \
-    -size -"{{ $.Values.referenceData.maxFileSize }}" \
-    -not -regex "{{ $.Values.referenceData.ignoreFiles }}" \
-    -exec echo '"{}"' \; | xargs tar cPf $REFERENCE_DATA_LOCATION/{{ $index }}.tar
+  # Update reference data files.
+  rsync -rvu "{{ $mount.mountPath }}/" \
+    --max-size="{{ $.Values.referenceData.maxFileSize }}" \
+    {{ range $folderIndex, $folderPattern := $.Values.referenceData.ignoreFolders -}}
+    --exclude="{{ $folderPattern }}" \
+    {{ end -}}
+    --delete \
+    /app/reference-data/{{ $index }}
   {{- end -}}
   {{- end }}
-
-  # List content of reference data folder
-  ls -lh $REFERENCE_DATA_LOCATION/*
 else
   echo "Drupal is not installed, skipping reference database dump."
+fi
+{{- end }}
+
+{{- define "drupal.import-reference-data" -}}
+if [ -f /app/reference-data/db.sql.gz ]; then
+
+  echo "Dropping old database"
+  drush sql-drop -y
+
+  echo "Importing reference database dump"
+  cat /app/reference-data/db.sql.gz | gunzip | drush sql-cli
+
+  {{ range $index, $mount := .Values.mounts -}}
+  {{- if eq $mount.enabled true -}}
+  if [ -d "/app/reference-data/{{ $index }}" ]; then
+    echo "Importing {{ $index }} files"
+    rsync -r "/app/reference-data/{{ $index }}/" "{{ $mount.mountPath }}"
+  fi
+  {{- end -}}
+  {{- end }}
+else
+  printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
 fi
 {{- end }}

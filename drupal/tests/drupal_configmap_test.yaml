@@ -16,6 +16,7 @@ tests:
         upload_max_filesize: '123M'
         post_max_size: '321M'
     asserts:
+    - matchRegex:
         path: data.php_ini
         pattern: 'post_max_size = 321M'
     - matchRegex:

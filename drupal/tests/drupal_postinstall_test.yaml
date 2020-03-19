@@ -26,7 +26,7 @@ tests:
       - matchRegex:
           path: spec.template.spec.containers[0].args[0]
           pattern: 'foo'
-      - notMatchRegex:
+      - matchRegex:
           path: spec.template.spec.containers[0].args[0]
           pattern: 'bar'
 
@@ -38,7 +38,7 @@ tests:
     asserts:
       - matchRegex:
           path: spec.template.spec.containers[0].args[0]
-          pattern: 'REFERENCE_DATA_LOCATION'
+          pattern: 'Dump reference database'
 
   - it: doesn't exports reference data after deployments if disabled
     set:
@@ -49,7 +49,7 @@ tests:
     asserts:
       - notMatchRegex:
           path: spec.template.spec.containers[0].args[0]
-          pattern: 'REFERENCE_DATA_LOCATION'
+          pattern: 'Dump reference database'
 
   - it: sets environment variables correctly
     set:
