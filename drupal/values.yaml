@@ -248,6 +248,7 @@ referenceData:
     - js
     - styles
     - languages
+    - php
 
   # Files larger than this will not be included in reference data.
   maxFileSize: '5M'
