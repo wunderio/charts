@@ -291,7 +291,7 @@ if [ -f /app/reference-data/db.sql.gz ]; then
   {{- if eq $mount.enabled true -}}
   if [ -d "/app/reference-data/{{ $index }}" ]; then
     echo "Importing {{ $index }} files"
-    rsync -r "/app/reference-data/{{ $index }}/" "{{ $mount.mountPath }}"
+    rsync -ru "/app/reference-data/{{ $index }}/" "{{ $mount.mountPath }}"
   fi
   {{ end -}}
   {{- end }}
