@@ -271,7 +271,7 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
     {{ end -}}
     --delete \
     /app/reference-data/{{ $index }}
-  {{- end -}}
+  {{ end -}}
   {{- end }}
 else
   echo "Drupal is not installed, skipping reference database dump."
