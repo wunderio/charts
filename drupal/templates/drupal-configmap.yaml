@@ -129,7 +129,7 @@ data:
         include conf.d/*.conf;
     }
 
-  drupal_conf: |
+  fastcgi_conf: |
 
     fastcgi_param  QUERY_STRING       $query_string;
     fastcgi_param  REQUEST_METHOD     $request_method;
@@ -156,6 +156,8 @@ data:
     fastcgi_param  REDIRECT_STATUS    200;
 
     fastcgi_param  HTTPS              $fastcgi_https;
+
+  drupal_conf: |
 
     ## Nginx FCGI specific directives.
     fastcgi_buffer_size 32k;

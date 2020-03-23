@@ -58,6 +58,10 @@ spec:
           mountPath: /etc/nginx/conf.d/drupal.conf
           readOnly: true
           subPath: drupal_conf
+        - name: config
+          mountPath: /etc/nginx/fastcgi.conf
+          readOnly: true
+          subPath: fastcgi_conf
         {{- if .Values.nginx.extraConfig }}
         - name: config
           # provide empty configuration file in /etc/nginx/conf.d for users to populate

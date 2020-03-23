@@ -35,15 +35,10 @@ tests:
     set:
       shell.enabled: true
       shell.gitAuth.repositoryUrl: 'foo'
-      shell.gitAuth.apiToken: 'bar'
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
           content:
             name: GITAUTH_REPOSITORY_URL
             value: foo
-      - contains:
-          path: spec.template.spec.containers[0].env
-          content:
-            name: GITAUTH_API_TOKEN
-            value: bar
+

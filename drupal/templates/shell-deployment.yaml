@@ -27,7 +27,10 @@ spec:
         env:
         {{- include "drupal.env" . | indent 8 }}
         - name: GITAUTH_API_TOKEN
-          value: "{{ .Values.shell.gitAuth.apiToken }}"
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-secrets-shell
+              key: gitAuth.apiToken
         - name: GITAUTH_REPOSITORY_URL
           value: "{{ .Values.shell.gitAuth.repositoryUrl }}"
         - name: DRUSH_OPTIONS_URI
