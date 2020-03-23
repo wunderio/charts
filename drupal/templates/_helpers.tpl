@@ -285,16 +285,19 @@ if [ -f /app/reference-data/db.sql.gz ]; then
   drush sql-drop -y
 
   echo "Importing reference database dump"
-  cat /app/reference-data/db.sql.gz | gunzip | drush sql-cli
+  cat /app/reference-data/db.sql.gz | gunzip | drush sql-cli &
 
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
   if [ -d "/app/reference-data/{{ $index }}" ]; then
     echo "Importing {{ $index }} files"
-    rsync -ru "/app/reference-data/{{ $index }}/" "{{ $mount.mountPath }}"
+    rsync -r "/app/reference-data/{{ $index }}/" "{{ $mount.mountPath }}" &
   fi
   {{ end -}}
   {{- end }}
+
+  # Wait for imports to complete.
+  wait
 else
   printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
 fi
