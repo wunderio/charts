@@ -200,7 +200,7 @@ until curl --silent --connect-timeout 2 "$ELASTICSEARCH_HOST:9200" ; do
   sleep 5
   TIME_WAITING=$((TIME_WAITING+5))
 
-  if [ $TIME_WAITING -gt 180 ]; then
+  if [ $TIME_WAITING -gt 300 ]; then
     echo "Elasticsearch connection timeout"
     exit 1
   fi
