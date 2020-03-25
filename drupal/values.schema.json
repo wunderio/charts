@@ -101,6 +101,9 @@
       "properties": {
         "enabled": { "type": "boolean" }
       }
+    },
+    "silta-release": {
+      "type": "object"
     }
   }
 }
