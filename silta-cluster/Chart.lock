@@ -5,9 +5,6 @@ dependencies:
 - name: redis
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 10.4.4
-- name: kube-state-metrics
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 2.2.3
 - name: minio
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 2.5.14
