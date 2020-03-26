@@ -121,28 +121,6 @@ redis:
     enabled: false
     slaveCount: 0
 
-# Filebeat settings
-filebeat:
-  enabled: false
-  version: ''
-  elasticCloudId: ''
-  elasticsearchHost: ''
-  elasticsearchPort: ''
-  elasticsearchUsername: ''
-  elasticsearchPassword: ''
-  elasticsearchCloudAuth: ''
-
-# Metricbeat settings
-metricbeat:
-  enabled: false
-  version: ''
-  elasticCloudId: ''
-  elasticsearchHost: ''
-  elasticsearchPort: ''
-  elasticsearchUsername: ''
-  elasticsearchPassword: ''
-  elasticsearchCloudAuth: ''
-
 cert-manager:
   enabled: true
   email: ''
