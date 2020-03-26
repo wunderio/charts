@@ -149,3 +149,6 @@ cert-manager:
 
 silta-downscaler:
   enabled: false
+
+instana-agent:
+  enabled: false

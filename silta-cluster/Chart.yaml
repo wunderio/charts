@@ -27,3 +27,7 @@ dependencies:
   version: 0.1.0
   repository: file://../silta-downscaler
   condition: silta-downscaler.enabled
+- name: instana-agent
+  version: 1.0.x
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: instana.enabled

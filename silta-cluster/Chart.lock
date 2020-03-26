@@ -17,5 +17,6 @@ dependencies:
 - name: silta-downscaler
   repository: file://../silta-downscaler
   version: 0.1.0
-digest: sha256:8f227e5cb9596b87e11a111a686a9676a23ea11a14870386c819720a0a436562
-generated: "2020-04-24T11:05:09.891956+02:00"
+- name: instana-agent
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 1.0.25
