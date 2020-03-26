@@ -21,6 +21,7 @@ spec:
           labels:
             {{- include "frontend.release_labels" $ | nindent 12 }}
         spec:
+          enableServiceLinks: false
           containers:
           - name: {{ $jobName }}-cron
             image: {{ $service.image | quote }}

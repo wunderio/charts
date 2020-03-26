@@ -14,6 +14,7 @@ spec:
       labels:
         {{ include "drupal.release_labels" . | indent 8 }}
     spec:
+      enableServiceLinks: false
       containers:
       # Nginx container
       - name: nginx
