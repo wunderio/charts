@@ -18,6 +18,7 @@ spec:
           labels:
             {{- include "drupal.release_labels" $ | nindent 12 }}
         spec:
+          enableServiceLinks: false
           containers:
           - name: drupal-cron
             {{- include "drupal.php-container" $ | nindent 12 }}

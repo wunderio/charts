@@ -16,6 +16,7 @@ spec:
   template:
     spec:
       restartPolicy: Never
+      enableServiceLinks: false
       containers:
       - name: post-release
         {{- include "drupal.php-container" . | nindent 8 }}
