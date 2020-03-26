@@ -11,6 +11,8 @@ data:
 
   settings_silta_php: |{{ .Files.Get "files/settings.silta.php" | nindent 4 }}
 
+  silta_services_yml: |{{ .Files.Get "files/silta.services.yml" | nindent 4 }}
+
   php_ini: |
     [PHP]
     short_open_tag = Off

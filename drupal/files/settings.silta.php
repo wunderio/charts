@@ -70,3 +70,8 @@ if (getenv('VARNISH_ADMIN_HOST')) {
   $config['varnish.settings']['varnish_control_terminal'] = getenv('VARNISH_ADMIN_HOST') . ':' . getenv('VARNISH_ADMIN_PORT');
   $config['varnish.settings']['varnish_control_key'] = trim(getenv('VARNISH_CONTROL_KEY'));
 }
+
+/**
+ * Use our own services override.
+ */
+$settings['container_yamls'][] = 'sites/default/silta.services.yml';

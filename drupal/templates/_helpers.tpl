@@ -26,6 +26,10 @@ ports:
   mountPath: /app/web/sites/default/settings.silta.php
   readOnly: true
   subPath: settings_silta_php
+- name: config
+  mountPath: /app/web/sites/default/silta.services.yml
+  readOnly: true
+  subPath: silta_services_yml
 {{- end }}
 
 {{- define "drupal.volumes" -}}

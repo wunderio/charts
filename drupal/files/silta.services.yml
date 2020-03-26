@@ -1,0 +1,9 @@
+parameters:
+  monolog.channel_handlers:
+     # Log to the stdout by default.
+     default: ['stdout']
+
+services:
+  monolog.handler.stdout:
+    class: Monolog\Handler\StreamHandler
+    arguments: ['php://stdout']
