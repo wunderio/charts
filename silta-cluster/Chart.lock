@@ -8,9 +8,6 @@ dependencies:
 - name: kube-state-metrics
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 2.2.3
-- name: newrelic-infrastructure
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 0.13.8
 - name: minio
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 2.5.14

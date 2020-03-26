@@ -143,18 +143,6 @@ metricbeat:
   elasticsearchPassword: ''
   elasticsearchCloudAuth: ''
 
-kube-state-metrics:
-  enabled: false
-
-# Newrelic monitoring
-# https://github.com/helm/charts/tree/master/stable/newrelic-infrastructure
-newrelic-infrastructure:
-  enabled: false
-  licenseKey: ""
-  cluster: "silta"
-  # kube-state-metrics are set up at "{{ .Release.Name }}-kube-state-metrics:8080"
-  kubeStateMetricsUrl: silta-cluster-kube-state-metrics:8080
-
 cert-manager:
   enabled: true
   email: ''
