@@ -15,6 +15,7 @@ spec:
     spec:
       template:
         spec:
+          enableServiceLinks: false
           containers:
           - name: reference-data-cron
             {{- include "drupal.php-container" . | nindent 12 }}

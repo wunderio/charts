@@ -16,6 +16,7 @@ spec:
     spec:
       template:
         spec:
+          enableServiceLinks: false
           containers:
           - name: backup
             {{- include "drupal.php-container" . | nindent 12 }}

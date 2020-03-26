@@ -19,6 +19,7 @@ spec:
         # We use a checksum to redeploy the pods when the configMap changes.
         configMap-checksum: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
+      enableServiceLinks: false
       containers:
       # Nginx container
       - name: nginx

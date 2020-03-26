@@ -21,6 +21,7 @@ spec:
         # We use a checksum to redeploy the pods when the configMap changes.
         configMap-checksum: {{ include (print $.Template.BasePath "/varnish-configmap-vcl.yaml") . | sha256sum }}
     spec:
+      enableServiceLinks: false
       containers:
       - name: varnish
         image: wunderio/drupal-varnish:v0.1.5
