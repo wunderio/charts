@@ -49,3 +49,7 @@ Rclone CSI plugin: https://github.com/wunderio/csi-rclone
 
 The 100% Open Source, Enterprise-Grade, Amazon S3 Compatible Object Storage. This is an optional component for csi-rclone storage plugin.
 MinIO project: https://min.io/  
+
+#### Instana agent
+
+Instana is an APM solution built for microservices, see more details on the official chart: https://github.com/helm/charts/tree/master/stable/instana-agent
