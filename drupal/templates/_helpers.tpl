@@ -214,20 +214,29 @@ done
 {{- define "drupal.post-release-command" -}}
 set -e
 
+{{ if and .Release.IsInstall .Values.referenceData.enabled -}}
+{{ include "drupal.import-reference-files" . }}
+{{- end }}
+
 {{ include "drupal.wait-for-db-command" . }}
-{{ if .Values.elasticsearch.enabled }}
-{{ include "drupal.wait-for-elasticsearch-command" . }}
-{{ end }}
 
 {{ if .Release.IsInstall }}
 touch /app/web/sites/default/files/_installing
 {{- if .Values.referenceData.enabled }}
-{{ include "drupal.import-reference-data" . }}
+{{ include "drupal.import-reference-db" . }}
 {{- end }}
+
+{{ if .Values.elasticsearch.enabled }}
+{{ include "drupal.wait-for-elasticsearch-command" . }}
+{{ end }}
+
 {{ .Values.php.postinstall.command}}
 rm /app/web/sites/default/files/_installing
 {{ end }}
 {{ .Values.php.postupgrade.command}}
+
+# Wait for background imports to complete.
+wait
 
 {{- if and .Values.referenceData.enabled .Values.referenceData.updateAfterDeployment }}
 {{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
@@ -278,15 +287,19 @@ else
 fi
 {{- end }}
 
-{{- define "drupal.import-reference-data" -}}
+{{- define "drupal.import-reference-db" -}}
 if [ -f /app/reference-data/db.sql.gz ]; then
-
   echo "Dropping old database"
   drush sql-drop -y
 
   echo "Importing reference database dump"
-  cat /app/reference-data/db.sql.gz | gunzip | drush sql-cli &
+  cat /app/reference-data/db.sql.gz | gunzip | drush sql-cli
+else
+  printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
+fi
+{{- end }}
 
+{{- define "drupal.import-reference-files" -}}
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
   if [ -d "/app/reference-data/{{ $index }}" ]; then
@@ -295,10 +308,4 @@ if [ -f /app/reference-data/db.sql.gz ]; then
   fi
   {{ end -}}
   {{- end }}
-
-  # Wait for imports to complete.
-  wait
-else
-  printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
-fi
 {{- end }}
