@@ -1,7 +1,7 @@
 {
   "type": "object",
   "if": {
-    "properties": { "branchName": { "const": "production" }}
+    "properties": { "environmentName": { "const": "production" }}
   },
   "then": {
     "properties": {
