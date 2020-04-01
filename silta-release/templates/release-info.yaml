@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-release
+  labels:
+    release: {{ .Release.Name }}
+data:
+  branchName: {{ .Values.branchName | quote }}

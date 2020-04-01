@@ -1,0 +1,8 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "branchName": { "type": "string" },
+    "global": { "type": "object"}
+  }
+}
