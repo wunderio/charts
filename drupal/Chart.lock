@@ -4,12 +4,15 @@ dependencies:
   version: 4.4.2
 - name: memcached
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 3.2.2
+  version: 3.2.3
 - name: mailhog
   repository: https://codecentric.github.io/helm-charts
   version: 3.1.2
 - name: elasticsearch
   repository: https://helm.elastic.co
   version: 7.5.2
-digest: sha256:02dde6e19fd53d97af692f2ef0e2c4c7b12ab03b09c5c7016cb07059e637d338
-generated: "2020-02-25T13:53:00.457644905Z"
+- name: silta-release
+  repository: file://../silta-release
+  version: 0.1.0
+digest: sha256:c991296c688cbe44c90ebd0ac9bdd993a6a9d0d1e464584949fb8b2275a83473
+generated: "2020-03-25T15:00:36.522277+01:00"
