@@ -25,6 +25,11 @@ app: frontend
 #   -     issuer: letsencrypt-staging
 exposeDomains: {}
 
+# Add prefixes to the generated per-branch domains, to be used for projects that need to respond
+# on multiple domains.
+# domainPrefixes: ['en', 'fi']
+domainPrefixes: []
+
 ssl:
   # Enable HTTPS for this deployment
   enabled:  true

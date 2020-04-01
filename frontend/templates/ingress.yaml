@@ -17,6 +17,9 @@ spec:
   {{- if .Values.ssl.enabled }}
   tls:
   - secretName: {{ .Release.Name }}-tls
+  {{- range $index, $prefix := .Values.domainPrefixes }}
+  - secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+  {{- end }}
   {{- end }}
   rules:
   - host: {{ template "frontend.domain" . }}
@@ -26,6 +29,15 @@ spec:
         backend:
           serviceName: {{ .Release.Name }}-nginx
           servicePort: 80
+{{- range $index, $prefix := .Values.domainPrefixes }}
+  - host: {{$prefix}}.{{ template "frontend.domain" $ }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ $.Release.Name }}-nginx
+          servicePort: 80
+{{- end }}
 ---
 {{- range $index, $domain := .Values.exposeDomains }}
 apiVersion: extensions/v1beta1

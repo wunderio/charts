@@ -1,9 +1,14 @@
+{{ $protocol := .Values.ssl.enabled | ternary "https" "http" -}}
 Deployed {{ .Release.Name }} successfully, your site is available here:
+
 {{ range $index, $service := .Values.services -}}
   {{ if $service.exposedRoute }}
-  http://{{- template "frontend.domain" $ }}{{ $service.exposedRoute }}
+  {{ $protocol }}://{{- template "frontend.domain" $ }}{{ $service.exposedRoute }}
+  {{- range $index, $prefix := $.Values.domainPrefixes }}
+  {{ $protocol}}://{{$prefix}}.{{- template "frontend.domain" $ }}{{ $service.exposedRoute }}
+  {{- end }}
   {{- range $index, $domain := $.Values.exposeDomains }}
-  http://{{ $domain.hostname }}{{ $service.exposedRoute }}
+  {{ $protocol }}://{{ $domain.hostname }}{{ $service.exposedRoute }}
   {{- end -}}
   {{- end -}}
 {{- end }}
