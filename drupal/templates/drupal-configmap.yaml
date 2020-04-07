@@ -123,7 +123,7 @@ data:
         add_header                  Strict-Transport-Security "max-age=31536000; {{ .Values.nginx.hsts_include_subdomains | default "" }} preload" always;
         {{- if .Values.nginx.content_security_policy }}
         add_header                  Content-Security-Policy "{{ .Values.nginx.content_security_policy }}" always;
-        {{ - end }}
+        {{- end }}
         add_header                  X-XSS-Protection "1; mode=block";
         add_header                  Referrer-Policy "no-referrer, strict-origin-when-cross-origin" always;
 
