@@ -1,0 +1,12 @@
+# Default networkPolicy restricting access by default.
+{{- $params := mergeOverwrite . (dict "id" "default") -}}
+{{ include "silta-release.networkPolicy" $params }}
+---
+# Iterate through exceptions
+{{- range $index, $accessDefinition := .Values.ingressAccess -}}
+{{- $podSelectors := $accessDefinition.additionalPodSelector -}}
+{{- $from := $accessDefinition.from -}}
+{{- $params := mergeOverwrite $ (dict "id" $index "additionalPodSelectors" $podSelectors "from" $from) -}}
+{{ include "silta-release.networkPolicy" $params }}
+---
+{{ end }}

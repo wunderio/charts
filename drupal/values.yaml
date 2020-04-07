@@ -1,4 +1,7 @@
 
+# Configuration for the wunderio/silta-release subchart.
+silta-release: {}
+
 # Main domain of the cluster.
 # Subdomains of this domain will be created automatically for each environment.
 clusterDomain: "silta.wdr.io"

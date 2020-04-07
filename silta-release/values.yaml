@@ -1,3 +1,19 @@
 
 # Keep track of the git branch from which the release was created.
 branchName: ""
+
+# By default, access to pods is limited to the current namespace, you can specify exceptions here.
+# Note that the key is only used for documentation purposes and to facilitate overrides.
+# Structure:
+#
+#  nameYourAccessException:
+#    additionalPodSelector:
+#      # The current release is selected by default, add additional pod selectors here.
+#      app: drupal
+#
+#    # This is passed directly to the "from" clause of the Kubernetes NetworkPolicy resource.
+#    from:
+#      - namespaceSelector:
+#          matchLabels:
+#            name: other-namespace
+ingressAccess: {}
