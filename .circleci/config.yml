@@ -4,20 +4,6 @@ orbs:
   silta: silta/silta@0.1
 
 jobs:
-  validate:
-    executor: silta/silta
-
-    steps:
-      - checkout
-      - run:
-          name: Lint Helm charts and run helm unit tests
-          command: |
-            for CHARTFILE in `find . -name Chart.yaml`
-            do
-              CHART=`dirname $CHARTFILE`
-              helm lint $CHART
-              helm unittest $CHART --helm3
-            done
 
   build:
     executor: silta/silta
@@ -49,6 +35,8 @@ jobs:
             do
               CHART=`dirname $CHARTFILE`
               helm dependency build $CHART
+              helm lint $CHART
+              helm unittest $CHART --helm3
               helm package $CHART --destination /tmp/charts
             done
 
@@ -77,11 +65,8 @@ workflows:
   version: 2
   commit:
     jobs:
-      - validate
       - build:
           context: global_nonprod
-          requires:
-            - validate
       - deploy:
           context: global_nonprod
           requires:
