@@ -18,11 +18,11 @@ data:
     short_open_tag = Off
     precision = -1
     serialize_precision = -1
-    realpath_cache_size = 32k
-    realpath_cache_ttl = 120
+    realpath_cache_size = 256k
+    realpath_cache_ttl = 7200
     max_execution_time = 60
     max_input_time = 60
-    memory_limit = 256M
+    memory_limit = {{ .Values.php.php_ini.memory_limit | default "256M" }}
     error_reporting = E_ALL
     log_errors_max_len = 10240
     report_memleaks = On
@@ -53,7 +53,7 @@ data:
     [opcache]
     opcache.enable = 1
     opcache.enable_cli = 0
-    opcache.memory_consumption = 128
+    opcache.memory_consumption = 256
     opcache.interned_strings_buffer = 32
     opcache.use_cwd = ${PHP_OPCACHE_USE_CWD}
     opcache.validate_timestamps = 0
