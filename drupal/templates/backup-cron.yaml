@@ -71,7 +71,7 @@ spec:
                 # List content of backup folder
                 ls -lh /backups/*
             resources:
-              {{- .Values.php.resources | toYaml | nindent 14 }}
+              {{- .Values.backup.resources | toYaml | nindent 14 }}
           restartPolicy: Never
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}

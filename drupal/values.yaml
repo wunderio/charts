@@ -263,6 +263,14 @@ referenceData:
   # Skips mounting the volume outside of the reference environment, only used programmatically.
   skipMount: false
 
+  # Resources for the reference data cron job.
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 512M
+    limits:
+      memory: 512M
+
 # Parameters for sanitizing reference data with gdpr-dump.
 # Uses formatters from https://packagist.org/packages/fzaninotto/faker.
 gdprDump:
@@ -300,6 +308,14 @@ backup:
 
   # These tables will have their content ignored from the backups.
   ignoreTableContent: '(cache|cache_.*)'
+
+  # Resources for the backup cron job.
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 512M
+    limits:
+      memory: 512M
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
