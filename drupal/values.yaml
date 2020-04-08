@@ -238,7 +238,7 @@ referenceData:
   referenceEnvironment: 'master'
 
   # When to automatically update the reference data.
-  schedule: '0 3 * * *'
+  schedule: '~ 3 * * *'
 
   # Update the reference data after deployments on the reference environment.
   updateAfterDeployment: true
