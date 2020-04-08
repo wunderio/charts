@@ -16,6 +16,9 @@ spec:
       labels:
         {{ include "frontend.release_labels" $ | indent 8 }}
         deployment: frontend-{{ $index }}
+        {{ if $.Values.shell.enabled -}}
+        silta-ingress: allow
+        {{- end }}
     spec:
       enableServiceLinks: false
       containers:
