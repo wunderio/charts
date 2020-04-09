@@ -111,7 +111,7 @@ data:
 
         gzip                        on;
         gzip_buffers                16 8k;
-        gzip_comp_level             {{ .Values.nginx.comp_level | default 6 }};
+        gzip_comp_level             {{ .Values.nginx.comp_level }};
         gzip_http_version           1.1;
         gzip_min_length             20;
         gzip_types                  text/plain text/css application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript image/x-icon application/vnd.ms-fontobject font/opentype application/x-font-ttf application/json image/svg+xml;
@@ -120,7 +120,7 @@ data:
         gzip_disable                msie6;
 
         ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.
-        add_header                  Strict-Transport-Security "max-age=31536000; {{ .Values.nginx.hsts_include_subdomains | default "" }} preload" always;
+        add_header                  Strict-Transport-Security "max-age=31536000; {{ .Values.nginx.hsts_include_subdomains }} preload" always;
         {{- if .Values.nginx.content_security_policy }}
         add_header                  Content-Security-Policy "{{ .Values.nginx.content_security_policy }}" always;
         {{- end }}

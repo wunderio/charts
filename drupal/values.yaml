@@ -98,11 +98,13 @@ nginx:
     gke-internal: 10.0.0.0/8
 
   # Security headers
+  # includeSubdomains should be used whenever possible, but before enabling it needs to be made sure there are no subdomains not using https:
+  hsts_include_subdomains: ""
   #hsts_include_subdomains: " includeSubDomains;"
   #content_security_policy: "upgrade-insecure-requests; default-src https: data: 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self'; base-uri 'self'; object-src 'self'; connect-src wss: https:"
 
   # Gzip compression level
-  #comp_level: 6
+  comp_level: 6
 
   # Extra configuration block in server context. 
   serverExtraConfig: |
