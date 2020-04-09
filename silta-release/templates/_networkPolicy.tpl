@@ -3,7 +3,7 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ .Release.Name }}-{{ .id }}
+  name: {{ .Release.Name }}-{{ .id | lower }}
   labels:
     release: {{ .Release.Name }}
 spec:

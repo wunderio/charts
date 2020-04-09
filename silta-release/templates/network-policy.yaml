@@ -6,14 +6,14 @@
 {{- $id := "allow-ingress" -}}
 {{- $podSelectors := dict "silta-ingress" "allow" -}}
 {{- $from := list (dict "namespaceSelector" (dict "matchLabels" (dict "name" "silta-cluster"))) -}}
-{{- $params := mergeOverwrite $ (dict "id" $id "additionalPodSelectors" $podSelectors "from" $from) -}}
-{{ include "silta-release.networkPolicy" $params }}
+{{- $params := dict "id" $id "additionalPodSelectors" $podSelectors "from" $from -}}
+{{ include "silta-release.networkPolicy" (merge $params . ) }}
 ---
 # Iterate through exceptions
 {{- range $index, $accessDefinition := .Values.ingressAccess -}}
 {{- $podSelectors := $accessDefinition.additionalPodSelector -}}
 {{- $from := $accessDefinition.from -}}
-{{- $params := mergeOverwrite $ (dict "id" $index "additionalPodSelectors" $podSelectors "from" $from) -}}
-{{ include "silta-release.networkPolicy" $params }}
+{{- $params := dict "id" $index "additionalPodSelectors" $podSelectors "from" $from -}}
+{{ include "silta-release.networkPolicy" (merge $params $) }}
 ---
 {{ end }}
