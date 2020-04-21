@@ -30,6 +30,10 @@ ports:
   mountPath: /app/web/sites/default/silta.services.yml
   readOnly: true
   subPath: silta_services_yml
+- name: config
+  mountPath: /usr/local/etc/php-fpm.d/zz-custom.conf
+  readOnly: true
+  subPath: php_fpm_d_custom
 {{- end }}
 
 {{- define "drupal.volumes" -}}
