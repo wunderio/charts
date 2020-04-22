@@ -1,0 +1,14 @@
+
+
+domain: downscaler.silta.wdr.io
+
+ssl:
+  enabled: true
+  issuer: letsencrypt
+
+# A cron schedule to determine when applications will be downscaled.
+schedule: "0 6,18 * * *"
+
+image: wunderio/silta-downscaler
+
+resources: {}
