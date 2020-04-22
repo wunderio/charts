@@ -43,7 +43,7 @@ Importing a database dump:
 {{ if eq $mount.enabled true -}}
 Importing files to {{ $index }}:
 
-  rsync -azv -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' local_folder/ {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }}
+  rsync -azv --temp-dir=/tmp/ -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' local_folder/ {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }}
 
 {{ end -}}
 {{ end -}}
