@@ -117,6 +117,11 @@ php:
     limits:
       memory: 512M
 
+  fpm:
+    # Custom php-fpm settings block. May override parameters previously defined. 
+    # This will be put under [www] process pool.
+    extraConfig: |
+
   # Cron tasks, each of which will be run into a dedicated temporary pod.
   # When overriding this value, make sure to include the `drush cron` command.
   cron:
@@ -175,12 +180,15 @@ php:
   # This is a useful override for development environments.
   errorLevel: "verbose"
 
-  # Custom php settings.
+  # PHP settings
   php_ini:
     loglevel: notice # Possible Values: alert, error, warning, notice, debug
     upload_max_filesize: 60M
     post_max_size: 60M
     memory_limit: 256M
+    # Custom php settings block. May override parameters previously defined. 
+    # Note: include correct php ini section, i.e. "[PHP]" or "[Date]".
+    extraConfig: |
 
   # Define the location of the Drupal config files relative to the composer root.
   # This variable is exposed as $DRUPAL_CONFIG_PATH in the container.
