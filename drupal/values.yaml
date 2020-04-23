@@ -294,7 +294,7 @@ backup:
   schedule: '~ 2 * * *'
 
   # How many daily backups to preserve.
-  retention: 7
+  retention: 14
 
   # If specified, replace environment content with the given backup.
   restoreId: null
