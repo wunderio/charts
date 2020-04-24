@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "1.0"
 description: Setup a silta kubernetes cluster.
 name: silta-cluster
-version: 0.2.2
+version: 0.2.3
 dependencies:
 - name: traefik
   version: 1.86.x
@@ -31,3 +31,7 @@ dependencies:
   version: 0.10.x
   repository: https://charts.jetstack.io/
   condition: cert-manager.enabled
+- name: silta-downscaler
+  version: 0.1.0
+  repository: file://../silta-downscaler
+  condition: silta-downscaler.enabled
