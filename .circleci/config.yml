@@ -59,6 +59,7 @@ jobs:
           name: Deploy to Google Cloud Storage
           command: |
             gsutil -m rsync -d -r /tmp/charts gs://charts.wdr.io
+            gsutil setmeta -h "Cache-Control:no-cache,max-age=0" gs://charts.wdr.io/*
 
 workflows:
   version: 2
