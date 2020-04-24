@@ -11,6 +11,12 @@ metadata:
     traefik.ingress.kubernetes.io/frontend-entry-points: "http"
     ingress.kubernetes.io/ssl-redirect: "false"
     {{- end }}
+
+    {{- if (index .Values "silta-release").downscaler.enabled }}
+    auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" .Release.Time "UTC" }}
+    auto-downscale/label-selector: "release={{ .Release.Name }}"
+    auto-downscale/services: {{ .Release.Name }}-nginx
+    {{- end }}
   labels:
     {{ include "frontend.release_labels" . | indent 4 }}
 spec:

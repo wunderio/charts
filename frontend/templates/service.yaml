@@ -4,9 +4,13 @@ metadata:
   name: {{ .Release.Name }}-nginx
   labels:
     {{ include "frontend.release_labels" . | indent 4 }}
+  annotations:
+      auto-downscale/down: "false"
 spec:
   type: NodePort
   externalTrafficPolicy: Local
+  # We explicitly unset this, in case the application is currently downscaled.
+  externalName: null
   ports:
     - port: 80
   selector:
