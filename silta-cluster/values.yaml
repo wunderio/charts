@@ -159,3 +159,5 @@ cert-manager:
   enabled: true
   email: ''
 
+silta-downscaler:
+  enabled: false

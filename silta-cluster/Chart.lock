@@ -1,7 +1,7 @@
 dependencies:
 - name: traefik
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 1.86.1
+  version: 1.86.2
 - name: redis
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 10.4.4
@@ -20,5 +20,8 @@ dependencies:
 - name: cert-manager
   repository: https://charts.jetstack.io/
   version: v0.10.1
-digest: sha256:715bdf69f126e33626db52dd3decbfae911b7b4573b90ff5125e9192c81f1ae3
-generated: "2020-02-12T09:58:16.442092696Z"
+- name: silta-downscaler
+  repository: file://../silta-downscaler
+  version: 0.1.0
+digest: sha256:8f227e5cb9596b87e11a111a686a9676a23ea11a14870386c819720a0a436562
+generated: "2020-04-24T11:05:09.891956+02:00"
