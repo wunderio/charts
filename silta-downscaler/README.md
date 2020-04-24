@@ -8,5 +8,4 @@
 - When someone hits the placeholder
     - Get Ingress matching current hostname
     - Show message to user with option to re-enable
-    - TODO: Give an option to never downscale this release
     - When upscale is ready, redirect user
