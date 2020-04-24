@@ -12,3 +12,12 @@ schedule: "0 6,18 * * *"
 image: wunderio/silta-downscaler
 
 resources: {}
+
+# How long should releases be kept by default.
+defaultMinAge: 1d
+
+# How long should releases with matching names be kept. The last matching rule takes effect.
+releaseMinAge:
+  "^production": 10y
+  "^(master|stage|staging)": 1w
+  "^dependabot": 1h
