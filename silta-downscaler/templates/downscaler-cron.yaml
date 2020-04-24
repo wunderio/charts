@@ -5,7 +5,6 @@ metadata:
 spec:
   schedule: "{{ .Values.schedule }}"
   startingDeadlineSeconds: 3600
-  suspend: true
   jobTemplate:
     spec:
       template:
