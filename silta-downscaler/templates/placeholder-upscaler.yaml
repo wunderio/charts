@@ -33,7 +33,7 @@ spec:
       serviceAccountName: {{ .Release.Name }}-downscaler
       containers:
       - name: placeholder-upscaler
-        image: {{ .Values.image | quote }}
+        image: "{{ .Values.image }}:{{ .Values.tag }}"
         imagePullPolicy: Always
         ports:
         - containerPort: 3000

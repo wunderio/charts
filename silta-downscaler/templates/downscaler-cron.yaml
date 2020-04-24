@@ -13,7 +13,7 @@ spec:
           serviceAccountName: {{ .Release.Name }}-downscaler
           containers:
           - name: downscaler-cron
-            image: {{ .Values.image | quote }}
+            image: "{{ .Values.image }}:{{ .Values.tag }}"
             command: ["/bin/sh", "-c"]
             args:
               - node downscale
