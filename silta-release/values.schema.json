@@ -3,6 +3,7 @@
   "additionalProperties": false,
   "properties": {
     "branchName": { "type": "string" },
+    "downscaler": { "type": "object" },
     "ingressAccess": {
       "type": "object",
       "additionalProperties": {

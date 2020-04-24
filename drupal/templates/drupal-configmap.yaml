@@ -53,7 +53,8 @@ data:
     [opcache]
     opcache.enable = 1
     opcache.enable_cli = 0
-    opcache.memory_consumption = 256
+    ; This should adjust to amount of memory given to the container
+    opcache.memory_consumption = 128
     opcache.interned_strings_buffer = 32
     opcache.use_cwd = ${PHP_OPCACHE_USE_CWD}
     opcache.validate_timestamps = 0
@@ -61,7 +62,10 @@ data:
 
     [igbinary]
     igbinary.compact_strings=1
-
+    
+    ; Custom configuration below
+    {{ .Values.php.php_ini.extraConfig | nindent 4 }}
+    
   nginx_conf: |
     user                            nginx;
     worker_processes                auto;
@@ -169,6 +173,26 @@ data:
     fastcgi_param  REDIRECT_STATUS    200;
 
     fastcgi_param  HTTPS              $fastcgi_https;
+
+  php_fpm_d_custom: |
+
+    [www]
+    pm = dynamic
+    ; This should adjust to amount of memory given to the container
+    pm.max_children = 6
+    pm.start_servers = 2
+    pm.min_spare_servers = 2
+    pm.max_spare_servers = 2
+    pm.process_idle_timeout = 60s
+    pm.max_requests = 500
+    
+    access.log = /proc/self/fd/2
+    catch_workers_output = yes
+    
+    clear_env = no
+
+    ; Custom configuration below
+    {{ .Values.php.fpm.extraConfig | nindent 4 }}
 
   drupal_conf: |
 

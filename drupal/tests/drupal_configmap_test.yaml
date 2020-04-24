@@ -23,6 +23,16 @@ tests:
         path: data.php_ini
         pattern: 'upload_max_filesize = 123M'
 
+  - it: injects custom php.ini values with extraConfig
+    set:
+      php.php_ini.extraConfig: |
+        [PHP]
+        display_errors = On
+    asserts:
+    - matchRegex:
+        path: data.php_ini
+        pattern: 'display_errors = On'
+
   - it: injects custom nginx configuration into server context
     set:
       nginx:

@@ -15,6 +15,7 @@ spec:
       labels:
         {{- include "drupal.release_labels" . | nindent 8 }}
         deployment: drupal
+        silta-ingress: allow
       annotations:
         # We use a checksum to redeploy the pods when the configMap changes.
         configMap-checksum: {{ include (print $.Template.BasePath "/drupal-configmap.yaml") . | sha256sum }}

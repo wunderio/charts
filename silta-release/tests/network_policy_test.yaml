@@ -22,11 +22,11 @@ tests:
                 matchLabels:
                   name: other-namespace
     asserts:
-      - documentIndex: 1
+      - documentIndex: 2
         equal:
           path: spec.podSelector.matchLabels.release
           value: "RELEASE-NAME"
-      - documentIndex: 1
+      - documentIndex: 2
         equal:
           path: spec.ingress[0].from[0].namespaceSelector.matchLabels.name
           value: "other-namespace"

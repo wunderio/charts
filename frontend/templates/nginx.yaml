@@ -15,6 +15,7 @@ spec:
       labels:
         {{ include "frontend.release_labels" . | indent 8 }}
         deployment: frontend
+        silta-ingress: allow
       annotations:
         # We use a checksum to redeploy the pods when the configMap changes.
         configMap-checksum: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
