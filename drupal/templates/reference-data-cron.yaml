@@ -7,7 +7,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
-  schedule: {{ .Values.referenceData.schedule | quote }}
+  schedule: {{ .Values.referenceData.schedule | replace "~" (randNumeric 1) | quote }}
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 3600
   successfulJobsHistoryLimit: 0
@@ -33,7 +33,7 @@ spec:
                 {{ include "drupal.extract-reference-data" . | nindent 16 }}
 
             resources:
-              {{- .Values.php.resources | toYaml | nindent 14 }}
+              {{- .Values.referenceData.resources | toYaml | nindent 14 }}
           restartPolicy: Never
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}
