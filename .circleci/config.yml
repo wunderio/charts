@@ -30,7 +30,6 @@ jobs:
             helm repo add elastic https://helm.elastic.co
             helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
-            mkdir -p /tmp/charts
             for CHARTFILE in `find . -name Chart.yaml`
             do
               CHART=`dirname $CHARTFILE`
