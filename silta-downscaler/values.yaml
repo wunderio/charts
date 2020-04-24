@@ -7,7 +7,7 @@ ssl:
   issuer: letsencrypt
 
 # A cron schedule to determine when applications will be downscaled.
-schedule: "0 6,18 * * *"
+schedule: "0 4,18 * * *"
 
 image: wunderio/silta-downscaler
 
