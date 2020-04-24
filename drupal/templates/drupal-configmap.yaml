@@ -92,18 +92,21 @@ data:
 
         access_log                  /proc/self/fd/1 main;
 
+        ssl_session_cache           shared:SSL:10m;
+        ssl_session_timeout         10m;
+
         send_timeout                60s;
         sendfile                    on;
         client_body_timeout         60s;
         client_header_timeout       60s;
         ## This value is set to be identical with PHP's post_max_size.
         client_max_body_size        {{ .Values.php.php_ini.post_max_size }};
-        client_body_buffer_size     16k;
+        client_body_buffer_size     128k;
         client_header_buffer_size   4k;
         large_client_header_buffers 8 16K;
-        keepalive_timeout           75s;
+        keepalive_timeout           15 10;
         keepalive_requests          100;
-        reset_timedout_connection   off;
+        reset_timedout_connection   on;
         tcp_nodelay                 on;
         tcp_nopush                  on;
         server_tokens               off;
@@ -112,20 +115,28 @@ data:
 
         gzip                        on;
         gzip_buffers                16 8k;
-        gzip_comp_level             1;
+        gzip_comp_level             {{ .Values.nginx.comp_level }};
         gzip_http_version           1.1;
         gzip_min_length             20;
-        gzip_types                  text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascrip
+        gzip_types                  text/plain text/css application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript image/x-icon application/vnd.ms-fontobject font/opentype application/x-font-ttf application/json image/svg+xml;
         gzip_vary                   on;
         gzip_proxied                any;
         gzip_disable                msie6;
 
         ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.
-        add_header                  X-Frame-Options SAMEORIGIN;
-        add_header                  X-Content-Type-Options nosniff;
-        add_header                  Strict-Transport-Security max-age=31536000;
-        add_header                  X-XSS-Protection '1; mode=block';
+        add_header                  Strict-Transport-Security "max-age=31536000; {{ .Values.nginx.hsts_include_subdomains }} preload" always;
+        {{- if .Values.nginx.content_security_policy }}
+        add_header                  Content-Security-Policy "{{ .Values.nginx.content_security_policy }}" always;
+        {{- end }}
+        add_header                  X-XSS-Protection "1; mode=block";
+        add_header                  Referrer-Policy "no-referrer, strict-origin-when-cross-origin" always;
 
+        port_in_redirect off;
+        merge_slashes off;
+
+        types_hash_max_size 8192;
+        server_names_hash_bucket_size 64;
+        
         map_hash_bucket_size 128;
 
         map $uri $no_slash_uri {
