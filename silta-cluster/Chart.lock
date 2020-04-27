@@ -19,4 +19,6 @@ dependencies:
   version: 0.1.0
 - name: instana-agent
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 1.0.25
+  version: 1.0.27
+digest: sha256:a3f3005b3a3aa75c144b954ed7ad25f35a2a619dfbbc8cd63f62ab3f89584580
+generated: "2020-04-27T16:12:16.975853+02:00"
