@@ -5,12 +5,6 @@ dependencies:
 - name: redis
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 10.4.4
-- name: kube-state-metrics
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 2.2.3
-- name: newrelic-infrastructure
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 0.13.8
 - name: minio
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 2.5.14
@@ -23,5 +17,8 @@ dependencies:
 - name: silta-downscaler
   repository: file://../silta-downscaler
   version: 0.1.0
-digest: sha256:8f227e5cb9596b87e11a111a686a9676a23ea11a14870386c819720a0a436562
-generated: "2020-04-24T11:05:09.891956+02:00"
+- name: instana-agent
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 1.0.27
+digest: sha256:a3f3005b3a3aa75c144b954ed7ad25f35a2a619dfbbc8cd63f62ab3f89584580
+generated: "2020-04-27T16:12:16.975853+02:00"

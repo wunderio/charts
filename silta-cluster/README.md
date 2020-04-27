@@ -4,10 +4,6 @@ This helm chart helps setting up resources for https://github.com/wunderio/silta
 
 ## Requirements
 
-ServiceAccount and Roles for filebeat and metricbeat services. These have to be deployed manually.
- - https://raw.githubusercontent.com/wunderio/silta-cluster/master/filebeat-roles.yaml
- - https://raw.githubusercontent.com/wunderio/silta-cluster/master/metricbeat-roles.yaml
-
 Configure static resource allocation for tiller (change this if tiller is unstable):
 ```
 kubectl set resources deployment tiller-deploy --requests=cpu=100m,memory=1Gi --limits=cpu=500m,memory=1Gi -n kube-system
@@ -54,7 +50,6 @@ Rclone CSI plugin: https://github.com/wunderio/csi-rclone
 The 100% Open Source, Enterprise-Grade, Amazon S3 Compatible Object Storage. This is an optional component for csi-rclone storage plugin.
 MinIO project: https://min.io/  
 
-#### Newrelic infrastructure monitoring
-Monitoring Kubernetes deployments with newrelic:
- - [A Complete Introduction to Monitoring Kubernetes with New Relic](https://newrelic.com/platform/kubernetes/monitoring-guide)
- - [newrelic-infrastructure chart](https://github.com/helm/charts/tree/master/stable/newrelic-infrastructure)
+#### Instana agent
+
+Instana is an APM solution built for microservices, see more details on the official chart: https://github.com/helm/charts/tree/master/stable/instana-agent
