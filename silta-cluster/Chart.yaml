@@ -30,4 +30,4 @@ dependencies:
 - name: instana-agent
   version: 1.0.x
   repository: https://kubernetes-charts.storage.googleapis.com/
-  condition: instana.enabled
+  condition: instana-agent.enabled
