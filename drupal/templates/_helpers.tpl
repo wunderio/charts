@@ -302,6 +302,9 @@ if [ -f /app/reference-data/db.sql.gz ]; then
 
   echo "Importing reference database dump"
   cat /app/reference-data/db.sql.gz | gunzip | drush sql-cli
+
+  # Clear caches before doing anything else.
+  drush cr
 else
   printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
 fi
