@@ -19,7 +19,17 @@ Basicauth password: {{ .Values.nginx.basicauth.credentials.password }}
 {{- end }}
 {{ if $.Values.shell.enabled }}
 SSH connection (limited access through VPN):
-{{ range $index, $service := .Values.services }}
-    ssh www-admin@{{ template "frontend.environment.hostname" $ }}-shell-{{ $index }}.{{ $.Release.Namespace }} -J {{ include "frontend.jumphost" $ }}
-{{- end }}
+  {{ range $index, $service := .Values.services }}
+      ssh www-admin@{{ template "frontend.environment.hostname" $ }}-shell-{{ $index }}.{{ $.Release.Namespace }} -J {{ include "frontend.jumphost" $ }}
+  {{- end }}
+
+  {{ range $index, $service := .Values.services -}}
+    {{ if $service.mounts }}
+      {{ range $indexMount, $service.mounts -}}
+Importing files to service '{{ $index }}', folder '{{ (index $.Values.mounts $indexMount).mountPath }}':
+rsync -azv -e 'ssh -A -J {{ include "frontend.jumphost" $ }}' local_folder/ www-admin@{{ template "frontend.environment.hostname" $ }}-shell-{{ $index }}.{{ $.Release.Namespace }}:{{ (index $.Values.mounts $indexMount).mountPath }}
+
+      {{ end -}}
+    {{ end -}}
+  {{ end -}}
 {{- end -}}
