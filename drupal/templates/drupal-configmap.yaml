@@ -541,25 +541,14 @@ data:
             fastcgi_pass php;
         }
 
-        ## Run the update from the web interface with Drupal 7.
-        location = /update.php {
-            include fastcgi.conf;
-            fastcgi_param  SCRIPT_FILENAME    $document_root/update.php;
-            fastcgi_pass php;
+        ## Disallow these update scripts as they are not used in current workflow, Drupal 7/8.
+        location ~ ^/(update.php|core/update.php) {
+            return 404;
         }
 
-        ## Run the install from the web interface with Drupal 7.
-        location = /install.php {
-            include fastcgi.conf;
-            fastcgi_param  SCRIPT_FILENAME    $document_root/install.php;
-            fastcgi_pass php;
-        }
-
-        ## Run the install from the web interface with Drupal 8.
-        location = /core/install.php {
-            include fastcgi.conf;
-            fastcgi_param  SCRIPT_FILENAME    $document_root/core/install.php;
-            fastcgi_pass php;
+        ## Disallow these install cripts as they are not used in current workflow, Drupal 7/8.
+        location ~ ^/(install.php|core/install.php) {
+            return 404;
         }
 
         ## Allow running _ping.php
