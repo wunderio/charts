@@ -313,9 +313,11 @@ fi
 {{- define "drupal.import-reference-files" -}}
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
-  if [ -d "/app/reference-data/{{ $index }}" ]; then
+  if [ -d "/app/reference-data/{{ $index }}" ] && [ -n "$(ls /app/reference-data/{{ $index }})" ]; then
     echo "Importing {{ $index }} files"
-    rsync -r --temp-dir=/tmp/ "/app/reference-data/{{ $index }}/" "{{ $mount.mountPath }}" &
+    for f in /app/reference-data/{{ $index }}/*; do
+      rsync -r --temp-dir=/tmp/ $f "{{ $mount.mountPath }}" &
+    done
   fi
   {{ end -}}
   {{- end }}
