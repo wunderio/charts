@@ -22,7 +22,6 @@ spec:
   podManagementPolicy: {{ .Values.podManagementPolicy }}
   updateStrategy:
     type: {{ .Values.updateStrategy }}
-  enableServiceLinks: false
   {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
@@ -142,6 +141,7 @@ spec:
       imagePullSecrets:
 {{ toYaml .Values.imagePullSecrets | indent 8 }}
       {{- end }}
+      enableServiceLinks: false
       initContainers:
       {{- if .Values.sysctlInitContainer.enabled }}
       - name: configure-sysctl
