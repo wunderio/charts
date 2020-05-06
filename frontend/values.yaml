@@ -156,7 +156,8 @@ mounts: {}
 #    storageClassName: silta-shared
 #    csiDriverName: csi-rclone
 
-# Provide SSH access based on GitHub public keys and repository access.
+# Provide SSH access based on GitHub public keys and repository access. 
+# Note: Shell only works when the base image wunderio/silta-node is used!
 shell:
   enabled: false
   gitAuth:
