@@ -22,6 +22,7 @@ spec:
   podManagementPolicy: {{ .Values.podManagementPolicy }}
   updateStrategy:
     type: {{ .Values.updateStrategy }}
+  enableServiceLinks: false
   {{- if .Values.persistence.enabled }}
   volumeClaimTemplates:
   - metadata:
