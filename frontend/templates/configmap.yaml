@@ -63,7 +63,9 @@ data:
         add_header                  X-Content-Type-Options nosniff;
         add_header                  Strict-Transport-Security max-age=31536000;
         add_header                  X-XSS-Protection '1; mode=block';
-                                                                    
+
+        map_hash_bucket_size 128;
+
         map $uri $no_slash_uri {                                                                                                                           
             ~^/(?<no_slash>.*)$ $no_slash;                                                                                                                 
         }                                                            
@@ -76,11 +78,40 @@ data:
         default $https;                                            
         http '';                          
         https on;                          
-    }                                      
+    }
+
+    {{- if .Values.nginx.redirects }}
+    # Custom redirects with full url matching
+    map '$scheme://$host$request_uri' $redirect_uri {
+        {{- range .Values.nginx.redirects }}
+        {{- if contains "://" .from }}
+        {{ .from | squote }} {{ .to | squote }};
+        {{- end }}
+        {{- end }}
+    }
+    # Custom redirects with absolute path matching
+    map $request_uri $redirect_uri_local {
+        {{- range .Values.nginx.redirects }}
+        {{- if not ( contains "://" .from ) }}
+        {{ .from | squote }} {{ .to | squote }};
+        {{- end }}
+        {{- end }}
+    }
+    {{- end }}                                      
                                           
     server {                               
         server_name frontend;
-        listen 80;          
+        listen 80;
+
+        {{- if .Values.nginx.redirects }}
+        # Redirects to specified path if map returns anything
+        if ($redirect_uri) {
+    	    return 301 $redirect_uri;
+        }
+        if ($redirect_uri_local) {
+    	    return 301 $redirect_uri_local;
+        }
+        {{- end }}          
                                         
         root /app/web;
         index index.html;
