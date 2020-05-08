@@ -1,0 +1,36 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "clusterDomain": { "type": "string" },
+    "projectName": { "type": "string" },
+    "environmentName": { "type": "string" },
+    "branchName": { "type": "string" },
+    "imagePullSecrets": { "type": "array" },
+    "app": { "type": "string" },
+    "exposeDomains": { "type": ["array","object"], "items": { "type": "object"}},
+    "domainPrefixes": { "type": "array", "items": { "type": "string"}},
+    "ssl": { "type": "object" },
+
+    "nginx": { "type": "object" },
+    "services": { "type": "object" },
+    "serviceDefaults": { "type": "object" },
+    "shell": { "type": "object" },
+    "mounts": { "type": "object" },
+    "elasticsearch": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "rabbitmq": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "silta-release": {
+      "type": "object"
+    }
+  }
+}
