@@ -1,0 +1,32 @@
+# This file includes the configuration used to validate the chart with a dry-run installation.
+
+exposeDomains:
+ - hostname: example.com
+ - hostname: www.example.com
+   ssl:
+     enabled: true
+     issuer: letsencrypt-staging
+
+domainPrefixes: ['en', 'fi']
+
+autoscaling:
+  enabled: true
+
+varnish:
+  enabled: true
+
+memcached:
+  enabled: true
+
+elasticsearch:
+  enabled: true
+
+mailhog:
+  enabled: true
+
+backup:
+  enabled: true
+
+mounts:
+  private-files:
+    enabled: true
