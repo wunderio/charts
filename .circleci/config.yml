@@ -36,8 +36,8 @@ jobs:
               helm dependency build $CHART
               helm lint $CHART
               helm unittest $CHART --helm3
-              if [ -f $CHART test.values.yaml ]; then
-                helm install --dry-run --generate-name --values $CHART/test.values.yaml $CHART
+              if [ -f "$CHART/test.values.yaml" ]; then
+                helm install --dry-run --generate-name --values "$CHART/test.values.yaml" $CHART
               fi
               helm package $CHART --destination /tmp/charts
             done
