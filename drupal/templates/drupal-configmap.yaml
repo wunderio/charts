@@ -62,6 +62,11 @@ data:
 
     [igbinary]
     igbinary.compact_strings=1
+
+    [instana]
+    ; Disable Twig instrumentation, it causes issues when used with Drupal.
+    ; See https://docs.instana.io/ecosystem/php/#tracing
+    instana.disabled_instrumentation=2097152
     
     ; Custom configuration below
     {{ .Values.php.php_ini.extraConfig | nindent 4 }}
