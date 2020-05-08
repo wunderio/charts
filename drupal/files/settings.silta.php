@@ -74,4 +74,6 @@ if (getenv('VARNISH_ADMIN_HOST')) {
 /**
  * Use our own services override.
  */
-$settings['container_yamls'][] = 'sites/default/silta.services.yml';
+if (PHP_SAPI !== 'cli') {
+  $settings['container_yamls'][] = 'sites/default/silta.services.yml';
+}
