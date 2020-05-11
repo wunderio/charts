@@ -2,18 +2,18 @@ apiVersion: v2
 appVersion: "1.0"
 description: Setup a silta kubernetes cluster.
 name: silta-cluster
-version: 0.2.4
+version: 0.2.5
 dependencies:
 - name: traefik
   version: 1.86.x
   repository: https://kubernetes-charts.storage.googleapis.com/
 - name: redis
   version: 10.4.x
-  repository: https://kubernetes-charts.storage.googleapis.com/
+  repository: https://charts.bitnami.com/bitnami
   condition: deploymentRemover.enabled
 - name: minio
-  version: 2.5.14
-  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 3.3.x
+  repository: https://charts.bitnami.com/bitnami
   condition: minio.enabled
 - name: csi-rclone
   version: 0.1.x

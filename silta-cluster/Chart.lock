@@ -3,11 +3,11 @@ dependencies:
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 1.86.2
 - name: redis
-  repository: https://kubernetes-charts.storage.googleapis.com/
+  repository: https://charts.bitnami.com/bitnami
   version: 10.4.4
 - name: minio
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 2.5.14
+  repository: https://charts.bitnami.com/bitnami
+  version: 3.3.10
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 0.1.10
@@ -20,5 +20,5 @@ dependencies:
 - name: instana-agent
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 1.0.28
-digest: sha256:eb212c6dcccdb4d54d49d5ec7b9ff41aeeeebcd3fdab30b10425f2839c1925a1
-generated: "2020-05-06T10:33:31.848873+02:00"
+digest: sha256:0cfff60ba3b2d25c743338f7be87b94a77c166fd6de2295300c010afd59edc7c
+generated: "2020-05-11T11:24:13.372165794Z"
