@@ -79,13 +79,16 @@ splash:
 
 # SSH Jumphost settings
 gitAuth:
-  host: 'github.com'
-  organisation: ''
-  apiToken: ''
+  enabled: true
+  keyserver:
+    url: ''
+    username: ''
+    password: ''
+  scope: ''
+  outsideCollaborators: true
   allowedIps: []
   # Kubernetes resource allocation.
   resources: {}
-
   # The static IP to be used for the exposed endpoint.
   loadBalancerIP: null
 
