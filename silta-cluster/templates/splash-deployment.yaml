@@ -25,6 +25,7 @@ spec:
       labels:
         name: {{ .Release.Name }}-splash
     spec:
+      enableServiceLinks: false
       containers:
       - image: "wunderio/silta-splash"
         name: nginx

@@ -29,6 +29,7 @@ spec:
       labels:
         name: {{ .Release.Name }}-jumpserver
     spec:
+      enableServiceLinks: false
       containers:
       - name: {{ .Release.Name }}-jumpserver
         image: wunderio/sshd-gitauth:v0.1

@@ -23,6 +23,7 @@ spec:
       labels:
         name: {{ .Release.Name }}-deployment-remover
     spec:
+      enableServiceLinks: false
       initContainers:
       - name: wait-redis
         image: busybox
