@@ -1,0 +1,77 @@
+{{- if .Values.sshKeyServer.enabled }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ssh-key-server
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    {{- if .Values.sshKeyServer.ssl.enabled }}
+    traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
+    ingress.kubernetes.io/ssl-redirect: "true"
+    {{- else }}
+    traefik.ingress.kubernetes.io/frontend-entry-points: "http"
+    ingress.kubernetes.io/ssl-redirect: "false"
+    {{- end }}
+spec:
+  {{- if .Values.sshKeyServer.ssl.enabled }}
+  tls:
+  - secretName: {{ .Release.Name }}-tls-ssh-key-server
+  {{- end }}
+  rules:
+  - host: keys.{{ .Values.clusterDomain }}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: {{ .Release.Name }}-ssh-key-server
+          servicePort: 80
+---
+{{- if .Values.sshKeyServer.ssl.enabled }}
+{{- if has .Values.sshKeyServer.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-crt-ssh-key-server
+spec:
+  secretName: {{ .Release.Name }}-tls-ssh-key-server
+  dnsNames:
+  - keys.{{ .Values.clusterDomain }}
+  issuerRef:
+    name: {{ .Values.sshKeyServer.ssl.issuer }}
+    kind: ClusterIssuer
+  acme:
+    config:
+      - http01:
+          ingress: {{ .Release.Name }}-ssh-key-server
+        domains:
+          - keys.{{ .Values.clusterDomain }}
+---
+{{- else if eq .Values.sshKeyServer.ssl.issuer "selfsigned" }}
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-crt-ssh-key-server
+spec:
+  secretName: {{ .Release.Name }}-tls-ssh-key-server
+  duration: 2160h
+  renewBefore: 150h 
+  commonName: keys.{{ .Values.clusterDomain }}
+  dnsNames:
+  - keys.{{ .Values.clusterDomain }}
+  issuerRef:
+    name: {{ .Values.sshKeyServer.ssl.issuer }}
+    kind: ClusterIssuer
+---
+{{- else if eq .Values.sshKeyServer.ssl.issuer "custom" }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-tls-ssh-key-server
+type: kubernetes.io/tls
+data:
+  tls.crt: {{ .Values.sshKeyServer.ssl.crt | b64enc }}
+  tls.key: {{ .Values.sshKeyServer.ssl.key | b64enc }}
+---
+{{- end }}
+{{- end }}
+{{- end }}

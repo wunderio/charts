@@ -1,0 +1,42 @@
+{{- if .Values.sshKeyServer.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-ssh-key-server
+spec:
+  type: NodePort
+  externalTrafficPolicy: Local
+  ports:
+    - port: 80
+  selector:
+    name: {{ .Release.Name }}-ssh-key-server
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-ssh-key-server
+spec:
+  replicas: {{ .Values.sshKeyServer.replicas }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Release.Name }}-ssh-key-server
+    spec:
+      enableServiceLinks: false
+      containers:
+      - name: {{ .Release.Name }}-ssh-key-server
+        image: wunderio/silta-ssh-keys:v0.1
+        ports:
+          - containerPort: 80
+        imagePullPolicy: Always
+        env:
+          - name: GITAUTH_API_TOKEN
+            value: {{ required "A valid .Values.sshKeyServer.gitauthApiToken entry required!" .Values.sshKeyServer.gitauthApiToken | quote }}
+          - name: KEYS_SERVER_API_USERNAME
+            value: {{ required "A valid .Values.sshKeyServer.computeZone entry required!" .Values.sshKeyServer.apiUsername | quote }}
+          - name: KEYS_SERVER_API_PASSWORD
+            value: {{ required "A valid .Values.sshKeyServer.clusterName entry required!" .Values.sshKeyServer.apiPassword | quote }}
+        resources:
+          {{- .Values.sshKeyServer.resources | toYaml | nindent 10 }}
+{{- end }}
