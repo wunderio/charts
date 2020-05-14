@@ -43,7 +43,7 @@ spec:
         - name: ssh-keys
           mountPath: /etc/ssh/keys
         resources:
-          {{- .Values.php.resources | toYaml | nindent 10 }}
+          {{- merge .Values.shell.resources .Values.php.resources | toYaml | nindent 10 }}
       nodeSelector:
         {{ if .Values.shell.nodeSelector }}
         {{- .Values.shell.nodeSelector | toYaml | nindent 8 }}
