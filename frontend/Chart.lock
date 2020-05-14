@@ -3,10 +3,10 @@ dependencies:
   repository: https://helm.elastic.co
   version: 7.4.1
 - name: rabbitmq
-  repository: https://kubernetes-charts.storage.googleapis.com
+  repository: https://charts.bitnami.com/bitnami
   version: 6.17.5
 - name: silta-release
   repository: file://../silta-release
   version: 0.1.1
-digest: sha256:af56513c0a081e79457b8aa77d1cccc225b407b713479bb7ab98013caf538178
-generated: "2020-04-07T13:50:07.997276+02:00"
+digest: sha256:dd58db136bbeb96a9bf3e4f657fbae4280fffed7c618f7d8220a47f1d6e313d3
+generated: "2020-05-06T13:31:48.717227326Z"
