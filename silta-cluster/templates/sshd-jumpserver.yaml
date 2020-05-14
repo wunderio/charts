@@ -1,3 +1,4 @@
+{{- if .Values.gitAuth.enabled }}
 ---
 apiVersion: v1
 kind: Service
@@ -29,19 +30,24 @@ spec:
       labels:
         name: {{ .Release.Name }}-jumpserver
     spec:
+      enableServiceLinks: false
       containers:
       - name: {{ .Release.Name }}-jumpserver
-        image: wunderio/sshd-gitauth:v0.1
+        image: wunderio/sshd-gitauth:v0.2
         imagePullPolicy: Always
         ports:
           - containerPort: 22
         env:
-          - name: GITAUTH_API_TOKEN
-            value: {{ required "A valid .Values.gitAuth.apiToken entry required!" .Values.gitAuth.apiToken | quote }}
-          - name: GITAUTH_HOST
-            value: {{ required "A valid .Values.gitAuth.host entry required!" .Values.gitAuth.host | quote }}
-          - name: GITAUTH_ORGANISATION
-            value: {{ required "A valid .Values.gitAuth.organisation entry required!" .Values.gitAuth.organisation | quote }}
+          - name: GITAUTH_URL
+            value: {{ .Values.gitAuth.keyserver.url | default (printf "https://keys.%s/api/1/git-ssh-keys" .Values.clusterDomain) | quote }}
+          - name: GITAUTH_USERNAME
+            value: {{ .Values.gitAuth.keyserver.username | default .Values.sshKeyServer.apiUsername | quote }}
+          - name: GITAUTH_PASSWORD
+            value: {{ .Values.gitAuth.keyserver.password | default .Values.sshKeyServer.apiPassword | quote }}
+          - name: GITAUTH_SCOPE
+            value: {{ required "A valid .Values.gitAuth.scope entry required!" .Values.gitAuth.scope | quote }}
+          - name: OUTSIDE_COLLABORATORS
+            value: {{ .Values.gitAuth.outsideCollaborators | default true | quote }}
         volumeMounts:
         - name: shell-keys
           mountPath: /etc/ssh/keys
@@ -66,3 +72,5 @@ spec:
   resources:
     requests:
       storage: 50M
+
+{{- end }}

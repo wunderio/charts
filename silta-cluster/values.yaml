@@ -79,15 +79,36 @@ splash:
 
 # SSH Jumphost settings
 gitAuth:
-  host: 'github.com'
-  organisation: ''
-  apiToken: ''
+  enabled: true
+  keyserver:
+    url: ''
+    username: ''
+    password: ''
+  scope: ''
+  outsideCollaborators: true
   allowedIps: []
   # Kubernetes resource allocation.
   resources: {}
-
   # The static IP to be used for the exposed endpoint.
   loadBalancerIP: null
+
+# SSH keyserver (keys.[clusterDomain])
+sshKeyServer:
+  enabled: true
+  gitauthApiToken: ''
+  apiUsername: ''
+  apiPassword: ''
+  replicas: 1
+  resources: {}
+  ssl:
+    enabled: true
+    email: admin@example.com
+    # Available issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
+    issuer: letsencrypt
+    # Used when certificate type is custom
+    # ca: ""
+    # key: ""
+    # crt: ""
 
 # Deployment remover
 deploymentRemover:
