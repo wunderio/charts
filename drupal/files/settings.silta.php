@@ -73,6 +73,10 @@ if (getenv('VARNISH_ADMIN_HOST')) {
 
 /**
  * Use our own services override.
+ *
+ * We don't include this when running on cli, for example when using drush,
+ * because the output from monolog to stdout interferes with drush batch
+ * processing, causing the process to die when drush tries to start a new batch.
  */
 if (PHP_SAPI !== 'cli') {
   $settings['container_yamls'][] = 'sites/default/silta.services.yml';
