@@ -145,12 +145,6 @@ imagePullSecrets:
       key: hashsalt
 - name: DRUPAL_CONFIG_PATH
   value: {{ .Values.php.drupalConfigPath }}
-{{- if ne .Values.php.newrelic.license "" }}
-- name: NEWRELIC_ENABLED
-  value: "true"
-- name: NEWRELIC_LICENSE
-  value: "{{ .Values.php.newrelic.license }}"
-{{- end }}
 {{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
