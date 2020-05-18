@@ -301,7 +301,8 @@ if [ -f /app/reference-data/db.sql.gz ]; then
   drush sql-drop -y
 
   echo "Importing reference database dump"
-  cat /app/reference-data/db.sql.gz | gunzip | drush sql-cli
+  gunzip -c /app/reference-data/db.sql.gz > /tmp/reference-data-db.sql
+  pv /tmp/reference-data-db.sql | drush sql-cli
 
   # Clear caches before doing anything else.
   drush cr
