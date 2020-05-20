@@ -118,6 +118,10 @@ services: {}
   #   # A single pod (the default value) is good for development environments to minimise resource usage.
   #   # Multiple pods make sense for high availability.
   #   replicas: 1
+  
+  #   # Use storage mountpoints (defined in the mounts section) for this service.
+  #   mounts:
+  #     - files
 
   #   # Enable autoscaling using HorizontalPodAutoscaler
   #   # see: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
