@@ -119,7 +119,7 @@ services: {}
   #   # Multiple pods make sense for high availability.
   #   replicas: 1
   
-  #   Use storage mountpoints (defined in the mounts section) for this service.
+  #   # Use storage mountpoints (defined in the mounts section) for this service.
   #   mounts:
   #     - files
 
