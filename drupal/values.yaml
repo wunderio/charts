@@ -426,10 +426,13 @@ memcached:
   replicaCount: 1
   pdbMinAvailable: 0
   memcached:
-    maxItemMemory: 128
+    # This should be less than the memory limit, or memcached will crash.
+    maxItemMemory: 118
   resources:
     requests:
       cpu: 10m
+      memory: 128Mi
+    limits:
       memory: 128Mi
 
 # Mailhog service overrides
