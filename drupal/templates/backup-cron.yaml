@@ -12,6 +12,7 @@ spec:
   startingDeadlineSeconds: 3600
   failedJobsHistoryLimit: 1
   successfulJobsHistoryLimit: 1
+  suspend: false
   jobTemplate:
     spec:
       template:
