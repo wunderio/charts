@@ -9,7 +9,7 @@ metadata:
 spec:
   secretName: {{ .Release.Name }}-tls
   dnsNames:
-  - {{ template "drupal.domain" . }}
+  - {{ include "drupal.domain" . | quote }}
   issuerRef:
     name: {{ .Values.ssl.issuer }}
     kind: ClusterIssuer
@@ -30,7 +30,7 @@ metadata:
 spec:
   secretName: {{ $.Release.Name }}-tls-p{{ $index }}
   dnsNames:
-  - {{$prefix}}.{{ template "drupal.domain" $ }}
+  - '{{$prefix}}.{{ include "drupal.domain" $ }}'
   issuerRef:
     name: {{ $.Values.ssl.issuer }}
     kind: ClusterIssuer
@@ -39,7 +39,7 @@ spec:
       - http01:
           ingress: {{ $.Release.Name }}-drupal
         domains:
-          - {{$prefix}}.{{ template "drupal.domain" $ }}
+          - '{{$prefix}}.{{ include "drupal.domain" $ }}'
 ---
 {{- end }}
 
