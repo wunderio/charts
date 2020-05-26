@@ -41,7 +41,7 @@ Importing a database dump:
 
 Downloading a file from server:
 
-  rsync -chavzP -e "ssh -A -J {{ include "drupal.jumphost" . }}" {{ include "drupal.shellHost" . }}:/app/filename filename
+  rsync -chavzP -e "ssh -A -J {{ include "drupal.jumphost" . }}" {{ include "drupal.shellHost" . }}:/app/remote-filename ./
 
 {{ range $index, $mount := .Values.mounts -}}
 {{ if eq $mount.enabled true -}}
