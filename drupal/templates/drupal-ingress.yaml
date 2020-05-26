@@ -26,7 +26,7 @@ spec:
   {{- end }}
   {{- end }}
   rules:
-  - host: {{ template "drupal.domain" . }}
+  - host: {{ include "drupal.domain" . | quote }}
     http:
       paths:
       - path: /
@@ -34,7 +34,7 @@ spec:
           serviceName: {{ include "drupal.servicename" . }}
           servicePort: 80
 {{- range $index, $prefix := .Values.domainPrefixes }}
-  - host: {{$prefix}}.{{ template "drupal.domain" $ }}
+  - host: '{{$prefix}}.{{ template "drupal.domain" $ }}'
     http:
       paths:
       - path: /
