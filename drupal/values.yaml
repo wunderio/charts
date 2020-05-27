@@ -221,8 +221,13 @@ shell:
   # Values for the SSH gitAuth.
   gitAuth:
     # Project's git repository URL
-    repositoryUrl: 'you need to pass in a value for repositoryUrl to your helm chart'
-    apiToken: 'you need to pass in a value for shell.gitAuth.apiToken to your helm chart'
+    repositoryUrl: 'you need to pass in a value for shell.gitAuth.repositoryUrl to your helm chart'
+    outsideCollaborators: true
+    keyserver:
+      # Defaults to https://keys.[clusterDomain]/api/1/git-ssh-keys
+      url: ''
+      username: ''
+      password: ''
 
   # Specifications for the volume where host keys are mounted.
   mount:
