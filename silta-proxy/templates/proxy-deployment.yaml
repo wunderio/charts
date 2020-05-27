@@ -30,6 +30,8 @@ spec:
           - name: tinyproxy
             mountPath: /etc/tinyproxy
             readOnly: true
+        resources:
+          {{- .Values.resources | toYaml | nindent 10 }}
       volumes:
       - name: tinyproxy
         configMap:
