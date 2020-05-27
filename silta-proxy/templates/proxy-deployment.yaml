@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-proxy
+spec:
+  type: NodePort
+  ports:
+    - port: {{ .Values.service.port }}
+  selector:
+    name: {{ .Release.Name }}-proxy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-proxy
+spec:
+  selector:
+    matchLabels:
+      name: {{ .Release.Name }}-proxy
+  template:
+    metadata:
+      labels:
+        name: {{ .Release.Name }}-proxy
+    spec:
+      enableServiceLinks: false
+      containers:
+      - image: "wunderio/silta-proxy"
+        name: proxy
+        volumeMounts:
+          - name: tinyproxy
+            mountPath: /etc/tinyproxy
+            readOnly: true
+      volumes:
+      - name: tinyproxy
+        configMap:
+          name: {{ .Release.Name }}-tinyproxy
