@@ -1,14 +1,7 @@
 # Default values for silta-proxy.
 
-image:
-  repository: nginx
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart version.
-  tag: ""
-
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+image: wunderio/silta-proxy
+tag: "latest"
 
 service:
   port: 80

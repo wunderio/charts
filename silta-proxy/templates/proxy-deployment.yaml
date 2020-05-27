@@ -24,7 +24,7 @@ spec:
     spec:
       enableServiceLinks: false
       containers:
-      - image: "wunderio/silta-proxy"
+      - image: "{{ .Values.image }}:{{ .Values.tag }}"
         name: proxy
         volumeMounts:
           - name: tinyproxy
