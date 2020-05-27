@@ -18,6 +18,10 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-nodeSelector: {}
+nodeSelector:
+  cloud.google.com/gke-nodepool: static-ip
 
-tolerations: []
+tolerations:
+  - key: cloud.google.com/gke-nodepool
+    operator: Equal
+    value: static-ip
