@@ -27,13 +27,22 @@ spec:
         image: {{ .Values.shell.image | quote }}
         env:
         {{- include "drupal.env" . | indent 8 }}
-        - name: GITAUTH_API_TOKEN
+        - name: GITAUTH_URL
+          value: {{ .Values.shell.gitAuth.keyserver.url | default (printf "https://keys.%s/api/1/git-ssh-keys" .Values.clusterDomain) | quote }}
+        - name: GITAUTH_USERNAME
           valueFrom:
             secretKeyRef:
               name: {{ .Release.Name }}-secrets-shell
-              key: gitAuth.apiToken
-        - name: GITAUTH_REPOSITORY_URL
-          value: "{{ .Values.shell.gitAuth.repositoryUrl }}"
+              key: keyserver.username
+        - name: GITAUTH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-secrets-shell
+              key: keyserver.password
+        - name: GITAUTH_SCOPE
+          value: {{ .Values.shell.gitAuth.repositoryUrl }}
+        - name: OUTSIDE_COLLABORATORS
+          value: {{ .Values.shell.gitAuth.outsideCollaborators | default true | quote }}
         - name: DRUSH_OPTIONS_URI
           value: "http://{{- template "drupal.domain" . }}"
         ports:

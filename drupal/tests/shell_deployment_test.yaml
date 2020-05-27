@@ -39,6 +39,6 @@ tests:
       - contains:
           path: spec.template.spec.containers[0].env
           content:
-            name: GITAUTH_REPOSITORY_URL
+            name: GITAUTH_SCOPE
             value: foo
 
