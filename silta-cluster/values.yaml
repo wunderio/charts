@@ -149,5 +149,8 @@ cert-manager:
 silta-downscaler:
   enabled: false
 
+silta-proxy:
+  enabled: false
+
 instana-agent:
   enabled: false
