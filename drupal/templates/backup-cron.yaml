@@ -39,7 +39,7 @@ spec:
                 IGNORED_TABLES=""
                 for TABLE in `drush sql-query "show tables;" | grep -E '{{ .Values.backup.ignoreTableContent }}'` ;
                 do
-                  IGNORE_TABLES="$IGNORE_TABLES --ignore-table='$DB_NAME.$TABLE'";
+                  IGNORE_TABLES="$IGNORE_TABLES --ignore-table=$DB_NAME.$TABLE";
                   IGNORED_TABLES="$IGNORED_TABLES $TABLE";
                 done
 
