@@ -16,7 +16,7 @@ tests:
           }
     asserts:
     - matchRegex:
-        path: data.drupal_conf
+        path: data.simple_conf
         pattern: "location = /randomlocation"
 
   - it: injects the nginx configuration
@@ -37,5 +37,5 @@ tests:
         pattern: 'set_real_ip_from *1.2.3.4'
     - template: configmap.yaml
       matchRegex:
-        path: data.drupal_conf
+        path: data.simple_conf
         pattern: 'auth_basic "Restricted";'
