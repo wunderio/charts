@@ -34,7 +34,7 @@ You can see the available options and default values in values.yaml.
 To override these options for your project, specify a file when creating/upgrading your helm releases:
 
 ```bash
-$ helm upgrade --install drupal
+$ helm upgrade --install simple
   --repo https://storage.googleapis.com/charts.wdr.io \
   --values silta.yml
     
