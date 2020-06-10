@@ -71,10 +71,22 @@ spec:
           value: {{ $.Release.Name }}-rabbitmq
         {{- end }}
         {{ if $.Values.shell.enabled -}}
-        - name: GITAUTH_API_TOKEN
-          value: "{{ $.Values.shell.gitAuth.apiToken }}"
-        - name: GITAUTH_REPOSITORY_URL
-          value: "{{ $.Values.shell.gitAuth.repositoryUrl }}"
+        - name: GITAUTH_URL
+          value: {{ $.Values.shell.gitAuth.keyserver.url | default (printf "https://keys.%s/api/1/git-ssh-keys" $.Values.clusterDomain) | quote }}
+        - name: GITAUTH_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ $.Release.Name }}-secrets-shell
+              key: keyserver.username
+        - name: GITAUTH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ $.Release.Name }}-secrets-shell
+              key: keyserver.password
+        - name: GITAUTH_SCOPE
+          value: {{ $.Values.shell.gitAuth.repositoryUrl }}
+        - name: OUTSIDE_COLLABORATORS
+          value: {{ $.Values.shell.gitAuth.outsideCollaborators | default true | quote }} 
         {{- end }}
         resources:
           {{ if $service.resources -}}

@@ -166,7 +166,14 @@ shell:
   enabled: false
   gitAuth:
     apiToken: ''
-    repositoryURL: ''
+    # Project's git repository URL
+    repositoryUrl: ''
+    outsideCollaborators: true
+    keyserver:
+      # Defaults to https://keys.[clusterDomain]/api/1/git-ssh-keys
+      url: ''
+      username: ''
+      password: ''
   mount:
     storageClassName: silta-shared
     csiDriverName: csi-rclone

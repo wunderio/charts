@@ -12,7 +12,7 @@ tests:
       - notContains:
           path: spec.template.spec.containers[0].env
           content:
-            name: GITAUTH_API_TOKEN
+            name: GITAUTH_URL
             value: foo
 
   - it: can enable shell
@@ -23,18 +23,19 @@ tests:
       shell:
         enabled: true
         gitAuth:
-          apiToken: foo
           repositoryUrl: bar
+          keyserver:
+            url: foo
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
           content:
-            name: GITAUTH_API_TOKEN
+            name: GITAUTH_URL
             value: foo
       - contains:
           path: spec.template.spec.containers[0].env
           content:
-            name: GITAUTH_REPOSITORY_URL
+            name: GITAUTH_SCOPE
             value: bar
       - contains:
           path: spec.template.spec.containers[0].volumeMounts
