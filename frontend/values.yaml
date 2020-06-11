@@ -159,6 +159,7 @@ mounts: {}
 #    mountPath: /app/files
 #    storageClassName: silta-shared
 #    csiDriverName: csi-rclone
+#    accessModes: ReadWriteMany
 
 # Provide SSH access based on GitHub public keys and repository access. 
 # Note: Shell only works when the base image wunderio/silta-node is used!
@@ -177,6 +178,7 @@ shell:
   mount:
     storageClassName: silta-shared
     csiDriverName: csi-rclone
+    accessModes: ReadWriteMany
 
 # Provide defaults for all services.
 # Note that only keys used here can be overridden.
