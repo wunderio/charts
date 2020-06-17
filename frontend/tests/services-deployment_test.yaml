@@ -249,3 +249,27 @@ tests:
             resource:
               name: cpu
               targetAverageUtilization: 100
+
+  - it: uses RollingUpdate as default service deployment strategy
+    set:
+      services:
+        foo:
+          exposedRoute: '/bar'
+          image: 'bar'
+    asserts:
+      - equal:
+          path: spec.strategy.type
+          value: RollingUpdate
+
+  - it: allows service deployment strategy override
+    set:
+      services:
+        foo:
+          image: 'bar'
+          exposedRoute: '/bar'
+          strategy:
+            foo: BAR
+    asserts:
+      - equal:
+          path: spec.strategy.foo
+          value: BAR

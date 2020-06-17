@@ -7,6 +7,8 @@ metadata:
     {{ include "frontend.release_labels" $ | indent 4 }}
 spec:
   replicas: {{ default 1 $service.replicas }}
+  strategy:
+    {{ default $.Values.serviceDefaults.strategy $service.strategy | toYaml }}
   selector:
     matchLabels:
       {{ include "frontend.release_labels" $ | indent 6 }}

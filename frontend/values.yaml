@@ -190,6 +190,9 @@ serviceDefaults:
       memory: 64Mi
     limits:
       memory: 256Mi
+  # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
+  strategy:
+    type: RollingUpdate
   autoscaling:
     enabled: false
     minReplicas: 1
