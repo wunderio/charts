@@ -606,3 +606,10 @@ data:
   extraConfig: |
   {{ .Values.nginx.extraConfig | nindent 4 }}
 {{- end }}
+
+{{ $proxy := ( index .Values "silta-release" ).proxy }}
+{{ if $proxy.enabled }}
+  ssh_config: |
+    Host *
+    ProxyCommand=nc -X connect -x {{ $proxy.url }}:{{ $proxy.port }} %h %p
+{{- end }}

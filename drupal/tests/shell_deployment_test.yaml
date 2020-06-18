@@ -1,6 +1,7 @@
 suite: shell deployment
 templates:
   - shell-deployment.yaml
+  - drupal-configmap.yaml
 tests:
   - it: is a deployment with default values
     set:
