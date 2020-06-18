@@ -66,3 +66,36 @@ storageClass that supports the `ReadWriteMany` access mode.
 - The Cloud Native Edge Router, [Traefik](https://traefik.io/), is running on the cluster with a wildcard DNS
 entry pointing to its load balancer. This makes it possible to have a dedicated
 domain added to each ingress with a simple annotation.
+
+## Available environment variables
+
+PHP, Cron and Shell containers have following environment variables:
+  - Variables defined in silta.yml `php.env`
+  - SILTA_CLUSTER: Value always set to "1". Use this conditional statements.
+  - PROJECT_NAME: Project name. Defaults to github repository name (i.e. "charts").
+  - ENVIRONMENT_NAME: Environment name. Provided by build process. Equal to branch name (including slashes, i.e. `feature/slt-318`).
+  - ERROR_LEVEL:  Set whether Drupal errors are displayed. 
+  - HASH_SALT: Drupal settings hash salt
+  - DRUPAL_CONFIG_PATH: Drupal config directory location
+  - *_PATH: File mount locations from silta.yml `mount` section, i.e. "PUBLIC_FILES_PATH=/app/web/sites/default/files".  
+  - Shell container only: 
+    - DRUSH_OPTIONS_URI: Pre-generatred domain name of current deployment for manually run drush commands.
+  - When MariaDB is enabled:
+    - DB_HOST: Database server host. 
+    - DB_USER: Database username. Uses silta.yml `mariadb.db.user`, default value provided by build process.
+    - DB_PASS: Database password. Uses silta.yml `mariadb.db.password` default value provided by build process
+    - DB_NAME: Database name. Set to "drupal" by default.
+  - When Memcached is enabled:
+    - MEMCACHED_HOST: Memcached server host.
+  - When Elasticsearch is enabled:
+    - ELASTICSEARCH_HOST: Elasticsearch server host.
+  - When SMTP is enabled:
+    - SMTP_ADDRESS, SSMTP_MAILHUB: SMTP server address. 
+    - SMTP_TLS, SSMTP_USETLS: true if TLS is enabled 
+    - SMTP_STARTTLS, SSMTP_USESTARTTLS: true if STARTTLS is enabled 
+    - SMTP_USERNAME, SSMTP_AUTHUSER: SMTP credentials
+    - SMTP_PASSWORD, SSMTP_AUTHPASS: SMTP credentials
+  - When Varnish is enabled:
+    - VARNISH_ADMIN_HOST: Varnish server host.
+    - VARNISH_ADMIN_PORT: Varnish server port. Used for cache invalidation using admin port. 
+    - VARNISH_CONTROL_KEY: Used for cache invalidation using admin port. 
