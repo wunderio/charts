@@ -1,0 +1,20 @@
+# Default values for silta-proxy.
+
+image: wunderio/silta-proxy
+tag: "latest"
+
+service:
+  port: 80
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 10Mi
+
+nodeSelector:
+  cloud.google.com/gke-nodepool: static-ip
+
+tolerations:
+  - key: cloud.google.com/gke-nodepool
+    operator: Equal
+    value: static-ip

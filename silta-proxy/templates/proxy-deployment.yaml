@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-proxy
+spec:
+  type: NodePort
+  ports:
+    - port: {{ .Values.service.port }}
+  selector:
+    name: {{ .Release.Name }}-proxy
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-proxy
+spec:
+  selector:
+    matchLabels:
+      name: {{ .Release.Name }}-proxy
+  template:
+    metadata:
+      labels:
+        name: {{ .Release.Name }}-proxy
+    spec:
+      enableServiceLinks: false
+      containers:
+      - image: "{{ .Values.image }}:{{ .Values.tag }}"
+        name: proxy
+        volumeMounts:
+          - name: tinyproxy
+            mountPath: /etc/tinyproxy
+            readOnly: true
+        resources:
+          {{- .Values.resources | toYaml | nindent 10 }}
+      volumes:
+      - name: tinyproxy
+        configMap:
+          name: {{ .Release.Name }}-tinyproxy
+      nodeSelector:
+        {{- .Values.nodeSelector | toYaml | nindent 8 }}
+      tolerations:
+        {{- .Values.tolerations | toYaml | nindent 8 }}
