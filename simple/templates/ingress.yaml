@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-drupal
@@ -28,7 +28,7 @@ spec:
           servicePort: 80
 ---
 {{- range $index, $domain := .Values.exposeDomains }}
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: {{ $.Release.Name }}-drupal-{{ $index }}
