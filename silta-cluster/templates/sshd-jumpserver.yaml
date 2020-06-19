@@ -25,6 +25,9 @@ metadata:
   name: {{ .Release.Name }}-jumpserver
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      name: {{ .Release.Name }}-jumpserver
   template:
     metadata:
       labels:

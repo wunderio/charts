@@ -18,6 +18,9 @@ metadata:
   name: {{ .Release.Name }}-ssh-key-server
 spec:
   replicas: {{ .Values.sshKeyServer.replicas }}
+  selector:
+    matchLabels:
+      name: {{ .Release.Name }}-ssh-key-server
   template:
     metadata:
       labels:
