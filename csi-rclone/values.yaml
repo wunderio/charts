@@ -17,14 +17,14 @@ priorityClassName: ""
 params:
 
   remote: "s3"
-  remotePath: "bucketname"
+  #remotePath: "bucketname"
   #remotePathSuffix: "/subpath"
 
-  s3-provider: "Minio"
-  s3-endpoint: "http://minio-release.default:9000"
+  #s3-provider: "Minio"
+  #s3-endpoint: "http://minio-release.default:9000"
   # Default credentials of minio chart https://github.com/helm/charts/tree/master/stable/minio
-  s3-access-key-id: "AKIAIOSFODNN7EXAMPLE"
-  s3-secret-access-key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  #s3-access-key-id: "AKIAIOSFODNN7EXAMPLE"
+  #s3-secret-access-key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
 
 nodePlugin:
   registrar:
