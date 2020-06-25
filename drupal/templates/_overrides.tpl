@@ -17,3 +17,11 @@ we make it compatible by overriding the following templates.
 {{- define "elasticsearch.endpoints" -}}
 {{ .Release.Name }}-es-0
 {{- end -}}
+
+{{/*
+The mariadb chart switched to an incompatible naming scheme,
+we make it compatible by overriding the following templates.
+*/}}
+{{- define "mariadb.fullname" -}}
+{{ .Release.Name }}-mariadb
+{{- end }}
