@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ .Release.Name }}-drupal
+  name: {{ .Release.Name }}-simple
   annotations:
     kubernetes.io/ingress.class: traefik
     {{- if .Values.ssl.enabled }}
@@ -12,26 +12,26 @@ metadata:
     ingress.kubernetes.io/ssl-redirect: "false"
     {{- end }}
   labels:
-    {{ include "drupal.release_labels" . | indent 4 }}
+    {{ include "simple.release_labels" . | indent 4 }}
 spec:
   {{- if .Values.ssl.enabled }}
   tls:
   - secretName: {{ .Release.Name }}-tls
   {{- end }}
   rules:
-  - host: {{ template "drupal.domain" . }}
+  - host: {{ template "simple.domain" . }}
     http:
       paths:
       - path: /
         backend:
-          serviceName: {{ .Release.Name }}-drupal
+          serviceName: {{ .Release.Name }}-simple
           servicePort: 80
 ---
 {{- range $index, $domain := .Values.exposeDomains }}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $.Release.Name }}-drupal-{{ $index }}
+  name: {{ $.Release.Name }}-simple-{{ $index }}
   annotations:
     kubernetes.io/ingress.class: traefik
     {{- if $domain.ssl }}
@@ -44,7 +44,7 @@ metadata:
     ingress.kubernetes.io/ssl-redirect: "false"
     {{- end }}
   labels:
-    {{ include "drupal.release_labels" $ | indent 4 }}
+    {{ include "simple.release_labels" $ | indent 4 }}
 spec:
   {{- if $domain.ssl }}
   {{- if $domain.ssl.enabled }}
@@ -58,7 +58,7 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: {{ $.Release.Name }}-drupal
+          serviceName: {{ $.Release.Name }}-simple
           servicePort: 80
 ---
 {{- end }}

@@ -1,6 +1,6 @@
 Deployed {{ .Release.Name }} successfully, your site is available here:
 
-  http://{{- template "drupal.domain" . }}
+  http://{{- template "simple.domain" . }}
 
 {{ if .Values.nginx.basicauth.enabled -}}
 Basicauth username: {{ .Values.nginx.basicauth.credentials.username }}

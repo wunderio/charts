@@ -32,11 +32,11 @@ tests:
           path: spec.rules[0].host
           value: 'foo.namespace.baz'
 
-  - it: directs traefik requests to drupal service by default
+  - it: directs traefik requests to simple service by default
     asserts:
       - equal:
           path: spec.rules[0].http.paths[0].backend.serviceName
-          value: 'RELEASE-NAME-drupal'
+          value: 'RELEASE-NAME-simple'
 
   - it: shortens long project names
     set:

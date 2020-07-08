@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-nginx-conf
   labels:
-    {{ include "drupal.release_labels" . | indent 4 }}
+    {{ include "simple.release_labels" . | indent 4 }}
 data:
   nginx_conf: |
     user                            nginx;                                                 
@@ -71,7 +71,7 @@ data:
         include conf.d/*.conf;                                                                                                                             
     }     
 
-  drupal_conf: |                          
+  simple_conf: |                          
     map $http_x_forwarded_proto $fastcgi_https {                                                        
         default $https;                                            
         http '';                          
@@ -79,7 +79,7 @@ data:
     }                                      
                                           
     server {                               
-        server_name drupal;                          
+        server_name simple;                          
         listen 80;          
                                         
         root /var/www/html/web;                                     
@@ -87,7 +87,7 @@ data:
                                                                               
         include fastcgi.conf;
 
-        {{ include "drupal.basicauth" . | indent 6}}
+        {{ include "simple.basicauth" . | indent 6}}
 
         # Custom configuration gets included here
         {{- .Values.nginx.serverExtraConfig | nindent 8 -}}

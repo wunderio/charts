@@ -1,9 +1,9 @@
-{{- define "drupal.release_labels" }}
+{{- define "simple.release_labels" }}
 app: {{ .Values.app | quote }}
 release: {{ .Release.Name }}
 {{- end }}
 
-{{- define "drupal.domain" -}}
+{{- define "simple.domain" -}}
 {{- $projectName := regexReplaceAll "[^[:alnum:]]" (.Values.projectName | default .Release.Namespace) "-"  | trimSuffix "-" | lower }}
 {{- $projectNameHash := sha256sum $projectName | trunc 3 }}
 {{- $projectName := (ge (len $projectName) 30) | ternary (print ($projectName | trunc 27) $projectNameHash ) $projectName}}
@@ -16,11 +16,11 @@ release: {{ .Release.Name }}
 {{ $environmentName }}.{{ $projectName }}.{{ .Values.clusterDomain }}
 {{- end -}} 
 
-{{- define "drupal.referenceEnvironment" -}}
+{{- define "simple.referenceEnvironment" -}}
 {{ regexReplaceAll "[^[:alnum:]]" .Values.referenceData.referenceEnvironment "-" | lower }}
 {{- end -}}
 
-{{- define "drupal.basicauth" }}
+{{- define "simple.basicauth" }}
   {{- if .Values.nginx.basicauth.enabled }}
   satisfy any;
   allow 127.0.0.1;

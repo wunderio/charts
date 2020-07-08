@@ -15,7 +15,7 @@ environmentName: ""
 # The app label added to our Kubernetes resources.
 app: simple
 
-# How many instances of the Drupal pod should be in our Kubernetes deployment.
+# How many instances of the resulting pod should be in our Kubernetes deployment.
 # A single pod (the default value) is good for development environments to minimise resource usage.
 # Multiple pods make sense for high availability.
 replicas: 1
