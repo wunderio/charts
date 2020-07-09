@@ -235,40 +235,70 @@ done
 -f /app/web/sites/default/files/_installing
 {{- end -}}
 
+
 {{- define "drupal.post-release-command" -}}
-set -e
+  set -e
 
-{{ if and .Release.IsInstall .Values.referenceData.enabled -}}
-{{ include "drupal.import-reference-files" . }}
+  {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
+    {{ include "drupal.import-reference-files" . }}
+  {{- end }}
+
+  {{ include "drupal.wait-for-db-command" . }}
+
+  {{ if .Release.IsInstall }}
+    touch /app/web/sites/default/files/_installing
+    {{- if .Values.referenceData.enabled }}
+      {{ include "drupal.import-reference-db" . }}
+    {{- end }}
+  {{- end }}
+
+  {{ if .Values.elasticsearch.enabled }}
+    {{ include "drupal.wait-for-elasticsearch-command" . }}
+  {{ end }}
+
+  {{ if .Release.IsInstall }}
+    {{ .Values.php.postinstall.command }}
+    rm /app/web/sites/default/files/_installing
+  {{ end }}
+  {{ .Values.php.postupgrade.command}}
+
+  # Wait for background imports to complete.
+  wait
+
+  {{- if and .Values.referenceData.enabled .Values.referenceData.updateAfterDeployment }}
+    {{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
+      {{ include "drupal.extract-reference-data" . }}
+    {{- end }}
+  {{- end }}
 {{- end }}
 
-{{ include "drupal.wait-for-db-command" . }}
+{{- define "drupal.restore-backup-command" -}}
+  set -e
 
-{{ if .Release.IsInstall }}
-touch /app/web/sites/default/files/_installing
-{{- if .Values.referenceData.enabled }}
-{{ include "drupal.import-reference-db" . }}
-{{- end }}
-{{- end }}
+  {{ include "drupal.wait-for-db-command" . }}
 
-{{ if .Values.elasticsearch.enabled }}
-{{ include "drupal.wait-for-elasticsearch-command" . }}
-{{ end }}
+  # Make backup of current deployment
+  {{ include "drupal.backup-command" . }}
+  
+  # Restore files from targeted backup
+  {{ include "drupal.import-backup-files" . }}
 
-{{ if .Release.IsInstall }}
-{{ .Values.php.postinstall.command}}
-rm /app/web/sites/default/files/_installing
-{{ end }}
-{{ .Values.php.postupgrade.command}}
+  touch /app/web/sites/default/files/_installing
 
-# Wait for background imports to complete.
-wait
+  # Restore db from targeted backup
+  {{ include "drupal.import-backup-db" . }}
 
-{{- if and .Values.referenceData.enabled .Values.referenceData.updateAfterDeployment }}
-{{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
-{{ include "drupal.extract-reference-data" . }}
-{{- end }}
-{{- end }}
+  {{ if .Values.elasticsearch.enabled }}
+    {{ include "drupal.wait-for-elasticsearch-command" . }}
+  {{ end }}
+
+  # Run postupgrade commands from normal deployment
+  {{ .Values.php.postupgrade.command }}
+
+  # Running custom commands after restored backup
+  {{ .Values.php.postRestoreCommand }}
+  rm /app/web/sites/default/files/_installing
+
 {{- end }}
 
 
@@ -329,6 +359,22 @@ else
 fi
 {{- end }}
 
+{{- define "drupal.import-backup-db" -}}
+if [ -f /backups/{{ $.Values.backup.restoreId }}/db.sql.gz ]; then
+  echo "Dropping old database"
+  drush sql-drop -y
+
+  echo "Importing backup database dump"
+  gunzip -c /backups/{{ $.Values.backup.restoreId }}/db.sql.gz > /tmp/backup-data-db.sql
+  pv /tmp/backup-data-db.sql | drush sql-cli
+
+  # Clear caches before doing anything else.
+  drush cr
+else
+  printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
+fi
+{{- end }}
+
 {{- define "drupal.import-reference-files" -}}
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
@@ -340,4 +386,62 @@ fi
   fi
   {{ end -}}
   {{- end }}
+{{- end }}
+
+{{- define "drupal.import-backup-files" -}}
+  {{ range $index, $mount := .Values.mounts -}}
+  {{- if eq $mount.enabled true }}
+  echo "Deleting old files"
+  rm -rf {{ $mount.mountPath }}/*
+  rm -rf {{ $mount.mountPath }}/.*
+  echo "Restoring {{ $index }} volume backup."
+  tar -xvzf /backups/{{ $.Values.backup.restoreId }}/{{ $index }}.tar.gz -C /
+  {{- end -}}
+  {{- end }}
+{{- end }}
+
+{{- define "drupal.backup-command" -}}
+set -e
+
+  # Generate the id of the backup.
+  BACKUP_ID=`date +%Y-%m-%d-%H-%M-%S`
+  BACKUP_LOCATION="/backups/$BACKUP_ID-{{ .Values.environmentName }}"
+
+  # Figure out which tables to skip.
+  IGNORE_TABLES=""
+  IGNORED_TABLES=""
+  for TABLE in `drush sql-query "show tables;" | grep -E '{{ .Values.backup.ignoreTableContent }}'` ;
+  do
+    IGNORE_TABLES="$IGNORE_TABLES --ignore-table='$DB_NAME.$TABLE'";
+    IGNORED_TABLES="$IGNORED_TABLES $TABLE";
+  done
+
+  # Take a database dump. We use the full path to bypass gdpr-dump
+  echo "Starting database backup."
+  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
+  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
+  echo "Database backup complete."
+
+  # Compress the database dump and copy it into the backup folder.
+  # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
+  echo "Compressing database backup."
+  gzip -9 /tmp/db.sql
+
+  # Create a folder for the backup
+  mkdir -p $BACKUP_LOCATION
+  cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
+
+  {{ range $index, $mount := .Values.mounts -}}
+  {{- if eq $mount.enabled true }}
+  # File backup for {{ $index }} volume.
+  echo "Starting {{ $index }} volume backup."
+  tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
+  {{- end -}}
+  {{- end }}
+
+  # Delete old backups
+  find /backups/ -mtime +{{ .Values.backup.retention }} -exec rm -r {} \;
+
+  # List content of backup folder
+  ls -lh /backups/*
 {{- end }}

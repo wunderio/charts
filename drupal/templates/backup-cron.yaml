@@ -28,49 +28,7 @@ spec:
             command: ["/bin/bash", "-c"]
             args:
               - |
-                set -e
-
-                # Generate the id of the backup.
-                BACKUP_ID=`date +%Y-%m-%d`
-                BACKUP_LOCATION="/backups/$BACKUP_ID-{{ .Values.environmentName }}"
-
-                # Figure out which tables to skip.
-                IGNORE_TABLES=""
-                IGNORED_TABLES=""
-                for TABLE in `drush sql-query "show tables;" | grep -E '{{ .Values.backup.ignoreTableContent }}'` ;
-                do
-                  IGNORE_TABLES="$IGNORE_TABLES --ignore-table=$DB_NAME.$TABLE";
-                  IGNORED_TABLES="$IGNORED_TABLES $TABLE";
-                done
-
-                # Take a database dump. We use the full path to bypass gdpr-dump
-                echo "Starting database backup."
-                /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
-                /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
-                echo "Database backup complete."
-
-                # Compress the database dump and copy it into the backup folder.
-                # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
-                echo "Compressing database backup."
-                gzip -9 /tmp/db.sql
-
-                # Create a folder for the backup
-                mkdir -p $BACKUP_LOCATION
-                cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
-
-                {{ range $index, $mount := .Values.mounts -}}
-                {{- if eq $mount.enabled true }}
-                # File backup for {{ $index }} volume.
-                echo "Starting {{ $index }} volume backup."
-                tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
-                {{- end -}}
-                {{- end }}
-
-                # Delete old backups
-                find /backups/ -mtime +{{ .Values.backup.retention }} -exec rm -r {} \;
-
-                # List content of backup folder
-                ls -lh /backups/*
+                {{ include "drupal.backup-command" . | nindent 16 }}
             resources:
               {{- .Values.backup.resources | toYaml | nindent 14 }}
           restartPolicy: Never

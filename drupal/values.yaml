@@ -323,11 +323,12 @@ backup:
   retention: 14
 
   # If specified, replace environment content with the given backup.
-  restoreId: null
+  restoreId: ""
 
-  # Specify how to restore a backup.
-  restoreCommand: |
-    # figure out how to restore
+  # Custom commands to be executed after backup db, files are imported
+  postRestoreCommand: |
+
+  
 
   storage: 10G
   storageClassName: silta-shared
