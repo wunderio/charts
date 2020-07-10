@@ -78,7 +78,6 @@ metadata:
     service: varnish
 spec:
   type: NodePort
-  externalTrafficPolicy: Local
   ports:
   - name: web
     port: 80

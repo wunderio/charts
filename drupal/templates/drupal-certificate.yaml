@@ -79,6 +79,7 @@ data:
 # Certificates for exposeDomains 
 
 {{- range $index, $domain := .Values.exposeDomains }}
+{{ $domain := merge $domain $.Values.exposeDomainsDefaults}}
 {{- if $domain.ssl }}
 {{- if $domain.ssl.enabled }}
 {{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
@@ -98,7 +99,7 @@ spec:
   acme:
     config:
       - http01:
-          ingress: {{ $.Release.Name }}-drupal
+          ingress: {{ $.Release.Name }}-drupal-{{ $index }}
         domains:
           - {{ $domain.hostname }}
 ---
