@@ -45,13 +45,11 @@ spec:
 ---
 
 {{- range $index, $domain := .Values.exposeDomains }}
-{{ $domain := merge $domain $.Values.exposeDomainsDefaults}}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: {{ $.Release.Name }}-drupal-{{ $index }}
   annotations:
-    {{ if eq $domain.type "traefik" }}
     kubernetes.io/ingress.class: traefik
     {{- if $domain.ssl }}
     {{- if $domain.ssl.enabled }}
@@ -62,17 +60,6 @@ metadata:
     traefik.ingress.kubernetes.io/frontend-entry-points: http
     ingress.kubernetes.io/ssl-redirect: "false"
     {{- end }}
-    {{- end }}
-
-    {{ if eq $domain.type "gke" }}
-    acme.cert-manager.io/http01-edit-in-place: "true"
-    cert-manager.io/cluster-issuer: letsencrypt
-    {{- end }}
-
-    {{ if $domain.staticIpAddressName }}
-    kubernetes.io/ingress.global-static-ip-name: {{ $domain.staticIpAddressName }}
-    {{- end }}
-
 spec:
   {{- if $domain.ssl }}
   {{- if $domain.ssl.enabled }}
@@ -84,7 +71,7 @@ spec:
   - host: {{ $domain.hostname }}
     http:
       paths:
-      - path: /*
+      - path: /
         backend:
           serviceName: {{ include "drupal.servicename" $ }}
           servicePort: 80
