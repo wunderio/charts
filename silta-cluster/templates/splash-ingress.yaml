@@ -28,7 +28,7 @@ spec:
 ---
 {{- if .Values.ssl.enabled }}
 {{- if has .Values.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-apiVersion: certmanager.k8s.io/v1alpha1
+apiVersion: cert-manager.io/v1alpha2
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt-splash
@@ -39,15 +39,9 @@ spec:
   issuerRef:
     name: {{ .Values.ssl.issuer }}
     kind: ClusterIssuer
-  acme:
-    config:
-      - http01:
-          ingress: {{ .Release.Name }}-splash
-        domains:
-          - {{ .Values.clusterDomain }}
 ---
 {{- else if eq .Values.ssl.issuer "selfsigned" }}
-apiVersion: certmanager.k8s.io/v1alpha1
+apiVersion: cert-manager.io/v1alpha2
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt-splash
