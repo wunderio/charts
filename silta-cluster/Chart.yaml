@@ -20,7 +20,7 @@ dependencies:
   repository: https://storage.googleapis.com/charts.wdr.io
   condition: csi-rclone.enabled
 - name: cert-manager
-  version: 0.10.x
+  version: 0.15.x
   repository: https://charts.jetstack.io/
   condition: cert-manager.enabled
 - name: silta-downscaler

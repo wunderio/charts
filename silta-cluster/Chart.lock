@@ -13,7 +13,7 @@ dependencies:
   version: 0.1.10
 - name: cert-manager
   repository: https://charts.jetstack.io/
-  version: v0.10.1
+  version: v0.15.2
 - name: silta-downscaler
   repository: file://../silta-downscaler
   version: 0.1.0
@@ -23,5 +23,5 @@ dependencies:
 - name: instana-agent
   repository: https://kubernetes-charts.storage.googleapis.com/
   version: 1.0.28
-digest: sha256:47d4af74bb5c3db57e2a4eb2506e717dda600df75703d4751b0f45c2851b658e
-generated: "2020-05-29T15:08:50.879954+02:00"
+digest: sha256:5f2b81edccd17946f4fd16511dfb159fe6d509d0ead2e7061d3af35134179d39
+generated: "2020-07-15T13:46:15.482458+02:00"
