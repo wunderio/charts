@@ -7,8 +7,3 @@ tests:
       - isKind:
           of: Service
 
-  - it: externalTrafficPolicy is Local by default
-    asserts:
-      - equal:
-          path: "spec.externalTrafficPolicy"
-          value: "Local"

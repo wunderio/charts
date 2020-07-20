@@ -4,9 +4,10 @@ metadata:
   name: {{ .Release.Name }}-drupal
   annotations:
     auto-downscale/down: "false"
+    beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}-drupal"}}'
+    cloud.google.com/neg: '{"ingress": true}'
 spec:
   type: NodePort
-  externalTrafficPolicy: Local
   # We explicitly unset this, in case the application is currently downscaled.
   externalName: null
   ports:

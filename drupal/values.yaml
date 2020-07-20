@@ -47,10 +47,21 @@ autoscaling:
 # exposeDomains:
 #   - hostname: example.com
 #   - hostname: www.example.com
+#     type: gke
+#     staticIpAddressName: example-com-production
 #     ssl:
 #       enabled: true
 #       issuer: letsencrypt-staging
 exposeDomains: []
+
+exposeDomainsDefaults:
+  type: traefik
+  # The name of the reserved static IP address.
+  # It is best to first reserve the IP address and then add it here.
+  staticIpAddressName: null
+  ssl:
+    enabled: true
+    issuer: letsencrypt
 
 # Add prefixes to the generated per-branch domains, to be used for projects that need to respond
 # on multiple domains, for example using Drupal's domain module, or using different domains for different languages.
@@ -98,6 +109,8 @@ nginx:
   # Note that the key is only used for documentation purposes.
   noauthips:
     gke-internal: 10.0.0.0/8
+    gce-health-check-1: 130.211.0.0/22
+    gce-health-check-2: 35.191.0.0/16
 
   # Security headers
   # includeSubdomains should be used whenever possible, but before enabling it needs to be made sure there are no subdomains not using https:
