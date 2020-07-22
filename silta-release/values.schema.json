@@ -19,7 +19,15 @@
         }
       }
     },
-    "proxy": { "type": "object" },
+    "proxy": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean"},
+        "url":     { "type": "string"},
+        "port": { "type": "integer"},
+        "no_proxy": { "type": "string"}
+      }
+    },
     "global": { "type": "object"}
   }
 }
