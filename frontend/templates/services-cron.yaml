@@ -13,6 +13,7 @@ spec:
   concurrencyPolicy: {{ default "Forbid" $job.concurrencyPolicy }}
   startingDeadlineSeconds: 3600
   successfulJobsHistoryLimit: 0
+  suspend: false
   jobTemplate:
     spec:
       parallelism: {{ default 1 $job.parallelism }}
