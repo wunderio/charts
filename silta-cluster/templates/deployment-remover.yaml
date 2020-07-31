@@ -18,6 +18,9 @@ metadata:
   name: {{ .Release.Name }}-deployment-remover
 spec:
   replicas: 2
+  selector:
+    matchLabels:
+      name: {{ .Release.Name }}-deployment-remover
   template:
     metadata:
       labels:
