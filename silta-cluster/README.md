@@ -4,11 +4,6 @@ This helm chart helps setting up resources for https://github.com/wunderio/silta
 
 ## Requirements
 
-Configure static resource allocation for tiller (change this if tiller is unstable):
-```
-kubectl set resources deployment tiller-deploy --requests=cpu=100m,memory=1Gi --limits=cpu=500m,memory=1Gi -n kube-system
-``` 
-
 Custom resource definitions for cert-manager (from https://github.com/helm/charts/tree/master/stable/cert-manager):
 ```
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.10/deploy/manifests/00-crds.yaml
