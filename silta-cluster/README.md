@@ -7,6 +7,7 @@ This helm chart helps setting up resources for https://github.com/wunderio/silta
 Custom resource definitions for cert-manager (from https://github.com/helm/charts/tree/master/stable/cert-manager):
 ```
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.10/deploy/manifests/00-crds.yaml
+kubectl create namespace silta-cluster
 kubectl label namespace silta-cluster certmanager.k8s.io/disable-validation="true"
 ```
 
