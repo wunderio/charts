@@ -320,7 +320,7 @@ gdprDump:
     pass:
       formatter: password
     mail:
-      formatter: safeEmailDomain
+      formatter: safeEmail
     init:
       formatter: clear
 
