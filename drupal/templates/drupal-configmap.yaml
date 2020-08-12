@@ -314,6 +314,10 @@ data:
         {{- end}}
 
         location / {
+            {{- if .Values.nginx.extraLocations }}
+            # Custom configuration gets included here
+              {{- .Values.nginx.serverExtraLocations | nindent 12 -}}
+            {{- end }}
 
             location ~* /system/files/ {
                 include fastcgi.conf;
