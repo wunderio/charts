@@ -124,6 +124,9 @@ nginx:
   # Extra configuration block in server context. 
   serverExtraConfig: |
 
+  # Extra configuration block in location context. 
+  locationExtraConfig: |
+
   # Extra configuration to pass to nginx as a file
   extraConfig: |
 
