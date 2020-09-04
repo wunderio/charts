@@ -39,14 +39,6 @@ if ($elasticsearch_host = getenv('ELASTICSEARCH_HOST')) {
 }
 
 /**
- * If Elasticsearch is enabled, add configuration for the Elasticsearch Helper module.
- */
-if (getenv('ELASTICSEARCH_HOST')) {
-  $config['elasticsearch_helper.settings']['elasticsearch_helper']['host'] = getenv('ELASTICSEARCH_HOST');;
-  $config['elasticsearch_helper.settings']['elasticsearch_helper']['port'] = "9200";
-}
-
-/**
  * Set the memcache server hostname when a memcached server is available
  */
 if (getenv('MEMCACHED_HOST')) {
