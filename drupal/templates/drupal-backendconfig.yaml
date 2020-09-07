@@ -4,6 +4,7 @@ metadata:
   name: {{ .Release.Name }}-drupal
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
+{{ if .Values.backendConfig }} 
 spec:
-  securityPolicy:
-    name: "silta-ingress"
+  {{- toYaml .Values.backendConfig | nindent 2 }}
+{{- end }}

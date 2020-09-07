@@ -66,7 +66,32 @@
     "domainPrefixes": { "type": "array", "items": { "type": "string"}},
     "ssl": { "type": "object" },
 
-    "nginx": { "type": "object" },
+    "backendConfig": { "type": ["array","object"], "items": { "type": "object"}},
+    
+    "nginx": {
+      "type": "object",
+      "properties": {
+        "image": { "type": "string"},
+        "basicauth": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean"},
+            "credentials": {
+              "type": "object",
+              "properties": {
+                "username": { "type": "string"},
+                "password": { "type": "string"}
+              }
+            }
+          }
+        },
+        "realipfrom": { "type": "string"},
+        "noauthips": {
+          "type": "object",
+          "additionalProperties": { "type": "string"}
+        }
+      }
+    },
     "php": { "type": "object" },
     "shell": { "type": "object" },
     "mounts": { "type": "object" },

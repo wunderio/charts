@@ -81,7 +81,7 @@ nginx:
 
     # Add IP addresses that should be excluded from basicauth
     noauthips:
-      - 10.0.0.0/8 # GKE internal IPs
+      gke-internal: 10.0.0.0/8
 
   # Robots txt file blocked by default
   robotsTxt:

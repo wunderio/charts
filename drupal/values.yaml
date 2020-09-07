@@ -68,6 +68,11 @@ exposeDomainsDefaults:
 # domainPrefixes: ['en', 'fi']
 domainPrefixes: []
 
+# backendConfig customisations for Drupal service
+backendConfig:
+ securityPolicy:
+   name: "silta-ingress"
+
 ssl:
   # Enable HTTPS for this deployment
   enabled:  true

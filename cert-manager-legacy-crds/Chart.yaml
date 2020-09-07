@@ -1,5 +1,5 @@
 apiVersion: v2
 appVersion: "1.0"
-name: cert-manager-crds
+name: cert-manager-legacy-crds
 description: A helper chart to install CRDs from an older version of the cert-manager chart.
 version: 0.1.0
