@@ -24,9 +24,18 @@ if (getenv('PRIVATE_FILES_PATH')) {
 /**
  * If Elasticsearch is enabled, add configuration for the Elasticsearch Helper module.
  */
-if (getenv('ELASTICSEARCH_HOST')) {
-  $config['elasticsearch_helper.settings']['elasticsearch_helper']['host'] = getenv('ELASTICSEARCH_HOST');;
-  $config['elasticsearch_helper.settings']['elasticsearch_helper']['port'] = "9200";
+if ($elasticsearch_host = getenv('ELASTICSEARCH_HOST')) {
+  // Elasticsearch Helper 6.x compatible configuration override.
+  $config['elasticsearch_helper.settings']['elasticsearch_helper']['host'] = $elasticsearch_host;
+  $config['elasticsearch_helper.settings']['elasticsearch_helper']['port'] = 9200;
+
+  // Elasticsearch Helper 7.x compatible configuration override.
+  $config['elasticsearch_helper.settings']['hosts'] = [
+    [
+      'host' => $elasticsearch_host,
+      'port' => 9200,
+    ],
+  ];
 }
 
 /**
