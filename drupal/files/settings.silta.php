@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @file
+ * Automatically injected settings for the Silta environment.
+ */
+
 // Database settings.
 $databases['default']['default'] = [
   'database' => getenv('DB_NAME'),
@@ -22,7 +27,7 @@ if (getenv('PRIVATE_FILES_PATH')) {
 }
 
 /**
- * If Elasticsearch is enabled, add configuration for the Elasticsearch Helper module.
+ * Set Elasticsearch Helper module configuration if needed.
  */
 if ($elasticsearch_host = getenv('ELASTICSEARCH_HOST')) {
   // Elasticsearch Helper 6.x compatible configuration override.
@@ -39,7 +44,7 @@ if ($elasticsearch_host = getenv('ELASTICSEARCH_HOST')) {
 }
 
 /**
- * Set the memcache server hostname when a memcached server is available
+ * Set the memcache server hostname when a memcached server is available.
  */
 if (getenv('MEMCACHED_HOST')) {
   $settings['memcache']['servers'] = [getenv('MEMCACHED_HOST') . ':11211' => 'default'];
@@ -66,7 +71,7 @@ $settings['trusted_host_patterns'][] = '^.*$';
 $config['system.logging']['error_level'] = getenv('ERROR_LEVEL');
 
 /**
- * Enable reverse proxy
+ * Enable reverse proxy.
  */
 $settings['reverse_proxy'] = TRUE;
 $settings['reverse_proxy_addresses'] = [];
