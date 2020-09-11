@@ -6,8 +6,8 @@ dependencies:
   repository: https://charts.bitnami.com/bitnami
   version: 10.4.4
 - name: minio
-  repository: https://charts.bitnami.com/bitnami
-  version: 3.3.10
+  repository: https://helm.min.io/
+  version: 6.0.5
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 0.1.10
@@ -22,6 +22,6 @@ dependencies:
   version: 0.1.0
 - name: instana-agent
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 1.0.28
-digest: sha256:47d4af74bb5c3db57e2a4eb2506e717dda600df75703d4751b0f45c2851b658e
-generated: "2020-05-29T15:08:50.879954+02:00"
+  version: 1.0.30
+digest: sha256:e22c2d35489f5cbc14606e1a3c712d04fe7577d54354c6a0718123a68135a1e7
+generated: "2020-09-11T09:56:15.61414303+03:00"

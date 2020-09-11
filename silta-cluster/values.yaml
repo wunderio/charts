@@ -61,10 +61,10 @@ csi-rclone:
     
     # Minio as S3 provider
     s3-provider: "Minio"
-    s3-endpoint: "http://minio-release.default:9000"
-    # Default credentials of minio chart https://github.com/helm/charts/tree/master/stable/minio
-    s3-access-key-id: "AKIAIOSFODNN7EXAMPLE"
-    s3-secret-access-key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    s3-endpoint: "http://silta-cluster-minio:9000"
+    # Default credentials of minio chart https://github.com/minio/charts/blob/master/minio/values.yaml
+    s3-access-key-id: "YOURACCESSKEY"
+    s3-secret-access-key: "YOURSECRETKEY"
 
 minio:
   enabled: false
