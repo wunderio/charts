@@ -17,6 +17,12 @@
     "serviceDefaults": { "type": "object" },
     "shell": { "type": "object" },
     "mounts": { "type": "object" },
+    "mariadb": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
     "elasticsearch": {
       "type": "object",
       "properties": {

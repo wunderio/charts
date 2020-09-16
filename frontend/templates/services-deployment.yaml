@@ -50,6 +50,7 @@ spec:
           tcpSocket:
             port: {{ default $.Values.serviceDefaults.port $service.port }}
         env:
+        {{- include "services.env" $ | indent 8 }}
         {{- range $key, $val := $service.env }}
         - name: {{ $key }}
           value: {{ $val | quote }}

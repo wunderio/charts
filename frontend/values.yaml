@@ -1,4 +1,5 @@
 # Configuration for the wunderio/silta-release subchart.
+# see: https://github.com/wunderio/charts/blob/master/silta-release/values.yaml
 silta-release:
   downscaler:
     enabled: true
@@ -142,11 +143,13 @@ services: {}
   #     limits:
   #       memory: 512Mi
 
-  #   cron:
-  #     example:
-  #       command: echo "hello world"
-  #       schedule: "~ 1 * * *"
-  #       parallelism: 1
+    # cron:
+    #   example:
+    #     command: echo "hello world"
+    #     schedule: "~ 1 * * *"
+    #     parallelism: 1
+    #     nodeSelector:
+    #       cloud.google.com/gke-nodepool: static-ip
 
   #   nodeSelector:
   #     cloud.google.com/gke-nodepool: static-ip
