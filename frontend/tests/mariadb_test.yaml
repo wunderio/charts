@@ -1,0 +1,28 @@
+suite: MariaDB
+templates:
+  - services-deployment.yaml
+  - configmap.yaml
+tests:
+  - it: sets mariadb user in service environment if mariadb explicitly enabled
+    set:
+      mariadb.enabled: true
+      mariadb.db.user: testuser
+      services.foo.bar: yes
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DB_USER
+            value: testuser
+
+  - it: sets no mariadb user in service environment if mariadb disabled
+    set:
+      mariadb.enabled: false
+      mariadb.db.user: testuser
+      services.foo.bar: yes
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DB_USER
+            value: testuser

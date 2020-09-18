@@ -26,6 +26,63 @@ release: {{ .Release.Name }}
 {{- end }}
 
 {{- define "services.env" }}
+{{- $service := .service -}}
+- name: 'PORT'
+  value: {{ default .Values.serviceDefaults.port $service.port | quote }}
+- name: PROJECT_NAME
+  value: "{{ .Values.projectName | default .Release.Namespace }}"
+- name: 'ENVIRONMENT_DOMAIN'
+  value: {{ template "frontend.domain" . }}
+- name: 'RELEASE_NAME'
+  value: {{ .Release.Name | quote }}
+{{- range $index, $service := .Values.services }}
+- name: "{{ $index }}_HOST"
+  value: "{{ $.Release.Name }}-{{ $index }}:{{ default $.Values.serviceDefaults.port $service.port }}"
+{{- end }}
+# Elasticsearch
+{{- if .Values.elasticsearch.enabled }}
+- name: ELASTICSEARCH_HOST
+  value: {{ .Release.Name }}-es
+{{- end }}
+# RabbitMQ
+{{- if .Values.rabbitmq.enabled }}
+- name: RABBITMQ_HOST
+  value: {{ .Release.Name }}-rabbitmq
+{{- end }}
+# MariaDB
+{{- if .Values.mariadb.enabled }}
+- name: DB_USER
+  value: "{{ .Values.mariadb.db.user }}"
+- name: DB_NAME
+  value: "{{ .Values.mariadb.db.name }}"
+- name: DB_HOST
+  value: {{ .Release.Name }}-mariadb
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb
+      key: mariadb-password
+{{- end }}
+# Shell / Gitauth
+{{ if .Values.shell.enabled -}}
+- name: GITAUTH_URL
+  value: {{ .Values.shell.gitAuth.keyserver.url | default (printf "https://keys.%s/api/1/git-ssh-keys" .Values.clusterDomain) | quote }}
+- name: GITAUTH_USERNAME
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets-shell
+      key: keyserver.username
+- name: GITAUTH_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-secrets-shell
+      key: keyserver.password
+- name: GITAUTH_SCOPE
+  value: {{ .Values.shell.gitAuth.repositoryUrl }}
+- name: OUTSIDE_COLLABORATORS
+  value: {{ .Values.shell.gitAuth.outsideCollaborators | default true | quote }}
+{{- end }}
+# Proxy
 {{ $proxy := ( index .Values "silta-release" ).proxy }}
 {{ if $proxy.enabled }}
 # The http_proxy needs to be defined in lowercase.

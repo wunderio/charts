@@ -24,3 +24,11 @@ The rabbitmq chart has some unconventional naming logic, we prefer to keep thing
 {{- define "rabbitmq.fullname" -}}
 {{ .Release.Name }}-rabbitmq
 {{- end -}}
+
+{{/*
+The mariadb chart switched to an incompatible naming scheme,
+we make it compatible by overriding the following templates.
+*/}}
+{{- define "mariadb.fullname" -}}
+{{ .Release.Name }}-mariadb
+{{- end }}

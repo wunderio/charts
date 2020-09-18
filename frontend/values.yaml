@@ -206,6 +206,38 @@ serviceDefaults:
           name: cpu
           targetAverageUtilization: 80
 
+# Override the default values of the MariaDB subchart.
+# These settings are optimised for development environments.
+# see: https://github.com/bitnami/charts/blob/master/bitnami/mariadb/values.yaml
+mariadb:
+  enabled: false
+  replication:
+    enabled: false
+  db:
+    name: frontend
+    user: frontend
+  master:
+    persistence:
+      # Database storage disk space allocation
+      # Request assistance from ops team after changing this on existing deployment.
+      size: 1G
+    resources:
+      requests:
+        cpu: 25m
+        memory: 384M
+      limits:
+        memory: 512M
+    affinity:
+      nodeAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          preference:
+            matchExpressions:
+            - key: cloud.google.com/gke-nodepool
+              operator: NotIn
+              values:
+              - static-ip
+
 elasticsearch:
   enabled: false
 
