@@ -78,7 +78,7 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ .Release.Name }}-secrets-smtp
       key: password
-# Duplicate SMTP env variables for ssmtp bundled with amazee php image 
+# Duplicate SMTP env variables for ssmtp bundled with amazee php image
 - name: SSMTP_MAILHUB
   {{- if .Values.mailhog.enabled }}
   value: "{{ .Release.Name }}-mailhog:1025"
@@ -279,7 +279,7 @@ done
 
   # Make backup of current deployment
   {{ include "drupal.backup-command" . }}
-  
+
   # Restore files from targeted backup
   {{ include "drupal.import-backup-files" . }}
 
@@ -412,7 +412,7 @@ set -e
   IGNORED_TABLES=""
   for TABLE in `drush sql-query "show tables;" | grep -E '{{ .Values.backup.ignoreTableContent }}'` ;
   do
-    IGNORE_TABLES="$IGNORE_TABLES --ignore-table='$DB_NAME.$TABLE'";
+    IGNORE_TABLES="$IGNORE_TABLES --ignore-table=$DB_NAME.$TABLE";
     IGNORED_TABLES="$IGNORED_TABLES $TABLE";
   done
 
