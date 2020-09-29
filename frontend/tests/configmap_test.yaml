@@ -3,11 +3,13 @@ templates:
   - configmap.yaml
 tests:
   - it: is a ConfigMap
+    template: configmap.yaml
     asserts:
       - isKind:
           of: ConfigMap
 
   - it: injects the nginx configuration
+    template: configmap.yaml
     set:
       services:
         foo:

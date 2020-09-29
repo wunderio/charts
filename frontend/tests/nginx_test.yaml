@@ -4,6 +4,7 @@ templates:
   - configmap.yaml
 tests:
   - it: is a deployment with default values
+    template: nginx.yaml
     asserts:
       - isKind:
           of: Deployment
@@ -15,6 +16,7 @@ tests:
           value: frontend
 
   - it: uses the right docker images
+    template: nginx.yaml
     set:
       nginx.image: 'nginx-12345'
     asserts:
@@ -23,6 +25,7 @@ tests:
           value: 'nginx-12345'
 
   - it: sets the replica count correctly
+    template: nginx.yaml
     set:
       nginx.replicas: 3
     asserts:
@@ -31,6 +34,7 @@ tests:
           value: 3
 
   - it: takes resource requests and limits
+    template: nginx.yaml
     set:
       nginx.resources:
         requests:

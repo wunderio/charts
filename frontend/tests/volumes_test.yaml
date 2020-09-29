@@ -3,6 +3,7 @@ templates:
   - volumes.yaml
 tests:
   - it: public files volume should be configurable
+    template: volumes.yaml
     set:
       mounts:
         example-files:

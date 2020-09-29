@@ -4,6 +4,7 @@ templates:
   - configmap.yaml
 tests:
   - it: has no shell enabled by default
+    template: services-deployment.yaml
     set:
       services:
         foo:
@@ -16,6 +17,7 @@ tests:
             value: foo
 
   - it: can enable shell
+    template: services-deployment.yaml
     set:
       services:
         foo:

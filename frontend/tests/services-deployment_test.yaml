@@ -4,6 +4,7 @@ templates:
   - configmap.yaml
 tests:
   - it: is a deployment with default values
+    template: services-deployment.yaml
     set:
       services:
         foo:
@@ -19,6 +20,7 @@ tests:
           value: frontend
 
   - it: uses the right docker images
+    template: services-deployment.yaml
     set:
       services:
         foo:
@@ -29,6 +31,7 @@ tests:
           value: 'bar'
 
   - it: sets the replica count correctly
+    template: services-deployment.yaml
     set:
       services:
         foo:
@@ -39,6 +42,7 @@ tests:
           value: 3
 
   - it: sets environment variables correctly
+    template: services-deployment.yaml
     set:
       services:
         foo:
@@ -62,6 +66,7 @@ tests:
             value: release-name.namespace.silta.wdr.io
 
   - it: uses the default port
+    template: services-deployment.yaml
     set:
       services:
         foo:
@@ -79,6 +84,7 @@ tests:
           pattern: 'location /bar'
 
   - it: uses the port and exposed route of the service
+    template: services-deployment.yaml
     set:
       services:
         foo:
@@ -95,6 +101,7 @@ tests:
           pattern: 'location /bar'
 
   - it: uses default requests and limits
+    template: services-deployment.yaml
     set:
       services:
         foo:
@@ -121,6 +128,7 @@ tests:
           value: 2G
 
   - it: takes resource requests and limits
+    template: services-deployment.yaml
     set:
       services.foo.resources:
         requests:
@@ -144,6 +152,7 @@ tests:
           value: 2G
 
   - it: merges resource requests and limits
+    template: services-deployment.yaml
     set:
       serviceDefaults.resources:
         requests:
@@ -172,6 +181,7 @@ tests:
           value: 4G
 
   - it: can set nodeSelectors
+    template: services-deployment.yaml
     set:
       services.foo:
         image: 'bar'
@@ -190,6 +200,7 @@ tests:
             value: baz
 
   - it: can autoscale with default values
+    template: services-deployment.yaml
     set:
       services.foo:
         image: 'bar'
@@ -217,6 +228,7 @@ tests:
               targetAverageUtilization: 80
 
   - it: can override autoscale values
+    template: services-deployment.yaml
     set:
       services.foo:
         image: 'bar'
@@ -251,6 +263,7 @@ tests:
               targetAverageUtilization: 100
 
   - it: uses RollingUpdate as default service deployment strategy
+    template: services-deployment.yaml
     set:
       services:
         foo:
@@ -262,6 +275,7 @@ tests:
           value: RollingUpdate
 
   - it: allows service deployment strategy override
+    template: services-deployment.yaml
     set:
       services:
         foo:

@@ -3,6 +3,7 @@ templates:
   - services-cron.yaml
 tests:
   - it: is a CronJob with default values
+    template: services-cron.yaml
     set:
       services.foo:
         image: 'bar'
@@ -25,6 +26,7 @@ tests:
           value: 1
 
   - it: can override parallelism
+    template: services-cron.yaml
     set:
       services.foo:
         image: 'bar'

@@ -3,17 +3,20 @@ templates:
   - ingress.yaml
 tests:
   - it: is a ingress
+    template: ingress.yaml
     asserts:
       - isKind:
           of: Ingress
 
   - it: uses traefik ingress class
+    template: ingress.yaml
     asserts:
       - equal:
           path: 'metadata.annotations.kubernetes\.io/ingress\.class'
           value: 'traefik'
 
   - it: sets correct hostname for deployment
+    template: ingress.yaml
     set:
       environmentName: 'foo'
       projectName: 'bar' 
@@ -24,6 +27,7 @@ tests:
           value: 'foo.bar.baz'
   
   - it: sets correct hostname for deployment when projectName is absent
+    template: ingress.yaml
     set:
       environmentName: 'foo'
       clusterDomain: 'baz' 
@@ -33,12 +37,14 @@ tests:
           value: 'foo.namespace.baz'
 
   - it: directs traefik requests to nginx service by default
+    template: ingress.yaml
     asserts:
       - equal:
           path: spec.rules[0].http.paths[0].backend.serviceName
           value: 'RELEASE-NAME-nginx'
 
   - it: shortens long project names
+    template: ingress.yaml
     set:
       projectName: 'client-fi-longclient-longproject-backend'
     asserts:
@@ -47,6 +53,7 @@ tests:
           value: 'release-name.client-fi-longclient-longpra6b.silta.wdr.io'
 
   - it: shortens long branch names
+    template: ingress.yaml
     set:
       environmentName: 'feature/my-project-shortname-12345-with-additional-description'
     asserts:
@@ -55,6 +62,7 @@ tests:
           value: 'feature-my-project-shortname-12345-witdb6.namespace.silta.wdr.io'
 
   - it: shortens branch names more when project name is already long
+    template: ingress.yaml
     set:
       projectName: 'client-fi-longclient-longproject-backend'
       environmentName: 'feature/my-project-shortname-12345-with-additional-description'
@@ -64,6 +72,7 @@ tests:
           value: 'feature-my-projecdb6.client-fi-longclient-longpra6b.silta.wdr.io'
 
   - it: takes a hostname prefix
+    template: ingress.yaml
     set:
       domainPrefixes: ['qux', 'quux']
       environmentName: 'foo'

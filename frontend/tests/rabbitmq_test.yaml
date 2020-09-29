@@ -4,6 +4,7 @@ templates:
   - services-cron.yaml
 tests:
   - it: gets exposed when enabled
+    template: services-deployment.yaml
     set:
       services.foo:
         image: 'bar'
