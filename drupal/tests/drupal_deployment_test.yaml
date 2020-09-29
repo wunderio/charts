@@ -4,6 +4,7 @@ templates:
   - drupal-configmap.yaml
 tests:
   - it: is a deployment with default values
+    template: drupal-deployment.yaml
     asserts:
       - isKind:
           of: Deployment
@@ -15,6 +16,7 @@ tests:
           value: drupal
 
   - it: uses the right docker images
+    template: drupal-deployment.yaml
     set:
       php.image: 'drupal-12345'
       nginx.image: 'nginx-12345'
@@ -27,6 +29,7 @@ tests:
           value: 'nginx-12345'
 
   - it: sets environment variables correctly
+    template: drupal-deployment.yaml
     set:
       php.env:
         foo: bar
@@ -49,6 +52,7 @@ tests:
             value: baz
 
   - it: sets smtp environment variables correctly
+    template: drupal-deployment.yaml
     set:
       mailhog:
         enabled: false
@@ -68,6 +72,7 @@ tests:
             name: SMTP_USERNAME
             value: foo
   - it: sets mailhog smtp environment variables correctly
+    template: drupal-deployment.yaml
     set:
       mailhog:
         enabled: true
@@ -80,6 +85,7 @@ tests:
             name: SMTP_ADDRESS
             value: RELEASE-NAME-mailhog:1025
   - it: sets ssmtp environment variables correctly
+    template: drupal-deployment.yaml
     set:
       mailhog:
         enabled: false
@@ -100,6 +106,7 @@ tests:
             value: foo
 
   - it: sets the replica count correctly
+    template: drupal-deployment.yaml
     set:
       replicas: 3
     asserts:
@@ -108,6 +115,7 @@ tests:
           value: 3
 
   - it: takes resource requests and limits
+    template: drupal-deployment.yaml
     set:
       php.resources:
         requests:
@@ -151,6 +159,7 @@ tests:
           value: 2G
  
   - it: sets varnish environment variables if varnish is enabled
+    template: drupal-deployment.yaml
     set:
       varnish.enabled: true
     asserts:
@@ -174,6 +183,7 @@ tests:
                 name: RELEASE-NAME-secrets-varnish
   
   - it: does not have varnish environment variables if varnish is disabled
+    template: drupal-deployment.yaml
     set:
       varnish.enabled: false
     asserts:

@@ -4,6 +4,7 @@ templates:
   - drupal-configmap.yaml
 tests:
   - it: is a deployment with default values
+    template: shell-deployment.yaml
     set:
       shell.enabled: true
     asserts:
@@ -17,6 +18,7 @@ tests:
           value: shell
 
   - it: deployment does not exist when disabled
+    template: shell-deployment.yaml
     set:
       shell.enabled: false
     asserts:
@@ -24,6 +26,7 @@ tests:
         count: 0
 
   - it: uses the right docker images
+    template: shell-deployment.yaml
     set:
       shell.enabled: true
       shell.image: 'shell-12345'
@@ -33,6 +36,7 @@ tests:
           value: 'shell-12345'
 
   - it: sets environment variables correctly
+    template: shell-deployment.yaml
     set:
       shell.enabled: true
       shell.gitAuth.repositoryUrl: 'foo'

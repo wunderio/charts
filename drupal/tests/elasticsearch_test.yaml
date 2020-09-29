@@ -4,6 +4,7 @@ templates:
   - drupal-configmap.yaml
 tests:
   - it: sets elasticsearch hostname in drupal environment if elasticsearch is enabled
+    template: drupal-deployment.yaml
     set:
       elasticsearch.enabled: true
     asserts:
@@ -14,6 +15,7 @@ tests:
             value: RELEASE-NAME-es
 
   - it: sets no elasticsearch hostname in drupal environment if elasticsearch is disabled
+    template: drupal-deployment.yaml
     set:
       elasticsearch.enabled: false
     asserts:

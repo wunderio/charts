@@ -4,6 +4,7 @@ templates:
   - drupal-configmap.yaml
 tests:
   - it: sets mariadb user
+    template: drupal-deployment.yaml
     set:
       mariadb.db.user: testuser
     asserts:
@@ -14,6 +15,7 @@ tests:
             value: testuser
 
   - it: sets mariadb user in drupal environment if mariadb explicitly enabled
+    template: drupal-deployment.yaml
     set:
       mariadb.enabled: true
       mariadb.db.user: testuser
@@ -25,6 +27,7 @@ tests:
             value: testuser
 
   - it: sets no mariadb user in drupal environment if mariadb disabled
+    template: drupal-deployment.yaml
     set:
       mariadb.enabled: false
       mariadb.db.user: testuser

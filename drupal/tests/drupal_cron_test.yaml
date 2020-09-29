@@ -3,6 +3,7 @@ templates:
   - drupal-cron.yaml
 tests:
   - it: is a cron job
+    template: drupal-cron.yaml
     asserts:
       - isKind:
           of: CronJob
@@ -11,6 +12,7 @@ tests:
           value: drupal
 
   - it: uses the right docker image
+    template: drupal-cron.yaml
     set:
       php.image: 'drupal-12345'
     asserts:
@@ -19,6 +21,7 @@ tests:
           value: 'drupal-12345'
 
   - it: sets environment variables correctly
+    template: drupal-cron.yaml
     set:
       php.env:
         foo: bar
@@ -30,6 +33,7 @@ tests:
             value: bar
 
   - it: has public files mounted
+    template: drupal-cron.yaml
     asserts:
       - contains:
           path: spec.jobTemplate.spec.template.spec.volumes
@@ -39,6 +43,7 @@ tests:
               claimName: RELEASE-NAME-public-files
 
   - it: runs multiple jobs
+    template: drupal-cron.yaml
     set:
       php.cron:
         drupal:
@@ -68,6 +73,7 @@ tests:
         documentIndex: 1
 
   - it: uses default resource requests and limits
+    template: drupal-cron.yaml
     set:
       php:
         # Unset cron-specific resources.
@@ -96,6 +102,7 @@ tests:
           value: 2G
 
   - it: takes custom resource requests and limits
+    template: drupal-cron.yaml
     set:
       php.cron.drupal.resources:
         requests:

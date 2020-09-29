@@ -6,8 +6,8 @@ templates:
   - drupal-volumes.yaml
   - drupal-configmap.yaml
 tests:
-
   - it: By default no reference data PVC or CronJob is created, but the reference volume is mounted for the post-release job
+    template: post-release.yaml
     set:
       referenceData:
         referenceEnvironment: 'FOO'
@@ -35,6 +35,7 @@ tests:
           readOnly: true
 
   - it: is not mounted on the main deployment
+    template: post-release.yaml    
     asserts:
     - template: drupal-deployment.yaml
       notContains:
@@ -51,6 +52,7 @@ tests:
           mountPath: "/app/reference-data"
             
   - it: takes reference data information
+    template: post-release.yaml
     set:
       environmentName: 'feature/FOO'
       referenceData:
@@ -107,6 +109,7 @@ tests:
           mountPath: "/app/reference-data"
 
   - it: can be disabled
+    template: post-release.yaml
     set:
       environmentName: 'FOO'
       referenceData:
@@ -132,6 +135,7 @@ tests:
           mountPath: "/app/reference-data"
 
   - it: can skip mounting on non-reference environments
+    template: post-release.yaml
     set:
       environmentName: 'BAR'
       referenceData:
@@ -157,6 +161,7 @@ tests:
           mountPath: "/app/reference-data"
 
   - it: does not skip mounting on the reference environments
+    template: post-release.yaml
     set:
       environmentName: 'FOO'
       referenceData:

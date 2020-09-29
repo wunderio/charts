@@ -4,6 +4,7 @@ templates:
   - drupal-configmap.yaml
 tests:
   - it: populates extraConfig variable and check if its configmap gets mad
+    template: drupal-deployment.yaml
     set:
       nginx.extraConfig: |
         server {
@@ -18,6 +19,7 @@ tests:
             readOnly: true
             subPath: extraConfig
   - it: empty extraConfig renders no conf-misc volume
+    template: drupal-deployment.yaml
     set:
       nginx.extraConfig: |
     asserts:

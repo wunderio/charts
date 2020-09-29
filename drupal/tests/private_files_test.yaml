@@ -7,6 +7,7 @@ templates:
   - drupal-configmap.yaml
 tests:
   - it: private files should be disabled by default
+    template: drupal-deployment.yaml
     asserts:
       # No private files volume is mounted.
       - notContains:
@@ -21,6 +22,7 @@ tests:
         template: drupal-volumes.yaml
 
   - it: private files should work when enabled
+    template: drupal-deployment.yaml
     set:
       mounts:
         private-files:

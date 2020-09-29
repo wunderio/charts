@@ -3,8 +3,8 @@ templates:
   - backup-cron.yaml
   - backup-volume.yaml
 tests:
-
   - it: By default no backup cron job or volume is created
+    template: backup-cron.yaml
     asserts:
     - hasDocuments:
         count: 0
@@ -13,6 +13,7 @@ tests:
       template: backup-volume.yaml
 
   - it: creates a backup cron job and volume
+    template: backup-cron.yaml
     set:
       backup:
         enabled: true
@@ -26,6 +27,7 @@ tests:
       template: backup-volume.yaml
 
   - it: has no gdpr-dump configuration
+    template: backup-cron.yaml
     set:
       backup.enabled: true
     asserts:

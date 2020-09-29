@@ -4,17 +4,20 @@ templates:
   - varnish-configmap-vcl.yaml
 tests:
   - it: sets VARNISH_STORAGE_BACKEND environment variable correctly
+    template: varnish-deployment.yaml
     set:
       varnish.enabled: true
       varnish.storageBackend: 'type,/storage/location,size'
-    asserts:
-      - contains:
-          path: spec.template.spec.containers[0].env
+    asserts: 
+      - documentIndex: 0
+        contains:
+          path: 'spec.template.spec.containers[0].env'
           content:
             name: VARNISH_STORAGE_BACKEND
             value: 'type,/storage/location,size'
 
   - it: takes resource requests and limits
+    template: varnish-deployment.yaml
     set:
       varnish.enabled: true
       varnish.resources:
@@ -25,15 +28,19 @@ tests:
           cpu: 234m
           memory: 2G
     asserts:
-      - equal:
-          path: spec.template.spec.containers[0].resources.requests.cpu
+      - documentIndex: 0
+        equal:
+          path: 'spec.template.spec.containers[0].resources.requests.cpu'
           value: 123m
-      - equal:
-          path: spec.template.spec.containers[0].resources.requests.memory
+      - documentIndex: 0
+        equal:
+          path: 'spec.template.spec.containers[0].resources.requests.memory'
           value: 1G
-      - equal:
-          path: spec.template.spec.containers[0].resources.limits.cpu
+      - documentIndex: 0
+        equal:
+          path: 'spec.template.spec.containers[0].resources.limits.cpu'
           value: 234m
-      - equal:
-          path: spec.template.spec.containers[0].resources.limits.memory
+      - documentIndex: 0
+        equal:
+          path: 'spec.template.spec.containers[0].resources.limits.memory'
           value: 2G

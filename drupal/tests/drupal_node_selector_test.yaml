@@ -6,12 +6,14 @@ templates:
   - drupal-configmap.yaml
 tests:
   - it: has no node selector by default
+    template: drupal-deployment.yaml
     asserts:
       - equal:
           path: spec.template.spec.nodeSelector
           value: {}
 
   - it: can set a node selector
+    template: drupal-deployment.yaml
     set:
       php.nodeSelector:
         foo: bar
@@ -38,6 +40,7 @@ tests:
             value: bar
 
   - it: also sets matching tolerations
+    template: drupal-deployment.yaml
     set:
       php.nodeSelector:
         foo: bar
@@ -55,6 +58,7 @@ tests:
           value: bar
 
   - it: can set a node selector just for cron
+    template: drupal-deployment.yaml
     set:
       php.cron.drupal.nodeSelector:
         foo: bar
@@ -75,6 +79,7 @@ tests:
             value: bar
 
   - it: can set a node selector just for the shell
+    template: drupal-deployment.yaml
     set:
       shell.nodeSelector:
         foo: bar

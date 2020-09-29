@@ -6,6 +6,7 @@ templates:
   - drupal-configmap.yaml
 tests:
   - it: has no image pull secret by default
+    template: drupal-deployment.yaml
     asserts:
       - isNull:
           path: spec.template.spec.imagePullSecrets
@@ -17,10 +18,10 @@ tests:
           path: spec.template.spec.imagePullSecrets
 
   - it: sets the image pull secret
+    template: drupal-deployment.yaml
     set:
       imagePullSecrets:
         - name: gcr
-
     asserts:
      - contains:
          path: spec.template.spec.imagePullSecrets

@@ -3,12 +3,14 @@ templates:
   - shell-service.yaml
 tests:
   - it: is a service when enabled
+    template: shell-service.yaml
     set:
       shell.enabled: true
     asserts:
       - isKind:
           of: Service
   - it: service does not exist when disabled
+    template: shell-service.yaml
     set:
       shell.enabled: false
     asserts:

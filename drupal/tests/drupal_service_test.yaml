@@ -3,6 +3,7 @@ templates:
   - drupal-service.yaml
 tests:
   - it: is a service
+    template: drupal-service.yaml
     asserts:
       - isKind:
           of: Service

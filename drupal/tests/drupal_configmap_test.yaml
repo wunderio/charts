@@ -3,6 +3,7 @@ templates:
   - drupal-configmap.yaml
 tests:
   - it: is a ConfigMap
+    template: drupal-configmap.yaml
     asserts:
       - isKind:
           of: ConfigMap
@@ -11,6 +12,7 @@ tests:
           value: drupal
 
   - it: injects the php.ini values
+    template: drupal-configmap.yaml
     set:
       php.php_ini:
         upload_max_filesize: '123M'
@@ -24,6 +26,7 @@ tests:
         pattern: 'upload_max_filesize = 123M'
 
   - it: injects custom php.ini values with extraConfig
+    template: drupal-configmap.yaml
     set:
       php.php_ini.extraConfig: |
         [PHP]
@@ -34,6 +37,7 @@ tests:
         pattern: 'display_errors = On'
 
   - it: injects custom nginx configuration into server context
+    template: drupal-configmap.yaml
     set:
       nginx:
         serverExtraConfig: |
@@ -46,6 +50,7 @@ tests:
         pattern: "location = /randomlocation"
 
   - it: injects the nginx configuration
+    template: drupal-configmap.yaml
     set:
       nginx:
         loglevel: 'debug'

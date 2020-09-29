@@ -4,6 +4,7 @@ templates:
   - drupal-configmap.yaml
 tests:
   - it: sets memcached hostname in drupal environment if memcached is enabled
+    template: drupal-deployment.yaml
     set:
       memcached.enabled: true
     asserts:
@@ -14,6 +15,7 @@ tests:
             value: RELEASE-NAME-memcached
 
   - it: sets no memcached hostname in drupal environment if memcached is disabled
+    template: drupal-deployment.yaml
     set:
       memcached.enabled: false
     asserts:

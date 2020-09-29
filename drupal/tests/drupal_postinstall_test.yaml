@@ -3,11 +3,13 @@ templates:
   - post-release.yaml
 tests:
   - it: is a helm hook
+    template: post-release.yaml
     asserts:
       - isKind:
           of: Job
 
   - it: uses the right docker image
+    template: post-release.yaml
     set:
       php.image: 'drupal-12345'
     asserts:
@@ -16,6 +18,7 @@ tests:
           value: 'drupal-12345'
 
   - it: runs the right post-install command
+    template: post-release.yaml
     set:
       php.postinstall.command: foo
       php.postupgrade.command: bar
@@ -31,6 +34,7 @@ tests:
           pattern: 'bar'
 
   - it: exports reference data by default after each deployment
+    template: post-release.yaml
     set:
       # Simulate a deployment on the reference environment
       environmentName: reference-environment
@@ -41,6 +45,7 @@ tests:
           pattern: 'Dump reference database'
 
   - it: doesn't exports reference data after deployments if disabled
+    template: post-release.yaml
     set:
       # Simulate a deployment on the reference environment
       environmentName: reference-environment
@@ -52,6 +57,7 @@ tests:
           pattern: 'Dump reference database'
 
   - it: sets environment variables correctly
+    template: post-release.yaml
     set:
       php.env:
         foo: bar
@@ -63,6 +69,7 @@ tests:
             value: bar
 
   - it: has public files mounted
+    template: post-release.yaml
     asserts:
       - contains:
           path: spec.template.spec.volumes
@@ -72,6 +79,7 @@ tests:
               claimName: RELEASE-NAME-public-files
 
   - it: can override default php resource requests and limits
+    template: post-release.yaml
     set:
       php.postinstall.resources:
         requests:
