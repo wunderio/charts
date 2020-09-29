@@ -3,11 +3,13 @@ templates:
   - configmap.yaml
 tests:
   - it: is a ConfigMap
+    template: configmap.yaml
     asserts:
       - isKind:
           of: ConfigMap
 
   - it: injects custom nginx configuration into server context
+    template: configmap.yaml
     set:
       nginx:
         serverExtraConfig: |
@@ -20,6 +22,7 @@ tests:
         pattern: "location = /randomlocation"
 
   - it: injects the nginx configuration
+    template: configmap.yaml
     set:
       nginx:
         loglevel: 'debug'

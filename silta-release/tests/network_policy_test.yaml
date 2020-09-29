@@ -3,6 +3,7 @@ templates:
   - network-policy.yaml
 tests:
   - it: current namespace is allowed
+    template: network-policy.yaml
     asserts:
       - equal:
           path: spec.podSelector.matchLabels.release
@@ -12,6 +13,7 @@ tests:
           value: "NAMESPACE"
 
   - it: specified exceptions are added
+    template: network-policy.yaml
     set:
       ingressAccess:
         nameYourAccessException:

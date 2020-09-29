@@ -3,11 +3,13 @@ templates:
   - csi-controller-rclone.yaml
 tests:
   - it: is a stateful set
+    template: csi-controller-rclone.yaml
     asserts:
       - isKind:
           of: StatefulSet
 
   - it: can set resources
+    template: csi-controller-rclone.yaml
     set:
       controller:
         attacher:

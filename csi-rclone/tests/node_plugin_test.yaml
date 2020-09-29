@@ -3,11 +3,13 @@ templates:
   - csi-nodeplugin-rclone.yaml
 tests:
   - it: is a daemon
+    template: csi-nodeplugin-rclone.yaml
     asserts:
       - isKind:
           of: DaemonSet
 
   - it: can set resources
+    template: csi-nodeplugin-rclone.yaml
     set:
       nodePlugin:
         registrar:
