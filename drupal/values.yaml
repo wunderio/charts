@@ -1,6 +1,6 @@
-
-# Configuration for the wunderio/silta-release subchart.
+# Subchart with few functionality that is reused for our other charts
 silta-release:
+  # Enable downscaler by default. See https://github.com/wunderio/charts/blob/master/silta-downscaler/
   downscaler:
     enabled: true
 
@@ -42,37 +42,53 @@ autoscaling:
         targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
-# Example of exposing 2 additional domains for this deployment, each with its own certificate
-# Note that the key is only used for documentation purposes.
+# Example of exposing 2 additional domains for this deployment, each with its own certificate.
 # exposeDomains:
-#   - hostname: example.com
-#   - hostname: www.example.com
-#     type: gke
-#     staticIpAddressName: example-com-production
+#   example:
+#     hostname: example.com
+#   example2:
+#     hostname: example1.com
+#     # Reference to a key under `ingress`
+#     ingress: gce
 #     ssl:
 #       enabled: true
 #       issuer: letsencrypt-staging
-exposeDomains: []
+#   example_www:
+#     hostname: www.example.com
+#   example_no_https:
+#    hostname: insecure.example.com
+#      ssl: 
+#        enabled: false
+exposeDomains: {}
 
 exposeDomainsDefaults:
-  type: traefik
-  # The name of the reserved static IP address.
-  # It is best to first reserve the IP address and then add it here.
-  staticIpAddressName: null
+  ingress: default
   ssl:
     enabled: true
     issuer: letsencrypt
 
-# Add prefixes to the generated per-branch domains, to be used for projects that need to respond
-# on multiple domains, for example using Drupal's domain module, or using different domains for different languages.
-# domainPrefixes: ['en', 'fi']
-domainPrefixes: []
+ingress:
+  default:
+    type: traefik
+    tls: true
+    redirect-https: true
+  gce:
+    type: gce
+    # The name of the reserved static IP address.
+    # It is best to first reserve the IP address and then add it here.
+    # staticIpAddressName: null
 
 # backendConfig customisations for Drupal service
 backendConfig:
  securityPolicy:
    name: "silta-ingress"
 
+# Add prefixes to the generated per-branch domains, to be used for projects that need to respond
+# on multiple domains, for example using Drupal's domain module, or using different domains for different languages.
+# domainPrefixes: ['en', 'fi']
+domainPrefixes: []
+
+# Settings for default site provided by this deployment
 ssl:
   # Enable HTTPS for this deployment
   enabled:  true
@@ -217,7 +233,7 @@ php:
 
   # PHP settings
   php_ini:
-    loglevel: notice # Possible Values: alert, error, warning, notice, debug
+    loglevel: notice  # Possible Values: alert, error, warning, notice, debug
     upload_max_filesize: 60M
     post_max_size: 60M
     memory_limit: 256M

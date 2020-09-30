@@ -1,5 +1,7 @@
-{{- if .Values.ssl.enabled }}
-{{- if has .Values.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+{{- $context_ingress := .Values.ingress.default }}
+{{- $context_ssl := .Values.ssl }}
+{{- if $context_ingress.tls }}
+{{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
@@ -11,7 +13,7 @@ spec:
   dnsNames:
   - {{ include "drupal.domain" . | quote }}
   issuerRef:
-    name: {{ .Values.ssl.issuer }}
+    name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
   acme:
     config:
@@ -32,7 +34,7 @@ spec:
   dnsNames:
   - '{{$prefix}}.{{ include "drupal.domain" $ }}'
   issuerRef:
-    name: {{ $.Values.ssl.issuer }}
+    name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
   acme:
     config:
@@ -43,7 +45,7 @@ spec:
 ---
 {{- end }}
 
-{{- else if eq .Values.ssl.issuer "selfsigned" }}
+{{- else if eq $context_ssl.issuer "selfsigned" }}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
@@ -58,11 +60,11 @@ spec:
   dnsNames:
   - {{ template "drupal.domain" . }}
   issuerRef:
-    name: {{ .Values.ssl.issuer }}
+    name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
 ---
 
-{{- else if eq .Values.ssl.issuer "custom" }}
+{{- else if eq $context_ssl.issuer "custom" }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -71,13 +73,13 @@ metadata:
     {{- include "drupal.release_labels" . | nindent 4 }}
 type: kubernetes.io/tls
 data:
-  tls.crt: {{ .Values.ssl.crt | b64enc }}
-  tls.key: {{ .Values.ssl.key | b64enc }}
+  tls.ca: {{ $context_ssl.ca | b64enc }}
+  tls.crt: {{ $context_ssl.crt | b64enc }}
+  tls.key: {{ $context_ssl.key | b64enc }}
 ---
 {{- end }}
 
 # Certificates for exposeDomains 
-
 {{- range $index, $domain := .Values.exposeDomains }}
 {{ $domain := merge $domain $.Values.exposeDomainsDefaults}}
 {{- if $domain.ssl }}
@@ -99,7 +101,7 @@ spec:
   acme:
     config:
       - http01:
-          ingress: {{ $.Release.Name }}-drupal-{{ $index }}
+          ingress: {{ $.Release.Name }}-drupal-{{ $domain.ingress }}
         domains:
           - {{ $domain.hostname }}
 ---
@@ -111,7 +113,6 @@ metadata:
   name: {{ $.Release.Name }}-crt-{{ $index }}
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
-  # namespace: silta-cluster
 spec:
   secretName: {{ $.Release.Name }}-tls-{{ $index }}
   duration: 2160h

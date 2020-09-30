@@ -1,4 +1,4 @@
-{{ $protocol := .Values.ssl.enabled | ternary "https" "http" -}}
+{{ $protocol := .Values.ingress.default.tls | ternary "https" "http" -}}
 Your site is available at:
 
   {{ $protocol }}://{{- template "drupal.domain" . }}
