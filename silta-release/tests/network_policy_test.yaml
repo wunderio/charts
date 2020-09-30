@@ -5,10 +5,12 @@ tests:
   - it: current namespace is allowed
     template: network-policy.yaml
     asserts:
-      - equal:
+      - documentIndex: 0
+        equal:
           path: spec.podSelector.matchLabels.release
           value: "RELEASE-NAME"
-      - equal:
+      - documentIndex: 0
+        equal:
           path: spec.ingress[0].from[0].namespaceSelector.matchLabels.name
           value: "NAMESPACE"
 
