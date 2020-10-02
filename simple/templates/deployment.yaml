@@ -13,6 +13,7 @@ spec:
     metadata:
       labels:
         {{ include "simple.release_labels" . | indent 8 }}
+        silta-ingress: allow
     spec:
       enableServiceLinks: false
       containers:

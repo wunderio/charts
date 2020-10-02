@@ -1,4 +1,7 @@
-apiVersion: v1
 name: simple
-version: 0.2.6
+version: 0.2.7
 apiVersion: v2
+dependencies:
+- name: silta-release
+  version: 0.1.1
+  repository: file://../silta-release
