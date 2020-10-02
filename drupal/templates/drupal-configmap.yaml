@@ -148,6 +148,9 @@ data:
             ~^/(?<no_slash>.*)$ $no_slash;
         }
 
+        # List health checks that need to return status 200 here
+        map $http_user_agent $hc_ua { default 0; 'GoogleHC/1.0' 1; } 
+
         include conf.d/*.conf;
     }
 
@@ -258,6 +261,9 @@ data:
     server {
         server_name drupal;
         listen 80;
+
+        # Loadbalancer health checks need to be fed with http 200 
+        if ($hc_ua) { return 200; }
 
         {{- if .Values.nginx.redirects }}
         # Redirects to specified path if map returns anything
