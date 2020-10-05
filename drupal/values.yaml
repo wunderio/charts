@@ -415,6 +415,8 @@ mariadb:
               - static-ip
 
 varnish:
+  # See https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#using-varnish
+  # to configure varnish for Your site correctly.
   enabled: false
   resources:
     requests:

@@ -41,9 +41,12 @@ data:
 
     # Define the purge network access.
     # These are used below to allow cache purging via BAN.
-    # acl purge {
-    #   "127.0.0.1";
-    # }
+    acl purge {
+      "127.0.0.1";
+      {{- range .Values.nginx.noauthips }}
+      {{ . | quote }};
+      {{- end }}
+    }
 
     # List of upstream proxies we trust to set X-Forwarded-For correctly.
     acl upstream_proxy {
@@ -295,9 +298,9 @@ data:
       # Only allow BAN requests from IP addresses in the 'purge' ACL.
       if (req.method == "BAN") {
         # Admin port is only exposed to internal network
-        #     if (!client.ip ~ purge) {
-        #     return (synth(403, "Not allowed."));
-        # }
+        if (!client.ip ~ purge) {
+            return (synth(403, "Not allowed."));
+        }
         
         # Logic for the ban, using the cache tags headers. For more info
         # see https://github.com/geerlingguy/drupal-vm/issues/397.
