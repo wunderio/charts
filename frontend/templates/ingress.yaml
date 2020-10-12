@@ -1,15 +1,28 @@
+{{- $ingress := .Values.ingress.default }}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-nginx
   annotations:
-    kubernetes.io/ingress.class: traefik
-    {{- if .Values.ssl.enabled }}
+    kubernetes.io/ingress.class: {{ $ingress.type | quote }}
+    {{- if $ingress.tls }}
+    certmanager.k8s.io/acme-http01-edit-in-place: "true"
+    {{- if eq $ingress.type "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
-    ingress.kubernetes.io/ssl-redirect: "true"
+    {{- end }}
     {{- else }}
+    {{- if eq $ingress.type "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http"
-    ingress.kubernetes.io/ssl-redirect: "false"
+    {{- end }}
+    {{- end }}
+    {{- if (hasKey $ingress "redirect-https") }}
+    ingress.kubernetes.io/ssl-redirect: {{ (index $ingress "redirect-https") | quote }}
+    {{- end }}
+    {{- if eq $ingress.type "gce" }}
+    cert-manager.io/cluster-issuer: letsencrypt
+    {{- end }}
+    {{- if $ingress.staticIpAddressName }}
+    kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
 
     {{- if (index .Values "silta-release").downscaler.enabled }}
@@ -20,7 +33,7 @@ metadata:
   labels:
     {{ include "frontend.release_labels" . | indent 4 }}
 spec:
-  {{- if .Values.ssl.enabled }}
+  {{- if $ingress.tls }}
   tls:
   - secretName: {{ .Release.Name }}-tls
   {{- range $index, $prefix := .Values.domainPrefixes }}
@@ -36,7 +49,7 @@ spec:
           serviceName: {{ .Release.Name }}-nginx
           servicePort: 80
 {{- range $index, $prefix := .Values.domainPrefixes }}
-  - host: {{$prefix}}.{{ template "frontend.domain" $ }}
+  - host: {{ $prefix }}.{{ template "frontend.domain" $ }}
     http:
       paths:
       - path: /
@@ -45,39 +58,74 @@ spec:
           servicePort: 80
 {{- end }}
 ---
-{{- range $index, $domain := .Values.exposeDomains }}
+# Ingresses for exposeDomains 
+{{- range $ingress_index, $ingress := $.Values.ingress }}
+
+{{- $ingress := mergeOverwrite (deepCopy $.Values.ingress.default) $ingress }}
+
+{{- $ingress_in_use := false }}
+{{- range $domain_index, $domain := $.Values.exposeDomains }}
+  {{- $domain := mergeOverwrite (deepCopy $.Values.exposeDomainsDefaults) $domain }}
+  {{- if $domain.ingress }}
+    {{- if eq $ingress_index $domain.ingress }}
+      {{- $ingress_in_use = true }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- if $ingress_in_use }}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: {{ $.Release.Name }}-nginx-{{ $index }}
+  name: {{ $.Release.Name }}-nginx-{{ $ingress_index }}
   annotations:
-    kubernetes.io/ingress.class: traefik
-    {{- if $domain.ssl }}
-    {{- if $domain.ssl.enabled }}
-    traefik.ingress.kubernetes.io/frontend-entry-points: http,https
-    ingress.kubernetes.io/ssl-redirect: "true"
+    kubernetes.io/ingress.class: {{ $ingress.type | quote }}
+    {{- if $ingress.tls }}
+    certmanager.k8s.io/acme-http01-edit-in-place: "true"
+    {{- if eq $ingress.type "traefik" }}
+    traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
     {{- end }}
     {{- else }}
-    traefik.ingress.kubernetes.io/frontend-entry-points: http
-    ingress.kubernetes.io/ssl-redirect: "false"
+    {{- if eq $ingress.type "traefik" }}
+    traefik.ingress.kubernetes.io/frontend-entry-points: "http"
+    {{- end }}
+    {{- end }}
+    {{- if (hasKey $ingress "redirect-https") }}
+    ingress.kubernetes.io/ssl-redirect: {{ (index $ingress "redirect-https") | quote }}
+    {{- end }}
+    {{- if eq $ingress.type "gce" }}
+    cert-manager.io/cluster-issuer: letsencrypt
+    {{- end }}
+    {{- if $ingress.staticIpAddressName }}
+    kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
   labels:
     {{ include "frontend.release_labels" $ | indent 4 }}
 spec:
+  tls:
+  {{- range $domain_index, $domain := $.Values.exposeDomains }}
+  {{- $domain := mergeOverwrite (deepCopy $.Values.exposeDomainsDefaults) $domain }}
+  {{- if eq $domain.ingress $ingress_index }}
   {{- if $domain.ssl }}
   {{- if $domain.ssl.enabled }}
-  tls:
-  - secretName: {{ $.Release.Name }}-tls-{{ $index }}
+  - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}
+  {{- end }}
+  {{- end }}
   {{- end }}
   {{- end }}
   rules:
+  {{- range $domain_index, $domain := $.Values.exposeDomains }}
+  {{- $domain := mergeOverwrite (deepCopy $.Values.exposeDomainsDefaults) $domain }}
+  {{- if eq $domain.ingress $ingress_index }}
   - host: {{ $domain.hostname }}
     http:
       paths:
-      - path: /
+      - path: {{ if eq $ingress.type "gce" }}/*{{ else }}/{{ end }}
         backend:
           serviceName: {{ $.Release.Name }}-nginx
           servicePort: 80
+  {{- end }}
+  {{- end }}
 ---
 {{- end }}
-
+{{- end }}

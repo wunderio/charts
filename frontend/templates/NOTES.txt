@@ -1,8 +1,8 @@
-{{ $protocol := .Values.ssl.enabled | ternary "https" "http" -}}
+{{ $protocol := .Values.ingress.default.tls | ternary "https" "http" -}}
 Deployed {{ .Release.Name }} successfully, your site is available here:
 
-{{ range $index, $service := .Values.services -}}
-  {{ if $service.exposedRoute }}
+  {{ range $index, $service := .Values.services -}}
+  {{- if $service.exposedRoute }}
   {{ $protocol }}://{{- template "frontend.domain" $ }}{{ $service.exposedRoute }}
   {{- range $index, $prefix := $.Values.domainPrefixes }}
   {{ $protocol}}://{{$prefix}}.{{- template "frontend.domain" $ }}{{ $service.exposedRoute }}
@@ -11,25 +11,25 @@ Deployed {{ .Release.Name }} successfully, your site is available here:
   {{ $protocol }}://{{ $domain.hostname }}{{ $service.exposedRoute }}
   {{- end -}}
   {{- end -}}
-{{- end }}
+  {{- end }}
 
-{{ if .Values.nginx.basicauth.enabled -}}
-Basicauth username: {{ .Values.nginx.basicauth.credentials.username }}
-Basicauth password: {{ .Values.nginx.basicauth.credentials.password }}
-{{- end }}
+  {{ if .Values.nginx.basicauth.enabled -}}
+  Basicauth username: {{ .Values.nginx.basicauth.credentials.username }}
+  Basicauth password: {{ .Values.nginx.basicauth.credentials.password }}
+  {{- end }}
+
 {{ if $.Values.shell.enabled }}
 SSH connection (limited access through VPN):
   {{ range $index, $service := .Values.services }}
-      ssh www-admin@{{ template "frontend.environment.hostname" $ }}-shell-{{ $index }}.{{ $.Release.Namespace }} -J {{ include "frontend.jumphost" $ }}
+  ssh www-admin@{{ template "frontend.environment.hostname" $ }}-shell-{{ $index }}.{{ $.Release.Namespace }} -J {{ include "frontend.jumphost" $ }}
   {{- end }}
 
   {{ range $index, $service := .Values.services -}}
-    {{ if $service.mounts }}
-      {{ range $indexMount, $service.mounts -}}
-Importing files to service '{{ $index }}', folder '{{ (index $.Values.mounts $indexMount).mountPath }}':
+  {{- if $service.mounts }}
+  {{- range $indexMount, $service.mounts -}}
+  Importing files to service '{{ $index }}', folder '{{ (index $.Values.mounts $indexMount).mountPath }}':
 rsync -azv -e 'ssh -A -J {{ include "frontend.jumphost" $ }}' local_folder/ www-admin@{{ template "frontend.environment.hostname" $ }}-shell-{{ $index }}.{{ $.Release.Namespace }}:{{ (index $.Values.mounts $indexMount).mountPath }}
-
-      {{ end -}}
-    {{ end -}}
+  {{ end -}}
+  {{ end -}}
   {{ end -}}
 {{- end -}}

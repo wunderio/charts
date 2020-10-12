@@ -88,3 +88,118 @@ tests:
       - equal:
          path: spec.rules[2].host
          value: 'quux.foo.bar.baz'
+
+  - it: exposeDomains - uses default ingress type and has correct hostname
+    template: ingress.yaml
+    set:
+      ingress:
+        default:
+          type: foo
+      exposeDomains:
+        bar:
+          hostname: bar.baz
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: 'metadata.annotations.kubernetes\.io/ingress\.class'
+          value: 'foo'
+  
+  - it: exposeDomains - has correct hostname
+    template: ingress.yaml
+    set:
+      exposeDomains:
+        bar:
+          hostname: foo.bar
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.rules[0].host
+          value: 'foo.bar'
+
+  - it: exposeDomains - can disable ssl for a certain ingress
+    template: ingress.yaml
+    set:
+      ingress:
+        nossl:
+          tls: false
+          redirect-https: false
+      exposeDomains:
+        foo:
+          hostname: foo.bar
+          ingress: nossl
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: 'metadata.annotations.traefik\.ingress\.kubernetes\.io\/frontend-entry-points'
+          value: 'http'
+      - documentIndex: 1
+        equal:
+          path: 'ingress\.kubernetes\.io\/ssl-redirect'
+          value: null
+
+  - it: exposeDomains - can disable ssl redirect
+    template: ingress.yaml
+    set:
+      ingress:
+        nossl:
+          redirect-https: false
+      exposeDomains:
+        foo:
+          hostname: foo.bar
+          ingress: nossl
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: 'metadata.annotations.ingress\.kubernetes\.io\/ssl-redirect'
+          value: "false"
+
+  - it: exposeDomains - multiple hostnames can use the same ingress 
+    template: ingress.yaml
+    set:
+      exposeDomains:
+        foo:
+          hostname: foo.baz
+        bar:
+          hostname: bar.baz
+        
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: 'spec.rules[1].host'
+          value: 'foo.baz'
+      - documentIndex: 1
+        equal:
+          path: 'spec.rules[0].host'
+          value: 'bar.baz'
+
+  - it: exposeDomains as list, multiple hostnames can use the same ingress [list definition to be deprecated]
+    template: ingress.yaml
+    set:
+      exposeDomains:
+        - hostname: foo.baz
+        - hostname: bar.baz
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: 'spec.rules[0].host'
+          value: 'foo.baz'
+      - documentIndex: 1
+        equal:
+          path: 'spec.rules[1].host'
+          value: 'bar.baz'
+
+  - it: exposeDomains - can supply staticIpAddressName for gce type ingress
+    template: ingress.yaml
+    set:
+      exposeDomains:
+        bar:
+          hostname: foo.bar
+          ingress: gce
+      ingress:
+        gce:
+          staticIpAddressName: baz
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: 'metadata.annotations.kubernetes\.io\/ingress\.global-static-ip-name'
+          value: 'baz'

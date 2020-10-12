@@ -9,9 +9,11 @@
     "imagePullSecrets": { "type": "array" },
     "app": { "type": "string" },
     "exposeDomains": { "type": ["array","object"], "items": { "type": "object"}},
+    "exposeDomainsDefaults": { "type": "object"},
     "domainPrefixes": { "type": "array", "items": { "type": "string"}},
     "ssl": { "type": "object" },
-
+    "backendConfig": { "type": ["array","object"], "items": { "type": "object"}},
+    "ingress": { "type": "object" },
     "nginx": { "type": "object" },
     "services": { "type": "object" },
     "serviceDefaults": { "type": "object" },

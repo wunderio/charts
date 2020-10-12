@@ -6,6 +6,8 @@ metadata:
     {{ include "frontend.release_labels" . | indent 4 }}
   annotations:
       auto-downscale/down: "false"
+      beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}-nginx"}}'
+      cloud.google.com/neg: '{"ingress": true}'
 spec:
   type: NodePort
   externalTrafficPolicy: Local
