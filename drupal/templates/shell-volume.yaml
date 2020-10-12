@@ -5,6 +5,7 @@ metadata:
   name: {{ .Release.Name }}-{{ .Release.Namespace | sha256sum | trunc 7 }}-ssh-keys
   labels:
     name: {{ .Release.Name }}-{{ .Release.Namespace | sha256sum | trunc 7 }}-ssh-keys
+    {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
   accessModes:
     - ReadWriteMany

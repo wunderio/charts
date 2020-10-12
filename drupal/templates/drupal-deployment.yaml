@@ -8,7 +8,7 @@ spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      {{- include "drupal.release_labels" . | nindent 6 }}
+      {{- include "drupal.release_selector_labels" . | nindent 6 }}
       deployment: drupal
   template:
     metadata:

@@ -14,6 +14,9 @@ spec:
   completions: 1
   backoffLimit: 0
   template:
+    metadata:
+      labels:
+        {{- include "drupal.release_labels" . | nindent 8 }}
     spec:
       restartPolicy: Never
       enableServiceLinks: false

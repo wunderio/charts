@@ -12,7 +12,7 @@ spec:
     - name: ssh
       port: 22
   selector:
-    {{- include "drupal.release_labels" . | nindent 4 }}
+    {{- include "drupal.release_selector_labels" . | nindent 4 }}
     service: shell
 {{- end }}
 ---

@@ -30,6 +30,8 @@ metadata:
     auto-downscale/label-selector: "release={{ .Release.Name }}"
     auto-downscale/services: {{ include "drupal.servicename" . }}
     {{- end }}
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
   {{- if $ingress.tls }}
   tls:

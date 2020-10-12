@@ -410,7 +410,12 @@ data:
           # Authenticated users should not be cached
           return (pass);
         }
-            else {
+        # Include additional cookie rules before we unset all cookies
+        {{- if .Values.varnish.vcl_extra_cookies }}
+          {{ .Values.varnish.vcl_extra_cookies | indent 8 }}
+        {{- end }}
+
+        else {
           # Non-authenticated requests do not vary on cookies
           unset req.http.Cookie;
         }

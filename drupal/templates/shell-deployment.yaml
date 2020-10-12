@@ -10,7 +10,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "drupal.release_labels" . | nindent 6 }}
+      {{- include "drupal.release_selector_labels" . | nindent 6 }}
       service: shell
   strategy:
     type: Recreate

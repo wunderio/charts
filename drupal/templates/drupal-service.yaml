@@ -7,6 +7,8 @@ metadata:
     beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}-drupal"}}'
     # TODO: Re-enable this
     # cloud.google.com/neg: '{"ingress": true}'
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
   type: NodePort
   # We explicitly unset this, in case the application is currently downscaled.
@@ -14,5 +16,5 @@ spec:
   ports:
     - port: 80
   selector:
-    {{- include "drupal.release_labels" . | nindent 4 }}
+    {{- include "drupal.release_selector_labels" . | nindent 4 }}
     deployment: drupal

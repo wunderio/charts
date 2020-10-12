@@ -5,6 +5,7 @@ metadata:
   name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
   labels:
     name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
+    {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
   accessModes:
     - ReadWriteMany
@@ -24,8 +25,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ .Release.Name }}-backup
   labels:
-    app: {{ .Values.app | quote }}
-    release: {{ .Release.Name }}
+    {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
   storageClassName: {{ .Values.backup.storageClassName }}
   accessModes:
