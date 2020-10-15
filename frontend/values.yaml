@@ -176,13 +176,17 @@ services: {}
   #     limits:
   #       memory: 512Mi
 
-    # cron:
-    #   example:
-    #     command: echo "hello world"
-    #     schedule: "~ 1 * * *"
-    #     parallelism: 1
-    #     nodeSelector:
-    #       cloud.google.com/gke-nodepool: static-ip
+  #  cron:
+  #    example:
+  #      command: echo "hello world"
+  #      schedule: "~ 1 * * *"
+  #      parallelism: 1
+  #      nodeSelector:
+  #        cloud.google.com/gke-nodepool: static-ip
+  #      # Optionally override service resource requests
+  #      resources:
+  #        requests:
+  #          cpu: 500m
 
   #   nodeSelector:
   #     cloud.google.com/gke-nodepool: static-ip

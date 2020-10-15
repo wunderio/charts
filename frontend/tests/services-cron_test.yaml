@@ -40,3 +40,101 @@ tests:
       - equal:
           path: spec.jobTemplate.spec.parallelism
           value: 3
+
+  - it: job inherits service resource requests when none defined
+    template: services-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+        resources: 
+          requests:
+            cpu: 1m
+            memory: 2Mi    
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *' 
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu
+          value: 1m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.memory
+          value: 2Mi
+
+  - it: job can has it's own resource requests
+    template: services-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+        resources: 
+          requests:
+            cpu: 1m
+            memory: 2Mi    
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'        
+            resources: 
+              requests:
+                cpu: 3m
+                memory: 4Mi    
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu
+          value: 3m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.memory
+          value: 4Mi
+
+  - it: job's resource requests are merged with service resource requests
+    template: services-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+        resources: 
+          requests:
+            cpu: 1m
+            memory: 2Mi    
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'        
+            resources: 
+              requests:
+                cpu: 3m    
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu
+          value: 3m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.memory
+          value: 2Mi
+
+  - it: job's resource requests are merged with service resource request defaults
+    template: services-cron.yaml
+    set:
+      serviceDefaults:
+        resources: 
+          requests:
+            cpu: 1m
+            memory: 2Mi   
+      services.foo:
+        image: 'bar'
+        resources: 
+          requests:
+            cpu: 3m
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'        
+            resources: 
+              requests:
+                cpu: 4m    
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu
+          value: 4m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.memory
+          value: 2Mi

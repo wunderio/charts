@@ -51,9 +51,15 @@ spec:
                  {{ $job.command | nindent 18 }}
                  echo "cron run completed"
             resources:
-              {{ if $service.resources -}}
+              {{- if $job.resources }}
+              {{- if $service.resources }}
+              {{ merge $job.resources (merge $service.resources $.Values.serviceDefaults.resources) | toYaml | nindent 14 }}
+              {{- else }}
+              {{ merge $job.resources $.Values.serviceDefaults.resources | toYaml | nindent 14 }}
+              {{- end }}
+              {{- else if $service.resources }}
               {{ merge $service.resources $.Values.serviceDefaults.resources | toYaml | nindent 14 }}
-              {{ else -}}
+              {{- else }}
               {{ $.Values.serviceDefaults.resources | toYaml | nindent 14 }}
               {{- end }}
           volumes:
