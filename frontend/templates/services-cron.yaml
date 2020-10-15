@@ -21,6 +21,7 @@ spec:
         metadata:
           labels:
             {{- include "frontend.release_labels" $ | nindent 12 }}
+            cronjob: "true"
         spec:
           enableServiceLinks: false
           containers:

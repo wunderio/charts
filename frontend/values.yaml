@@ -65,6 +65,10 @@ ingress:
     # It is best to first reserve the IP address and then add it here.
     # staticIpAddressName: null
 
+# Infrastructure related settings.
+cluster: 
+  vpcNative: false
+
 # backendConfig customizations for main service
 backendConfig:
   securityPolicy:
