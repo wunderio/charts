@@ -1,7 +1,8 @@
+{{- if .Values.varnish.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-drupal
+  name: {{ .Release.Name }}-varnish
   annotations:
     auto-downscale/down: "false"
     beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}-drupal"}}'
@@ -12,12 +13,15 @@ metadata:
     {{- end }}
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
+    service: varnish
 spec:
   type: NodePort
-  # We explicitly unset this, in case the application is currently downscaled.
-  externalName: null
   ports:
-    - port: 80
+  - name: web
+    port: 80
+  - name: admin
+    port: 6082 
   selector:
     {{- include "drupal.release_selector_labels" . | nindent 4 }}
-    deployment: drupal
+    service: varnish
+{{- end }}

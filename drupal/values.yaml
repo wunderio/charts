@@ -78,6 +78,10 @@ ingress:
     # It is best to first reserve the IP address and then add it here.
     # staticIpAddressName: null
 
+# Infrastructure related settings.
+cluster: 
+  vpcNative: false
+
 # backendConfig customisations for Drupal service
 backendConfig:
  securityPolicy:

@@ -18,6 +18,7 @@ spec:
         metadata:
           labels:
             {{- include "drupal.release_labels" $ | nindent 12 }}
+            cronjob: "true"
         spec:
           enableServiceLinks: false
           containers:

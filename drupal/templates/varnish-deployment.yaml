@@ -67,23 +67,4 @@ spec:
       - name: varnish-secret
         secret:
           secretName: {{ .Release.Name }}-secrets-varnish
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Release.Name }}-varnish
-  labels:
-    {{- include "drupal.release_labels" . | nindent 4 }}
-    service: varnish
-spec:
-  type: NodePort
-  ports:
-  - name: web
-    port: 80
-  - name: admin
-    port: 6082 
-  selector:
-    {{- include "drupal.release_selector_labels" . | nindent 4 }}
-    service: varnish
 {{- end }}
