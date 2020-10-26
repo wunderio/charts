@@ -15,9 +15,18 @@ metadata:
     traefik.ingress.kubernetes.io/frontend-entry-points: "http"
     {{- end }}
     {{- end }}
+
+    {{- $redirect_https := false }}
     {{- if (hasKey $ingress "redirect-https") }}
-    ingress.kubernetes.io/ssl-redirect: {{ (index $ingress "redirect-https") | quote }}
+    {{- $redirect_https = (index $ingress "redirect-https") }}
     {{- end }}
+    {{- if not $ingress.tls }}
+    {{- $redirect_https = false }}
+    {{- end }}
+    {{- if $redirect_https }}
+    ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- end }}
+
     {{- if eq $ingress.type "gce" }}
     cert-manager.io/cluster-issuer: letsencrypt
     {{- end }}
@@ -91,9 +100,18 @@ metadata:
     traefik.ingress.kubernetes.io/frontend-entry-points: "http"
     {{- end }}
     {{- end }}
+    
+    {{- $redirect_https := false }}
     {{- if (hasKey $ingress "redirect-https") }}
-    ingress.kubernetes.io/ssl-redirect: {{ (index $ingress "redirect-https") | quote }}
+    {{- $redirect_https = (index $ingress "redirect-https") }}
     {{- end }}
+    {{- if not $ingress.tls }}
+    {{- $redirect_https = false }}
+    {{- end }}
+    {{- if $redirect_https }}
+    ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- end }}
+
     {{- if eq $ingress.type "gce" }}
     cert-manager.io/cluster-issuer: letsencrypt
     {{- end }}
@@ -101,6 +119,7 @@ metadata:
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
 spec:
+  {{- if $ingress.tls }}
   tls:
   {{- range $domain_index, $domain := $.Values.exposeDomains }}
   {{- $domain := mergeOverwrite (deepCopy $.Values.exposeDomainsDefaults) $domain }}
@@ -108,6 +127,7 @@ spec:
   {{- if $domain.ssl }}
   {{- if $domain.ssl.enabled }}
   - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}
+  {{- end }}
   {{- end }}
   {{- end }}
   {{- end }}
