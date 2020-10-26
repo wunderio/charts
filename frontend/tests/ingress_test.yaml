@@ -151,7 +151,7 @@ tests:
       - documentIndex: 1
         equal:
           path: 'metadata.annotations.ingress\.kubernetes\.io\/ssl-redirect'
-          value: "false"
+          value: null
 
   - it: exposeDomains - multiple hostnames can use the same ingress 
     template: ingress.yaml
