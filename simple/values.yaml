@@ -18,7 +18,7 @@ app: simple
 # Configuration for the wunderio/silta-release subchart.
 silta-release:
   downscaler:
-    enabled: true
+    enabled: false
 
 # How many instances of the resulting pod should be in our Kubernetes deployment.
 # A single pod (the default value) is good for development environments to minimise resource usage.
@@ -38,16 +38,29 @@ autoscaling:
         targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
-# Example of exposing 2 additional domains for this deployment, each with its own certificate
-# Note that the key is only used for documentation purposes.
+# Example of exposing 2 additional domains for this deployment, each with its own certificate.
 # exposeDomains:
-#   - hostname: example.com
-#   - hostname: www.example.com
-#   -   ssl:
-#   -     enabled: true
-#   -     issuer: letsencrypt-staging
+#   example:
+#     hostname: example.com
+#   example2:
+#     hostname: example1.com
+#     # Reference to a key under `ingress`
+#     ingress: gce
+#     ssl:
+#       enabled: true
+#       issuer: letsencrypt-staging
+#   example_www:
+#     hostname: www.example.com
+#   example_no_https:
+#    hostname: insecure.example.com
+#      ssl: 
+#        enabled: false
 exposeDomains: {}
 
+exposeDomainsDefaults:
+  ingress: default
+
+# Settings for default site provided by this deployment
 ssl:
   # Enable HTTPS for this deployment
   enabled:  true
@@ -57,6 +70,26 @@ ssl:
   # ca: ""
   # key: ""
   # crt: ""
+
+ingress:
+  default:
+    type: traefik
+    tls: true
+    redirect-https: true
+  gce:
+    type: gce
+    # The name of the reserved static IP address.
+    # It is best to first reserve the IP address and then add it here.
+    # staticIpAddressName: null
+
+# Infrastructure related settings.
+cluster: 
+  vpcNative: false
+
+# backendConfig customizations for main service
+backendConfig:
+  securityPolicy:
+    name: "silta-ingress"
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:

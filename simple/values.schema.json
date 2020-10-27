@@ -1,0 +1,29 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "replicas": { "type": "integer" },
+    "autoscaling": { "type": "object" },
+    "clusterDomain": { "type": "string" },
+    "projectName": { "type": "string" },
+    "environmentName": { "type": "string" },
+    "branchName": { "type": "string" },
+    "imagePullSecrets": { "type": "array" },
+    "app": { "type": "string" },
+    "exposeDomains": { "type": ["array","object"], "items": { "type": "object"}},
+    "exposeDomainsDefaults": { "type": "object"},
+    "ssl": { "type": "object" },
+    "backendConfig": { "type": ["array","object"], "items": { "type": "object"}},
+    "ingress": { "type": "object" },
+    "cluster": {
+      "type": "object",
+      "properties": {
+        "vpcNative": { "type": "boolean"}
+      }
+    },
+    "nginx": { "type": "object" },
+    "silta-release": {
+      "type": "object"
+    }
+  }
+}

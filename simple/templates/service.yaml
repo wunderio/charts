@@ -4,6 +4,14 @@ metadata:
   name: {{ .Release.Name }}-simple
   labels:
     {{ include "simple.release_labels" . | indent 4 }}
+  annotations:
+    auto-downscale/down: "false"
+    beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}-simple"}}'
+    {{- if .Values.cluster }}
+    {{- if .Values.cluster.vpcNative }}
+    cloud.google.com/neg: '{"ingress": true}'
+    {{- end }}
+    {{- end }}
 spec:
   type: NodePort
   externalTrafficPolicy: Local

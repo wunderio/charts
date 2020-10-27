@@ -1,5 +1,7 @@
-{{- if .Values.ssl.enabled }}
-{{- if has .Values.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+{{- $context_ingress := .Values.ingress.default }}
+{{- $context_ssl := .Values.ssl }}
+{{- if $context_ingress.tls }}
+{{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
@@ -11,7 +13,7 @@ spec:
   dnsNames:
   - {{ template "simple.domain" . }}
   issuerRef:
-    name: {{ .Values.ssl.issuer }}
+    name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
   acme:
     config:
@@ -21,7 +23,7 @@ spec:
           - {{ template "simple.domain" . }}
 ---
 
-{{- else if eq .Values.ssl.issuer "selfsigned" }}
+{{- else if eq $context_ssl.issuer "selfsigned" }}
 apiVersion: certmanager.k8s.io/v1alpha1
 kind: Certificate
 metadata:
@@ -36,11 +38,11 @@ spec:
   dnsNames:
   - {{ template "simple.domain" . }}
   issuerRef:
-    name: {{ .Values.ssl.issuer }}
+    name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
 ---
 
-{{- else if eq .Values.ssl.issuer "custom" }}
+{{- else if eq $context_ssl.issuer "custom" }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -49,8 +51,9 @@ metadata:
     {{- include "simple.release_labels" . | nindent 4 }}
 type: kubernetes.io/tls
 data:
-  tls.crt: {{ .Values.ssl.crt | b64enc }}
-  tls.key: {{ .Values.ssl.key | b64enc }}
+  tls.ca: {{ $context_ssl.ca | b64enc }}
+  tls.crt: {{ $context_ssl.crt | b64enc }}
+  tls.key: {{ $context_ssl.key | b64enc }}
 ---
 {{- end }}
 
