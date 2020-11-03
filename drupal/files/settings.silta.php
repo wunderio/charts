@@ -49,15 +49,12 @@ if ($elasticsearch_host = getenv('ELASTICSEARCH_HOST')) {
 if (getenv('MEMCACHED_HOST')) {
   $settings['memcache']['servers'] = [getenv('MEMCACHED_HOST') . ':11211' => 'default'];
 
-  $memcache_exists = class_exists('Memcache', FALSE);
-  $memcached_exists = class_exists('Memcached', FALSE);
-
   // Set the default cache backend to use memcache if memcache host is set
   // and if one of the memcache libraries was found.
   // The existence of the memcache drupal module should also be checked
   // but this is not possible until this issue has been fixed:
   // https://www.drupal.org/project/drupal/issues/2766509
-  if ($memcache_exists || $memcached_exists) {
+  if (class_exists('Memcache', FALSE) || class_exists('Memcached', FALSE)) {
     $settings['cache']['default'] = 'cache.backend.memcache';
   }
 }
