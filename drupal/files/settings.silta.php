@@ -5,6 +5,8 @@
  * Automatically injected settings for the Silta environment.
  */
 
+use Drupal\Core\Installer\InstallerKernel;
+
 // Database settings.
 $databases['default']['default'] = [
   'database' => getenv('DB_NAME'),
@@ -55,7 +57,7 @@ if (getenv('MEMCACHED_HOST')) {
   // The existence of the memcache drupal module should also be checked
   // but this is not possible until this issue has been fixed:
   // https://www.drupal.org/project/drupal/issues/2766509
-  if (!\Drupal\Core\Installer\InstallerKernel::installationAttempted() && (class_exists('Memcache', FALSE) || class_exists('Memcached', FALSE))) {
+  if (!InstallerKernel::installationAttempted() && (class_exists('Memcache', FALSE) || class_exists('Memcached', FALSE))) {
     $settings['cache']['default'] = 'cache.backend.memcache';
   }
 }
