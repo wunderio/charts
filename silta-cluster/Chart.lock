@@ -1,7 +1,10 @@
 dependencies:
+- name: silta-cluster-crds
+  repository: file://../silta-cluster-crds
+  version: 0.1.0
 - name: traefik
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 1.86.2
+  repository: https://helm.traefik.io/traefik
+  version: 9.8.4
 - name: redis
   repository: https://charts.bitnami.com/bitnami
   version: 10.4.4
@@ -22,6 +25,6 @@ dependencies:
   version: 0.1.0
 - name: instana-agent
   repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 1.0.30
-digest: sha256:e22c2d35489f5cbc14606e1a3c712d04fe7577d54354c6a0718123a68135a1e7
-generated: "2020-09-11T09:56:15.61414303+03:00"
+  version: 1.0.34
+digest: sha256:8cf02f18d628d5bd1f93ff218fc58903a90d6d998f9e029c765b9d0a4add3f2c
+generated: "2020-11-11T14:28:32.253148232+02:00"
