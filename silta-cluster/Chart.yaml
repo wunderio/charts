@@ -4,9 +4,6 @@ description: Setup a silta kubernetes cluster.
 name: silta-cluster
 version: 0.2.8
 dependencies:
-- name: silta-cluster-crds
-  version: 0.1.0
-  repository: file://../silta-cluster-crds
 - name: traefik
   version: 9.8.x
   repository: https://helm.traefik.io/traefik

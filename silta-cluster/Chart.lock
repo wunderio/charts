@@ -1,7 +1,4 @@
 dependencies:
-- name: silta-cluster-crds
-  repository: file://../silta-cluster-crds
-  version: 0.1.0
 - name: traefik
   repository: https://helm.traefik.io/traefik
   version: 9.8.4
