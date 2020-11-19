@@ -22,6 +22,6 @@ dependencies:
   version: 0.1.0
 - name: instana-agent
   repository: https://agents.instana.io/helm
-  version: 1.1.x
-digest: sha256:39231a3e2d554c2c8d9be8a6cc775d550a96ec83a7df8bf3c945f98b52e38c24
-generated: "2020-11-19T16:03:04.481979157+02:00"
+  version: 1.1.5
+digest: sha256:89beb0715895cd5f46a8faa079e98180fd0dff8658af1cce44a749db6ceecad7
+generated: "2020-11-20T11:25:10.914711675+02:00"
