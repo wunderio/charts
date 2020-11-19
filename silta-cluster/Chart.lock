@@ -21,7 +21,7 @@ dependencies:
   repository: file://../silta-proxy
   version: 0.1.0
 - name: instana-agent
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 1.0.30
-digest: sha256:e22c2d35489f5cbc14606e1a3c712d04fe7577d54354c6a0718123a68135a1e7
-generated: "2020-09-11T09:56:15.61414303+03:00"
+  repository: https://agents.instana.io/helm
+  version: 1.1.5
+digest: sha256:41508512ea626442c0109a58e3baad474a1ec785d3059b67ff24cc855bf55e2a
+generated: "2020-11-19T17:00:55.811366009+02:00"
