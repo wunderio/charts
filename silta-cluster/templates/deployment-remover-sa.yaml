@@ -1,0 +1,39 @@
+{{- if .Values.deploymentRemover.enabled }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Release.Name }}-deployment-remover
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}-deployment-remover
+  namespace: {{ .Release.Namespace }}
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- nonResourceURLs:
+  - '*'
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Release.Name }}-deployment-remover
+subjects:
+- kind: ServiceAccount
+  name: {{ .Release.Name }}-deployment-remover
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ .Release.Name }}-deployment-remover
+  apiGroup: rbac.authorization.k8s.io
+
+{{- end }}

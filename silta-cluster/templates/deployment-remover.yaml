@@ -27,6 +27,7 @@ spec:
         name: {{ .Release.Name }}-deployment-remover
     spec:
       enableServiceLinks: false
+      serviceAccountName: {{ .Release.Name }}-deployment-remover
       initContainers:
       - name: wait-redis
         image: busybox
@@ -49,14 +50,6 @@ spec:
             value: {{ .Release.Name }}-redis-master
           - name: REDIS_PASSWORD
             value: {{ required "A valid .Values.redis.password entry required!" .Values.redis.password | quote }}
-          - name: GCLOUD_KEY_JSON
-            value: {{ required "A valid .Values.gke.keyJSON entry required!" .Values.gke.keyJSON | quote }}
-          - name: GCLOUD_PROJECT_NAME
-            value: {{ required "A valid .Values.gke.projectName entry required!" .Values.gke.projectName | quote }}
-          - name: GCLOUD_COMPUTE_ZONE
-            value: {{ required "A valid .Values.gke.computeZone entry required!" .Values.gke.computeZone | quote }}
-          - name: GCLOUD_CLUSTER_NAME
-            value: {{ required "A valid .Values.gke.clusterName entry required!" .Values.gke.clusterName | quote }}
         resources:
           {{- .Values.deploymentRemover.resources | toYaml | nindent 10 }}
 {{- end }}
