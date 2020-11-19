@@ -4,11 +4,20 @@ This helm chart helps setting up resources for https://github.com/wunderio/silta
 
 ## Requirements
 
-Custom resource definitions for cert-manager (from https://github.com/helm/charts/tree/master/stable/cert-manager):
-```
-kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.10/deploy/manifests/00-crds.yaml
+ - Silta cluster namespace and label for NetworkPolicy rules:
+ ```
 kubectl create namespace silta-cluster
 kubectl label namespace silta-cluster name=silta-cluster
+```
+
+ - Custom resource definitions for traefik2 (Combined from https://github.com/traefik/traefik-helm-chart/tree/master/traefik/crds)
+```
+helm install --wait silta-cluster-crds silta-cluster --namespace silta-cluster --repo https://storage.googleapis.com/charts.wdr.io
+```
+
+ - Custom resource definitions for cert-manager (from https://github.com/helm/charts/tree/master/stable/cert-manager):
+```
+kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.10/deploy/manifests/00-crds.yaml
 kubectl label namespace silta-cluster certmanager.k8s.io/disable-validation="true"
 ```
 
@@ -19,7 +28,7 @@ kubectl label namespace silta-cluster certmanager.k8s.io/disable-validation="tru
 Here is an example of how we instantiate this helm chart: 
 
 ```bash
-helm upgrade --install --wait cluster-name silta-cluster \
+helm upgrade --install --wait silta-cluster silta-cluster \
              --repo "https://storage.googleapis.com/charts.wdr.io" \
              --values local-values.yaml            
 ```
