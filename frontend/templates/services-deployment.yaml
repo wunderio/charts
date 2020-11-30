@@ -21,6 +21,9 @@ spec:
         {{ if $.Values.shell.enabled -}}
         silta-ingress: allow
         {{- end }}
+      annotations:
+        # We use a checksum to redeploy the pods when the configMap changes.
+        configMap-checksum: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
     spec:
       enableServiceLinks: false
       containers:
