@@ -70,9 +70,9 @@ workflows:
   commit:
     jobs:
       - build:
-          context: global_nonprod
+          context: silta_dev
       - deploy:
-          context: global_nonprod
+          context: silta_dev
           requires:
             - build
           filters:
