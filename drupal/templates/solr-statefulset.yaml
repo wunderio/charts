@@ -1,0 +1,93 @@
+{{- if .Values.solr.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-solr
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+spec:
+  serviceName: {{ .Release.Name }}-solr
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "drupal.release_selector_labels" . | nindent 6 }}
+      statefulset: solr
+  template:
+    metadata:
+      labels:
+        {{- include "drupal.release_labels" . | nindent 8 }}
+        statefulset: solr
+    spec:
+      enableServiceLinks: false
+      initContainers:
+      # Copy solr config from php container, it's the only way to avoid extra image build
+      - name: conf-import
+        image: {{ .Values.php.image | quote }}
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            set -ex
+            echo "name={{ .Values.solr.coreName }}" > /var/solr/search/core.properties
+            cp -arv "{{ .Values.solr.confLocation }}/." "/var/solr/search/conf/"
+        volumeMounts:
+        - name: {{ .Release.Name }}-core-dir
+          mountPath: /var/solr/search
+      containers:
+      - name: solr
+        image: {{ printf "%s:%s" .Values.solr.image .Values.solr.imageTag | quote }}
+        ports:
+        - containerPort: 8983
+        command: {{ .Values.solr.command }}
+        args:
+          {{- range .Values.solr.commandArgs }}
+          - {{ . | quote }}
+          {{- end }}
+          - "-m"
+          - "{{ .Values.solr.javaProcessMemory }}"
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: 8983
+        readinessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          httpGet:
+            scheme: HTTP
+            path: /solr/admin/info/system
+            port:  8983
+        volumeMounts:
+        - name: {{ .Release.Name }}-core-dir
+          mountPath: /var/solr/search
+        - name: {{ .Release.Name }}-solr-data
+          mountPath: /var/solr/search/data
+        # Compatability mount: solr 8 core location
+        - name: {{ .Release.Name }}-core-dir
+          mountPath: /var/solr/data/search
+        - name: {{ .Release.Name }}-solr-data
+          mountPath: /var/solr/data/search/data
+        # Compatability mount: older solr versions have different core location
+        - name: {{ .Release.Name }}-core-dir
+          mountPath: /opt/solr/example/solr/search
+        - name: {{ .Release.Name }}-solr-data
+          mountPath: /opt/solr/example/solr/search/data
+
+        resources:
+          {{- .Values.solr.resources | toYaml | nindent 10 }}
+      volumes:
+      - name: {{ .Release.Name }}-core-dir
+        emptyDir: {}
+      
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ .Release.Name }}-solr-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: {{ .Values.solr.persistence.data.storageClassName }}
+      {{- if .Values.solr.persistence.data.csiDriverName }}
+      csiDriverName: {{ .Values.solr.persistence.data.csiDriverName }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.solr.persistence.data.size }}
+      accessModes: {{ .Values.solr.persistence.data.accessModes }}
+{{- end }}

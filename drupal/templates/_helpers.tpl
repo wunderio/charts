@@ -161,6 +161,11 @@ imagePullSecrets:
       key: hashsalt
 - name: DRUPAL_CONFIG_PATH
   value: {{ .Values.php.drupalConfigPath }}
+{{- if .Values.solr.enabled }}
+- name: SOLR_HOST
+  value: {{ .Release.Name }}-solr
+{{- end }}
+# Environment overrides via values file
 {{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}
   value: {{ $val | quote }}
@@ -185,9 +190,9 @@ imagePullSecrets:
 - name: HTTPS_PROXY
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: no_proxy
-  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 - name: NO_PROXY
-  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 {{- end }}
 {{- end }}
 
@@ -365,7 +370,9 @@ if [ -f /app/reference-data/db.sql.gz ]; then
   pv /tmp/reference-data-db.sql | drush sql-cli
 
   # Clear caches before doing anything else.
-  drush cr
+  drupal_major_version=$(drush status --fields=drupal-version  | sed -nEe 's/^[^0-9]*([0-9]+).*/\1/p')
+  if [[ $drupal_major_version -eq 7 ]] ; then drush cache-clear all; 
+  else drush cache-rebuild; fi
 else
   printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
 fi
@@ -381,7 +388,9 @@ if [ -f /backups/{{ $.Values.backup.restoreId }}/db.sql.gz ]; then
   pv /tmp/backup-data-db.sql | drush sql-cli
 
   # Clear caches before doing anything else.
-  drush cr
+  drupal_major_version=$(drush status --fields=drupal-version  | sed -nEe 's/^[^0-9]*([0-9]+).*/\1/p')
+  if [[ $drupal_major_version -eq 7 ]] ; then drush cache-clear all; 
+  else drush cache-rebuild; fi
 else
   printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
 fi
