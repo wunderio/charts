@@ -161,6 +161,8 @@ imagePullSecrets:
       key: hashsalt
 - name: DRUPAL_CONFIG_PATH
   value: {{ .Values.php.drupalConfigPath }}
+- name: DRUPAL_CORE_VERSION
+  value: {{ .Values.php.drupalCoreVersion }}
 {{- if .Values.solr.enabled }}
 - name: SOLR_HOST
   value: {{ .Release.Name }}-solr
