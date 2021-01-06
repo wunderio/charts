@@ -182,6 +182,12 @@ services: {}
   #     limits:
   #       memory: 512Mi
 
+  #  # Post-release hook.
+  #  # This is run every time a new release is deployed
+  #  postupgrade:
+  #    command: |
+  #      'your command here'
+
   #  cron:
   #    example:
   #      command: echo "hello world"
