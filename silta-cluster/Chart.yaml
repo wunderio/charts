@@ -5,8 +5,8 @@ name: silta-cluster
 version: 0.2.8
 dependencies:
 - name: traefik
-  version: 1.86.x
-  repository: https://kubernetes-charts.storage.googleapis.com/
+  version: 1.87.x
+  repository: file://../legacy_traefik
 - name: redis
   version: 10.4.x
   repository: https://charts.bitnami.com/bitnami
