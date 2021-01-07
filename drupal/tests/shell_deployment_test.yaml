@@ -47,3 +47,29 @@ tests:
             name: GITAUTH_SCOPE
             value: foo
 
+  - it: mounts backups volume correctly when backups are enabled
+    template: shell-deployment.yaml
+    set:
+      shell.enabled: true
+      backup.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            mountPath: /backups
+            name: RELEASE-NAME-backup
+            readOnly: true
+
+  - it: does not mount backups volume when backups are disabled
+    template: shell-deployment.yaml
+    set:
+      shell.enabled: true
+      backup.enabled: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            mountPath: /backups
+            name: RELEASE-NAME-backup
+            readOnly: true
+
