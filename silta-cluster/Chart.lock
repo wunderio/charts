@@ -1,7 +1,7 @@
 dependencies:
 - name: traefik
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 1.86.2
+  repository: file://../legacy_traefik
+  version: 1.87.7
 - name: redis
   repository: https://charts.bitnami.com/bitnami
   version: 10.4.4
@@ -21,7 +21,7 @@ dependencies:
   repository: file://../silta-proxy
   version: 0.1.0
 - name: instana-agent
-  repository: https://kubernetes-charts.storage.googleapis.com/
-  version: 1.0.30
-digest: sha256:e22c2d35489f5cbc14606e1a3c712d04fe7577d54354c6a0718123a68135a1e7
-generated: "2020-09-11T09:56:15.61414303+03:00"
+  repository: https://agents.instana.io/helm
+  version: 1.1.9
+digest: sha256:74d5935ea10b3716678f202658aac4af86e332c3d1e4373908ecc85ea654747e
+generated: "2021-01-06T13:42:18.450641561+02:00"

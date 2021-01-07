@@ -28,7 +28,7 @@ jobs:
             helm repo add codecentric https://codecentric.github.io/helm-charts
             helm repo add jetstack https://charts.jetstack.io
             helm repo add elastic https://helm.elastic.co
-            helm repo add stable https://kubernetes-charts.storage.googleapis.com
+            helm repo add instana https://agents.instana.io/helm
 
             for CHARTFILE in `find . -name Chart.yaml`
             do
@@ -69,9 +69,9 @@ workflows:
   commit:
     jobs:
       - build:
-          context: global_nonprod
+          context: silta_finland
       - deploy:
-          context: global_nonprod
+          context: silta_finland
           requires:
             - build
           filters:

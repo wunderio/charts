@@ -1,4 +1,6 @@
 {{- if .Values.backup.enabled }}
+{{- $db_password := randAlphaNum 20 }}
+{{- $params := dict "db_password" $db_password  -}}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
@@ -15,9 +17,13 @@ spec:
   suspend: false
   jobTemplate:
     spec:
+      activeDeadlineSeconds: 300
+      backoffLimit: 2
       template:
         spec:
           enableServiceLinks: false
+          # Lets us kill DB process (in mariadb container) from backup container
+          shareProcessNamespace: true
           containers:
           - name: backup
             {{- include "drupal.php-container" . | nindent 12 }}
@@ -28,17 +34,38 @@ spec:
             command: ["/bin/bash", "-c"]
             args:
               - |
-                {{ include "drupal.backup-command" . | nindent 16 }}
+                {{ include "drupal.backup-command" (merge $params . ) | nindent 16 }}
+                {{ include "mariadb.db-validation" (merge $params . ) | nindent 16 }}
+            securityContext:
+              capabilities:
+                #For shareProcessNamespace
+                add:
+                  - SYS_PTRACE
+          - name: mariadb
+            image: docker.io/bitnami/mariadb:10.2
+            imagePullPolicy: IfNotPresent
+            env:
+            - name: MARIADB_ROOT_PASSWORD
+              value: {{ $db_password }}
+            - name: MARIADB_DATABASE
+              value: drupal
+            ports:
+            - containerPort: 3306
+              name: mariadb
             resources:
               {{- .Values.backup.resources | toYaml | nindent 14 }}
+            securityContext:
+              capabilities:
+                #For shareProcessNamespace
+                add:
+                  - SYS_PTRACE
           restartPolicy: Never
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}
             - name: {{ .Release.Name }}-backup
               persistentVolumeClaim:
                 claimName: {{ .Release.Name }}-backup
-
-
           {{- include "drupal.imagePullSecrets" . | nindent 10 }}
 {{- end }}
+
 ---

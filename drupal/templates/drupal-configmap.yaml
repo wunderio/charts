@@ -9,8 +9,11 @@ data:
     [mysqldump]
     gdpr-replacements='{{ .Values.gdprDump | toJson }}'
 
+  {{- if eq .Values.php.drupalCoreVersion "7" }}
+  settings_silta_php: |{{ .Files.Get "files/settings.silta.d7.php" | nindent 4 }}
+  {{- else }}
   settings_silta_php: |{{ .Files.Get "files/settings.silta.php" | nindent 4 }}
-
+  {{- end }}
   silta_services_yml: |{{ .Files.Get "files/silta.services.yml" | nindent 4 }}
 
   php_ini: |

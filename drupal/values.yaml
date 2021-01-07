@@ -214,13 +214,18 @@ php:
   postupgrade:
     command: |
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-        # This first cache rebuild is unfortunately needed for the common case where a Drupal or
-        # contrib module flaw requires a rebuild before running database updates.
-        drush cr
-        drush updatedb -y
-        if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
-          drush config-import -y
-          drush cr
+        if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then
+          drush cache-clear all
+          drush updatedb -y
+        else
+          # This first cache rebuild is unfortunately needed for the common case where a Drupal or
+          # contrib module flaw requires a rebuild before running database updates.
+          drush cache-rebuild
+          drush updatedb -y
+          if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
+            drush config-import -y
+            drush cache-rebuild
+          fi
         fi
       fi
 
@@ -248,6 +253,10 @@ php:
   # Define the location of the Drupal config files relative to the composer root.
   # This variable is exposed as $DRUPAL_CONFIG_PATH in the container.
   drupalConfigPath: "config/sync"
+
+  # Define Drupal version to be able to use different settings.php and do other core specific tasks.
+  # This variable is exposed as $DRUPAL_CORE_VERSION in the container.
+  drupalCoreVersion: "8"
 
   # Set a restriction on where the php pod are provisioned.
   # This can be used for example to get a static IP for egress traffic.
@@ -507,3 +516,42 @@ smtp:
   # starttls: false
   # username: ""
   # password: ""
+
+# Solr.  
+solr:
+  enabled: false
+  # Available image tags: https://hub.docker.com/r/geerlingguy/solr/tags
+  image: geerlingguy/solr
+  imageTag: latest
+
+  # Solr 4.x and 5.x does not support "-force" argument (optional override)
+  command: ["/opt/solr/bin/solr"]
+  commandArgs: ["start", "-p", "8983", "-f", "-force"]
+
+  # Path in php container containing solr conf files (schema, solrconfig, stopwords, etc.).
+  # Solr init container will contents of this folder to actual solr container.
+  # Note: Configuration folder is not synced with shell container, drupal image rebuild required to update!
+  confLocation: /app/silta/solr/conf
+
+  coreName: search
+
+  # Sets the min (-Xms) and max (-Xmx) heap size for the JVM process
+  javaProcessMemory: 256m
+
+  # Kubernetes resource assignments.
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512M
+    limits:
+      cpu: 500m
+      memory: 768M
+
+  persistence:
+    data:
+      size: 1Gi
+      storageClassName: standard
+      # Provide driver name if using CSI driver backed storage class (optional).
+      # csiDriverName: csi-driver-name
+      accessModes: 
+        - ReadWriteOnce 
