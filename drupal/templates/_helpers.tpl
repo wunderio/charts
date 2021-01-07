@@ -161,6 +161,8 @@ imagePullSecrets:
       key: hashsalt
 - name: DRUPAL_CONFIG_PATH
   value: {{ .Values.php.drupalConfigPath }}
+- name: DRUPAL_CORE_VERSION
+  value: {{ .Values.php.drupalCoreVersion | quote }}
 {{- if .Values.solr.enabled }}
 - name: SOLR_HOST
   value: {{ .Release.Name }}-solr
@@ -370,8 +372,7 @@ if [ -f /app/reference-data/db.sql.gz ]; then
   pv /tmp/reference-data-db.sql | drush sql-cli
 
   # Clear caches before doing anything else.
-  drupal_major_version=$(drush status --fields=drupal-version  | sed -nEe 's/^[^0-9]*([0-9]+).*/\1/p')
-  if [[ $drupal_major_version -eq 7 ]] ; then drush cache-clear all; 
+  if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then drush cache-clear all;
   else drush cache-rebuild; fi
 else
   printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
@@ -388,8 +389,7 @@ if [ -f /backups/{{ $.Values.backup.restoreId }}/db.sql.gz ]; then
   pv /tmp/backup-data-db.sql | drush sql-cli
 
   # Clear caches before doing anything else.
-  drupal_major_version=$(drush status --fields=drupal-version  | sed -nEe 's/^[^0-9]*([0-9]+).*/\1/p')
-  if [[ $drupal_major_version -eq 7 ]] ; then drush cache-clear all; 
+  if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then drush cache-clear all;
   else drush cache-rebuild; fi
 else
   printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"

@@ -214,8 +214,7 @@ php:
   postupgrade:
     command: |
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-        drupal_major_version=$(drush status --fields=drupal-version  | sed -nEe 's/^[^0-9]*([0-9]+).*/\1/p')
-        if [[ $drupal_major_version -eq 7 ]] ; then
+        if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then
           drush cache-clear all
           drush updatedb -y
         else
@@ -254,6 +253,10 @@ php:
   # Define the location of the Drupal config files relative to the composer root.
   # This variable is exposed as $DRUPAL_CONFIG_PATH in the container.
   drupalConfigPath: "config/sync"
+
+  # Define Drupal version to be able to use different settings.php and do other core specific tasks.
+  # This variable is exposed as $DRUPAL_CORE_VERSION in the container.
+  drupalCoreVersion: "8"
 
   # Set a restriction on where the php pod are provisioned.
   # This can be used for example to get a static IP for egress traffic.
