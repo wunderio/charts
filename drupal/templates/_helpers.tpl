@@ -279,7 +279,10 @@ done
     {{ .Values.php.postinstall.command }}
     rm /app/web/sites/default/files/_installing
   {{ end }}
-  {{ .Values.php.postupgrade.command}}
+  {{ .Values.php.postupgrade.command }}
+  {{- if .Values.php.postupgrade.afterCommand }}
+    {{ .Values.php.postupgrade.afterCommand }}
+  {{- end }}
 
   # Wait for background imports to complete.
   wait

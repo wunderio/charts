@@ -228,6 +228,10 @@ php:
           fi
         fi
       fi
+    # Extra commands to run after previous 'command' block. 
+    # This removes the user step of copying the whole 'command' block and adding their own custom logic.
+    afterCommand: |
+    
 
   # Pass additional environment variables to all php containers as key-value pairs.
   env: {}
