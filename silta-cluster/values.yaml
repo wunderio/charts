@@ -154,3 +154,21 @@ silta-proxy:
 
 instana-agent:
   enabled: false
+
+# This should be replaced when an actual sidecar implementation is available. 
+# ETA Kubernetes 1.19
+# https://github.com/kubernetes/enhancements/issues/753#issuecomment-713471597
+k9sControllerSidecars:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: eu.gcr.io/silta-images/silta-k8s-controller-sidecars
+    tag: latest
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+     cpu: 100m
+     memory: 128Mi
+    limits:
+      cpu: "200m"
+      memory: "128Mi"
