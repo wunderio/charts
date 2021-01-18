@@ -375,6 +375,11 @@ data:
         return (synth( 403, "Forbidden"));
       }
 
+      if (req.http.Authorization) {
+        # Not cacheable by default
+        return (pass);
+      }
+
       if (req.url ~ "\.(png|gif|jpg|tif|tiff|ico|swf|css|js|pdf|doc|xls|ppt|zip)(\?.*)?$") {
         // Forcing a lookup with static file requests
         return (hash);
@@ -440,10 +445,6 @@ data:
       #unset req.http.Accept-Language;
       #unset req.http.user-agent;
 
-      if (req.http.host == "docs.local.ansibleref.com") {
-        return (pass);
-      }
-
       # Large static files are delivered directly to the end-user without
       # waiting for Varnish to fully read the file first.
       # Varnish 4 fully supports Streaming, so set do_stream in vcl_backend_response()
@@ -454,11 +455,6 @@ data:
 
       # Send Surrogate-Capability headers to announce ESI support to backend
       set req.http.Surrogate-Capability = "key=ESI/1.0";
-
-      if (req.http.Authorization) {
-        # Not cacheable by default
-        return (pass);
-      }
 
       // Allow pasing custom rules
       {{- if .Values.varnish.vcl_recv_extra }}
