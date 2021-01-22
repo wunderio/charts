@@ -480,15 +480,10 @@ fi
 
 
 {{- define "mariadb.db-validation" -}}
+  
   set -e
 
-  # Stop DB container when exiting this shell (backup container has done its job)
-  function stop_db {
-    mysqld_pid=$(pgrep mysqld)
-    kill -TERM $mysqld_pid && echo "Killed MariaDB, PID ${mysqld_pid}"
-  }
-  trap stop_db EXIT ERR
-
+  echo "** DB validation"
 
   export DB_USER=root 
   export DB_PASS={{ .db_password }}
@@ -497,6 +492,7 @@ fi
 
   TIME_WAITING=0
   echo "Waiting for database.";
+
   until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --protocol=tcp --silent; do
     echo -n "."
     sleep 1s
@@ -508,7 +504,7 @@ fi
     fi
   done
 
-  
+  echo "Importing database dump for validation"
   mysql -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp < /tmp/db.sql
   drush status --fields=bootstrap
 
