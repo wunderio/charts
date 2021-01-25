@@ -17,13 +17,16 @@ spec:
   suspend: false
   jobTemplate:
     spec:
-      activeDeadlineSeconds: 300
+      # This is a fallback for sidecar termination failure.
+      # Two hours should be enough for backup/validation actions.
+      activeDeadlineSeconds: 7200
       backoffLimit: 2
       template:
+        metadata:
+          annotations:
+            nrmitchi.com/sidecars: mariadb
         spec:
           enableServiceLinks: false
-          # Lets us kill DB process (in mariadb container) from backup container
-          shareProcessNamespace: true
           containers:
           - name: backup
             {{- include "drupal.php-container" . | nindent 12 }}
@@ -36,11 +39,6 @@ spec:
               - |
                 {{ include "drupal.backup-command" (merge $params . ) | nindent 16 }}
                 {{ include "mariadb.db-validation" (merge $params . ) | nindent 16 }}
-            securityContext:
-              capabilities:
-                #For shareProcessNamespace
-                add:
-                  - SYS_PTRACE
           - name: mariadb
             image: docker.io/bitnami/mariadb:10.2
             imagePullPolicy: IfNotPresent
@@ -54,11 +52,6 @@ spec:
               name: mariadb
             resources:
               {{- .Values.backup.resources | toYaml | nindent 14 }}
-            securityContext:
-              capabilities:
-                #For shareProcessNamespace
-                add:
-                  - SYS_PTRACE
           restartPolicy: Never
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}

@@ -50,9 +50,6 @@ data:
     [Assertion]
     zend.assertions = -1
 
-    [mbstring]
-    mbstring.internal_encoding = UTF-8
-
     [opcache]
     opcache.enable = 1
     opcache.enable_cli = 0
