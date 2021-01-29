@@ -25,7 +25,7 @@ spec:
       enableServiceLinks: false
       containers:
       - name: varnish
-        image: wunderio/drupal-varnish:v0.1.5
+        image: {{ .Values.varnish.image }}:{{ .Values.varnish.imageTag }}
         ports:
         - containerPort: 80
           name: web
