@@ -517,12 +517,11 @@ data:
     }
 
   vcl_synth_500.vcl: |
-    // Custom error
     set resp.http.Cache-Control = "no-cache, max-age: 0, must-revalidate";
-    set resp.http.x-sitename = "silta";
-    set resp.http.x-sitetitle = "silta";
-
     synthetic( {"
+      {{- if .Values.varnish.status_500_html }}
+        {{ .Values.varnish.status_500_html | indent 6 }}
+      {{- else }}
       <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
       <html xmlns="http://www.w3.org/1999/xhtml">
       <head>
@@ -541,7 +540,7 @@ data:
           font-size: 100px;
         }
       </style>
-      <title>"} + resp.http.x-sitetitle + {" - Something went wrong</title>
+      <title>Something went wrong</title>
 
       </head>
 
@@ -560,6 +559,7 @@ data:
 
       </body>
       </html>
+      {{- end }}
     "} );
     return (deliver);
 {{- end }}

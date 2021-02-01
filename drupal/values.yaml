@@ -439,13 +439,16 @@ varnish:
     requests:
       cpu: 25m
       memory: 32Mi
+  image: eu.gcr.io/silta-images/varnish
+  imageTag: 6-v0.1
   # https://varnish-cache.org/docs/trunk/users-guide/storage-backends.html
   storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
-  # Inject custom code into vcl_recv subroutine
-  vcl_recv_extra: |
-  
+  # Inject custom code into vcl_recv subroutine.
+  vcl_recv_extra: ""
+  # Html code for status 500 page.
+  status_500_html: ""
   # Additional cookie based rules
-  vcl_extra_cookies: |
+  vcl_extra_cookies: ""
 
 elasticsearch:
   enabled: false
@@ -507,6 +510,11 @@ memcached:
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
 mailhog:
   enabled: false
+  image:
+    # Set image repository to "mailhog/mailhog" to reenable logging.
+    repository: eu.gcr.io/silta-images/silta-mailhog
+    # Set image tag to "" to reenable logging.
+    tag: silent
   resources:
     requests:
       cpu: 1m
