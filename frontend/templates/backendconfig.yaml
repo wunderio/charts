@@ -1,0 +1,10 @@
+apiVersion: cloud.google.com/v1beta1
+kind: BackendConfig
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    {{- include "frontend.release_labels" $ | nindent 4 }}
+{{ if .Values.backendConfig }} 
+spec:
+  {{- toYaml .Values.backendConfig | nindent 2 }}
+{{- end }}

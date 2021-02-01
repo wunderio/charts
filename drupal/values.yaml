@@ -84,8 +84,8 @@ cluster:
 
 # backendConfig customisations for Drupal service
 backendConfig:
- securityPolicy:
-   name: "silta-ingress"
+  securityPolicy:
+    name: "silta-ingress"
 
 # Add prefixes to the generated per-branch domains, to be used for projects that need to respond
 # on multiple domains, for example using Drupal's domain module, or using different domains for different languages.
