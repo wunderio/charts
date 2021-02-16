@@ -4,7 +4,9 @@ metadata:
   name: {{ .Release.Name }}-drupal
   annotations:
     auto-downscale/down: "false"
+    {{- if eq .Values.cluster.type "gke" }}
     beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}-drupal"}}'
+    {{- end }}
     {{- if .Values.cluster }}
     {{- if .Values.cluster.vpcNative }}
     cloud.google.com/neg: '{"ingress": true}'

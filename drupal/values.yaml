@@ -80,6 +80,7 @@ ingress:
 
 # Infrastructure related settings.
 cluster: 
+  type: gke
   vpcNative: false
 
 # backendConfig customisations for Drupal service
