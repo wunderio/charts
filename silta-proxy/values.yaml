@@ -1,6 +1,6 @@
 # Default values for silta-proxy.
 
-image: wunderio/silta-proxy
+image: eu.gcr.io/silta-images/silta-proxy
 tag: "latest"
 
 service:
@@ -11,10 +11,10 @@ resources:
     cpu: 10m
     memory: 10Mi
 
-nodeSelector:
-  cloud.google.com/gke-nodepool: static-ip
+nodeSelector: {}
+  # cloud.google.com/gke-nodepool: static-ip
 
-tolerations:
-  - key: cloud.google.com/gke-nodepool
-    operator: Equal
-    value: static-ip
+tolerations: []
+  # - key: cloud.google.com/gke-nodepool
+  #   operator: Equal
+  #   value: static-ip
