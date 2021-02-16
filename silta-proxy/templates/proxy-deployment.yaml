@@ -36,7 +36,11 @@ spec:
       - name: tinyproxy
         configMap:
           name: {{ .Release.Name }}-tinyproxy
+      {{- if .Values.nodeSelector }}
       nodeSelector:
         {{- .Values.nodeSelector | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
       tolerations:
         {{- .Values.tolerations | toYaml | nindent 8 }}
+      {{- end }}
