@@ -1,4 +1,4 @@
-{{- if .Values.k9sControllerSidecars.enabled }}
+{{- if .Values.k8sControllerSidecars.enabled }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -38,7 +38,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   name: {{ .Release.Name }}-sidecar-controller
 spec:
-  replicas: {{ .Values.k9sControllerSidecars.replicaCount }}
+  replicas: {{ .Values.k8sControllerSidecars.replicaCount }}
   selector:
     matchLabels:
       name: {{ .Release.Name }}-sidecar-controller
@@ -49,9 +49,9 @@ spec:
     spec:
       serviceAccountName: {{ .Release.Name }}-sidecar-job-controller
       containers:
-        - image: "{{ .Values.k9sControllerSidecars.image.repository }}:{{ .Values.k9sControllerSidecars.image.tag }}"
-          imagePullPolicy: {{ .Values.k9sControllerSidecars.image.pullPolicy }}
+        - image: "{{ .Values.k8sControllerSidecars.image.repository }}:{{ .Values.k8sControllerSidecars.image.tag }}"
+          imagePullPolicy: {{ .Values.k8sControllerSidecars.image.pullPolicy }}
           name: sidecar-controller
           resources:
-            {{- .Values.k9sControllerSidecars.resources | toYaml | nindent 12 }}
+            {{- .Values.k8sControllerSidecars.resources | toYaml | nindent 12 }}
 {{- end }}
