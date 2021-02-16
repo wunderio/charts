@@ -158,7 +158,7 @@ instana-agent:
 # This should be replaced when an actual sidecar implementation is available. 
 # ETA Kubernetes 1.19
 # https://github.com/kubernetes/enhancements/issues/753#issuecomment-713471597
-k9sControllerSidecars:
+k8sControllerSidecars:
   enabled: true
   replicaCount: 1
   image:
