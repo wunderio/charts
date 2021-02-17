@@ -4,6 +4,7 @@ This helm chart helps setting up resources for https://github.com/wunderio/silta
 
 ## Requirements
 
+### cert-manager
 Custom resource definitions for cert-manager (from https://github.com/helm/charts/tree/master/stable/cert-manager):
 ```
 kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.10/deploy/manifests/00-crds.yaml
@@ -12,7 +13,17 @@ kubectl label namespace silta-cluster name=silta-cluster
 kubectl label namespace silta-cluster certmanager.k8s.io/disable-validation="true"
 ```
 
- - PriorityClass resources `scheduling.k8s.io/v1beta1` `scheduling.k8s.io/v1alpha1` requires at least kubernetes v1.14. `scheduling.k8s.io/v1` API requires kubernetes v1.17.
+### Calico
+If Calico networking is needed on AWS hosted cluster
+(from https://github.com/aws/eks-charts/tree/master/stable/aws-calico/):
+```
+helm repo add eks https://aws.github.io/eks-charts
+kubectl apply -k github.com/aws/eks-charts/tree/master/stable/aws-calico/crds
+helm install --name aws-calico --namespace kube-system eks/aws-calico
+```
+
+### PriorityClass
+ PriorityClass resources `scheduling.k8s.io/v1beta1` `scheduling.k8s.io/v1alpha1` requires at least kubernetes v1.14. `scheduling.k8s.io/v1` API requires kubernetes v1.17.
 
 ## Usage
 
