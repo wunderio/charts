@@ -450,6 +450,8 @@ varnish:
   status_500_html: ""
   # Additional cookie based rules
   vcl_extra_cookies: ""
+  # Do not cache files larger than 3 megabytes (use integers).
+  cache_skip_size: 3
 
 elasticsearch:
   enabled: false
