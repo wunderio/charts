@@ -11,3 +11,6 @@ exposeDomains:
 
 autoscaling:
   enabled: true
+
+cluster:
+  type: ""

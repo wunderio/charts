@@ -83,7 +83,8 @@ ingress:
     # staticIpAddressName: null
 
 # Infrastructure related settings.
-cluster: 
+cluster:
+  type: gke
   vpcNative: false
 
 # backendConfig customizations for main service
