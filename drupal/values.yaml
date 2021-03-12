@@ -565,7 +565,7 @@ solr:
   persistence:
     data:
       size: 1Gi
-      storageClassName: standard
+      # storageClassName: standard
       # Provide driver name if using CSI driver backed storage class (optional).
       # csiDriverName: csi-driver-name
       accessModes:

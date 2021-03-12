@@ -80,7 +80,11 @@ spec:
       name: {{ .Release.Name }}-solr-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      {{- if .Values.solr.persistence.data.storageClassName }}
       storageClassName: {{ .Values.solr.persistence.data.storageClassName }}
+      {{- else if eq .Values.cluster.type "gke" }}
+      storageClassName: standard
+      {{- end }}
       {{- if .Values.solr.persistence.data.csiDriverName }}
       csiDriverName: {{ .Values.solr.persistence.data.csiDriverName }}
       {{- end }}
