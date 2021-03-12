@@ -69,11 +69,12 @@ metadata:
   labels:
     name: {{ .Release.Name }}-jumpserver
 spec:
+  {{- if eq .Values.cluster.type "gke" }}
   storageClassName: standard
+  {{- end }}
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 50M
-
 {{- end }}

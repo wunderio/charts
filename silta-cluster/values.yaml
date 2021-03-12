@@ -172,3 +172,6 @@ k8sControllerSidecars:
     limits:
       cpu: "200m"
       memory: "256Mi"
+
+cluster:
+  type: gke
