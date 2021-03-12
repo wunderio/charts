@@ -42,6 +42,9 @@ exposeDomains: {}
 
 exposeDomainsDefaults:
   ingress: default
+  ssl:
+    enabled: true
+    issuer: letsencrypt
 
 # Settings for default site provided by this deployment
 ssl:
@@ -67,6 +70,7 @@ ingress:
 
 # Infrastructure related settings.
 cluster: 
+  type: gke
   vpcNative: false
 
 # backendConfig customizations for main service

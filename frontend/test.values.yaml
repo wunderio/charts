@@ -36,3 +36,6 @@ mounts:
     mountPath: /app/files
     storageClassName: silta-shared
     csiDriverName: csi-rclone
+
+cluster:
+  type: ""
