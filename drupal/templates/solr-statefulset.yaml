@@ -42,8 +42,6 @@ spec:
           {{- range .Values.solr.commandArgs }}
           - {{ . | quote }}
           {{- end }}
-          - "-m"
-          - "{{ .Values.solr.javaProcessMemory }}"
         livenessProbe:
           initialDelaySeconds: 30
           tcpSocket:
@@ -53,7 +51,7 @@ spec:
           periodSeconds: 20
           httpGet:
             scheme: HTTP
-            path: /solr/admin/info/system
+            path: {{ .Values.solr.readinessProbeUrl }}
             port:  8983
         volumeMounts:
         - name: {{ .Release.Name }}-core-dir
