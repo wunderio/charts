@@ -541,17 +541,15 @@ solr:
 
   # Solr 4.x and 5.x does not support "-force" argument (optional override)
   command: ["/opt/solr/bin/solr"]
-  commandArgs: ["start", "-p", "8983", "-f", "-force"]
+  commandArgs: ["start", "-p", "8983", "-f", "-force", "-m", "256m"]
 
   # Path in php container containing solr conf files (schema, solrconfig, stopwords, etc.).
   # Solr init container will contents of this folder to actual solr container.
   # Note: Configuration folder is not synced with shell container, drupal image rebuild required to update!
   confLocation: /app/silta/solr/conf
-
   coreName: search
 
-  # Sets the min (-Xms) and max (-Xmx) heap size for the JVM process
-  javaProcessMemory: 256m
+  readinessProbeUrl: /solr/admin/info/system
 
   # Kubernetes resource assignments.
   resources:
