@@ -57,7 +57,7 @@ autoscaling:
 #     hostname: www.example.com
 #   example_no_https:
 #    hostname: insecure.example.com
-#      ssl: 
+#      ssl:
 #        enabled: false
 exposeDomains: {}
 
@@ -79,7 +79,7 @@ ingress:
     # staticIpAddressName: null
 
 # Infrastructure related settings.
-cluster: 
+cluster:
   type: gke
   vpcNative: false
 
@@ -114,7 +114,7 @@ nginx:
     requests:
       cpu: 1m
       memory: 10M
-  
+
   # Set of values to enable and use http basic authentication
   # It is implemented only for very basic protection (like web crawlers)
   basicauth:
@@ -125,7 +125,7 @@ nginx:
       username: silta
       password: demo
 
-  # Trust X-Forwarded-For from these hosts for getting external IP 
+  # Trust X-Forwarded-For from these hosts for getting external IP
   realipfrom: 10.0.0.0/8
 
   # Define the internal network access.
@@ -147,10 +147,10 @@ nginx:
   # Gzip compression level
   comp_level: 6
 
-  # Extra configuration block in server context. 
+  # Extra configuration block in server context.
   serverExtraConfig: |
 
-  # Extra configuration block in location context. 
+  # Extra configuration block in location context.
   locationExtraConfig: |
 
   # Extra configuration to pass to nginx as a file
@@ -171,7 +171,7 @@ php:
       memory: 512M
 
   fpm:
-    # Custom php-fpm settings block. May override parameters previously defined. 
+    # Custom php-fpm settings block. May override parameters previously defined.
     # This will be put under [www] process pool.
     extraConfig: |
 
@@ -214,25 +214,25 @@ php:
   # This is run every time a new environment is upgraded.
   postupgrade:
     command: |
+      # Cache rebuild needs to be done before anything else, since if for
+      # example service files have changed, Drupal might not be able to
+      # bootstrap, not even for the `drush status` command below.
+      if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then
+        drush cache-clear all
+      else
+        drush cache-rebuild
+      fi
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-        if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then
-          drush cache-clear all
-          drush updatedb -y
-        else
-          # This first cache rebuild is unfortunately needed for the common case where a Drupal or
-          # contrib module flaw requires a rebuild before running database updates.
+        drush updatedb -y
+        if [[ $DRUPAL_CORE_VERSION -gt 7 && -f $DRUPAL_CONFIG_PATH/core.extension.yml ]]; then
+          drush config-import -y
           drush cache-rebuild
-          drush updatedb -y
-          if [ -f $DRUPAL_CONFIG_PATH/core.extension.yml ]; then
-            drush config-import -y
-            drush cache-rebuild
-          fi
         fi
       fi
-    # Extra commands to run after previous 'command' block. 
+    # Extra commands to run after previous 'command' block.
     # This removes the user step of copying the whole 'command' block and adding their own custom logic.
     afterCommand: |
-    
+
 
   # Pass additional environment variables to all php containers as key-value pairs.
   env: {}
@@ -251,7 +251,7 @@ php:
     upload_max_filesize: 60M
     post_max_size: 60M
     memory_limit: 256M
-    # Custom php settings block. May override parameters previously defined. 
+    # Custom php settings block. May override parameters previously defined.
     # Note: include correct php ini section, i.e. "[PHP]" or "[Date]".
     extraConfig: |
 
@@ -383,7 +383,7 @@ backup:
   # Custom commands to be executed after backup db, files are imported
   postRestoreCommand: |
 
-  
+
 
   storage: 10G
   storageClassName: silta-shared
@@ -402,7 +402,7 @@ backup:
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
-# see: https://github.com/bitnami/charts/blob/91fcd1eb5d00c33cc74e24502a85ce656ac1e963/bitnami/mariadb/values.yaml
+# see: https://github.com/bitnami/charts/blob/master/bitnami/mariadb/values.yaml
 mariadb:
   enabled: true
   replication:
@@ -494,20 +494,22 @@ elasticsearch:
           - static-ip
 
 # Memcache service overrides
-# see: https://github.com/helm/charts/blob/master/stable/memcached/values.yaml
+# see: https://github.com/bitnami/charts/blob/master/bitnami/memcached/values.yaml
 memcached:
   enabled: false
   replicaCount: 1
-  pdbMinAvailable: 0
-  memcached:
-    # This should be less than the memory limit, or memcached will crash.
-    maxItemMemory: 118
   resources:
     requests:
       cpu: 10m
       memory: 128Mi
     limits:
       memory: 128Mi
+  arguments:
+    - /run.sh
+    # MaxMemoryLimit, this should be less than the resources.limits.memory, or memcached will crash.
+    - -m 118
+    # MaxItemSize
+    - -I 4M
 
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
@@ -532,7 +534,7 @@ smtp:
   # username: ""
   # password: ""
 
-# Solr.  
+# Solr.
 solr:
   enabled: false
   # Available image tags: https://hub.docker.com/r/geerlingguy/solr/tags
@@ -563,8 +565,8 @@ solr:
   persistence:
     data:
       size: 1Gi
-      storageClassName: standard
+      # storageClassName: standard
       # Provide driver name if using CSI driver backed storage class (optional).
       # csiDriverName: csi-driver-name
-      accessModes: 
-        - ReadWriteOnce 
+      accessModes:
+        - ReadWriteOnce
