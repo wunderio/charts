@@ -494,20 +494,22 @@ elasticsearch:
           - static-ip
 
 # Memcache service overrides
-# see: https://github.com/helm/charts/blob/master/stable/memcached/values.yaml
+# see: https://github.com/bitnami/charts/blob/master/bitnami/memcached/values.yaml
 memcached:
   enabled: false
   replicaCount: 1
-  pdbMinAvailable: 0
-  memcached:
-    # This should be less than the memory limit, or memcached will crash.
-    maxItemMemory: 118
   resources:
     requests:
       cpu: 10m
       memory: 128Mi
     limits:
       memory: 128Mi
+  arguments:
+    - /run.sh
+    # MaxMemoryLimit, this should be less than the resources.limits.memory, or memcached will crash.
+    - -m 118
+    # MaxItemSize
+    - -I 4M
 
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
