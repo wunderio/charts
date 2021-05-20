@@ -42,6 +42,9 @@ exposeDomains: {}
 
 exposeDomainsDefaults:
   ingress: default
+  ssl:
+    enabled: true
+    issuer: letsencrypt
 
 # Settings for default site provided by this deployment
 ssl:
@@ -64,9 +67,13 @@ ingress:
     # The name of the reserved static IP address.
     # It is best to first reserve the IP address and then add it here.
     # staticIpAddressName: null
+    # Custom ingress annotations
+    # extraAnnotations:
+    #   networking.gke.io/suppress-firewall-xpn-error: "true"
 
 # Infrastructure related settings.
 cluster: 
+  type: gke
   vpcNative: false
 
 # backendConfig customizations for main service

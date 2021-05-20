@@ -6,8 +6,10 @@ metadata:
     {{ include "frontend.release_labels" . | indent 4 }}
   annotations:
     auto-downscale/down: "false"
-    beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}"}}'
     {{- if .Values.cluster }}
+    {{- if eq .Values.cluster.type "gke" }}
+    beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}-nginx"}}'
+    {{- end }}
     {{- if .Values.cluster.vpcNative }}
     cloud.google.com/neg: '{"ingress": true}'
     {{- end }}

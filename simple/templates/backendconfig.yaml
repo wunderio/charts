@@ -1,10 +1,12 @@
+{{- if eq .Values.cluster.type "gke" }}
 apiVersion: cloud.google.com/v1beta1
 kind: BackendConfig
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ .Release.Name }}-simple
   labels:
     {{- include "simple.release_labels" $ | nindent 4 }}
 {{ if .Values.backendConfig }} 
 spec:
   {{- toYaml .Values.backendConfig | nindent 2 }}
+{{- end }}
 {{- end }}
