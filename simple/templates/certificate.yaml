@@ -79,7 +79,7 @@ spec:
   acme:
     config:
       - http01:
-          ingress: {{ $.Release.Name }}-simple
+          ingress: {{ $.Release.Name }}-simple-{{ $domain.ingress }}
         domains:
           - {{ $domain.hostname }}
 ---
