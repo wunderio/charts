@@ -34,6 +34,10 @@ metadata:
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
 
+    {{- if $ingress.extraAnnotations }}
+    {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
+    {{- end }}
+
     {{- if (index .Values "silta-release").downscaler.enabled }}
     auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
     auto-downscale/label-selector: "release={{ .Release.Name }}"
@@ -116,6 +120,10 @@ metadata:
     {{- end }}
     {{- if $ingress.staticIpAddressName }}
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
+    {{- end }}
+
+    {{- if $ingress.extraAnnotations }}
+    {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- end }}
   labels:
     {{ include "frontend.release_labels" $ | indent 4 }}
