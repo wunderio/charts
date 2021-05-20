@@ -33,6 +33,9 @@ metadata:
     {{- if $ingress.staticIpAddressName }}
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
+    {{- if $ingress.extraAnnotations }}
+    {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
+    {{- end }}
   labels:
     {{ include "simple.release_labels" . | indent 4 }}
 spec:
@@ -97,6 +100,9 @@ metadata:
     {{- end }}
     {{- if $ingress.staticIpAddressName }}
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
+    {{- end }}
+    {{- if $ingress.extraAnnotations }}
+    {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- end }}
   labels:
     {{ include "simple.release_labels" $ | indent 4 }}
