@@ -61,8 +61,12 @@ data:
         ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.
         add_header                  X-Frame-Options SAMEORIGIN;                                                                                            
         add_header                  X-Content-Type-Options nosniff;
-        add_header                  Strict-Transport-Security max-age=31536000;
+        add_header                  Strict-Transport-Security "max-age=31536000; {{ .Values.nginx.hsts_include_subdomains }} preload" always;
         add_header                  X-XSS-Protection '1; mode=block';
+        {{- if .Values.nginx.content_security_policy }}
+        add_header                  Content-Security-Policy "{{ .Values.nginx.content_security_policy }}" always;
+        {{- end }}
+        add_header                  Referrer-Policy "no-referrer, strict-origin-when-cross-origin" always;
 
         map_hash_bucket_size        128;
 
