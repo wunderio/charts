@@ -15,6 +15,18 @@ tests:
           content:
             name: VARNISH_STORAGE_BACKEND
             value: 'type,/storage/location,size'
+  - it: sets VARNISH_EXTRA_PARAMS environment variable correctly
+    template: varnish-deployment.yaml
+    set:
+      varnish.enabled: true
+      varnish.extraParams: '-foo -bar'
+    asserts: 
+      - documentIndex: 0
+        contains:
+          path: 'spec.template.spec.containers[0].env'
+          content:
+            name: VARNISH_EXTRA_PARAMS
+            value: '-foo -bar'
 
   - it: takes resource requests and limits
     template: varnish-deployment.yaml
