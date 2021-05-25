@@ -439,6 +439,7 @@ varnish:
   # See https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#using-varnish
   # to configure varnish for Your site correctly.
   enabled: false
+  secret: "not-a-secret-123"
   resources:
     requests:
       cpu: 25m
