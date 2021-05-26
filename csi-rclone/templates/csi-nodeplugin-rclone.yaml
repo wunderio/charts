@@ -30,7 +30,7 @@ spec:
           args:
             - --v=5
             - --csi-address=/plugin/csi.sock
-            - --kubelet-registration-path={{ .Values.nodePlugin.kubeletBasePath }}var/lib/kubelet/plugins/csi-rclone/csi.sock
+            - --kubelet-registration-path={{ .Values.nodePlugin.kubeletBasePath }}/plugins/csi-rclone/csi.sock
           env:
             - name: KUBE_NODE_NAME
               valueFrom:
@@ -71,21 +71,21 @@ spec:
             - name: plugin-dir
               mountPath: /plugin
             - name: pods-mount-dir
-              mountPath: {{ .Values.nodePlugin.kubeletBasePath }}var/lib/kubelet/pods
+              mountPath: {{ .Values.nodePlugin.kubeletBasePath }}/pods
               mountPropagation: "Bidirectional"
           resources:
             {{- .Values.nodePlugin.rclone.resources | toYaml | nindent 12 }}
       volumes:
         - name: plugin-dir
           hostPath:
-            path: {{ .Values.nodePlugin.kubeletBasePath }}var/lib/kubelet/plugins/csi-rclone
+            path: {{ .Values.nodePlugin.kubeletBasePath }}/plugins/csi-rclone
             type: DirectoryOrCreate
         - name: pods-mount-dir
           hostPath:
-            path: {{ .Values.nodePlugin.kubeletBasePath }}var/lib/kubelet/pods
+            path: {{ .Values.nodePlugin.kubeletBasePath }}/pods
             type: Directory
         - hostPath:
-            path: {{ .Values.nodePlugin.kubeletBasePath }}var/lib/kubelet/plugins_registry
+            path: {{ .Values.nodePlugin.kubeletBasePath }}/plugins_registry
             type: DirectoryOrCreate
           name: registration-dir
       tolerations:

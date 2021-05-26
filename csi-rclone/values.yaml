@@ -31,8 +31,8 @@ nodePlugin:
     resources: {}
   rclone:
     resources: {}
-  # Some Kubernetes distributions use different kubelet base path (e.g. /var/snap/microk8s/common/ in Microk8s).
-  kubeletBasePath: "/"
+  # Some Kubernetes distributions use different kubelet base path (e.g. /var/snap/microk8s/common/var/lib/kubelet in Microk8s).
+  kubeletBasePath: "/var/lib/kubelet"
 
 controller:
   attacher:
