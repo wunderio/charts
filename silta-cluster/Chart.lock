@@ -10,7 +10,7 @@ dependencies:
   version: 6.0.5
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
-  version: 0.1.10
+  version: 0.1.11
 - name: cert-manager
   repository: https://charts.jetstack.io/
   version: v0.10.1
@@ -23,5 +23,5 @@ dependencies:
 - name: instana-agent
   repository: https://agents.instana.io/helm
   version: 1.1.10
-digest: sha256:ed37d3b73da2b6e280e633b357a84703fa66b668cf1d64136c64918c56fe93ed
-generated: "2021-02-16T15:28:50.749394882+02:00"
+digest: sha256:f9708b599c358c58934eef0ab278d62c44257949f170d3536e923dab952dca0a
+generated: "2021-05-26T15:53:15.158274857+03:00"
