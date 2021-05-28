@@ -80,6 +80,7 @@ splash:
 # SSH Jumphost settings
 gitAuth:
   enabled: true
+  port: 22
   keyserver:
     url: ''
     username: ''
