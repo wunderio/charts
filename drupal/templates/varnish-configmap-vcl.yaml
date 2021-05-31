@@ -15,19 +15,7 @@ data:
     backend prod1_http1 {
       .host = "{{ .Release.Name }}-drupal";
       .port = "80";
-      .max_connections = 300;
-
-      .probe = {
-        .url       = "/robots.txt"; 
-        .interval  = 5s; # check the health of each backend every n seconds
-        .timeout   = 1s; # timing out after n seconds
-        .window    = 5;  # If 3 out of the last 5 polls succeeded the backend is
-        .threshold = 3;  # considered healthy, otherwise it will be marked as sick
-      }
-
-      .first_byte_timeout     = 300s;    # How long to wait before we receive a first byte from our backend?
-      .connect_timeout        = 10s;     # How long to wait for a backend connection?
-      .between_bytes_timeout  = 10s;     # How long to wait between bytes received from our backend?
+      {{- .Values.varnish.backend_config | nindent 6 }}
     }
  
     # Define the internal network access.

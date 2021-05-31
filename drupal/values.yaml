@@ -439,7 +439,6 @@ varnish:
   # See https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#using-varnish
   # to configure varnish for Your site correctly.
   enabled: false
-  secret: "not-a-secret-123"
   resources:
     requests:
       cpu: 25m
@@ -458,6 +457,19 @@ varnish:
   vcl_extra_cookies: ""
   # Do not cache files larger than 3 megabytes (use integers).
   cache_skip_size: 3
+  # https://varnish-cache.org/docs/6.0/reference/vcl.html#backend-definition
+  backend_config: |
+    .max_connections = 300;
+    .probe = {
+      .url       = "/robots.txt";
+      .interval  = 5s;
+      .timeout   = 5s;
+      .window    = 5;
+      .threshold = 3;
+    }
+    .first_byte_timeout     = 300s;
+    .connect_timeout        = 10s;
+    .between_bytes_timeout  = 10s;
 
 elasticsearch:
   enabled: false
