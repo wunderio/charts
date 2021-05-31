@@ -99,3 +99,8 @@ PHP, Cron and Shell containers have following environment variables:
     - VARNISH_ADMIN_HOST: Varnish server host.
     - VARNISH_ADMIN_PORT: Varnish server port. Used for cache invalidation using admin port. 
     - VARNISH_CONTROL_KEY: Used for cache invalidation using admin port. 
+
+## Contributing
+
+Check out the [Helping with Silta development](https://wunderio.github.io/silta/docs/help-with-silta-dev) page in the Silta documentation
+for more information on how to contribute to Chart development.
