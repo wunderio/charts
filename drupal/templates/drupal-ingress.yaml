@@ -134,8 +134,8 @@ spec:
   {{- if eq $domain.ingress $ingress_index }}
   {{- if $domain.ssl }}
   {{- if $domain.ssl.enabled }}
-  {{- if $domain.ssl.existingSecret }}
-  - secretName: {{ $domain.ssl.existingSecret }}
+  {{- if $domain.ssl.existingTLSSecret }}
+  - secretName: {{ $domain.ssl.existingTLSSecret }}
   {{- else }}
   - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}
   {{- end }}
