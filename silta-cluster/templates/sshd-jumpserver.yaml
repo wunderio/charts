@@ -4,6 +4,12 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Release.Name }}-jumpserver
+  {{- if .Values.gitAuth.annotations }}
+  annotations:
+  {{- range $key, $value := .Values.gitAuth.annotations }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+  {{- end }}
 spec:
   ports:
     - name: ssh
