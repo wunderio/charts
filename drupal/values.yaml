@@ -403,6 +403,9 @@ backup:
   # These tables will have their content ignored from the backups.
   ignoreTableContent: '(cache|cache_.*)'
 
+  #  Do not backup files
+  #skipFiles: true
+
   # Resources for the backup cron job.
   resources:
     requests:
