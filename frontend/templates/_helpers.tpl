@@ -25,6 +25,25 @@ release: {{ .Release.Name }}
 {{- end }}
 {{- end }}
 
+{{- define "frontend.backup.create-destination-path" -}}
+set -ex
+
+# Generate the id of the backup.
+BACKUP_ID=`date +%Y-%m-%d-%H-%M-%S`
+BACKUP_LOCATION="/backup_archive"
+
+# Related issue: https://github.com/rclone/rclone/issues/3453
+mkdir -p "${BACKUP_LOCATION}/${BACKUP_ID}"; touch "${BACKUP_LOCATION}/${BACKUP_ID}/.anchor"
+
+ln -s "${BACKUP_LOCATION}/${BACKUP_ID}" /backups/current
+{{- end }}
+
+{{- define "frontend.backup.copy-mounts" -}}
+set -e
+
+rsync -az /values_mounts/ /backups/current/
+{{- end }}
+
 {{- define "services.env" }}
 {{- $service := .service -}}
 - name: 'PORT'

@@ -212,6 +212,11 @@ services: {}
   #      resources:
   #        requests:
   #          cpu: 500m
+  #  backup:
+  #   # Extra commands for gathering data to be backed up.
+  #   # Commands must store data at /backups/current
+  #   command: |
+  #     your command goes here
 
   #   nodeSelector:
   #     cloud.google.com/gke-nodepool: static-ip
@@ -244,6 +249,29 @@ shell:
     storageClassName: silta-shared
     csiDriverName: csi-rclone
     accessModes: ReadWriteMany
+
+backup:
+  # Whether backups should be taken for the current environment.
+  enabled: false
+
+  # Cron schedule when backups should be taken, this is expected to take place daily.
+  # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
+  schedule: '~ 2 * * *'
+
+  # How many days the backups will persist.
+  retention: 14
+
+  storage: 100Mi
+  storageClassName: silta-shared
+  csiDriverName: csi-rclone
+
+  # Resources for the backup cron job.
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128M
+    limits:
+      memory: 128M
 
 # Provide defaults for all services.
 # Note that only keys used here can be overridden.

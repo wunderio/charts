@@ -37,6 +37,12 @@
         "enabled": { "type": "boolean" }
       }
     },
+    "backup": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
     "rabbitmq": {
       "type": "object",
       "properties": {
