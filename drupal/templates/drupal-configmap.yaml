@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-drupal
   labels:
-    {{- include "drupal.release_labels" . | nindent 4 }}
+  {{- include "drupal.release_labels" . | nindent 4 }}
 data:
   gdpr-dump: |
     [mysqldump]
@@ -67,10 +67,10 @@ data:
     ; Disable Twig instrumentation, it causes issues when used with Drupal.
     ; See https://docs.instana.io/ecosystem/php/#tracing
     instana.disabled_instrumentation=2097152
-    
+
     ; Custom configuration below
     {{ .Values.php.php_ini.extraConfig | nindent 4 }}
-    
+
   nginx_conf: |
     user                            nginx;
     worker_processes                auto;
@@ -130,9 +130,9 @@ data:
 
         ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.
         add_header                  Strict-Transport-Security "max-age=31536000; {{ .Values.nginx.hsts_include_subdomains }} preload" always;
-        {{- if .Values.nginx.content_security_policy }}
+    {{- if .Values.nginx.content_security_policy }}
         add_header                  Content-Security-Policy "{{ .Values.nginx.content_security_policy }}" always;
-        {{- end }}
+    {{- end }}
         add_header                  X-XSS-Protection "1; mode=block";
         add_header                  Referrer-Policy "no-referrer, strict-origin-when-cross-origin" always;
 
@@ -141,7 +141,7 @@ data:
 
         types_hash_max_size 8192;
         server_names_hash_bucket_size 64;
-        
+
         map_hash_bucket_size 128;
 
         map $uri $no_slash_uri {
@@ -149,7 +149,7 @@ data:
         }
 
         # List health checks that need to return status 200 here
-        map $http_user_agent $hc_ua { default 0; 'GoogleHC/1.0' 1; } 
+        map $http_user_agent $hc_ua { default 0; 'GoogleHC/1.0' 1; }
 
         include conf.d/*.conf;
     }
@@ -193,7 +193,7 @@ data:
     pm.max_spare_servers = 2
     pm.process_idle_timeout = 60s
     pm.max_requests = 500
-    
+
     ; Custom configuration below
     {{ .Values.php.fpm.extraConfig | nindent 4 }}
 
@@ -237,19 +237,19 @@ data:
     {{- if .Values.nginx.redirects }}
     # Custom redirects with full url matching
     map '$scheme://$host$request_uri' $redirect_uri {
-        {{- range .Values.nginx.redirects }}
-        {{- if contains "://" .from }}
-        {{ .from | squote }} {{ .to | squote }};
-        {{- end }}
-        {{- end }}
+    {{- range .Values.nginx.redirects }}
+    {{- if contains "://" .from }}
+    {{ .from | squote }} {{ .to | squote }};
+    {{- end }}
+    {{- end }}
     }
     # Custom redirects with absolute path matching
     map $request_uri $redirect_uri_local {
-        {{- range .Values.nginx.redirects }}
-        {{- if not ( contains "://" .from ) }}
-        {{ .from | squote }} {{ .to | squote }};
-        {{- end }}
-        {{- end }}
+    {{- range .Values.nginx.redirects }}
+    {{- if not ( contains "://" .from ) }}
+    {{ .from | squote }} {{ .to | squote }};
+    {{- end }}
+    {{- end }}
     }
     {{- end }}
 
@@ -257,10 +257,10 @@ data:
         server_name drupal;
         listen 80;
 
-        # Loadbalancer health checks need to be fed with http 200 
+        # Loadbalancer health checks need to be fed with http 200
         if ($hc_ua) { return 200; }
 
-        {{- if .Values.nginx.redirects }}
+    {{- if .Values.nginx.redirects }}
         # Redirects to specified path if map returns anything
         if ($redirect_uri) {
     	    return 301 $redirect_uri;
@@ -268,34 +268,34 @@ data:
         if ($redirect_uri_local) {
     	    return 301 $redirect_uri_local;
         }
-        {{- end }}
+    {{- end }}
 
-        root /app/web;
+        root {{ .Values.webRoot }};
         index index.php;
 
         include fastcgi.conf;
 
-        {{ include "drupal.basicauth" . | indent 6}}
+    {{ include "drupal.basicauth" . | indent 6}}
 
         # Custom configuration gets included here
-        {{- .Values.nginx.serverExtraConfig | nindent 8 -}}
+    {{- .Values.nginx.serverExtraConfig | nindent 8 -}}
 
-        {{- if .Values.mailhog.enabled }}
+    {{- if .Values.mailhog.enabled }}
         location /mailhog {
 
             # Auth / whitelist always enabled
             satisfy any;
             allow 127.0.0.1;
-            {{- range .Values.nginx.noauthips }}
+    {{- range .Values.nginx.noauthips }}
             allow {{ . }};
-            {{- end }}
+    {{- end }}
             deny all;
 
-            {{- if gt (len .Values.nginx.noauthips) 1 -}}
+    {{- if gt (len .Values.nginx.noauthips) 1 -}}
             # Basic auth only offered when at least one extra ip is whitelisted. Prevents using default credentials.
             auth_basic "Restricted";
             auth_basic_user_file /etc/nginx/.htaccess;
-            {{- end}}
+    {{- end}}
 
             rewrite ^/mailhog$ /mailhog/ permanent;
 
@@ -312,14 +312,14 @@ data:
             proxy_redirect off;
             proxy_buffering off;
         }
-        {{- end}}
+    {{- end}}
 
         location / {
 
             # Custom configuration gets included here
-            {{ if .Values.nginx.locationExtraConfig }}
-            {{ .Values.nginx.locationExtraConfig | nindent 10 }} 
-            {{- end }}
+    {{ if .Values.nginx.locationExtraConfig }}
+    {{ .Values.nginx.locationExtraConfig | nindent 10 }}
+    {{- end }}
 
             location ~* /system/files/ {
                 include fastcgi.conf;
@@ -608,14 +608,14 @@ data:
 
     }
 
-{{- if .Values.nginx.extraConfig }}
+  {{- if .Values.nginx.extraConfig }}
   extraConfig: |
-  {{ .Values.nginx.extraConfig | nindent 4 }}
-{{- end }}
+    {{ .Values.nginx.extraConfig | nindent 4 }}
+    {{- end }}
 
-{{ $proxy := ( index .Values "silta-release" ).proxy }}
-{{ if $proxy.enabled }}
+    {{ $proxy := ( index .Values "silta-release" ).proxy }}
+  {{ if $proxy.enabled }}
   ssh_config: |
     Host *
     ProxyCommand=nc -X connect -x {{ $proxy.url }}:{{ $proxy.port }} %h %p
-{{- end }}
+    {{- end }}
