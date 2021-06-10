@@ -24,6 +24,11 @@ imagePullSecrets: []
 # The app label added to our Kubernetes resources.
 app: drupal
 
+# Path to the web root folder.
+# If you change this, make sure to check for any other references to "/app/web" or "web/" in your project.
+# See https://github.com/wunderio/silta/blob/master/docs/changing_the_webroot.md
+webRoot: /app/web
+
 # How many instances of the Drupal pod should be in our Kubernetes deployment.
 # A single pod (the default value) is good for development environments to minimise resource usage.
 # Multiple pods make sense for high availability.
@@ -305,6 +310,7 @@ mounts:
   public-files:
     enabled: true
     storage: 1G
+    # Assumes that webRoot is set to the default value "/app/web".
     mountPath: /app/web/sites/default/files
     storageClassName: silta-shared
     csiDriverName: csi-rclone
