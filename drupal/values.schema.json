@@ -53,6 +53,7 @@
     "branchName": { "type": "string" },
     "imagePullSecrets": { "type": "array" },
     "app": { "type": "string" },
+    "webRoot": { "type": "string" },
 
     "replicas": { "type": "integer" },
     "autoscaling": {
