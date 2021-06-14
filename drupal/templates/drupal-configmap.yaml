@@ -67,10 +67,10 @@ data:
     ; Disable Twig instrumentation, it causes issues when used with Drupal.
     ; See https://docs.instana.io/ecosystem/php/#tracing
     instana.disabled_instrumentation=2097152
-    
+
     ; Custom configuration below
     {{ .Values.php.php_ini.extraConfig | nindent 4 }}
-    
+
   nginx_conf: |
     user                            nginx;
     worker_processes                auto;
@@ -141,7 +141,7 @@ data:
 
         types_hash_max_size 8192;
         server_names_hash_bucket_size 64;
-        
+
         map_hash_bucket_size 128;
 
         map $uri $no_slash_uri {
@@ -149,7 +149,7 @@ data:
         }
 
         # List health checks that need to return status 200 here
-        map $http_user_agent $hc_ua { default 0; 'GoogleHC/1.0' 1; } 
+        map $http_user_agent $hc_ua { default 0; 'GoogleHC/1.0' 1; }
 
         include conf.d/*.conf;
     }
@@ -193,7 +193,7 @@ data:
     pm.max_spare_servers = 2
     pm.process_idle_timeout = 60s
     pm.max_requests = 500
-    
+
     ; Custom configuration below
     {{ .Values.php.fpm.extraConfig | nindent 4 }}
 
@@ -257,7 +257,7 @@ data:
         server_name drupal;
         listen 80;
 
-        # Loadbalancer health checks need to be fed with http 200 
+        # Loadbalancer health checks need to be fed with http 200
         if ($hc_ua) { return 200; }
 
         {{- if .Values.nginx.redirects }}
@@ -270,7 +270,7 @@ data:
         }
         {{- end }}
 
-        root /app/web;
+        root {{ .Values.webRoot }};
         index index.php;
 
         include fastcgi.conf;
@@ -318,7 +318,7 @@ data:
 
             # Custom configuration gets included here
             {{ if .Values.nginx.locationExtraConfig }}
-            {{ .Values.nginx.locationExtraConfig | nindent 10 }} 
+            {{ .Values.nginx.locationExtraConfig | nindent 10 }}
             {{- end }}
 
             location ~* /system/files/ {
