@@ -27,13 +27,15 @@ spec:
         {{- include "drupal.php-container" . | nindent 8}}
         volumeMounts:
           {{- include "drupal.volumeMounts" . | nindent 10 }}
+          - name: config
+            mountPath: /php-fpm-probe.sh
+            subPath: php-fpm-probe.sh
         livenessProbe:
           tcpSocket:
             port: 9000
         readinessProbe:
           exec:
-            # Prevent coming in during the installation process.
-            command: ['/bin/bash', '-c', 'if [ {{ include "drupal.installation-in-progress-test" . }} ]; then exit 1; fi']
+            command: ['/bin/bash', '-c', '/php-fpm-probe.sh']
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
 

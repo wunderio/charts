@@ -116,6 +116,9 @@ ssl:
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
 
+  # Possible Values: debug, info, notice, warn, error, crit, alert, or emerg.
+  loglevel: error
+
   # The Kubernetes resources for the nginx container.
   # These values are optimised for development environments.
   resources:
@@ -255,7 +258,6 @@ php:
 
   # PHP settings
   php_ini:
-    loglevel: notice  # Possible Values: alert, error, warning, notice, debug
     upload_max_filesize: 60M
     post_max_size: 60M
     memory_limit: 256M

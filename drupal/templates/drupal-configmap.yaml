@@ -619,3 +619,19 @@ data:
     Host *
     ProxyCommand=nc -X connect -x {{ $proxy.url }}:{{ $proxy.port }} %h %p
 {{- end }}
+
+  php-fpm-probe.sh: |
+    #!/bin/bash
+    
+    # Prevent requests during the site installation process.
+    if [ {{ include "drupal.installation-in-progress-test" $ }} ]; then 
+        exit 1; 
+    fi
+
+    # Ping php-fpm process
+    SCRIPT_NAME=/ping \
+    SCRIPT_FILENAME=/ping \
+    REQUEST_METHOD=GET \
+    cgi-fcgi -bind -connect localhost:9000 \
+    > /dev/null
+
