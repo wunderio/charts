@@ -464,12 +464,14 @@ fi
   mkdir -p $BACKUP_LOCATION
   cp /tmp/db.sql.gz $BACKUP_LOCATION/db.sql.gz
 
+  {{- if not .Values.backup.skipFiles }}
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true }}
   # File backup for {{ $index }} volume.
   echo "Starting {{ $index }} volume backup."
   tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
   {{- end -}}
+  {{- end }}
   {{- end }}
 
   # Delete old backups
