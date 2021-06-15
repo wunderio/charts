@@ -7,7 +7,7 @@ metadata:
 spec:
   ports:
     - name: ssh
-      port: 22
+      port: {{ .Values.gitAuth.port }}
   type: "LoadBalancer"
 {{- if .Values.gitAuth.loadBalancerIP }}
   loadBalancerIP: {{ .Values.gitAuth.loadBalancerIP }}
