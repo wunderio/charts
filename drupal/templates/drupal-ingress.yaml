@@ -48,9 +48,13 @@ metadata:
 spec:
   {{- if $ingress.tls }}
   tls:
+  {{- if .Values.ssl.existingTLSSecret }}
+  - secretName: {{ .Values.ssl.existingTLSSecret }}
+  {{- else }}
   - secretName: {{ .Release.Name }}-tls
   {{- range $index, $prefix := .Values.domainPrefixes }}
   - secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+  {{- end }}
   {{- end }}
   {{- end }}
   rules:
@@ -134,7 +138,11 @@ spec:
   {{- if eq $domain.ingress $ingress_index }}
   {{- if $domain.ssl }}
   {{- if $domain.ssl.enabled }}
+  {{- if $domain.ssl.existingTLSSecret }}
+  - secretName: {{ $domain.ssl.existingTLSSecret }}
+  {{- else }}
   - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}
+  {{- end }}
   {{- end }}
   {{- end }}
   {{- end }}
