@@ -63,7 +63,7 @@ ports:
 - name: config
   configMap:
     name: {{ .Release.Name }}-drupal
-    defaultMode: 0777
+    defaultMode: 0755
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}
