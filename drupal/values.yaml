@@ -77,6 +77,14 @@ ingress:
     type: traefik
     tls: true
     redirect-https: true
+    extraAnnotations:
+      traefik.ingress.kubernetes.io/rate-limit: |
+        extractorfunc: client.ip
+        rateset:
+          default:
+            period: 1m
+            average: 32
+            burst: 90
   gce:
     type: gce
     # The name of the reserved static IP address.
