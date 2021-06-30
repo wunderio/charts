@@ -8,11 +8,12 @@ data:
   nginx_conf: |
     user                            nginx;                                                 
     worker_processes                auto;
+    worker_rlimit_nofile            102400;
 
     error_log                       /proc/self/fd/2 {{ .Values.nginx.loglevel }};                                 
                                                                                           
     events {                                                                               
-        worker_connections          1024;                                                  
+        worker_connections          102400;                                                  
         multi_accept                on;                                                    
     }                                                                                      
                                                                                           
