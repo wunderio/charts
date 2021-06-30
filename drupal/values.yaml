@@ -83,8 +83,8 @@ ingress:
         rateset:
           default:
             period: 1m
-            average: 32
-            burst: 90
+            average: 600
+            burst: 900
   gce:
     type: gce
     # The name of the reserved static IP address.
