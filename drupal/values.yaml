@@ -82,9 +82,9 @@ ingress:
         extractorfunc: client.ip
         rateset:
           default:
-            period: 1m
-            average: 600
-            burst: 900
+            period: 1s
+            average: 32
+            burst: 90
   gce:
     type: gce
     # The name of the reserved static IP address.
