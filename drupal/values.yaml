@@ -45,6 +45,10 @@ autoscaling:
       resource:
         name: cpu
         targetAverageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
 # Example of exposing 2 additional domains for this deployment, each with its own certificate.
