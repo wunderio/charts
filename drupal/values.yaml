@@ -45,6 +45,10 @@ autoscaling:
       resource:
         name: cpu
         targetAverageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
 # Example of exposing 2 additional domains for this deployment, each with its own certificate.
@@ -82,7 +86,7 @@ ingress:
         extractorfunc: client.ip
         rateset:
           default:
-            period: 1m
+            period: 1s
             average: 32
             burst: 90
   gce:
@@ -143,6 +147,9 @@ nginx:
     credentials:
       username: silta
       password: demo
+
+  # Header containing real IP address
+  real_ip_header: X-Forwarded-For
 
   # Trust X-Forwarded-For from these hosts for getting external IP
   realipfrom: 10.0.0.0/8
