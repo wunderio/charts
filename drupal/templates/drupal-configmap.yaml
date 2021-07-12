@@ -149,9 +149,6 @@ data:
             ~^/(?<no_slash>.*)$ $no_slash;
         }
 
-        # List health checks that need to return status 200 here
-        map $http_user_agent $hc_ua { default 0; 'GoogleHC/1.0' 1; }
-
         include conf.d/*.conf;
     }
 
@@ -253,6 +250,9 @@ data:
         {{- end }}
     }
     {{- end }}
+    
+    # List health checks that need to return status 200 here
+    map $http_user_agent $hc_ua { default 0; 'GoogleHC/1.0' 1; }
 
     server {
         server_name drupal;

@@ -118,6 +118,8 @@ imagePullSecrets:
   value: "{{ .Values.projectName | default .Release.Namespace }}"
 - name: ENVIRONMENT_NAME
   value: "{{ .Values.environmentName }}"
+- name: DRUSH_OPTIONS_URI
+  value: "http://{{- template "drupal.domain" . }}"
 {{- if .Values.mariadb.enabled }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"

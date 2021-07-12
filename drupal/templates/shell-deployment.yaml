@@ -46,8 +46,6 @@ spec:
           value: {{ .Values.shell.gitAuth.repositoryUrl }}
         - name: OUTSIDE_COLLABORATORS
           value: {{ .Values.shell.gitAuth.outsideCollaborators | default true | quote }}
-        - name: DRUSH_OPTIONS_URI
-          value: "http://{{- template "drupal.domain" . }}"
         ports:
           - containerPort: 22
         volumeMounts:
