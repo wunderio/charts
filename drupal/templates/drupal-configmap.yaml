@@ -72,6 +72,9 @@ data:
     {{ .Values.php.php_ini.extraConfig | nindent 4 }}
 
   nginx_conf: |
+
+    include modules/*.conf;
+
     user                            nginx;
     worker_processes                auto;
     worker_rlimit_nofile            10240;
@@ -94,7 +97,6 @@ data:
         log_format  main            '$remote_addr - $remote_user [$time_local] "$request" '
                                     '$status $body_bytes_sent "$http_referer" '
                                     '"$http_user_agent" "$http_x_forwarded_for"';
-
 
         access_log                  /proc/self/fd/1 main;
 
@@ -487,6 +489,22 @@ data:
             # This is cool because no php is touched for static content
             try_files $uri @drupal;
         }
+
+        {{- if .Values.nginx.retry404s }}
+        # Retry file lookup in 5 seconds (fs sync workaround)
+        location /sites/default/files/ {
+            try_files $uri $uri/ @files_delay;
+        }
+        location @files_delay {
+            internal;
+            echo_sleep {{ .Values.nginx.retry404s }}.0;
+            echo_exec @files_retry;
+        }
+        location @files_retry {
+            internal;
+            try_files $uri $uri/ =404;
+        }
+        {{- end }}
 
         location @drupal {
             include fastcgi.conf;

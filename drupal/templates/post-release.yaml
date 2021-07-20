@@ -26,18 +26,12 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
         - |
-            {{- if .Values.backup.restoreId }}
-            {{- include "drupal.restore-backup-command" . | nindent 12 }}
-            {{- else -}}
             {{- include "drupal.post-release-command" . | nindent 12 }}
-            {{- end }}
         volumeMounts:
-          {{- if not .Values.backup.restoreId }}
           - name: config
             mountPath: /etc/my.cnf.d/gdpr-dump.cnf
             readOnly: true
             subPath: gdpr-dump
-          {{- end }}
           {{- include "drupal.volumeMounts" . | nindent 10 }}
           {{- if .Values.referenceData.enabled }}
           {{- if or (eq .Values.referenceData.referenceEnvironment .Values.environmentName) (not .Values.referenceData.skipMount) }}
@@ -47,11 +41,6 @@ spec:
             readOnly: true
             {{- end }}
           {{- end -}}
-          {{- end }}
-          {{- if .Values.backup.restoreId }}
-          - name: {{ .Release.Name }}-backup
-            mountPath: /backups
-            readOnly: false
           {{- end }}
         resources:
           {{- .Values.php.postinstall.resources | toYaml | nindent 10 }}
@@ -65,8 +54,3 @@ spec:
             claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
         {{- end -}}
         {{- end }}
-        {{- if .Values.backup.restoreId }}
-        - name: {{ .Release.Name }}-backup
-          persistentVolumeClaim:
-            claimName: {{ .Release.Name }}-backup
-        {{- end -}}

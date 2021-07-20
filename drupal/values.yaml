@@ -173,6 +173,9 @@ nginx:
   # Gzip compression level
   comp_level: 6
 
+  # Retry file lookup in 5 seconds (filesystem sync workaround)
+  # retry404s: 5
+
   # Extra configuration block in server context.
   serverExtraConfig: |
 
@@ -402,14 +405,6 @@ backup:
 
   # How many daily backups to preserve.
   retention: 14
-
-  # If specified, replace environment content with the given backup.
-  restoreId: ""
-
-  # Custom commands to be executed after backup db, files are imported
-  postRestoreCommand: |
-
-
 
   storage: 10G
   storageClassName: silta-shared

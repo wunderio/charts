@@ -297,36 +297,6 @@ done
   {{- end }}
 {{- end }}
 
-{{- define "drupal.restore-backup-command" -}}
-  set -e
-
-  {{ include "drupal.wait-for-db-command" . }}
-
-  # Make backup of current deployment
-  {{ include "drupal.backup-command" . }}
-
-  # Restore files from targeted backup
-  {{ include "drupal.import-backup-files" . }}
-
-  touch {{ .Values.webRoot }}/sites/default/files/_installing
-
-  # Restore db from targeted backup
-  {{ include "drupal.import-backup-db" . }}
-
-  {{ if .Values.elasticsearch.enabled }}
-    {{ include "drupal.wait-for-elasticsearch-command" . }}
-  {{ end }}
-
-  # Run postupgrade commands from normal deployment
-  {{ .Values.php.postupgrade.command }}
-
-  # Running custom commands after restored backup
-  {{ .Values.php.postRestoreCommand }}
-  rm {{ .Values.webRoot }}/sites/default/files/_installing
-
-{{- end }}
-
-
 {{- define "drupal.extract-reference-data" -}}
 set -e
 if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
@@ -385,23 +355,6 @@ else
 fi
 {{- end }}
 
-{{- define "drupal.import-backup-db" -}}
-if [ -f /backups/{{ $.Values.backup.restoreId }}/db.sql.gz ]; then
-  echo "Dropping old database"
-  drush sql-drop -y
-
-  echo "Importing backup database dump"
-  gunzip -c /backups/{{ $.Values.backup.restoreId }}/db.sql.gz > /tmp/backup-data-db.sql
-  pv /tmp/backup-data-db.sql | drush sql-cli
-
-  # Clear caches before doing anything else.
-  if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then drush cache-clear all;
-  else drush cache-rebuild; fi
-else
-  printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
-fi
-{{- end }}
-
 {{- define "drupal.import-reference-files" -}}
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
@@ -412,18 +365,6 @@ fi
     done
   fi
   {{ end -}}
-  {{- end }}
-{{- end }}
-
-{{- define "drupal.import-backup-files" -}}
-  {{ range $index, $mount := .Values.mounts -}}
-  {{- if eq $mount.enabled true }}
-  echo "Deleting old files"
-  rm -rf {{ $mount.mountPath }}/*
-  rm -rf {{ $mount.mountPath }}/.*
-  echo "Restoring {{ $index }} volume backup."
-  tar -xvzf /backups/{{ $.Values.backup.restoreId }}/{{ $index }}.tar.gz -C /
-  {{- end -}}
   {{- end }}
 {{- end }}
 
