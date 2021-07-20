@@ -62,6 +62,14 @@ ingress:
     type: traefik
     tls: true
     redirect-https: true
+    extraAnnotations:
+      traefik.ingress.kubernetes.io/rate-limit: |
+        extractorfunc: request.host
+        rateset:
+          default:
+            period: 5s
+            average: 150
+            burst: 200
   gce:
     type: gce
     # The name of the reserved static IP address.
@@ -142,8 +150,19 @@ nginx:
   #hsts_include_subdomains: " includeSubDomains;"
   #content_security_policy: "upgrade-insecure-requests; default-src https: data: 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self'; base-uri 'self'; object-src 'self'; connect-src wss: https:"
 
+  # Extra configuration block in server context.
+  serverExtraConfig: |
+
+  # Extra configuration block in location context.
+  locationExtraConfig: |
+
+  # Extra configuration to pass to nginx as a file
+  extraConfig: |
+
+  # DEPRECATED. Please use serverExtraConfig instead
   extra_headers: {}
 
+  # DEPRECATED. Please use locationExtraConfig instead
   extra_conditions: ""
     # |
     # # need this for node OPTIONS requests to work while site has bauth

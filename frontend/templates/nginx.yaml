@@ -38,6 +38,13 @@ spec:
           mountPath: /etc/nginx/conf.d/frontend.conf # mount nginx-conf configmap volume to /etc/nginx
           readOnly: true
           subPath: frontend_conf
+        {{- if .Values.nginx.extraConfig }}
+        - name: config
+          # provide empty configuration file in /etc/nginx/conf.d for users to populate
+          mountPath: /etc/nginx/conf.d/misc.conf
+          readOnly: true
+          subPath: extraConfig
+        {{- end }}
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
           mountPath: /etc/nginx/.htaccess
