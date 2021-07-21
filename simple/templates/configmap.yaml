@@ -130,11 +130,11 @@ data:
                                                                               
         include fastcgi.conf;
 
-        {{ include "simple.basicauth" . | indent 6}}
-
         # Custom configuration gets included here
         {{- .Values.nginx.serverExtraConfig | nindent 8 -}}
-         
+
+        {{ include "simple.basicauth" . | indent 6}}
+
         location = /robots.txt {
           access_log off;
           {{- if not .Values.nginx.robotsTxt.allow }}
@@ -143,7 +143,13 @@ data:
           {{- end}}
         } 
 
-        location / {                                                                                                              
+        location / {
+
+            # Custom configuration include
+            {{ if .Values.nginx.locationExtraConfig }}
+            {{ .Values.nginx.locationExtraConfig | nindent 10 }}
+            {{- end }}
+
             ## Most sites won't have configured favicon
             ## and since its always grabbed, turn it off in access log
             ## and turn off it's not-found error in the error log
