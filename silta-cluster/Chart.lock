@@ -13,7 +13,7 @@ dependencies:
   version: 0.1.11
 - name: cert-manager
   repository: https://charts.jetstack.io/
-  version: v0.11.1
+  version: v0.10.1
 - name: silta-downscaler
   repository: file://../silta-downscaler
   version: 0.1.0
@@ -23,5 +23,5 @@ dependencies:
 - name: instana-agent
   repository: https://agents.instana.io/helm
   version: 1.1.10
-digest: sha256:34b88504cc5d99fa8322431f54639bbda6a3037ec9078692e8b3a3c4e0db4bee
-generated: "2021-08-02T11:55:31.255143177+03:00"
+digest: sha256:f9708b599c358c58934eef0ab278d62c44257949f170d3536e923dab952dca0a
+generated: "2021-08-02T18:10:51.903496879+03:00"
