@@ -1,5 +1,5 @@
 {{- if .Values.ssl.enabled }}
-apiVersion: certmanager.k8s.io/v1alpha1
+{{- include "cert-manager.api-version" . }}
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-staging
@@ -14,6 +14,6 @@ spec:
     privateKeySecretRef:
       # Secret resource used to store the account's private key.
       name: tls-le-staging-issuer-account-key
-    # Add a single challenge solver, HTTP01 using nginx
-    http01: {}
+    # Add a single challenge solver, HTTP01
+    {{- include "cert-manager.solver-http01" . | nindent 4}}
 {{- end }}
