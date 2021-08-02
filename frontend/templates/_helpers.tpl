@@ -121,3 +121,12 @@ rsync -az /values_mounts/ /backups/current/
   value: .svc.cluster.local,{{ .Release.Name }}-es{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 {{- end }}
 {{- end }}
+
+{{- define "cert-manager.api-version" }}
+{{- if ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
+apiVersion: cert-manager.io/v1
+{{- else -}}
+apiVersion: certmanager.k8s.io/v1alpha1
+{{- end -}}
+{{- end }}
+
