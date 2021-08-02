@@ -2,7 +2,7 @@
 {{- $context_ssl := .Values.ssl }}
 {{- if $context_ingress.tls }}
 {{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-apiVersion: certmanager.k8s.io/v1alpha1
+{{- include "cert-manager.api-version" $ }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt
@@ -15,15 +15,17 @@ spec:
   issuerRef:
     name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
+{{- if not ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
   acme:
     config:
       - http01:
           ingress: {{ .Release.Name }}-drupal
         domains:
           - {{ template "drupal.domain" . }}
+{{- end }}
 ---
 {{- range $index, $prefix := .Values.domainPrefixes }}
-apiVersion: certmanager.k8s.io/v1alpha1
+{{- include "cert-manager.api-version" $ }}
 kind: Certificate
 metadata:
   name: {{ $.Release.Name }}-crt-p{{ $index }}
@@ -36,17 +38,19 @@ spec:
   issuerRef:
     name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
+{{- if not ( $.Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
   acme:
     config:
       - http01:
           ingress: {{ $.Release.Name }}-drupal
         domains:
           - '{{$prefix}}.{{ include "drupal.domain" $ }}'
+{{- end }}
 ---
 {{- end }}
 
 {{- else if eq $context_ssl.issuer "selfsigned" }}
-apiVersion: certmanager.k8s.io/v1alpha1
+{{- include "cert-manager.api-version" . }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt
@@ -87,7 +91,7 @@ data:
 {{- if $domain.ssl }}
 {{- if $domain.ssl.enabled }}
 {{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-apiVersion: certmanager.k8s.io/v1alpha1
+{{- include "cert-manager.api-version" $ }}
 kind: Certificate
 metadata:
   name: {{ $.Release.Name }}-crt-{{ $index }}
@@ -100,16 +104,18 @@ spec:
   issuerRef:
     name: {{ $domain.ssl.issuer }}
     kind: ClusterIssuer
+{{- if not ( $.Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
   acme:
     config:
       - http01:
           ingress: {{ $.Release.Name }}-drupal-{{ $domain.ingress }}
         domains:
           - {{ $domain.hostname }}
+{{- end }}
 ---
 
 {{- else if eq $domain.ssl.issuer "selfsigned" }}
-apiVersion: certmanager.k8s.io/v1alpha1
+{{- include "cert-manager.api-version" $ }}
 kind: Certificate
 metadata:
   name: {{ $.Release.Name }}-crt-{{ $index }}
