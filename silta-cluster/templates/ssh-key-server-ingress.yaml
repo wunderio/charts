@@ -28,7 +28,7 @@ spec:
 ---
 {{- if .Values.sshKeyServer.ssl.enabled }}
 {{- if has .Values.sshKeyServer.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-apiVersion: certmanager.k8s.io/v1alpha1
+{{- include "cert-manager.api-version" . }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt-ssh-key-server
@@ -39,15 +39,17 @@ spec:
   issuerRef:
     name: {{ .Values.sshKeyServer.ssl.issuer }}
     kind: ClusterIssuer
+{{- if not ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
   acme:
     config:
       - http01:
           ingress: {{ .Release.Name }}-ssh-key-server
         domains:
           - keys.{{ .Values.clusterDomain }}
+{{- end }}
 ---
 {{- else if eq .Values.sshKeyServer.ssl.issuer "selfsigned" }}
-apiVersion: certmanager.k8s.io/v1alpha1
+{{- include "cert-manager.api-version" . }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt-ssh-key-server

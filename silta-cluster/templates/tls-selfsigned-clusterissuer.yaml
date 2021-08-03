@@ -1,5 +1,5 @@
 {{- if .Values.ssl.enabled }}
-apiVersion: certmanager.k8s.io/v1alpha1
+{{- include "cert-manager.api-version" . }}
 kind: ClusterIssuer
 metadata:
   name: selfsigned

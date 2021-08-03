@@ -28,7 +28,7 @@ spec:
 ---
 {{- if .Values.deploymentRemover.ssl.enabled }}
 {{- if has .Values.deploymentRemover.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-apiVersion: certmanager.k8s.io/v1alpha1
+{{- include "cert-manager.api-version" . }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt-deployment-remover
@@ -39,15 +39,17 @@ spec:
   issuerRef:
     name: {{ .Values.deploymentRemover.ssl.issuer }}
     kind: ClusterIssuer
+{{- if not ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
   acme:
     config:
       - http01:
           ingress: {{ .Release.Name }}-deployment-remover
         domains:
           - webhooks.{{ .Values.clusterDomain }}
+{{- end }}
 ---
 {{- else if eq .Values.deploymentRemover.ssl.issuer "selfsigned" }}
-apiVersion: certmanager.k8s.io/v1alpha1
+{{- include "cert-manager.api-version" . }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt-deployment-remover
