@@ -416,6 +416,13 @@ data:
                 try_files $uri @drupal;
             }
 
+            {{- if .Values.nginx.retry404s }}
+            # Retry file lookup in 5 seconds (fs sync workaround)
+            location ~* ^/sites/(.*)/files/(?:css|js)/(.*).(?:css|js)$ {
+                try_files $uri $uri/ @files_delay;
+            }
+            {{- end }}
+            
             ## Serve static files & images directly, without all standard drupal rewrites, php-fpm etc.
             location ~* ^.+\.(?:css|js|jpe?g|gif|png|ico|svg|swf|docx?|xlsx?|tiff?|txt|cgi|bat|pl|dll|exe|class)$ {
                 tcp_nodelay     off;
@@ -491,10 +498,6 @@ data:
         }
 
         {{- if .Values.nginx.retry404s }}
-        # Retry file lookup in 5 seconds (fs sync workaround)
-        location /sites/default/files/ {
-            try_files $uri $uri/ @files_delay;
-        }
         location @files_delay {
             internal;
             echo_sleep {{ .Values.nginx.retry404s }}.0;
@@ -502,7 +505,8 @@ data:
         }
         location @files_retry {
             internal;
-            try_files $uri $uri/ =404;
+            # Pass file request to drupal as a final fallback. 
+            try_files $uri @drupal;
         }
         {{- end }}
 
