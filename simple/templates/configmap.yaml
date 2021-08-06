@@ -164,3 +164,8 @@ data:
             location ~ /\. { return 404; access_log off; log_not_found off; }
         }                                                                                                                                                                                                                                                                                                                                     
     }
+
+{{- if .Values.nginx.extraConfig }}
+  extraConfig: |
+  {{ .Values.nginx.extraConfig | nindent 4 }}
+{{- end }}
