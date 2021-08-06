@@ -6,6 +6,8 @@
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt
+  annotations:
+    cert-manager.io/issue-temporary-certificate: "true" 
   labels:
     {{- include "frontend.release_labels" . | nindent 4 }}
 spec:
@@ -94,6 +96,8 @@ data:
 kind: Certificate
 metadata:
   name: {{ $.Release.Name }}-crt-{{ $index }}
+  annotations:
+    cert-manager.io/issue-temporary-certificate: "true" 
   labels:
     {{- include "frontend.release_labels" $ | nindent 4 }}
 spec:
