@@ -6,8 +6,11 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- if $ingress.tls }}
-    certmanager.k8s.io/acme-http01-edit-in-place: "true"
+    {{- if ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
     acme.cert-manager.io/http01-edit-in-place: "true"
+    {{- else }}
+    certmanager.k8s.io/acme-http01-edit-in-place: "true"
+    {{- end }}
     {{- if eq $ingress.type "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
     {{- end }}
@@ -95,8 +98,11 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- if $ingress.tls }}
-    certmanager.k8s.io/acme-http01-edit-in-place: "true"
+    {{- if ( $.Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
     acme.cert-manager.io/http01-edit-in-place: "true"
+    {{- else }}
+    certmanager.k8s.io/acme-http01-edit-in-place: "true"
+    {{- end }}
     {{- if eq $ingress.type "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
     {{- end }}

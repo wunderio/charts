@@ -36,7 +36,7 @@ spec:
           readOnly: true
           subPath: simple_conf
         {{- if .Values.nginx.extraConfig }}
-        - name: config
+        - name: nginx-conf
           # provide empty configuration file in /etc/nginx/conf.d for users to populate
           mountPath: /etc/nginx/conf.d/misc.conf
           readOnly: true
@@ -67,6 +67,10 @@ spec:
                 path: nginx_conf
               - key: simple_conf
                 path: simple_conf
+              {{- if .Values.nginx.extraConfig }}
+              - key: extraConfig
+                path: extraConfig
+              {{- end }}
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
           secret:
