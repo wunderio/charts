@@ -53,7 +53,7 @@ spec:
         - name: ssh-keys
           mountPath: /etc/ssh/keys
         {{- if .Values.backup.enabled }}
-        - name: {{ .Release.Name }}-backup
+        - name: {{ .Release.Name }}-backups
           mountPath: /backups
           readOnly: true
         {{- end }}
@@ -77,9 +77,9 @@ spec:
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-ssh-keys
       {{- if .Values.backup.enabled }}
-      - name: {{ .Release.Name }}-backup
+      - name: {{ .Release.Name }}-backups
         persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-backup
+          claimName: {{ .Release.Name }}-backups
       {{- end }}
       {{- include "drupal.imagePullSecrets" . | nindent 6 }}
 {{- end }}

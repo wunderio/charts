@@ -57,7 +57,7 @@ tests:
           path: spec.template.spec.containers[0].volumeMounts
           content:
             mountPath: /backups
-            name: RELEASE-NAME-backup
+            name: RELEASE-NAME-backups
             readOnly: true
 
   - it: does not mount backups volume when backups are disabled
@@ -70,6 +70,6 @@ tests:
           path: spec.template.spec.containers[0].volumeMounts
           content:
             mountPath: /backups
-            name: RELEASE-NAME-backup
+            name: RELEASE-NAME-backups
             readOnly: true
 
