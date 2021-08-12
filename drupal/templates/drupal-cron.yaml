@@ -30,13 +30,14 @@ spec:
             command: ["/bin/bash", "-c"]
             args:
               - |
-                 set -ex
-                 if [ ! {{ include "drupal.installation-in-progress-test" $ }} ]
-                 then
-                  {{ $job.command | nindent 18 }}
-                 else
-                   exit 1
-                 fi
+                {{- include "cron.entrypoints" $ | nindent 16 }}
+                set -ex
+                if [ ! {{ include "drupal.installation-in-progress-test" $ }} ]
+                then
+                {{ $job.command | nindent 18 }}
+                else
+                  exit 1
+                fi
             resources:
               {{ if $job.resources }}
               {{- $job.resources | toYaml | nindent 14 }}

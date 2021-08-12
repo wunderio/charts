@@ -1,0 +1,50 @@
+suite: drupal cache tag exposure
+templates:
+  - varnish-configmap-vcl.yaml
+  - drupal-configmap.yaml
+tests:
+  - it: cache tag headers are removed when varnish is off and header exposing is off (nginx conf)
+    template: drupal-configmap.yaml
+    set:
+      nginx.expose_cache_headers: false
+      varnish.enabled: false
+    asserts:
+    - matchRegex:
+        path: data.drupal_conf
+        pattern: "fastcgi_hide_header 'Purge-Cache-Tags';"
+  - it: cache tag headers persist when varnish is off and header exposing is on (nginx conf)
+    template: drupal-configmap.yaml
+    set:
+      nginx.expose_cache_headers: true
+      varnish.enabled: false
+    asserts:
+    - notMatchRegex:
+        path: data.drupal_conf
+        pattern: "fastcgi_hide_header 'Purge-Cache-Tags';"
+  - it: cache tag headers persist when varnish is on and header exposing is off (nginx conf)
+    template: drupal-configmap.yaml
+    set:
+      nginx.expose_cache_headers: false
+      varnish.enabled: true
+    asserts:
+    - notMatchRegex:
+        path: data.drupal_conf
+        pattern: "fastcgi_hide_header 'Purge-Cache-Tags';"
+  - it: cache tag headers are removed when varnish is on and header exposing is off (varnish vcl)
+    template: varnish-configmap-vcl.yaml
+    set:
+      nginx.expose_cache_headers: false
+      varnish.enabled: true
+    asserts:
+    - matchRegex:
+        path: data.vcl_deliver_vcl
+        pattern: "unset resp.http.X-Drupal-Cache-Tags;"
+  - it: cache tag headers persist when varnish is on and header exposing is on (varnish vcl)
+    template: varnish-configmap-vcl.yaml
+    set:
+      nginx.expose_cache_headers: true
+      varnish.enabled: true
+    asserts:
+    - notMatchRegex:
+        path: data.vcl_deliver_vcl
+        pattern: "unset resp.http.X-Drupal-Cache-Tags;"

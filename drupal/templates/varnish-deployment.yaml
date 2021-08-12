@@ -54,7 +54,7 @@ spec:
           readOnly: true
         - name: varnish-vcl
           mountPath: /etc/varnish/includes/vcl_deliver.vcl
-          subPath: vcl_deliver.vcl
+          subPath: vcl_deliver_vcl
           readOnly: true
         - name: varnish-vcl
           mountPath: /etc/varnish/includes/vcl_synth_500.vcl

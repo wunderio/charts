@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
+  name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backups
   labels:
-    name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
+    name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backups
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
   accessModes:
@@ -15,15 +15,15 @@ spec:
   {{- if .Values.backup.csiDriverName }}
   csi:
     driver: {{ .Values.backup.csiDriverName }}
-    volumeHandle: {{ .Release.Namespace }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
+    volumeHandle: {{ .Release.Namespace }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backups
     volumeAttributes:
-      remotePathSuffix: /{{ .Release.Namespace }}/backup
+      remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/backups
   {{- end }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-backup
+  name: {{ .Release.Name }}-backups
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
@@ -36,6 +36,6 @@ spec:
 {{- if eq .Values.backup.storageClassName "silta-shared" }}
   selector:
     matchLabels:
-      name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
+      name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backups
 {{- end }}
 {{- end }}

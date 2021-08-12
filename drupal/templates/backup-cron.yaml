@@ -32,7 +32,7 @@ spec:
             {{- include "drupal.php-container" . | nindent 12 }}
             volumeMounts:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
-              - name: {{ .Release.Name }}-backup
+              - name: {{ .Release.Name }}-backups
                 mountPath: /backups
             command: ["/bin/bash", "-c"]
             args:
@@ -40,7 +40,7 @@ spec:
                 {{ include "drupal.backup-command" (merge $params . ) | nindent 16 }}
                 {{ include "mariadb.db-validation" (merge $params . ) | nindent 16 }}
           - name: mariadb
-            image: docker.io/bitnami/mariadb:10.2
+            image: docker.io/bitnami/mariadb:10.3.24-debian-10-r49
             imagePullPolicy: IfNotPresent
             env:
             - name: MARIADB_ROOT_PASSWORD
@@ -51,13 +51,14 @@ spec:
             - containerPort: 3306
               name: mariadb
             resources:
-              {{- .Values.backup.resources | toYaml | nindent 14 }}
+              requests:
+                {{- .Values.backup.resources | toYaml | nindent 14 }}
           restartPolicy: Never
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}
-            - name: {{ .Release.Name }}-backup
+            - name: {{ .Release.Name }}-backups
               persistentVolumeClaim:
-                claimName: {{ .Release.Name }}-backup
+                claimName: {{ .Release.Name }}-backups
           {{- include "drupal.imagePullSecrets" . | nindent 10 }}
 {{- end }}
 

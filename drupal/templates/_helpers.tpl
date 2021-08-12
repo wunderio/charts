@@ -378,7 +378,7 @@ fi
 
   # Generate the id of the backup.
   BACKUP_ID=`date +%Y-%m-%d-%H-%M-%S`
-  BACKUP_LOCATION="/backups/$BACKUP_ID-{{ .Values.environmentName }}"
+  BACKUP_LOCATION="/backups/$BACKUP_ID"
 
   # Figure out which tables to skip.
   IGNORE_TABLES=""
@@ -418,12 +418,32 @@ fi
   {{- end }}
 
   # Delete old backups
-  find /backups/ -mtime +{{ .Values.backup.retention }} -exec rm -r {} \;
+  echo "Removing backups older than {{ .Values.backup.retention }} days"
+  # Can't locate directories based on mtime due to storage backend limitations, 
+  # Using folder name for time selection. 
+  retention_time=$(date -d "{{ .Values.backup.retention }} days ago" +%s)
+                  
+  find /backups -type d -mindepth 1 -maxdepth 1 -print \
+  | grep -E '/[0-9-]+$' \
+  | while read -r dir
+  do
+    # convert dir name into timestamp
+    stamp="$(echo "$dir" | sed -re 's%.+/(.+)-(.+)-(.+)-(.+)-(.+)-(.+)$%\1-\2-\3 \4:\5:\6%')"
+    stamp="$(date -d "$stamp" '+%s')" || continue
+    
+    # jump out of the execution block if the directory more recent than retention time
+    if [[ "$stamp" -gt "$retention_time" ]]; then
+      continue
+    fi
+    # All checks have passed and we can remove the directory.
+    echo "Removing directory: $dir"
+    rm -rf "$dir"
+  done
 
   # List content of backup folder
+  echo "Current backups:"
   ls -lh /backups/*
 {{- end }}
-
 
 {{- define "mariadb.db-validation" -}}
 
@@ -444,7 +464,7 @@ fi
     sleep 1s
     TIME_WAITING=$((TIME_WAITING+1))
 
-    if [ $TIME_WAITING -gt 20 ]; then
+    if [ $TIME_WAITING -gt 60 ]; then
       echo "Database connection timeout"
       exit 1
     fi
@@ -464,3 +484,10 @@ apiVersion: certmanager.k8s.io/v1alpha1
 {{- end }}
 {{- end }}
 
+{{- define "cron.entrypoints" -}}
+
+set -e
+# Trigger lagoon entrypoint scripts if present.
+if [ -f /lagoon/entrypoints.sh ] ; then /lagoon/entrypoints.sh ; fi
+
+{{- end }}
