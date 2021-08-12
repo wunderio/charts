@@ -46,11 +46,11 @@ spec:
         volumeMounts:
         - name: varnish-vcl
           mountPath: /etc/varnish/default.vcl
-          subPath: default.vcl
+          subPath: default_vcl
           readOnly: true
         - name: varnish-vcl
           mountPath: /etc/varnish/includes/vcl_recv.vcl
-          subPath: vcl_recv.vcl
+          subPath: vcl_recv_vcl
           readOnly: true
         - name: varnish-vcl
           mountPath: /etc/varnish/includes/vcl_deliver.vcl
@@ -58,7 +58,7 @@ spec:
           readOnly: true
         - name: varnish-vcl
           mountPath: /etc/varnish/includes/vcl_synth_500.vcl
-          subPath: vcl_synth_500.vcl
+          subPath: vcl_synth_500_vcl
           readOnly: true
         - name: varnish-secret
           mountPath: "/etc/varnish/secret"
