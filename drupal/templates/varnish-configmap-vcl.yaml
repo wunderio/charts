@@ -320,8 +320,11 @@ data:
       if (client.ip ~ upstream_proxy && req.http.X-Envoy-External-Address) {
         set req.http.X-Forwarded-For = req.http.X-Envoy-External-Address;
       } 
-      elseif (client.ip ~ upstream_proxy && req.http.X-Forwarded-For) {
+      elseif (client.ip ~ upstream_proxy && req.http.X-Real-IP) {
         set req.http.X-Forwarded-For = req.http.X-Real-IP;
+      } 
+      elseif (client.ip ~ upstream_proxy && req.http.X-Forwarded-For) {
+        set req.http.X-Forwarded-For = req.http.X-Forwarded-For;
       } 
       else {
         set req.http.X-Forwarded-For = client.ip;
