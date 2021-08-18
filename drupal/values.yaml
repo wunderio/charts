@@ -155,7 +155,10 @@ nginx:
   expose_cache_headers: false
 
   # Trust X-Forwarded-For from these hosts for getting external IP
-  realipfrom: 10.0.0.0/8
+  realipfrom: 
+    gke-internal: 10.0.0.0/8
+    gce-health-check-1: 130.211.0.0/22
+    gce-health-check-2: 35.191.0.0/16
 
   # Define the internal network access.
   # These are used below to allow internal access to certain files

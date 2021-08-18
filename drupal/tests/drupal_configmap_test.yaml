@@ -1,6 +1,7 @@
 suite: drupal ConfigMaps
 templates:
   - drupal-configmap.yaml
+  - varnish-configmap-vcl.yaml
 tests:
   - it: is a ConfigMap
     template: drupal-configmap.yaml
@@ -67,3 +68,57 @@ tests:
     - matchRegex:
         path: data.drupal_conf
         pattern: 'auth_basic "Restricted";'
+
+  - it: tests realipfrom nginx configuration (legacy string value)
+    template: drupal-configmap.yaml
+    set:
+      nginx:
+        realipfrom: '1.2.3.4'
+    asserts:
+    - matchRegex:
+        path: data.nginx_conf
+        pattern: 'set_real_ip_from *1.2.3.4'
+ 
+  - it: tests realipfrom nginx configuration (multivalue object)
+    template: drupal-configmap.yaml
+    set:
+      nginx:
+        realipfrom: 
+          foo: '1.1.1.1'
+          bar: '2.2.2.2'
+    asserts:
+    - matchRegex:
+        path: data.nginx_conf
+        pattern: 'set_real_ip_from *1.1.1.1'
+    - matchRegex:
+        path: data.nginx_conf
+        pattern: 'set_real_ip_from *2.2.2.2'
+
+  - it: tests realipfrom varnish configuration (legacy string value)
+    template: varnish-configmap-vcl.yaml
+    set:
+      nginx:
+        realipfrom: '1.1.1.1'
+      varnish:
+        enabled: true
+    asserts:
+    - matchRegex:
+        path: data.default_vcl
+        pattern: "1.1.1.1"
+
+  - it: tests realipfrom varnish configuration (multivalue object)
+    template: varnish-configmap-vcl.yaml
+    set:
+      nginx:
+        realipfrom: 
+          foo: '1.1.1.1'
+          bar: '2.2.2.2'
+      varnish:
+        enabled: true
+    asserts:
+    - matchRegex:
+        path: data.default_vcl
+        pattern: "1.1.1.1"
+    - matchRegex:
+        path: data.default_vcl
+        pattern: "2.2.2.2"

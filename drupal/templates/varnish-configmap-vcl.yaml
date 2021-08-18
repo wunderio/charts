@@ -38,7 +38,14 @@ data:
 
     # List of upstream proxies we trust to set X-Forwarded-For correctly.
     acl upstream_proxy {
+      {{- if kindIs "string" .Values.nginx.realipfrom }}
       {{ .Values.nginx.realipfrom | quote }};
+      {{- end }}
+      {{- if kindIs "map" .Values.nginx.realipfrom }}
+      {{- range .Values.nginx.realipfrom }}
+      {{ . | quote }};
+      {{- end }}
+      {{- end }}
     }
 
     sub vcl_init {

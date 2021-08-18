@@ -92,7 +92,10 @@
             }
           }
         },
-        "realipfrom": { "type": "string"},
+        "realipfrom": {
+          "type": ["string","object"],
+          "additionalProperties": { "type": "string"}
+        },
         "noauthips": {
           "type": "object",
           "additionalProperties": { "type": "string"}
