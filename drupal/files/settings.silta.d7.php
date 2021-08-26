@@ -26,14 +26,6 @@ if (getenv('PRIVATE_FILES_PATH')) {
   $conf['file_private_path'] = getenv('PRIVATE_FILES_PATH');
 }
 
-/**
- * Set the memcache server hostname when a memcached server is available.
- */
-if (getenv('MEMCACHED_HOST')) {
-  if (class_exists('Memcache', FALSE) || class_exists('Memcached', FALSE)) {
-    $conf['memcache_servers'] = [getenv('MEMCACHED_HOST') . ':11211' => 'default'];
-  }
-}
 
 /**
  * Show all error messages, with backtrace information.
