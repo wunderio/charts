@@ -90,7 +90,7 @@ gitAuth:
   allowedIps: []
   replicas: 1
   persistence:
-    storageClassName: null
+    # storageClassName: silta-shared
     accessMode: ReadWriteOnce
     size: 50M
   # Kubernetes resource allocation.
