@@ -88,6 +88,11 @@ gitAuth:
   scope: ''
   outsideCollaborators: true
   allowedIps: []
+  replicas: 1
+  store:
+    storageClassName: standard
+    accessMode: ReadWriteOnce
+    size: 50M
   # Kubernetes resource allocation.
   resources: {}
   # The static IP to be used for the exposed endpoint.
