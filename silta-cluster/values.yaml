@@ -89,8 +89,8 @@ gitAuth:
   outsideCollaborators: true
   allowedIps: []
   replicas: 1
-  store:
-    storageClassName: standard
+  persistence:
+    storageClassName: null
     accessMode: ReadWriteOnce
     size: 50M
   # Kubernetes resource allocation.

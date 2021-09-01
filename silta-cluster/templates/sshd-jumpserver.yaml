@@ -74,18 +74,21 @@ metadata:
   labels:
     name: {{ .Release.Name }}-jumpserver
 spec:
-  storageClassName: {{ .Values.gitAuth.store.storageClassName }}
+  {{- if .Values.gitAuth.persistence.storageClassName }}
+  storageClassName: {{ .Values.gitAuth.persistence.storageClassName }}
+  {{- end }}
   accessModes:
-    - {{ .Values.gitAuth.store.accessMode }}
+    - {{ .Values.gitAuth.persistence.accessMode }}
   resources:
     requests:
-      storage: {{ .Values.gitAuth.store.size }}
+      storage: {{ .Values.gitAuth.persistence.size }}
   selector:
     matchLabels:
       name: {{ $.Release.Name }}-shell-keys-pv
 {{- end }}
 # silta-shared volume definition if its storage is selected
-{{- if eq .Values.gitAuth.store.storageClassName "silta-shared" }}
+{{- if .Values.gitAuth.persistence.storageClassName }}
+{{- if eq .Values.gitAuth.persistence.storageClassName "silta-shared" }}
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -95,16 +98,17 @@ metadata:
     name: {{ $.Release.Name }}-shell-keys-pv
 spec:
   accessModes:
-    - {{ .Values.gitAuth.store.accessMode }}
+    - {{ .Values.gitAuth.persistence.accessMode }}
   capacity:
-    storage: {{ .Values.gitAuth.store.size }}
-  storageClassName: {{ .Values.gitAuth.store.storageClassName }}
-  {{- if .Values.gitAuth.store.csiDriverName }}
+    storage: {{ .Values.gitAuth.persistence.size }}
+  storageClassName: {{ .Values.gitAuth.persistence.storageClassName }}
+  {{- if .Values.gitAuth.persistence.csiDriverName }}
   csi:
-    driver: {{ .Values.gitAuth.store.csiDriverName }}
+    driver: {{ .Values.gitAuth.persistence.csiDriverName }}
     volumeHandle: {{ $.Release.Name }}-shell-keys-pv
     volumeAttributes:
       remotePathSuffix: /{{ $.Release.Namespace }}/jumpserver
       umask: "077"
   {{- end }}
+{{- end }}
 {{- end }}
