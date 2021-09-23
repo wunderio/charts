@@ -17,6 +17,18 @@ release: {{ .Release.Name }}
   {{- end }}
 {{- end }}
 
+{{- define "frontend.security_headers" }}
+  ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.
+  add_header    X-Frame-Options SAMEORIGIN;
+  add_header    X-Content-Type-Options nosniff;
+  add_header    Strict-Transport-Security "max-age=31536000; {{ .Values.nginx.hsts_include_subdomains }} preload" always;
+  {{- if .Values.nginx.content_security_policy }}
+  add_header    Content-Security-Policy "{{ .Values.nginx.content_security_policy }}" always;
+  {{- end }}
+  add_header    X-XSS-Protection "1; mode=block";
+  add_header    Referrer-Policy "no-referrer, strict-origin-when-cross-origin" always;
+{{- end }}
+
 {{- define "frontend.tolerations" -}}
 {{- range $key, $label := $ }}
 - key: {{ $key }}
