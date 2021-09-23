@@ -1,12 +1,10 @@
-{{- if eq .Values.cluster.type "gke" }}
+{{- if and (eq .Values.cluster.type "gke") (.Values.backendConfig) }}
 apiVersion: cloud.google.com/v1
 kind: BackendConfig
 metadata:
   name: {{ .Release.Name }}-drupal
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
-{{ if .Values.backendConfig }} 
 spec:
   {{- toYaml .Values.backendConfig | nindent 2 }}
-{{- end }}
 {{- end }}

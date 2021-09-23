@@ -36,21 +36,83 @@ tests:
           path: spec.rules[0].host
           value: 'foo.namespace.baz'
 
-  - it: directs traefik requests to drupal service by default
+  - it: directs traefik requests to drupal service by default (cm 0.8)
     template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
+      apiVersions:
+        - certmanager.k8s.io/v1alpha1
     asserts:
       - equal:
           path: spec.rules[0].http.paths[0].backend.serviceName
           value: 'RELEASE-NAME-drupal'
 
-  - it: directs traefik requests to varnish service when varnish is enabled
+  - it: directs traefik requests to drupal service by default (cm 1.4+)
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 18
+      apiVersions:
+        - cert-manager.io/v1
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: 'RELEASE-NAME-drupal'
+  
+  - it: directs traefik requests to varnish service when varnish is enabled (cm 0.8)
     template: drupal-ingress.yaml
     set:
       varnish.enabled: true
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
+      apiVersions:
+        - certmanager.k8s.io/v1alpha1
     asserts:
       - equal:
           path: spec.rules[0].http.paths[0].backend.serviceName
           value: 'RELEASE-NAME-varnish'
+
+  - it: directs traefik requests to varnish service when varnish is enabled (cm 1.4+)
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 18
+      apiVersions:
+        - cert-manager.io/v1
+    set:
+      varnish.enabled: true
+    asserts:
+      - equal:
+          path: spec.rules[0].http.paths[0].backend.service.name
+          value: 'RELEASE-NAME-varnish'
+
+  - it: uses correct ingress api version (1.17)
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
+    asserts:
+      - equal:
+          path: apiVersion
+          value: 'networking.k8s.io/v1beta1'
+
+  - it: uses correct ingress api version (1.18+)
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 18
+    asserts:
+      - equal:
+          path: apiVersion
+          value: 'networking.k8s.io/v1'
+
+
+
+
+
+
 
   - it: shortens long project names
     template: drupal-ingress.yaml

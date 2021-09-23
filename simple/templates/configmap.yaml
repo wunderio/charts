@@ -19,8 +19,22 @@ data:
                                                                                           
     http {
 
-        set_real_ip_from                {{ .Values.nginx.basicauth.realipfrom }};
-        real_ip_header                  {{ .Values.nginx.real_ip_header }};
+        # List of upstream proxies we trust to set X-Forwarded-For correctly.
+        {{- if kindIs "string" .Values.nginx.realipfrom }}
+        set_real_ip_from            {{ .Values.nginx.realipfrom }};
+        {{- end }}
+        {{- if kindIs "map" .Values.nginx.realipfrom }}
+        {{- range .Values.nginx.realipfrom }}
+        set_real_ip_from            {{ . }};
+        {{- end }}
+        {{- end }}
+
+        {{ if .Values.nginx.basicauth.realipfrom }}
+        # This will be depreciated, migrate this setting to nginx.realipfrom
+        set_real_ip_from            {{ .Values.nginx.basicauth.realipfrom }};
+        {{- end }}
+
+        real_ip_header              {{ .Values.nginx.real_ip_header }};
 
         include                     /etc/nginx/mime.types;                                 
         default_type                application/octet-stream;                              
@@ -70,6 +84,12 @@ data:
         add_header                  Referrer-Policy "no-referrer, strict-origin-when-cross-origin" always;
 
         map_hash_bucket_size        128;
+
+        map $http_host $x_robots_tag_header {
+            "~{{ template "simple.domain" $ }}$" "noindex, nofollow, nosnippet, noarchive";
+            default  '';
+        }
+        add_header                  X-Robots-Tag $x_robots_tag_header;
 
         map $uri $no_slash_uri {                                                                                                                           
             ~^/(?<no_slash>.*)$ $no_slash;                                                                                                                 
@@ -136,12 +156,8 @@ data:
         {{ include "simple.basicauth" . | indent 6}}
 
         location = /robots.txt {
-          access_log off;
-          {{- if not .Values.nginx.robotsTxt.allow }}
-            add_header Content-Type text/plain;
-            return 200 'User-agent: *\nDisallow: /';
-          {{- end}}
-        } 
+            access_log off;
+        }
 
         location / {
 

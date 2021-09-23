@@ -21,7 +21,42 @@
         "vpcNative": { "type": "boolean"}
       }
     },
-    "nginx": { "type": "object" },
+    "nginx": { 
+      "type": "object",
+      "properties": {
+        "image": { "type": "string"},
+        "basicauth": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean"},
+            "credentials": {
+              "type": "object",
+              "properties": {
+                "username": { "type": "string"},
+                "password": { "type": "string"}
+              }
+            },
+            "realipfrom": {
+              "type": ["string"],
+              "deprecated": true
+            },
+            "noauthips": {
+              "type": ["object"],
+              "deprecated": true
+            }
+          },
+          "additionalProperties": false
+        },
+        "realipfrom": {
+          "type": ["string", "object"],
+          "additionalProperties": { "type": "string"}
+        },
+        "noauthips": {
+          "type": "object",
+          "additionalProperties": { "type": "string"}
+        }
+      }
+    },
     "silta-release": {
       "type": "object"
     }
