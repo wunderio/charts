@@ -1,12 +1,12 @@
 {{- $ingress := .Values.ingress.default }}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: {{ include "ingress.api-version" . | trim }}
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-drupal
   annotations:
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- if $ingress.tls }}
-    {{- if ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
+    {{- if eq ( include "cert-manager.api-version" $ | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
     {{- else }}
     certmanager.k8s.io/acme-http01-edit-in-place: "true"
@@ -67,16 +67,30 @@ spec:
       paths:
       - path: /
         backend:
+          {{- if eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ include "drupal.servicename" . }}
+            port: 
+              number: 80
+          {{- else }}
           serviceName: {{ include "drupal.servicename" . }}
           servicePort: 80
+          {{- end }}
 {{- range $index, $prefix := .Values.domainPrefixes }}
   - host: '{{ $prefix }}.{{ template "drupal.domain" $ }}'
     http:
       paths:
       - path: /
         backend:
+          {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ include "drupal.servicename" $ }}
+            port: 
+              number: 80
+          {{- else }}
           serviceName: {{ include "drupal.servicename" $ }}
           servicePort: 80
+          {{- end }}
 {{- end }}
 ---
 
@@ -96,14 +110,14 @@ spec:
 {{- end }}
 
 {{- if $ingress_in_use }}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: {{ include "ingress.api-version" $ | trim }}
 kind: Ingress
 metadata:
   name: {{ $.Release.Name }}-drupal-{{ $ingress_index }}
   annotations:
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- if $ingress.tls }}
-    {{- if ( $.Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
+    {{- if eq ( include "cert-manager.api-version" $ | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
     {{- else }}
     certmanager.k8s.io/acme-http01-edit-in-place: "true"
@@ -165,8 +179,15 @@ spec:
       paths:
       - path: {{ if eq $ingress.type "gce" }}/*{{ else }}/{{ end }}
         backend:
+          {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ include "drupal.servicename" $ }}
+            port: 
+              number: 80
+          {{- else }}
           serviceName: {{ include "drupal.servicename" $ }}
           servicePort: 80
+          {{- end }}
   {{- end }}
   {{- end }}
 ---
