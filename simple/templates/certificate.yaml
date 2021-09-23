@@ -2,12 +2,13 @@
 {{- $context_ssl := .Values.ssl }}
 {{- if $context_ingress.tls }}
 {{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-{{- include "cert-manager.api-version" . }}
+apiVersion: {{ include "cert-manager.api-version" . | trim }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt
   annotations:
     cert-manager.io/issue-temporary-certificate: "true"
+    acme.cert-manager.io/http01-override-ingress-name: "{{ .Release.Name }}-simple"
   labels:
     {{- include "simple.release_labels" . | nindent 4 }}
 spec:
@@ -17,7 +18,7 @@ spec:
   issuerRef:
     name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
-{{- if not ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
+{{- if eq ( include "cert-manager.api-version" . | trim ) "certmanager.k8s.io/v1alpha1" }}
   acme:
     config:
       - http01:
@@ -28,7 +29,7 @@ spec:
 ---
 
 {{- else if eq $context_ssl.issuer "selfsigned" }}
-{{- include "cert-manager.api-version" . }}
+apiVersion: {{ include "cert-manager.api-version" . | trim }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt
@@ -68,12 +69,13 @@ data:
 {{- if $domain.ssl }}
 {{- if $domain.ssl.enabled }}
 {{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-{{- include "cert-manager.api-version" $ }}
+apiVersion: {{ include "cert-manager.api-version" $ | trim }}
 kind: Certificate
 metadata:
   name: {{ $.Release.Name }}-crt-{{ $index }}
   annotations:
     cert-manager.io/issue-temporary-certificate: "true"
+    acme.cert-manager.io/http01-override-ingress-name: "{{ $.Release.Name }}-simple-{{ $domain.ingress }}"
   labels:
     {{- include "simple.release_labels" $ | nindent 4 }}
 spec:
@@ -83,7 +85,7 @@ spec:
   issuerRef:
     name: {{ $domain.ssl.issuer }}
     kind: ClusterIssuer
-{{- if not ( $.Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
+{{- if eq ( include "cert-manager.api-version" $ | trim ) "certmanager.k8s.io/v1alpha1" }}
   acme:
     config:
       - http01:
@@ -94,7 +96,7 @@ spec:
 ---
 
 {{- else if eq $domain.ssl.issuer "selfsigned" }}
-{{- include "cert-manager.api-version" $ }}
+apiVersion: {{ include "cert-manager.api-version" $ | trim }}
 kind: Certificate
 metadata:
   name: {{ $.Release.Name }}-crt-{{ $index }}

@@ -24,8 +24,15 @@ release: {{ .Release.Name }}
   {{- if .Values.nginx.basicauth.enabled }}
   satisfy any;
   allow 127.0.0.1;
+  {{- if .Values.nginx.basicauth.noauthips }}
   {{- range .Values.nginx.basicauth.noauthips }}
   allow {{ . }};
+  {{- end }}
+  {{- end }}
+  {{- if .Values.nginx.noauthips }}
+  {{- range .Values.nginx.noauthips }}
+  allow {{ . }};
+  {{- end }}
   {{- end }}
   deny all;
 
@@ -36,8 +43,16 @@ release: {{ .Release.Name }}
 
 {{- define "cert-manager.api-version" }}
 {{- if ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
-apiVersion: cert-manager.io/v1
+cert-manager.io/v1
 {{- else }}
-apiVersion: certmanager.k8s.io/v1alpha1
+certmanager.k8s.io/v1alpha1
+{{- end }}
+{{- end }}
+
+{{- define "ingress.api-version" }}
+{{- if semverCompare ">=1.18" .Capabilities.KubeVersion.Version }}
+networking.k8s.io/v1
+{{- else }}
+networking.k8s.io/v1beta1
 {{- end }}
 {{- end }}
