@@ -26,6 +26,9 @@ shell:
 elasticsearch:
   enabled: true
 
+mongodb:
+  enabled: true
+
 rabbitmq:
   enabled: true
 

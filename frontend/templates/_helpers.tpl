@@ -94,6 +94,11 @@ rsync -az /values_mounts/ /backups/current/
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
 {{- end }}
+# MongoDB
+{{- if .Values.mongodb.enabled }}
+- name: MONGODB_HOST
+  value: {{ .Release.Name }}-mongodb
+{{- end }}
 # Shell / Gitauth
 {{ if .Values.shell.enabled -}}
 - name: GITAUTH_URL

@@ -20,3 +20,5 @@ Service containers have following environment variables:
       - DB_USER: Database username. Uses silta.yml `mariadb.db.user`, default value provided by build process.
       - DB_PASS: Database password. Uses silta.yml `mariadb.db.password` default value provided by build process
       - DB_NAME: Database name. Set to "frontend" by default.
+  - When MongoDB is enabled:
+    - MONGODB_HOST: MongoDB server host.

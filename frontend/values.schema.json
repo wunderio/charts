@@ -31,6 +31,12 @@
         "enabled": { "type": "boolean" }
       }
     },
+    "mongodb": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
     "elasticsearch": {
       "type": "object",
       "properties": {

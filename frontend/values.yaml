@@ -387,6 +387,18 @@ elasticsearch:
           values:
           - static-ip
 
+# These settings are not optimized. To see which overrides are available see:
+# https://github.com/bitnami/charts/blob/master/bitnami/mongodb/values.yaml
+
+# Note: upstream values.yaml has image.tag: 4.4.9-debian-19-r0 - do we have to
+# override this?
+mongodb:
+  enabled: false
+
+  # Use a low default to prevent unnecessary storage use.
+  persistence:
+    size: 1Gi
+
 rabbitmq:
   enabled: false
 
