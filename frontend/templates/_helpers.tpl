@@ -94,6 +94,11 @@ rsync -az /values_mounts/ /backups/current/
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
 {{- end }}
+# MongoDB
+{{- if .Values.mongodb.enabled }}
+- name: MONGODB_HOST
+  value: {{ .Release.Name }}-mongodb
+{{- end }}
 # Shell / Gitauth
 {{ if .Values.shell.enabled -}}
 - name: GITAUTH_URL
@@ -128,9 +133,9 @@ rsync -az /values_mounts/ /backups/current/
 - name: HTTPS_PROXY
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: no_proxy
-  value: .svc.cluster.local,{{ .Release.Name }}-es{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-mongodb,{{ .Release.Name }}-es{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 - name: NO_PROXY
-  value: .svc.cluster.local,{{ .Release.Name }}-es{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: .svc.cluster.local,{{ .Release.Name }}-mongodb,{{ .Release.Name }}-es{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 {{- end }}
 {{- end }}
 
