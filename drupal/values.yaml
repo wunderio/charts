@@ -573,7 +573,8 @@ smtp:
   enabled: false
   # address: smtp.example.com:25
   # tls: false
-  # starttls: false
+  # StartTLS value YES is required when you use smtp.office365.com:587
+  # starttls: "YES"
   # username: ""
   # password: ""
 
