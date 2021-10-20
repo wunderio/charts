@@ -5,6 +5,9 @@ dependencies:
 - name: redis
   repository: https://charts.bitnami.com/bitnami
   version: 10.4.4
+- name: pxc-operator
+  repository: https://percona.github.io/percona-helm-charts/
+  version: 1.9.1
 - name: minio
   repository: https://helm.min.io/
   version: 6.0.5
@@ -23,5 +26,5 @@ dependencies:
 - name: instana-agent
   repository: https://agents.instana.io/helm
   version: 1.1.10
-digest: sha256:f9708b599c358c58934eef0ab278d62c44257949f170d3536e923dab952dca0a
-generated: "2021-08-02T18:10:51.903496879+03:00"
+digest: sha256:ed300a1115fe6b255e546567a8869bf1d995ddb47c14864c91e59a9ae0b127b7
+generated: "2021-10-18T10:42:28.059051808+03:00"

@@ -22,6 +22,12 @@ kubectl apply -k github.com/aws/eks-charts/tree/master/stable/aws-calico/crds
 helm install --name aws-calico --namespace kube-system eks/aws-calico
 ```
 
+
+#### Percona XtraDB Cluster for replicated database support
+```
+kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/main/charts/pxc-operator/crds/crd.yaml
+```
+
 ### PriorityClass
  PriorityClass resources `scheduling.k8s.io/v1beta1` `scheduling.k8s.io/v1alpha1` requires at least kubernetes v1.14. `scheduling.k8s.io/v1` API requires kubernetes v1.17.
 
@@ -35,7 +41,7 @@ helm upgrade --install --wait cluster-name silta-cluster \
              --values local-values.yaml            
 ```
 
-## Components
+## Components 
 
 #### SSH Jumphost
 

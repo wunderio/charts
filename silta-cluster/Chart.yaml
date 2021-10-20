@@ -11,6 +11,10 @@ dependencies:
   version: 10.4.x
   repository: https://charts.bitnami.com/bitnami
   condition: deploymentRemover.enabled
+- name: pxc-operator
+  version: 1.9.x
+  repository: https://percona.github.io/percona-helm-charts/
+  condition: pxc-operator.enabled
 - name: minio
   version: 6.0.x
   repository: https://helm.min.io/

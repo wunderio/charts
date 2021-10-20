@@ -148,6 +148,12 @@ redis:
     enabled: false
     slaveCount: 0
 
+# Percona XtraDB Cluster for replicated database support
+# https://github.com/percona/percona-helm-charts/tree/main/charts/pxc-operator
+pxc-operator:
+  enabled: false
+  watchAllNamespaces: true
+
 cert-manager:
   enabled: true
   email: ''
