@@ -2,6 +2,9 @@ suite: drupal cache tag exposure
 templates:
   - varnish-configmap-vcl.yaml
   - drupal-configmap.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: cache tag headers are removed when varnish is off and header exposing is off (nginx conf)
     template: drupal-configmap.yaml

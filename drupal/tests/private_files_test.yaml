@@ -5,6 +5,9 @@ templates:
   - post-release.yaml
   - drupal-cron.yaml
   - drupal-configmap.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: private files should be disabled by default
     template: drupal-deployment.yaml

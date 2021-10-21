@@ -1,6 +1,9 @@
 suite: drupal post-install hook
 templates:
   - post-release.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: is a helm hook
     template: post-release.yaml

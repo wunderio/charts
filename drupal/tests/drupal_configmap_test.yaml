@@ -2,6 +2,9 @@ suite: drupal ConfigMaps
 templates:
   - drupal-configmap.yaml
   - varnish-configmap-vcl.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: is a ConfigMap
     template: drupal-configmap.yaml

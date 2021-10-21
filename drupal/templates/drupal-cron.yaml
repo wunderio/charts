@@ -3,7 +3,9 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   {{- $indexHash := sha256sum $index | trunc 3 }}
-  name: {{ $.Release.Name }}-cron-{{ (gt (len $index) 6) | ternary ( print ($index | trunc 3) print $indexHash ) $index}}
+  {{- $nameAppendix := (gt (len $index) 6) | ternary ( print ($index | trunc 3) print $indexHash ) $index}}
+  {{- $releaseNameTrimmed := substr 0 (int (sub 46 (len $nameAppendix))) $.Release.Name }}
+  name: {{ $releaseNameTrimmed }}-cron-{{ $nameAppendix }}
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:

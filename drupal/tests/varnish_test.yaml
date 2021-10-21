@@ -2,6 +2,9 @@ suite: varnish deployment
 templates:
   - varnish-deployment.yaml
   - varnish-configmap-vcl.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: sets VARNISH_STORAGE_BACKEND environment variable correctly
     template: varnish-deployment.yaml

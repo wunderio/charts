@@ -1,6 +1,9 @@
 suite: shell service
 templates:
   - shell-service.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: is a service when enabled
     template: shell-service.yaml

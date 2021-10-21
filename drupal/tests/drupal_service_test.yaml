@@ -1,6 +1,9 @@
 suite: drupal service
 templates:
   - drupal-service.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: is a service
     template: drupal-service.yaml

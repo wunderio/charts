@@ -4,6 +4,9 @@ templates:
   - drupal-cron.yaml
   - post-release.yaml
   - drupal-configmap.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: has no image pull secret by default
     template: drupal-deployment.yaml

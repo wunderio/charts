@@ -2,6 +2,9 @@ suite: reference data
 templates:
   - backup-cron.yaml
   - backup-volume.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: By default no backup cron job or volume is created
     template: backup-cron.yaml

@@ -1,4 +1,6 @@
 {{- range $index, $mount := .Values.mounts }}
+#Trimmed release name to fit *it*, sha256sum(7 chars), $index and '-' separators together into a single 63 character string
+{{- $releaseNameTrimmed := substr 0 (int (sub 54 (len $index))) $.Release.Name }}
 {{- if eq $mount.enabled true }}
 {{- if eq $mount.storageClassName "silta-shared" }}
 # Mount-enabled: {{ $mount.enabled  }}
@@ -7,7 +9,7 @@ kind: PersistentVolume
 metadata:
   name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
   labels:
-    name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
+    name: {{ $releaseNameTrimmed }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
     {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
   accessModes:
@@ -40,7 +42,7 @@ spec:
 {{- if eq $mount.storageClassName "silta-shared" }}
   selector:
     matchLabels:
-      name: {{ $.Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
+      name: {{ $releaseNameTrimmed }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
 {{- end }}
 ---
 {{- end -}}

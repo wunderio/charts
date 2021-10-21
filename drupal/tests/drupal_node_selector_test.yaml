@@ -4,6 +4,9 @@ templates:
   - drupal-cron.yaml
   - shell-deployment.yaml
   - drupal-configmap.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: has no node selector by default
     template: drupal-deployment.yaml

@@ -2,6 +2,9 @@ suite: additional nginx configuration file
 templates:
   - drupal-deployment.yaml
   - drupal-configmap.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: populates extraConfig variable and check if its configmap gets mad
     template: drupal-deployment.yaml

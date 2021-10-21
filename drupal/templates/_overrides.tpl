@@ -25,3 +25,12 @@ we make it compatible by overriding the following templates.
 {{- define "mariadb.fullname" -}}
 {{ .Release.Name }}-mariadb
 {{- end }}
+
+{{/*
+The way pxc chart trims resource names can cause resource collisions so we add hash to it.
+https://github.com/percona/percona-helm-charts/blob/main/charts/pxc-db/templates/_helpers.tpl
+*/}}
+{{- define "pxc-database.fullname" -}}
+{{- $releaseNameHash := sha256sum .Release.Name | trunc 3 -}}
+{{- (gt (len .Release.Name) 22) | ternary ( print (.Release.Name | trunc 18) print $releaseNameHash ) .Release.Name }}
+{{- end -}}
