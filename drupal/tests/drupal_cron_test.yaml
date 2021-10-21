@@ -1,6 +1,9 @@
 suite: drupal cron jobs
 templates:
   - drupal-cron.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: is a cron job
     template: drupal-cron.yaml

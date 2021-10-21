@@ -5,6 +5,9 @@ templates:
   - drupal-deployment.yaml
   - drupal-volumes.yaml
   - drupal-configmap.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: By default no reference data PVC or CronJob is created, but the reference volume is mounted for the post-release job
     template: post-release.yaml

@@ -1,0 +1,100 @@
+suite: drupal database
+templates:
+  - drupal-deployment.yaml
+  - drupal-configmap.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
+tests:
+  - it: sets mariadb user
+    template: drupal-deployment.yaml
+    set:
+      mariadb.db.user: testuser
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DB_USER
+            value: testuser
+
+  - it: sets mariadb user in drupal environment if mariadb explicitly enabled
+    template: drupal-deployment.yaml
+    set:
+      mariadb.enabled: true
+      mariadb.db.user: testuser
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DB_USER
+            value: testuser
+
+  - it: sets no mariadb user in drupal environment if mariadb disabled
+    template: drupal-deployment.yaml
+    set:
+      mariadb.enabled: false
+      mariadb.db.user: testuser
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DB_USER
+            value: testuser
+  - it: sets correct db environments when dbms is enabled
+    template: drupal-deployment.yaml
+    set:
+      mariadb.enabled: true
+      pxc-db.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MARIADB_DB_HOST
+            value: RELEASE-NAME-mariadb
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PXC_DB_HOST
+            value: RELEASE-NAME-haproxy-replicas
+  - it: does not set db environments when dbms are disabled
+    template: drupal-deployment.yaml
+    set:
+      mariadb.enabled: false
+      pxc-db.enabled: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MARIADB_DB_HOST
+            value: RELEASE-NAME-mariadb
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PXC_DB_HOST
+            value: RELEASE-NAME-haproxy-replicas
+  - it: sets correct db host when mariadb enabled and primary db
+    template: drupal-deployment.yaml
+    set:
+      mariadb.enabled: true
+      pxc-db.enabled: true
+      db.primary: mariadb
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DB_HOST
+            value: RELEASE-NAME-mariadb
+  - it: sets correct db host when pxc enabled and primary db
+    template: drupal-deployment.yaml
+    set:
+      mariadb.enabled: true
+      pxc-db.enabled: true
+      db.primary: pxc-db
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DB_HOST
+            value: RELEASE-NAME-haproxy-replicas
+
+  

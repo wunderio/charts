@@ -1,6 +1,9 @@
 suite: drupal volumes
 templates:
   - drupal-volumes.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: public files volume should be configurable
     template: drupal-volumes.yaml

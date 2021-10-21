@@ -1,11 +1,15 @@
 apiVersion: v2
 name: drupal
-version: 0.3.101
+version: 0.3.102
 dependencies:
 - name: mariadb
   version: 7.5.x
   repository: https://charts.bitnami.com/bitnami
   condition: mariadb.enabled,drupal.mariadb.enabled,global.mariadb.enabled
+- name: pxc-db
+  version: 1.9.x
+  repository: https://percona.github.io/percona-helm-charts/
+  condition: pxc-db.enabled
 - name: memcached
   version: 4.2.x
   repository: https://charts.bitnami.com/bitnami

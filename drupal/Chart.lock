@@ -2,6 +2,9 @@ dependencies:
 - name: mariadb
   repository: https://charts.bitnami.com/bitnami
   version: 7.5.2
+- name: pxc-db
+  repository: https://percona.github.io/percona-helm-charts/
+  version: 1.9.1
 - name: memcached
   repository: https://charts.bitnami.com/bitnami
   version: 4.2.27
@@ -14,5 +17,5 @@ dependencies:
 - name: silta-release
   repository: file://../silta-release
   version: 0.1.1
-digest: sha256:3d3656be7e04cbd84497dd57975d81d3a4d5d880548c69d27995421623cbdc3c
-generated: "2021-01-06T16:00:17.708426474+02:00"
+digest: sha256:17055f326935954f815a6a337b556b0c487391d6ac4ea6533151af403a787e88
+generated: "2021-10-19T09:02:03.014121382+03:00"

@@ -2,6 +2,9 @@ suite: drupal memcached
 templates:
   - drupal-deployment.yaml
   - drupal-configmap.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: sets memcached hostname in drupal environment if memcached is enabled
     template: drupal-deployment.yaml

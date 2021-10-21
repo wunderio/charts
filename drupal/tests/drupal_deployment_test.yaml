@@ -2,6 +2,9 @@ suite: drupal deployment
 templates:
   - drupal-deployment.yaml
   - drupal-configmap.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: is a deployment with default values
     template: drupal-deployment.yaml

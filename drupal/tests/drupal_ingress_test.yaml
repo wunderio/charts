@@ -1,6 +1,9 @@
 suite: drupal ingress
 templates:
   - drupal-ingress.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
 tests:
   - it: is a ingress
     template: drupal-ingress.yaml
