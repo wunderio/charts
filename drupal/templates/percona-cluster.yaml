@@ -1,3 +1,5 @@
+{{- if (index (index .Values "pxc-db") "enabled") }}
 {{- if not ( .Capabilities.APIVersions.Has "pxc.percona.com/v1" ) }}
 {{- fail "API pxc.percona.com/v1 unavailable, ask cluster administrator to enable Percona XtraDB Cluster support in Silta cluster first!" }}
+{{- end }}
 {{- end }}
