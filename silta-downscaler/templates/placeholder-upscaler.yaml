@@ -55,7 +55,7 @@ spec:
               fieldRef:
                 fieldPath: metadata.namespace
 ---
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: {{ include "ingress.api-version" . | trim }}
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-placeholder-upscaler
@@ -77,15 +77,25 @@ spec:
       paths:
       - path: /
         backend:
+          {{- if eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Release.Name }}-placeholder-upscaler
+            port: 
+              number: 80
+          {{- else }}
           serviceName: {{ .Release.Name }}-placeholder-upscaler
           servicePort: 80
+          {{- end }}
 ---
 {{- if .Values.ssl.enabled }}
 {{- if has .Values.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-apiVersion: certmanager.k8s.io/v1alpha1
+apiVersion: {{ include "cert-manager.api-version" . | trim }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-placeholder-upscaler
+  annotations:
+    cert-manager.io/issue-temporary-certificate: "true" 
+    acme.cert-manager.io/http01-override-ingress-name: "{{ .Release.Name }}-placeholder-upscaler"
   labels:
     release: {{ .Release.Name }}
     deployment: placeholder-upscaler
