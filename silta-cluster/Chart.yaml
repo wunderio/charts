@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "1.0"
 description: Setup a silta kubernetes cluster.
 name: silta-cluster
-version: 0.2.16
+version: 0.2.17
 dependencies:
 - name: traefik
   version: 1.87.x
