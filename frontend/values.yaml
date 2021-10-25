@@ -307,6 +307,10 @@ serviceDefaults:
   # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   strategy:
     type: RollingUpdate
+  livenessProbe:
+    initialDelaySeconds: 30
+  readinessProbe:
+    initialDelaySeconds: 30
   autoscaling:
     enabled: false
     minReplicas: 1
