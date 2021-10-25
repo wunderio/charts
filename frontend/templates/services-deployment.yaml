@@ -49,9 +49,15 @@ spec:
         livenessProbe:
           tcpSocket:
             port: {{ default $.Values.serviceDefaults.port $service.port }}
+          {{ if $service.probeDelay -}}
+          initialDelaySeconds: {{ $service.ProbeDelay }}
+          {{- end}}
         readinessProbe:
           tcpSocket:
             port: {{ default $.Values.serviceDefaults.port $service.port }}
+          {{ if $service.probeDelay -}}
+          initialDelaySeconds: {{ $service.ProbeDelay }}
+          {{- end}}
         env:
         {{- include "services.env" (dict "Values" $.Values "Release" $.Release "service" $service) | nindent 8 }}
         {{- range $key, $val := $service.env }}
