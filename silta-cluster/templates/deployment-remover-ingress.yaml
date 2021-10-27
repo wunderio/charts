@@ -28,7 +28,7 @@ spec:
 ---
 {{- if .Values.deploymentRemover.ssl.enabled }}
 {{- if has .Values.deploymentRemover.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-{{- include "cert-manager.api-version" . }}
+{{- include "silta-cluster.cert-manager-api-version" . }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt-deployment-remover
@@ -49,7 +49,7 @@ spec:
 {{- end }}
 ---
 {{- else if eq .Values.deploymentRemover.ssl.issuer "selfsigned" }}
-{{- include "cert-manager.api-version" . }}
+{{- include "silta-cluster.cert-manager-api-version" . }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt-deployment-remover

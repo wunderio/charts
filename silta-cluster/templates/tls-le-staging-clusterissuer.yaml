@@ -1,5 +1,5 @@
 {{- if .Values.ssl.enabled }}
-{{- include "cert-manager.api-version" . }}
+{{- include "silta-cluster.cert-manager-api-version" . }}
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-staging
@@ -15,5 +15,5 @@ spec:
       # Secret resource used to store the account's private key.
       name: tls-le-staging-issuer-account-key
     # Add a single challenge solver, HTTP01
-    {{- include "cert-manager.solver-http01" . | nindent 4}}
+    {{- include "silta-cluster.cert-manager-solver-http01" . | nindent 4}}
 {{- end }}

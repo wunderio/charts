@@ -5,12 +5,14 @@ This helm chart helps setting up resources for https://github.com/wunderio/silta
 ## Requirements
 
 ### cert-manager
-Custom resource definitions for cert-manager (from https://github.com/helm/charts/tree/master/stable/cert-manager):
 ```
-kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.10/deploy/manifests/00-crds.yaml
-kubectl create namespace silta-cluster
-kubectl label namespace silta-cluster name=silta-cluster
-kubectl label namespace silta-cluster certmanager.k8s.io/disable-validation="true"
+helm install \
+  cert-manager jetstack/cert-manager \
+  --namespace cert-manager \
+  --create-namespace \
+  --version v1.4.1 \
+  --set installCRDs=true \
+  --set global.logLevel=1
 ```
 
 ### Calico
@@ -33,13 +35,27 @@ kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/m
 
 ## Usage
 
-Here is an example of how we instantiate this helm chart: 
+Here is an example of how we instantiate and upgrade this helm chart: 
 
 ```bash
 helm upgrade --install --wait cluster-name silta-cluster \
              --repo "https://storage.googleapis.com/charts.wdr.io" \
              --values local-values.yaml            
 ```
+
+## Upgrading
+
+Chart upgrades are managed like a normal helm release, though it's suggested to do helm diff first:
+
+```
+helm diff upgrade cluster-name silta-cluster \
+    --values local-values.yaml      
+```
+
+## Upgrade path for older versions:
+
+ - Upgrading silta-cluster chart to 0.2.18 ([docs/Upgrading-to-0.2.18.md](docs/Upgrading-to-0.2.18.md))
+
 
 ## Components 
 
