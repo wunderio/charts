@@ -31,12 +31,16 @@ Following steps will upgrade cert-manager (0.10) that is shipped with silta-clus
 
     - Helm diff silta-cluster, make sure it’s correct cluster and values file
         ```bash
-        helm diff upgrade silta-cluster charts/silta-cluster --namespace silta-cluster --values path/to/cluster/values.yaml
+        helm diff upgrade silta-cluster charts/silta-cluster \
+        --namespace silta-cluster \
+        --values path/to/cluster/values.yaml
         ```
 
     - Helm upgrade --install
         ```bash
-        helm upgrade silta-cluster charts/silta-cluster --namespace silta-cluster --values path/to/cluster/values.yaml
+        helm upgrade silta-cluster charts/silta-cluster \
+        --namespace silta-cluster \
+        --values path/to/cluster/values.yaml
         ```
 
 2. LEAVE certmanager crds untouched since helm upgrades are still looking for v1alpha1 api. You can remove old crd’s in few months when there are no more v1alpha1 crd’s left. 
@@ -62,12 +66,19 @@ Following steps will upgrade cert-manager (0.10) that is shipped with silta-clus
 
     - Delete cert-manager clusterroles
       ```bash
-      kubectl delete clusterrole cert-manager-view cert-manager-edit cert-manager-controller-orders cert-manager-controller-issuers cert-manager-controller-ingress-shim cert-manager-controller-clusterissuers cert-manager-controller-challenges cert-manager-controller-certificates cert-manager-cainjector
+      kubectl delete clusterrole cert-manager-view cert-manager-edit \
+      cert-manager-controller-orders cert-manager-controller-issuers \
+      cert-manager-controller-ingress-shim cert-manager-controller-clusterissuers \
+      cert-manager-controller-challenges cert-manager-controller-certificates \
+      cert-manager-cainjector
       ```
 
     - Delete cert-manager clusterrolebindings
       ```bash
-      kubectl delete clusterrolebindings cert-manager-cainjector cert-manager-controller-certificates cert-manager-controller-challenges cert-manager-controller-clusterissuers cert-manager-controller-ingress-shim cert-manager-controller-issuers cert-manager-controller-orders
+      kubectl delete clusterrolebindings cert-manager-cainjector \
+      cert-manager-controller-certificates cert-manager-controller-challenges \
+      cert-manager-controller-clusterissuers cert-manager-controller-ingress-shim \
+      cert-manager-controller-issuers cert-manager-controller-orders
       ```
 
     - Delete cert-manager roles and rolebindings resources (cert-manager:*) in kube-system
@@ -87,12 +98,16 @@ helm install \
 
     - Helm diff silta-cluster, make sure it’s correct cluster and values file
       ```bash
-      helm diff upgrade silta-cluster charts/silta-cluster --namespace silta-cluster --values path/to/cluster/values.yaml
+      helm diff upgrade silta-cluster charts/silta-cluster \
+      --namespace silta-cluster \
+      --values path/to/cluster/values.yaml
       ```
 
     - Helm upgrade --install 
       ```bash
-      helm upgrade silta-cluster charts/silta-cluster --namespace silta-cluster --values path/to/cluster/values.yaml
+      helm upgrade silta-cluster charts/silta-cluster \
+      --namespace silta-cluster \
+      --values path/to/cluster/values.yaml
       ```
 
 6. Don’t forget to commit and push cluster values file changes!
