@@ -614,8 +614,11 @@ solr:
         - ReadWriteOnce
 
 db:
+  # Available options: mariadb, pxc-db
   primary: mariadb
 
+# Percona XtraDB Cluster
+# see: https://github.com/percona/percona-helm-charts/blob/main/charts/pxc-db/values.yaml
 pxc-db:
   enabled: false
   allowUnsafeConfigurations: false
