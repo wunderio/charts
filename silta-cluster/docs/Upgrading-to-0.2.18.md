@@ -31,14 +31,14 @@ Following steps will upgrade cert-manager (0.10) that is shipped with silta-clus
 
     - Helm diff silta-cluster, make sure it’s correct cluster and values file
         ```bash
-        helm diff upgrade silta-cluster charts/silta-cluster \
+        helm diff upgrade silta-cluster silta-cluster \
         --namespace silta-cluster \
         --values path/to/cluster/values.yaml
         ```
 
     - Helm upgrade --install
         ```bash
-        helm upgrade silta-cluster charts/silta-cluster \
+        helm upgrade silta-cluster silta-cluster \
         --namespace silta-cluster \
         --values path/to/cluster/values.yaml
         ```
@@ -98,14 +98,14 @@ helm install \
 
     - Helm diff silta-cluster, make sure it’s correct cluster and values file
       ```bash
-      helm diff upgrade silta-cluster charts/silta-cluster \
+      helm diff upgrade silta-cluster silta-cluster \
       --namespace silta-cluster \
       --values path/to/cluster/values.yaml
       ```
 
     - Helm upgrade --install 
       ```bash
-      helm upgrade silta-cluster charts/silta-cluster \
+      helm upgrade silta-cluster silta-cluster \
       --namespace silta-cluster \
       --values path/to/cluster/values.yaml
       ```

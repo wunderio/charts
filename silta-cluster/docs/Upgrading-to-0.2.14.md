@@ -30,14 +30,14 @@ Moving SSH keys storage to RWX volumes, backed by S3 compatible buckets. This en
 
     - Helm diff silta-cluster, make sure it’s correct cluster and values file
       ```bash
-      helm diff upgrade silta-cluster charts/silta-cluster \
+      helm diff upgrade silta-cluster silta-cluster \
       --namespace silta-cluster \
       --values path/to/cluster/values.yaml
       ```
 
     - Helm upgrade --install 
       ```bash
-      helm upgrade silta-cluster charts/silta-cluster \
+      helm upgrade silta-cluster silta-cluster \
       --namespace silta-cluster \
       --values path/to/cluster/values.yaml
       ```
