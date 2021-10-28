@@ -40,7 +40,7 @@ ssl:
   email: admin@example.com
   # Available issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
   issuer: letsencrypt
-  # Used when certificate type is custom
+  # Used when certificate issuer is "custom"
   # ca: ""
   # key: ""
   # crt: ""
@@ -55,16 +55,16 @@ csi-rclone:
   defaultParams: false
   storageClass:
     name: "silta-shared"
-  params:
-    remote: "s3"
-    remotePath: "projectname"
+  # params:
+  #   remote: "s3"
+  #   remotePath: "projectname"
     
-    # Minio as S3 provider
-    s3-provider: "Minio"
-    s3-endpoint: "http://silta-cluster-minio:9000"
-    # Default credentials of minio chart https://github.com/minio/charts/blob/master/minio/values.yaml
-    s3-access-key-id: "YOURACCESSKEY"
-    s3-secret-access-key: "YOURSECRETKEY"
+  #   # Minio as S3 provider
+  #   s3-provider: "Minio"
+  #   s3-endpoint: "http://silta-cluster-minio:9000"
+  #   # Default credentials of minio chart https://github.com/minio/charts/blob/master/minio/values.yaml
+  #   s3-access-key-id: "YOURACCESSKEY"
+  #   s3-secret-access-key: "YOURSECRETKEY"
 
 minio:
   enabled: false
@@ -154,9 +154,11 @@ pxc-operator:
   enabled: false
   watchAllNamespaces: true
 
+# Cert manager moved to subchart, see installation instructions.
+# Installs v0.10.1 when explicitly enabled, but it 
+# does not work on kubernetes 1.20+
 cert-manager:
-  enabled: true
-  email: ''
+  enabled: false
 
 silta-downscaler:
   enabled: false
@@ -168,7 +170,6 @@ instana-agent:
   enabled: false
 
 # This should be replaced when an actual sidecar implementation is available. 
-# ETA Kubernetes 1.19
 # https://github.com/kubernetes/enhancements/issues/753#issuecomment-713471597
 k8sControllerSidecars:
   enabled: true
