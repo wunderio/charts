@@ -126,7 +126,7 @@ data:
                 return (deliver);
             } else {
                 # No candidate for grace. Fetch a fresh object.
-                return(miss);
+                return (restart);
             }
         } else {
             # backend is sick - use full grace
@@ -135,7 +135,7 @@ data:
                 return (deliver);
             } else {
                 # no graced object.
-                return (miss);
+                return (restart);
             }
         }
     }
@@ -288,6 +288,11 @@ data:
       # Its purpose is to decide whether or not to serve the request, how to do it, and, if applicable,
       # which backend to use.
       # also used to modify the request
+
+      # Fixes "Too many restarts" error
+      if (req.restarts > 0) { 
+        set req.hash_always_miss = true; 
+      }
 
       # Pipe connections with x-pipe-request (used for larger file downloads)
       if (req.http.x-pipe-request && req.restarts > 0) {
@@ -518,6 +523,7 @@ data:
       {{- if not .Values.nginx.expose_cache_headers }} 
       # Removing cache headers from final response
       unset resp.http.cache-tags;
+      unset resp.http.purge-cache-tags;
       unset resp.http.X-Drupal-Cache-Tags;
       unset resp.http.X-Drupal-Cache-Contexts;
       {{- end }}
