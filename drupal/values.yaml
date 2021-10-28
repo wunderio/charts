@@ -469,10 +469,10 @@ varnish:
       cpu: 25m
       memory: 32Mi
   image: eu.gcr.io/silta-images/varnish
-  imageTag: 6-v0.1
-  # https://varnish-cache.org/docs/6.0/users-guide/storage-backends.html
+  imageTag: 6-v0.2
+  # https://varnish-cache.org/docs/6.6/users-guide/storage-backends.html
   storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
-  # https://varnish-cache.org/docs/6.0/reference/varnishd.html#list-of-parameters
+  # https://varnish-cache.org/docs/6.6/reference/varnishd.html#list-of-parameters
   extraParams: ""
   # Inject custom code into vcl_recv subroutine.
   vcl_recv_extra: ""
@@ -482,7 +482,7 @@ varnish:
   vcl_extra_cookies: ""
   # Do not cache files larger than 3 megabytes (use integers).
   cache_skip_size: 3
-  # https://varnish-cache.org/docs/6.0/reference/vcl.html#backend-definition
+  # https://varnish-cache.org/docs/6.6/reference/vcl.html#backends-and-health-probes
   backend_config: |
     .max_connections = 300;
     .probe = {
