@@ -4,4 +4,4 @@ metadata:
   name: {{ .Release.Name }}-tinyproxy
 data:
   tinyproxy.conf: |
-    {{- .Values.configuration | toYaml | nindent 4 }}
+    {{- .Values.configuration | nindent 4 }}
