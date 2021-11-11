@@ -19,20 +19,20 @@ tolerations: []
   #   operator: Equal
   #   value: static-ip
 
-configuration:
-  User: tinyproxy
-  Group: tinyproxy
-  Port: 80
-  Timeout: 600
-  DefaultErrorFile: "/usr/share/tinyproxy/default.html"
+configuration: |
+  User tinyproxy
+  Group tinyproxy
+  Port 80
+  Timeout 600
+  DefaultErrorFile "/usr/share/tinyproxy/default.html"
   # Allowed settings are: Critical (least verbose), Error, Warning, Notice, 
   # Connect (to log connections without Info's noise), Info (most verbose)
-  LogLevel: Info
-  MaxClients: 5000
-  MinSpareServers: 5
-  MaxSpareServers: 20
-  StartServers: 10
-  MaxRequestsPerChild: 0
+  LogLevel Info
+  MaxClients 5000
+  MinSpareServers 5
+  MaxSpareServers 20
+  StartServers 10
+  MaxRequestsPerChild 0
   # Allow 127.0.0.1
   # BasicAuth user password
   # AddHeader "X-My-Header" "Powered by Tinyproxy"
