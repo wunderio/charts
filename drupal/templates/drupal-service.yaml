@@ -12,6 +12,10 @@ metadata:
     cloud.google.com/neg: '{"ingress": true}'
     {{- end }}
     {{- end }}
+    {{- if .Values.nginx.sessionAffinity }}
+    traefik.ingress.kubernetes.io/affinity: "true"
+    traefik.ingress.kubernetes.io/session-cookie-name: "sticky-drupal"
+    {{- end }}
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:

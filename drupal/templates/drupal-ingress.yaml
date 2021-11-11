@@ -54,10 +54,16 @@ spec:
   tls:
   {{- if .Values.ssl.existingTLSSecret }}
   - secretName: {{ .Values.ssl.existingTLSSecret }}
+    hosts: 
+      - {{ include "drupal.domain" . | quote }}
   {{- else }}
   - secretName: {{ .Release.Name }}-tls
+    hosts: 
+      - {{ include "drupal.domain" . | quote }}
   {{- range $index, $prefix := .Values.domainPrefixes }}
   - secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+    hosts: 
+      - '{{ $prefix }}.{{ template "drupal.domain" $ }}'
   {{- end }}
   {{- end }}
   {{- end }}
@@ -162,8 +168,12 @@ spec:
   {{- if $domain.ssl.enabled }}
   {{- if $domain.ssl.existingTLSSecret }}
   - secretName: {{ $domain.ssl.existingTLSSecret }}
+    hosts: 
+      - {{ $domain.hostname }}
   {{- else }}
   - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}
+    hosts: 
+      - {{ $domain.hostname }}
   {{- end }}
   {{- end }}
   {{- end }}

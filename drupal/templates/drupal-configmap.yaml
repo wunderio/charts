@@ -6,8 +6,8 @@ metadata:
     {{- include "drupal.release_labels" . | nindent 4 }}
 data:
   gdpr-dump: |
-    [mysqldump]
-    gdpr-replacements='{{ .Values.gdprDump | toJson }}'
+    # [mysqldump]
+    # gdpr-replacements='{{ .Values.gdprDump | toJson }}'
 
   {{- if eq .Values.php.drupalCoreVersion "7" }}
   settings_silta_php: |{{ .Files.Get "files/settings.silta.d7.php" | nindent 4 }}
@@ -445,10 +445,15 @@ data:
             }
 
             {{- if .Values.nginx.retry404s }}
-            # Retry file lookup in 5 seconds (fs sync workaround)
-            location ~* ^/sites/(.*)/files/(?:css|js)/(.*).(?:css|js)$ {
+            {{- if kindIs "float64" .Values.nginx.retry404s }}
+            {{- fail ".Values.nginx.retry404s configuration schema has been changed. Please check chart values file for updates." }}
+            {{- end }}
+            # Retry file lookup in {{ .Values.nginx.retry404s.delay }} seconds (fs sync workaround)
+            {{- range .Values.nginx.retry404s.paths }}
+            location ~* {{ . }} {
                 try_files $uri $uri/ @files_delay;
             }
+            {{- end }}
             {{- end }}
             
             ## Serve static files & images directly, without all standard drupal rewrites, php-fpm etc.
@@ -528,7 +533,7 @@ data:
         {{- if .Values.nginx.retry404s }}
         location @files_delay {
             internal;
-            echo_sleep {{ .Values.nginx.retry404s }}.0;
+            echo_sleep {{ .Values.nginx.retry404s.delay }}.0;
             echo_exec @files_retry;
         }
         location @files_retry {

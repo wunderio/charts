@@ -180,7 +180,13 @@ nginx:
   comp_level: 6
 
   # Retry file lookup in 5 seconds (filesystem sync workaround)
-  # retry404s: 5
+  # retry404s:
+  #   delay: 5
+  #   paths:
+  #     - "^/sites/(.*)/files/(?:css|js)/(.*).(?:css|js)$"
+
+  # Allow load-balancer to pod session affinity for consecutive requests. Does not work with varnish enabled.
+  sessionAffinity: false
 
   # Extra configuration block in server context.
   serverExtraConfig: |
@@ -390,6 +396,7 @@ referenceData:
 
 # Parameters for sanitizing reference data with gdpr-dump.
 # Uses formatters from https://packagist.org/packages/fzaninotto/faker.
+# ! This functionality has been temporary disabled
 gdprDump:
   users_field_data:
     name:
@@ -626,6 +633,7 @@ pxc-db:
     size: 3
     expose:
       enabled: false
+    disableTLS: true
     resources:
       requests:
         cpu: 250m

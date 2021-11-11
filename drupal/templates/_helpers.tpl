@@ -314,10 +314,10 @@ done
   {{- end }}
 
   {{ include "drupal.wait-for-db-command" . }}
+  {{ include "drupal.create-db" . }}
 
   {{ if .Release.IsInstall }}
     touch {{ .Values.webRoot }}/sites/default/files/_installing
-    {{ include "drupal.create-db" . }}
     {{- if .Values.referenceData.enabled }}
       {{ include "drupal.import-reference-db" . }}
     {{- end }}
