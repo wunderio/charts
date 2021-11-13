@@ -10,7 +10,7 @@ ssl:
 schedule: "0 4,18 * * *"
 
 image: wunderio/silta-downscaler
-tag: "v0.1.4"
+tag: "v0.1"
 
 resources:
   requests:

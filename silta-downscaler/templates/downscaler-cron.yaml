@@ -14,6 +14,7 @@ spec:
           containers:
           - name: downscaler-cron
             image: "{{ .Values.image }}:{{ .Values.tag }}"
+            imagePullPolicy: Always
             command: ["/bin/sh", "-c"]
             args:
               - node downscale
