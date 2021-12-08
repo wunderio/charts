@@ -3,7 +3,8 @@ Your site is available at:
 
   {{ $protocol }}://{{- template "drupal.domain" . }}
   {{- range $index, $prefix := .Values.domainPrefixes }}
-  {{ $protocol}}://{{$prefix}}.{{ template "drupal.domain" $ }}
+  {{- $params := dict "prefix" $prefix }}
+  {{ $protocol}}://{{ template "drupal.domain" (merge $params $ ) }}
   {{- end }}
   {{- range $index, $domain := .Values.exposeDomains }}
   {{- if $domain.ssl }}

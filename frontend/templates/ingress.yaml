@@ -73,7 +73,8 @@ spec:
           servicePort: 80
           {{- end }}
 {{- range $index, $prefix := .Values.domainPrefixes }}
-  - host: {{ $prefix }}.{{ template "frontend.domain" $ }}
+{{ $params := dict "prefix" $prefix }}
+  - host: {{ template "frontend.domain" (merge $params $ ) }}
     http:
       paths:
       - path: /
