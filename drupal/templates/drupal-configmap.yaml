@@ -160,7 +160,8 @@ data:
         map $http_host $x_robots_tag_header {
             "~{{ template "drupal.domain" $ }}$" "noindex, nofollow, nosnippet, noarchive";
             {{- range $index, $prefix := .Values.domainPrefixes }}
-            "~{{$prefix}}.{{ template "drupal.domain" $ }}$" "noindex, nofollow, nosnippet, noarchive";
+            {{- $params := dict "prefix" $prefix  -}}
+            "~{{ template "drupal.domain" ( merge $params $ ) }}$" "noindex, nofollow, nosnippet, noarchive";
             {{- end }}
             default  '';
         }

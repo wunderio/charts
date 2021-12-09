@@ -61,9 +61,10 @@ spec:
     hosts: 
       - {{ include "drupal.domain" . | quote }}
   {{- range $index, $prefix := .Values.domainPrefixes }}
+  {{ $params := dict "prefix" $prefix -}}
   - secretName: {{ $.Release.Name }}-tls-p{{ $index }}
     hosts: 
-      - '{{ $prefix }}.{{ template "drupal.domain" $ }}'
+      - '{{ template "drupal.domain" (merge $params $ ) }}'
   {{- end }}
   {{- end }}
   {{- end }}
@@ -83,7 +84,8 @@ spec:
           servicePort: 80
           {{- end }}
 {{- range $index, $prefix := .Values.domainPrefixes }}
-  - host: '{{ $prefix }}.{{ template "drupal.domain" $ }}'
+{{- $params := dict "prefix" $prefix }}
+  - host: '{{ template "drupal.domain" (merge $params $ ) }}'
     http:
       paths:
       - path: /

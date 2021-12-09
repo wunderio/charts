@@ -5,7 +5,8 @@ Deployed {{ .Release.Name }} successfully, your site is available here:
   {{- if $service.exposedRoute }}
   {{ $protocol }}://{{- template "frontend.domain" $ }}{{ $service.exposedRoute }}
   {{- range $index, $prefix := $.Values.domainPrefixes }}
-  {{ $protocol}}://{{$prefix}}.{{- template "frontend.domain" $ }}{{ $service.exposedRoute }}
+  {{- $params := dict "prefix" $prefix }}
+  {{ $protocol}}://{{- template "frontend.domain" (merge $params $ ) }}{{ $service.exposedRoute }}
   {{- end }}
   {{- range $index, $domain := $.Values.exposeDomains }}
   {{ $protocol }}://{{ $domain.hostname }}{{ $service.exposedRoute }}

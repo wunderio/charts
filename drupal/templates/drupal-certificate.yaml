@@ -28,6 +28,7 @@ spec:
 {{- end }}
 ---
 {{- range $index, $prefix := .Values.domainPrefixes }}
+{{- $params := dict "prefix" $prefix  -}}
 apiVersion: {{ include "cert-manager.api-version" $ | trim }}
 kind: Certificate
 metadata:
@@ -40,7 +41,7 @@ metadata:
 spec:
   secretName: {{ $.Release.Name }}-tls-p{{ $index }}
   dnsNames:
-  - '{{$prefix}}.{{ include "drupal.domain" $ }}'
+  - '{{ include "drupal.domain" (merge $params $ ) }}'
   issuerRef:
     name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
@@ -50,7 +51,7 @@ spec:
       - http01:
           ingress: {{ $.Release.Name }}-drupal
         domains:
-          - '{{$prefix}}.{{ include "drupal.domain" $ }}'
+          - '{{ include "drupal.domain" (merge $params $ ) }}'
 {{- end }}
 ---
 {{- end }}
