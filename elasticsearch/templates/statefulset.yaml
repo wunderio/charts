@@ -311,7 +311,7 @@ spec:
           - name: network.host
             value: "{{ .Values.networkHost }}"
           - name: ES_JAVA_OPTS
-            value: "{{ .Values.esJavaOpts }}"
+            value: "-Dlog4j2.formatMsgNoLookups=true {{ .Values.esJavaOpts }}"
           {{- range $role, $enabled := .Values.roles }}
           - name: node.{{ $role }}
             value: "{{ $enabled }}"
