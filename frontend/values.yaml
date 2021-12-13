@@ -362,7 +362,8 @@ elasticsearch:
   clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
 
   # This value should be slightly less than 50% of the requested memory.
-  esJavaOpts: -Xmx220m -Xms220m
+  # Dlog4j2.formatMsgNoLookups=true *is* important to keep. This variable mitigates Log4j exploit CVE-2021-44228
+  esJavaOpts: -Dlog4j2.formatMsgNoLookups=true -Xmx220m -Xms220m
   xpack:
     enabled: false
   volumeClaimTemplate:
