@@ -174,10 +174,9 @@ spec:
         image: "{{ .Values.image }}:{{ .Values.imageTag }}"
         imagePullPolicy: "{{ .Values.imagePullPolicy }}"
         command:
-        - sh
+        - bash
         - -c
         - |
-          #!/usr/bin/env bash
           set -euo pipefail
 
           elasticsearch-keystore create
@@ -225,10 +224,10 @@ spec:
         readinessProbe:
           exec:
             command:
-              - sh
+              - bash
               - -c
               - |
-                #!/usr/bin/env bash -e
+                set -e
                 # If the node is starting up wait for the cluster to be ready (request params: "{{ .Values.clusterHealthCheckParams }}" )
                 # Once it has started only check that the node itself is responding
                 START_FILE=/tmp/.es_start_file
@@ -363,11 +362,10 @@ spec:
         image: "{{ .Values.image }}:{{ .Values.imageTag }}"
         imagePullPolicy: "{{ .Values.imagePullPolicy }}"
         command:
-        - "sh"
+        - "bash"
         - -c
         - |
-          #!/usr/bin/env bash
-          set -eo pipefail
+          set -euo pipefail
 
           http () {
               local path="${1}"
