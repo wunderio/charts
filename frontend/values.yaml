@@ -354,7 +354,7 @@ elasticsearch:
 
   # The elasticsearch version to use.
   # It's a good idea to tag this in your silta.yml
-  imageTag: 7.4.1
+  imageTag: 7.16.1
 
   replicas: 1
   minimumMasterNodes: 1
@@ -362,8 +362,7 @@ elasticsearch:
   clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
 
   # This value should be slightly less than 50% of the requested memory.
-  # Dlog4j2.formatMsgNoLookups=true *is* important to keep. This variable mitigates Log4j exploit CVE-2021-44228
-  esJavaOpts: -Dlog4j2.formatMsgNoLookups=true -Xmx220m -Xms220m
+  esJavaOpts: -Xmx220m -Xms220m
   xpack:
     enabled: false
   volumeClaimTemplate:

@@ -1,14 +1,15 @@
 apiVersion: v2
 name: frontend
-version: 0.2.56
+version: 0.2.57
 dependencies:
 - name: mariadb
   version: 7.10.x
   repository: https://charts.bitnami.com/bitnami
   condition: mariadb.enabled
 - name: elasticsearch
-  version: 7.4.1
-  repository: https://helm.elastic.co
+  version: 7.8.x
+#  repository: https://helm.elastic.co
+  repository: file://../elasticsearch
   condition: elasticsearch.enabled
 - name: rabbitmq
   version: 6.17.x

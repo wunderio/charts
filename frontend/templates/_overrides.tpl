@@ -6,15 +6,15 @@ Override templates from subcharts.
 The elasticsearch chart uses an incompatible naming scheme,
 we make it compatible by overriding the following templates.
 */}}
-{{- define "uname" -}}
+{{- define "elasticsearch.uname" -}}
 {{ .Release.Name }}-es
 {{- end }}
 
-{{- define "masterService" -}}
+{{- define "elasticsearch.masterService" -}}
 {{ .Release.Name }}-es
 {{- end }}
 
-{{- define "endpoints" -}}
+{{- define "elasticsearch.endpoints" -}}
 {{ .Release.Name }}-es-0
 {{- end -}}
 
