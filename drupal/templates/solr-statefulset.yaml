@@ -34,7 +34,7 @@ spec:
           mountPath: /var/solr/search
       containers:
       - name: solr
-        image: {{ printf "%s:%s" .Values.solr.image .Values.solr.imageTag | quote }}
+        image: "{{ .Values.solr.image }}:{{ .Values.solr.imageTag }}"
         ports:
         - containerPort: 8983
         command: {{ .Values.solr.command }}

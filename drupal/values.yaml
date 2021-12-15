@@ -508,7 +508,7 @@ elasticsearch:
 
   # The elasticsearch version to use.
   # It's a good idea to tag this in your silta.yml
-  imageTag: 6.8.3
+  imageTag: 6.8.21
 
   replicas: 1
   minimumMasterNodes: 1
@@ -587,8 +587,8 @@ smtp:
 solr:
   enabled: false
   # Available image tags: https://hub.docker.com/r/geerlingguy/solr/tags
-  image: geerlingguy/solr
-  imageTag: latest
+  image: eu.gcr.io/silta-images/solr
+  imageTag: 8
 
   # Solr 4.x and 5.x does not support "-force" argument (optional override)
   command: ["/opt/solr/bin/solr"]
