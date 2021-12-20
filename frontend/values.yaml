@@ -354,7 +354,7 @@ elasticsearch:
 
   # The elasticsearch version to use.
   # It's a good idea to tag this in your silta.yml
-  imageTag: 7.16.1
+  imageTag: 7.16.2
 
   replicas: 1
   minimumMasterNodes: 1
