@@ -10,7 +10,7 @@ helm install \
   cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --create-namespace \
-  --version v1.4.1 \
+  --version v1.6.1 \
   --set installCRDs=true \
   --set global.logLevel=1
 ```
