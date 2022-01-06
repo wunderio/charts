@@ -259,9 +259,9 @@ php:
       # example service files have changed, Drupal might not be able to
       # bootstrap, not even for the `drush status` command below.
       if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then
-        drush cache-clear all
+        drush cache-clear all || true
       else
-        drush cache-rebuild
+        drush cache-rebuild || true
       fi
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
         drush updatedb -y
