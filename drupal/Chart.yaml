@@ -1,6 +1,6 @@
 apiVersion: v2
 name: drupal
-version: 0.3.110
+version: 0.3.111
 dependencies:
 - name: mariadb
   version: 7.5.x

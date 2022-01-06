@@ -68,6 +68,11 @@ spec:
           mountPath: /opt/solr/example/solr/search
         - name: {{ .Release.Name }}-solr-data
           mountPath: /opt/solr/example/solr/search/data
+          # Compatability mount: SOLR 5.x
+        - name: {{ .Release.Name }}-core-dir
+          mountPath: /opt/solr/server/solr/search
+        - name: {{ .Release.Name }}-solr-data
+          mountPath: /opt/solr/server/solr/search/data
 
         resources:
           {{- .Values.solr.resources | toYaml | nindent 10 }}

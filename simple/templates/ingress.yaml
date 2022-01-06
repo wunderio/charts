@@ -52,6 +52,9 @@ spec:
     http:
       paths:
       - path: /
+        {{- if eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
         backend:
           {{- if eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1" }}
           service:
@@ -143,6 +146,9 @@ spec:
     http:
       paths:
       - path: {{ if eq $ingress.type "gce" }}/*{{ else }}/{{ end }}
+        {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
         backend:
           {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
           service:
