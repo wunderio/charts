@@ -183,7 +183,7 @@ nginx:
   # retry404s:
   #   delay: 5
   #   paths:
-  #     - "^/sites/(.*)/files/(?:css|js)/(.*).(?:css|js)$"
+  #     - "^/sites/[^/]+/files/(?:css|js)/"
 
   # Allow load-balancer to pod session affinity for consecutive requests. Does not work with varnish enabled.
   sessionAffinity: false
