@@ -4,7 +4,20 @@ This helm chart helps setting up resources for https://github.com/wunderio/silta
 
 ## Requirements
 
+### Set up helm repositories
+
+```
+# Jetstack helm chart repository for cert-manager
+helm repo add jetstack https://charts.jetstack.io
+
+# Wunderio helm chart repository for silta-cluster
+helm repo add wunderio https://storage.googleapis.com/charts.wdr.io
+```
+
 ### cert-manager
+
+Here are installation steps from official documentation https://cert-manager.io/docs/installation/helm/ -
+
 ```
 helm install \
   cert-manager jetstack/cert-manager \
@@ -38,7 +51,7 @@ kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/m
 Here is an example of how we instantiate and upgrade this helm chart: 
 
 ```bash
-helm upgrade --install --wait cluster-name silta-cluster \
+helm upgrade --install --wait silta-cluster silta-cluster \
              --repo "https://storage.googleapis.com/charts.wdr.io" \
              --values local-values.yaml            
 ```
@@ -48,7 +61,7 @@ helm upgrade --install --wait cluster-name silta-cluster \
 Chart upgrades are managed like a normal helm release, though it's suggested to do helm diff first:
 
 ```
-helm diff upgrade cluster-name silta-cluster \
+helm diff upgrade silta-cluster silta-cluster \
     --values local-values.yaml      
 ```
 
@@ -57,8 +70,6 @@ helm diff upgrade cluster-name silta-cluster \
  - Upgrading silta-cluster chart to 0.2.18 ([docs/Upgrading-to-0.2.18.md](docs/Upgrading-to-0.2.18.md))
 
  - Upgrading silta-cluster chart to 0.2.14 ([docs/Upgrading-to-0.2.14.md](docs/Upgrading-to-0.2.14.md))
-
-
 
 ## Components 
 
