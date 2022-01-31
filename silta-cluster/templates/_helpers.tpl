@@ -15,3 +15,11 @@ solvers:
 http01: {}
 {{- end -}}
 {{- end }}
+
+{{- define "silta-cluster.ingress-api-version" }}
+{{- if semverCompare ">=1.18" .Capabilities.KubeVersion.Version }}
+networking.k8s.io/v1
+{{- else }}
+networking.k8s.io/v1beta1
+{{- end }}
+{{- end }}

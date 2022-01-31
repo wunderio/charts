@@ -55,7 +55,7 @@ spec:
               fieldRef:
                 fieldPath: metadata.namespace
 ---
-apiVersion: {{ include "ingress-api-version" . | trim }}
+apiVersion: {{ include "silta-downscaler.ingress-api-version" . | trim }}
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-placeholder-upscaler
@@ -76,8 +76,11 @@ spec:
     http:
       paths:
       - path: /
+        {{- if eq ( include "silta-downscaler.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
         backend:
-          {{- if eq ( include "ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+          {{- if eq ( include "silta-downscaler.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
           service:
             name: {{ .Release.Name }}-placeholder-upscaler
             port: 
@@ -89,7 +92,7 @@ spec:
 ---
 {{- if .Values.ssl.enabled }}
 {{- if has .Values.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-apiVersion: {{ include "cert-manager-api-version" . | trim }}
+apiVersion: {{ include "silta-cluster.cert-manager-api-version" . | trim }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-placeholder-upscaler
@@ -106,7 +109,7 @@ spec:
   issuerRef:
     name: {{ .Values.ssl.issuer }}
     kind: ClusterIssuer
-  {{- if eq ( include "cert-manager-api-version" . | trim ) "certmanager.k8s.io/v1alpha1" }}
+  {{- if eq ( include "silta-cluster.cert-manager-api-version" . | trim ) "certmanager.k8s.io/v1alpha1" }}
   acme:
     config:
       - http01:
