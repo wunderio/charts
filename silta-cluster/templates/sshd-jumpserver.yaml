@@ -82,9 +82,13 @@ spec:
   resources:
     requests:
       storage: {{ .Values.gitAuth.persistence.size }}
+  {{- if .Values.gitAuth.persistence.storageClassName }}
+  {{- if eq .Values.gitAuth.persistence.storageClassName "silta-shared" }}
   selector:
     matchLabels:
       name: {{ $.Release.Name }}-shell-keys-pv
+  {{- end }}
+  {{- end }}
 {{- end }}
 # silta-shared volume definition if its storage is selected
 {{- if .Values.gitAuth.persistence.storageClassName }}
