@@ -21,8 +21,9 @@ spec:
         service: shell
         silta-ingress: allow
       annotations:
-        # We use a checksum to redeploy the pods when the configMap changes.
-        configMap-checksum: {{ include (print $.Template.BasePath "/drupal-configmap.yaml") . | sha256sum }}
+        # Redeploy pods when the configMap changes.
+        drupal-cm-checksum: {{ include (print $.Template.BasePath "/drupal-configmap.yaml") . | sha256sum }}
+        shell-cm-checksum: {{ include (print $.Template.BasePath "/shell-configmap.yaml") . | sha256sum }}
     spec:
       enableServiceLinks: false
       containers:
@@ -30,6 +31,7 @@ spec:
         image: {{ .Values.shell.image | quote }}
         env:
         {{- include "drupal.env" . | indent 8 }}
+        {{- if .Values.shell.gitAuth.keyserver.enabled }}
         - name: GITAUTH_URL
           value: {{ .Values.shell.gitAuth.keyserver.url | default (printf "https://keys.%s/api/1/git-ssh-keys" .Values.clusterDomain) | quote }}
         - name: GITAUTH_USERNAME
@@ -46,12 +48,17 @@ spec:
           value: {{ .Values.shell.gitAuth.repositoryUrl }}
         - name: OUTSIDE_COLLABORATORS
           value: {{ .Values.shell.gitAuth.outsideCollaborators | default true | quote }}
+        {{- end }}
         ports:
           - containerPort: 22
         volumeMounts:
         {{- include "drupal.volumeMounts" . | nindent 8 }}
         - name: ssh-keys
           mountPath: /etc/ssh/keys
+        - name: shell-configmap
+          mountPath: /etc/ssh/authorized_keys
+          subPath: authorizedKeys
+          readOnly: true
         {{- if .Values.backup.enabled }}
         - name: {{ .Release.Name }}-backups
           mountPath: /backups
@@ -76,6 +83,9 @@ spec:
       - name: ssh-keys
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-ssh-keys
+      - name: shell-configmap
+        configMap:
+          name: {{ .Release.Name }}-shell
       {{- if .Values.backup.enabled }}
       - name: {{ .Release.Name }}-backups
         persistentVolumeClaim:

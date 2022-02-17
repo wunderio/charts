@@ -6,9 +6,10 @@
 {{- $id := "allow-ingress" -}}
 {{- $podSelectors := dict "silta-ingress" "allow" -}}
 {{- $allowSiltaCluster := dict "namespaceSelector" (dict "matchLabels" (dict "name" "silta-cluster")) -}}
+{{- $allowKubeSystem := dict "namespaceSelector" (dict "matchLabels" (dict "name" "kube-system")) -}}
 {{- $allowLoadBalancer1 := dict "ipBlock" (dict "cidr" "35.191.0.0/16") -}}
 {{- $allowLoadBalancer2 := dict "ipBlock" (dict "cidr" "130.211.0.0/22") -}}
-{{- $from := list $allowSiltaCluster $allowLoadBalancer1 $allowLoadBalancer2 -}}
+{{- $from := list $allowSiltaCluster $allowKubeSystem $allowLoadBalancer1 $allowLoadBalancer2 -}}
 {{- $params := dict "id" $id "additionalPodSelectors" $podSelectors "from" $from -}}
 {{ include "silta-release.networkPolicy" (merge $params . ) }}
 ---

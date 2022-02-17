@@ -319,10 +319,14 @@ shell:
     repositoryUrl: 'you need to pass in a value for shell.gitAuth.repositoryUrl to your helm chart'
     outsideCollaborators: true
     keyserver:
+      enabled: true
       # Defaults to https://keys.[clusterDomain]/api/1/git-ssh-keys
       url: ''
       username: ''
       password: ''
+  # Static ssh keys 
+  # Note: cluster administrator support required for duplicating keys in jumphost.
+  authorizedKeys: []
 
   # Specifications for the volume where host keys are mounted.
   mount:
