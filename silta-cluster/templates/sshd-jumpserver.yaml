@@ -15,6 +15,7 @@ spec:
     - name: ssh
       port: {{ .Values.gitAuth.port }}
   type: "LoadBalancer"
+  externalTrafficPolicy: Local
 {{- if .Values.gitAuth.loadBalancerIP }}
   loadBalancerIP: {{ .Values.gitAuth.loadBalancerIP }}
 {{- end }}
@@ -38,6 +39,8 @@ spec:
     metadata:
       labels:
         name: {{ .Release.Name }}-jumpserver
+      annotations:
+        configMap-checksum: {{ include (print $.Template.BasePath "/sshd-jumpserver-cm.yaml") . | sha256sum }}
     spec:
       enableServiceLinks: false
       containers:
@@ -47,6 +50,7 @@ spec:
         ports:
           - containerPort: 22
         env:
+          {{- if .Values.gitAuth.keyserver.enabled }}
           - name: GITAUTH_URL
             value: {{ .Values.gitAuth.keyserver.url | default (printf "https://keys.%s/api/1/git-ssh-keys" .Values.clusterDomain) | quote }}
           - name: GITAUTH_USERNAME
@@ -57,15 +61,23 @@ spec:
             value: {{ required "A valid .Values.gitAuth.scope entry required!" .Values.gitAuth.scope | quote }}
           - name: OUTSIDE_COLLABORATORS
             value: {{ .Values.gitAuth.outsideCollaborators | default true | quote }}
+          {{- end }}
         volumeMounts:
         - name: shell-keys
           mountPath: /etc/ssh/keys
+        - name: sshd-jumphost-configmap
+          mountPath: /etc/ssh/authorized_keys
+          subPath: authorizedKeys
+          readOnly: true
         resources:
           {{- .Values.gitAuth.resources | toYaml | nindent 10 }}
       volumes:
       - name: shell-keys
         persistentVolumeClaim:
           claimName: {{ .Release.Name }}-shell-keys
+      - name: sshd-jumphost-configmap
+        configMap:
+          name: {{ .Release.Name }}-sshd-jumphost
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

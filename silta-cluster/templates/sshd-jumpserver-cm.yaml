@@ -1,0 +1,16 @@
+{{- if .Values.gitAuth.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-sshd-jumphost
+  namespace: {{ .Release.Namespace }}
+data:
+  authorizedKeys: |
+  {{- if .Values.gitAuth.authorizedKeys }}
+    {{- range .Values.gitAuth.authorizedKeys }}
+    {{ . }}
+    {{- end }}
+  {{- end }}
+
+{{- end }}

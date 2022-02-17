@@ -82,9 +82,11 @@ gitAuth:
   enabled: true
   port: 22
   keyserver:
+    enabled: true
     url: ''
     username: ''
     password: ''
+  authorizedKeys: []
   scope: ''
   outsideCollaborators: true
   allowedIps: []
