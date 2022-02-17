@@ -1,0 +1,79 @@
+suite: shell configmap
+templates:
+  - shell-configmap.yaml
+  - shell-deployment.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
+tests:
+  
+  - it: Secret ConfigMap is created
+    template: shell-configmap.yaml
+    set:
+      shell.enabled: true
+    asserts:
+      - isKind:
+          of: ConfigMap
+      - equal:
+          path: metadata.labels.app
+          value: drupal
+  
+  - it: Authorized keys addition is reflected into shell configmap
+    template: shell-configmap.yaml
+    set:
+      shell.enabled: true
+      shell.authorizedKeys:
+        - foo
+        - bar
+    asserts:
+      - template: shell-configmap.yaml 
+        equal:
+          path: data.authorizedKeys
+          value: |-
+            foo
+            bar
+  
+  - it: No extra authorized keys are present in template
+    template: shell-configmap.yaml
+    set:
+      shell.enabled: true
+      shell.authorizedKeys: []
+    asserts:
+      - template: shell-configmap.yaml 
+        equal:
+          path: data.authorizedKeys
+          value: ""
+
+  - it: Adds keyserver environment variables when shell is enabled 
+    template: shell-deployment.yaml
+    set:
+      shell.enabled: true
+      shell.gitAuth.keyserver.enabled: true
+      shell.gitAuth.keyserver.url: foo.bar
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GITAUTH_URL
+            value: foo.bar
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content: 
+            name: GITAUTH_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: keyserver.username
+                name: RELEASE-NAME-secrets-shell
+
+  - it: Keyserver environment variables not present when shell is disabled 
+    template: shell-deployment.yaml
+    set:
+      shell.enabled: true
+      shell.gitAuth.keyserver.enabled: false
+      shell.gitAuth.keyserver.url: foo.bar
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GITAUTH_URL
+            value: foo.bar

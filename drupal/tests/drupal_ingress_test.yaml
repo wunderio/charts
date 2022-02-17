@@ -111,12 +111,6 @@ tests:
           path: apiVersion
           value: 'networking.k8s.io/v1'
 
-
-
-
-
-
-
   - it: shortens long project names
     template: drupal-ingress.yaml
     set:

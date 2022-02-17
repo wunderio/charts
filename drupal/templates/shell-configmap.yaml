@@ -1,0 +1,15 @@
+{{- if .Values.shell.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-shell
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+data:
+  authorizedKeys: |
+  {{- if .Values.shell.authorizedKeys }}
+    {{- range .Values.shell.authorizedKeys }}
+    {{ . }}
+    {{- end }}
+  {{- end }}
+{{- end }}
