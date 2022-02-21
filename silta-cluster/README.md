@@ -14,7 +14,7 @@ helm repo add jetstack https://charts.jetstack.io
 helm repo add wunderio https://storage.googleapis.com/charts.wdr.io
 ```
 
-### cert-manager
+### cert-manager (required for ssl/tls)
 
 Here are installation steps from official documentation https://cert-manager.io/docs/installation/helm/ -
 
@@ -29,6 +29,15 @@ helm install \
 ```
 
 ### Calico
+
+Calico works with network policy resource definitions allowing fine grained traffic control for in-cluster resources. Our charts define secure defaults that allow selective access to environments.
+
+GKE: Calico can be enabled using GCP interface or `gcloud` cli tool (`--enable-network-policy`).
+
+AKS: Calico can be enabled using `az` cli tool (`--network-plugin kubenet`, `--network-policy calico`). This can't be changed after cluster is created.
+
+AWS: Requires manual installation, see below:
+
 If Calico networking is needed on AWS hosted cluster
 (from https://github.com/aws/eks-charts/tree/master/stable/aws-calico/):
 ```
@@ -37,14 +46,10 @@ kubectl apply -k github.com/aws/eks-charts/tree/master/stable/aws-calico/crds
 helm install --name aws-calico --namespace kube-system eks/aws-calico
 ```
 
-
-#### Percona XtraDB Cluster for replicated database support
+#### Percona XtraDB Cluster for replicated database support (optional)
 ```
 kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/main/charts/pxc-operator/crds/crd.yaml
 ```
-
-### PriorityClass
- PriorityClass resources `scheduling.k8s.io/v1beta1` `scheduling.k8s.io/v1alpha1` requires at least kubernetes v1.14. `scheduling.k8s.io/v1` API requires kubernetes v1.17.
 
 ## Usage
 
@@ -52,17 +57,25 @@ Here is an example of how we instantiate and upgrade this helm chart:
 
 ```bash
 helm upgrade --install --wait silta-cluster silta-cluster \
-             --repo "https://storage.googleapis.com/charts.wdr.io" \
-             --values local-values.yaml            
+    --namespace silta-cluster --create-namespace \
+    --repo "https://storage.googleapis.com/charts.wdr.io" \
+    --values local-values.yaml            
 ```
+
+- `local-values.yaml` contains overrides of [chart defaults](values.yaml) 
 
 ## Upgrading
 
 Chart upgrades are managed like a normal helm release, though it's suggested to do helm diff first:
 
 ```
-helm diff upgrade silta-cluster silta-cluster \
-    --values local-values.yaml      
+helm diff upgrade silta-cluster silta-cluster --namespace silta-cluster \
+    --values local-values.yaml
+    
+helm upgrade --install --wait silta-cluster silta-cluster \
+    --repo "https://storage.googleapis.com/charts.wdr.io" \
+    --namespace silta-cluster --create-namespace \
+    --values local-values.yaml
 ```
 
 ## Upgrade path for older versions:
