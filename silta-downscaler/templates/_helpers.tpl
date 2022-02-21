@@ -1,4 +1,4 @@
-{{- define "silta-cluster.cert-manager-api-version" }}
+{{- define "silta-downscaler.cert-manager-api-version" }}
 {{- if ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
 cert-manager.io/v1
 {{- else }}
