@@ -62,7 +62,7 @@
         "enabled": { "type": "boolean" }
       }
     },
-    "exposeDomains": { "type": ["array","object"], "items": { "type": "object"}},
+    "exposeDomains": { "type": "object", "items": { "type": "object"}},
     "exposeDomainsDefaults": { "type": "object"},
     "domainPrefixes": { "type": "array", "items": { "type": "string"}},
     "ssl": { "type": "object" },

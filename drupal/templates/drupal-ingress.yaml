@@ -29,6 +29,9 @@ metadata:
     {{- end }}
     {{- if $redirect_https }}
     ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- if eq $ingress.type "azure/application-gateway" }}
+    appgw.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- end }}
     {{- end }}
 
     {{- if eq $ingress.type "gce" }}
@@ -37,7 +40,11 @@ metadata:
     {{- if $ingress.staticIpAddressName }}
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
-
+    
+    {{- if eq $ingress.type "azure/application-gateway" }}
+    cert-manager.io/cluster-issuer: letsencrypt
+    {{- end }}
+    
     {{- if $ingress.extraAnnotations }}
     {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- end }}
@@ -154,6 +161,9 @@ metadata:
     {{- end }}
     {{- if $redirect_https }}
     ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- if eq $ingress.type "azure/application-gateway" }}
+    appgw.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- end }}
     {{- end }}
 
     {{- if eq $ingress.type "gce" }}
@@ -161,6 +171,10 @@ metadata:
     {{- end }}
     {{- if $ingress.staticIpAddressName }}
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
+    {{- end }}
+    
+    {{- if eq $ingress.type "azure/application-gateway" }}
+    cert-manager.io/cluster-issuer: letsencrypt
     {{- end }}
     
     {{- if $ingress.extraAnnotations }}

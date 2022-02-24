@@ -10,7 +10,7 @@
     "branchName": { "type": "string" },
     "imagePullSecrets": { "type": "array" },
     "app": { "type": "string" },
-    "exposeDomains": { "type": ["array","object"], "items": { "type": "object"}},
+    "exposeDomains": { "type": "object", "items": { "type": "object"}},
     "exposeDomainsDefaults": { "type": "object"},
     "ssl": { "type": "object" },
     "backendConfig": { "type": ["array","object"], "items": { "type": "object"}},
