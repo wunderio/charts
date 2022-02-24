@@ -209,22 +209,6 @@ tests:
           path: 'spec.rules[0].host'
           value: 'bar.baz'
 
-  - it: exposeDomains as list, multiple hostnames can use the same ingress [list definition to be deprecated]
-    template: ingress.yaml
-    set:
-      exposeDomains:
-        - hostname: foo.baz
-        - hostname: bar.baz
-    asserts:
-      - documentIndex: 1
-        equal:
-          path: 'spec.rules[0].host'
-          value: 'foo.baz'
-      - documentIndex: 1
-        equal:
-          path: 'spec.rules[1].host'
-          value: 'bar.baz'
-
   - it: exposeDomains - can supply staticIpAddressName for gce type ingress
     template: ingress.yaml
     set:

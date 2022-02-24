@@ -1,11 +1,13 @@
 # This file includes the configuration used to validate the chart with a dry-run installation.
 
 exposeDomains:
- - hostname: example.com
- - hostname: www.example.com
-   ssl:
-     enabled: true
-     issuer: letsencrypt-staging
+  example:
+    hostname: example.com
+  example2:
+    hostname: www.example.com
+    ssl:
+      enabled: true
+      issuer: letsencrypt-staging
 
 domainPrefixes: ['en', 'fi']
 
