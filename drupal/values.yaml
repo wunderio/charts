@@ -8,7 +8,7 @@ silta-release:
 # Subdomains of this domain will be created automatically for each environment.
 clusterDomain: "silta.wdr.io"
 
-# An optional human-readable label for the project, defaults to the repository name.
+# An optional machine-readable label for the project, defaults to the repository name.
 # This name is mainly used to create nice subdomains for each environment.
 projectName: ""
 
