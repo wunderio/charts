@@ -23,3 +23,11 @@ networking.k8s.io/v1
 networking.k8s.io/v1beta1
 {{- end }}
 {{- end }}
+
+{{- define "silta-cluster.priorityclass-api-version" }}
+{{- if semverCompare ">=1.21" .Capabilities.KubeVersion.Version }}
+scheduling.k8s.io/v1
+{{- else }}
+scheduling.k8s.io/v1beta1
+{{- end }}
+{{- end }}
