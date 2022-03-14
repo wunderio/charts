@@ -1,6 +1,6 @@
 {{- if .Values.referenceData.enabled }}
 {{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
-apiVersion: batch/v1beta1
+apiVersion: {{ include "drupal.cron.api-version" . | trim }}
 kind: CronJob
 metadata:
   name: {{ .Release.Name }}-refdata

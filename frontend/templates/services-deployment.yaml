@@ -215,7 +215,7 @@ spec:
 {{- if $service.autoscaling }}
 {{- if $service.autoscaling.enabled }}
 ---
-apiVersion: autoscaling/v2beta1
+apiVersion: {{ include "frontend.autoscaling.api-version" $ | trim }}
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ $.Release.Name }}-{{ $index }}

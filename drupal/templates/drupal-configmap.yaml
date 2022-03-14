@@ -463,7 +463,11 @@ data:
                 expires         365d;
                 add_header Cache-Control "public";
                 ## Set the OS file cache.
-                open_file_cache max=10000 inactive=120s;
+                {{- if .Values.nginx.open_file_cache.enabled }}
+                open_file_cache max={{ .Values.nginx.open_file_cache.max }} inactive={{ .Values.nginx.open_file_cache.inactive }};
+                {{- else }}
+                open_file_cache off;
+                {{- end }}
                 open_file_cache_valid 45s;
                 open_file_cache_min_uses 2;
                 open_file_cache_errors off;
@@ -485,7 +489,11 @@ data:
                 expires 365d;
                 add_header Cache-Control "public";
                 ## Set the OS file cache.
-                open_file_cache max=10000 inactive=120s;
+                {{- if .Values.nginx.open_file_cache.enabled }}
+                open_file_cache max={{ .Values.nginx.open_file_cache.max }} inactive={{ .Values.nginx.open_file_cache.inactive }};
+                {{- else }}
+                open_file_cache off;
+                {{- end }}
                 open_file_cache_valid 45s;
                 open_file_cache_min_uses 2;
                 open_file_cache_errors off;
