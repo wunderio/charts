@@ -1,5 +1,5 @@
 {{- if .Values.backup.enabled }}
-apiVersion: batch/v1beta1
+apiVersion: {{ include "frontend.cron.api-version" . | trim }}
 kind: CronJob
 metadata:
   name: {{ .Release.Name }}-backup
