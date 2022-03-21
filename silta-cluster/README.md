@@ -117,7 +117,6 @@ This is an exposed webhook that listens for branch delete events, logs in to clu
 
 #### Rclone storage
 
-https://github.com/wunderio/silta/blob/master/docs/vendor-aks.md#azure-files
 Provides persistent volume storageClass `silta-shared`, that allows mounting wide range of remote storage options to cluster pods.
 Rclone project: https://rclone.org/
 Rclone CSI plugin: https://github.com/wunderio/csi-rclone
