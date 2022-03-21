@@ -171,6 +171,15 @@ silta-proxy:
 instana-agent:
   enabled: false
 
+nfs-subdir-external-provisioner:
+  enabled: false
+  nfs:
+    path: /main_share
+  storageClass:
+    name: nfs-shared
+    pathPattern: "${.PVC.namespace}/${.PVC.annotations.nfs.io/storage-path}"
+    onDelete: delete
+
 # This should be replaced when an actual sidecar implementation is available. 
 # https://github.com/kubernetes/enhancements/issues/753#issuecomment-713471597
 k8sControllerSidecars:

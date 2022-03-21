@@ -51,6 +51,24 @@ helm install --name aws-calico --namespace kube-system eks/aws-calico
 kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/main/charts/pxc-operator/crds/crd.yaml
 ```
 
+#### Google Filestore as storage (optional)
+
+Adds a storageclass, backed by Filestore.
+Filestore is an NFS server managed by Google.
+
+Requires [Filestore NFS volume](https://cloud.google.com/filestore) to be accessible from the cluster.
+
+- Export NFS volume as `main_share`
+- Enable nfs-subdir chart, pass the NFS server IP in values file.
+
+```
+nfs-subdir-external-provisioner:
+  enabled: true
+  nfs:
+    server: x.x.x.x
+```
+
+
 ## Usage
 
 Here is an example of how we instantiate and upgrade this helm chart: 
