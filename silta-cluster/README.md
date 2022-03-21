@@ -56,19 +56,18 @@ kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/m
 Adds a storageclass, backed by Filestore.
 Filestore is an NFS server managed by Google.
 
-Requires [Filestore NFS volume](https://cloud.google.com/filestore/pricing) to be accessible from the cluster.
-```
-helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+Requires [Filestore NFS volume](https://cloud.google.com/filestore) to be accessible from the cluster.
 
-helm install \
-nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
---namespace silta-cluster \
---set nfs.server=x.x.x.x \
---set nfs.path=/exported/path \
---set storageClass.name=nfs-shared \
---set storageClass.onDelete=delete \
---set storageClass.pathPattern="${.PVC.namespace}/${.PVC.annotations.nfs.io/storage-path}"
+- Export NFS volume as `main_share`
+- Enable nfs-subdir chart, pass the NFS server IP in values file.
+
 ```
+nfs-subdir-external-provisioner:
+  enabled: true
+  nfs:
+    server: x.x.x.x
+```
+
 
 ## Usage
 
