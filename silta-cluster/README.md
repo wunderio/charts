@@ -55,7 +55,8 @@ kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/m
 
 Adds a storageclass, backed by Filestore.
 Filestore is an NFS server managed by Google.
-Only available on GKE and requires Filestore NFS volume to be accessible from the cluster.
+
+Requires [Filestore NFS volume](https://cloud.google.com/filestore/pricing) to be accessible from the cluster.
 ```
 helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
 
@@ -115,6 +116,7 @@ You need to supply Github API Personal access token that will be used to get the
 This is an exposed webhook that listens for branch delete events, logs in to cluster and removes named deployments using helm. Project code can be inspected at [silta-deployment-remover](https://github.com/wunderio/silta-deployment-remover).
 
 #### Rclone storage
+
 https://github.com/wunderio/silta/blob/master/docs/vendor-aks.md#azure-files
 Provides persistent volume storageClass `silta-shared`, that allows mounting wide range of remote storage options to cluster pods.
 Rclone project: https://rclone.org/
