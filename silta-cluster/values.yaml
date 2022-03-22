@@ -177,7 +177,7 @@ nfs-subdir-external-provisioner:
     path: /main_share
   storageClass:
     name: nfs-shared
-    pathPattern: "${.PVC.namespace}/${.PVC.annotations.nfs.io/storage-path}"
+    pathPattern: "${.PVC.namespace}/${.PVC.annotations.storage.silta/storage-path}"
     onDelete: delete
 
 # This should be replaced when an actual sidecar implementation is available. 
