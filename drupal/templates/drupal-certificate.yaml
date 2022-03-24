@@ -110,7 +110,7 @@ metadata:
 spec:
   secretName: {{ $.Release.Name }}-tls-{{ $index }}
   dnsNames:
-  - {{ $domain.hostname }}
+  - {{ $domain.hostname | quote }}
   issuerRef:
     name: {{ $domain.ssl.issuer }}
     kind: ClusterIssuer
@@ -120,7 +120,7 @@ spec:
       - http01:
           ingress: {{ $.Release.Name }}-drupal-{{ $domain.ingress }}
         domains:
-          - {{ $domain.hostname }}
+          - {{ $domain.hostname | quote }}
 {{- end }}
 ---
 
@@ -135,9 +135,9 @@ spec:
   secretName: {{ $.Release.Name }}-tls-{{ $index }}
   duration: 2160h
   renewBefore: 150h 
-  commonName: {{ $domain.hostname }}
+  commonName: {{ $domain.hostname | quote }}
   dnsNames:
-  - {{ $domain.hostname }}
+  - {{ $domain.hostname | quote }}
   issuerRef:
     name: {{ $domain.ssl.issuer }}
     kind: ClusterIssuer

@@ -26,6 +26,8 @@ metadata:
   name: {{ .Release.Name }}-backups
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
+  annotations:
+    storage.silta/storage-path: {{ .Values.environmentName | default .Release.Name }}/backups
 spec:
   storageClassName: {{ .Values.backup.storageClassName }}
   accessModes:
