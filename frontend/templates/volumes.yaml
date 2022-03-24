@@ -29,6 +29,8 @@ metadata:
   name: {{ $.Release.Name }}-{{ $index }}
   labels:
     {{- include "frontend.release_labels" $ | nindent 4 }}
+  annotations:
+    storage.silta/storage-path: {{ $.Values.environmentName | default $.Release.Name }}/{{ $index }}
 spec:
   storageClassName: {{ $mount.storageClassName }}
   accessModes:
@@ -75,6 +77,8 @@ metadata:
   name: {{ $.Release.Name }}-shell-keys
   labels:
     {{ include "frontend.release_labels" $ | indent 4 }}
+  annotations:
+    storage.silta/storage-path: {{ $.Values.environmentName | default $.Release.Name }}/shell-keys
 spec:
   storageClassName: {{ $.Values.shell.mount.storageClassName }}
   accessModes:
