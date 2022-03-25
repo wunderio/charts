@@ -300,7 +300,7 @@ data:
       }
 
       # Only allow BAN requests from IP addresses in the 'purge' ACL.
-      if (req.method == "BAN") {
+      if (req.method == "BAN" || req.method == "URIBAN") {
         # Admin port is only exposed to internal network
         if (!client.ip ~ purge) {
             return (synth(403, "Not allowed."));
@@ -313,6 +313,9 @@ data:
         }
         elseif (req.http.Cache-Tags) {
             ban("obj.http.Cache-Tags ~ " + req.http.Cache-Tags);
+        }
+        elseif (req.method == "URIBAN") {
+          ban("req.http.host == " + req.http.host + " && req.url == " + req.url);
         }
         else {
             return (synth(403, "Cache tags headers not present."));

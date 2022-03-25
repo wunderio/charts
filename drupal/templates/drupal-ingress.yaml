@@ -191,11 +191,11 @@ spec:
   {{- if $domain.ssl.existingTLSSecret }}
   - secretName: {{ $domain.ssl.existingTLSSecret }}
     hosts: 
-      - {{ $domain.hostname }}
+      - {{ $domain.hostname | quote }}
   {{- else }}
   - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}
     hosts: 
-      - {{ $domain.hostname }}
+      - {{ $domain.hostname | quote }}
   {{- end }}
   {{- end }}
   {{- end }}
@@ -206,7 +206,7 @@ spec:
   {{- range $domain_index, $domain := $.Values.exposeDomains }}
   {{- $domain := mergeOverwrite (deepCopy $.Values.exposeDomainsDefaults) $domain }}
   {{- if eq $domain.ingress $ingress_index }}
-  - host: {{ $domain.hostname }}
+  - host: {{ $domain.hostname | quote }}
     http:
       paths:
       - path: {{ if eq $ingress.type "gce" }}/*{{ else }}/{{ end }}
