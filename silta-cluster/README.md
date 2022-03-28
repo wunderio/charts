@@ -87,11 +87,10 @@ helm upgrade --install --wait silta-cluster silta-cluster \
 Chart upgrades are managed like a normal helm release, though it's suggested to do helm diff first:
 
 ```
-helm diff upgrade silta-cluster silta-cluster --namespace silta-cluster \
+helm diff upgrade silta-cluster wunderio/silta-cluster --namespace silta-cluster \
     --values local-values.yaml
     
-helm upgrade --install --wait silta-cluster silta-cluster \
-    --repo "https://storage.googleapis.com/charts.wdr.io" \
+helm upgrade --install --wait silta-cluster wunderio/silta-cluster \
     --namespace silta-cluster --create-namespace \
     --values local-values.yaml
 ```
