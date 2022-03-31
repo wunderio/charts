@@ -324,18 +324,22 @@ data:
         return (synth(200, "Ban added."));
       }
       
-      # Add a unique header containing the client address
+      # Match upstream allowlist to supply headers containing real ip
       if (client.ip ~ upstream_proxy && req.http.X-Envoy-External-Address) {
         set req.http.X-Forwarded-For = req.http.X-Envoy-External-Address;
-      } 
-      elseif (client.ip ~ upstream_proxy && req.http.X-Real-IP) {
-        set req.http.X-Forwarded-For = req.http.X-Real-IP;
+        set req.http.X-Real-IP = req.http.X-Envoy-External-Address;
       } 
       elseif (client.ip ~ upstream_proxy && req.http.X-Forwarded-For) {
         set req.http.X-Forwarded-For = req.http.X-Forwarded-For;
+        set req.http.X-Real-IP = req.http.X-Forwarded-For;
+      } 
+      elseif (client.ip ~ upstream_proxy && req.http.X-Real-IP) {
+        set req.http.X-Forwarded-For = req.http.X-Real-IP;
+        set req.http.X-Real-IP = req.http.X-Real-IP;
       } 
       else {
         set req.http.X-Forwarded-For = client.ip;
+        set req.http.X-Real-IP = client.ip;
       }
       
       # Only deal with "normal" types
