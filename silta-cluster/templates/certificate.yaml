@@ -18,6 +18,9 @@ spec:
   {{- if index (index .Values "silta-downscaler") "enabled" }}
   - downscaler.{{ .Values.clusterDomain }}
   {{- end }}
+  {{- if index (index .Values "docker-registry") "enabled" }}
+  - registry.{{ .Values.clusterDomain }}
+  {{- end }}
   issuerRef:
     name: {{ .Values.ssl.issuer }}
     kind: ClusterIssuer
@@ -36,6 +39,9 @@ spec:
           {{- end }}
           {{- if index (index .Values "silta-downscaler") "enabled" }}
           - downscaler.{{ .Values.clusterDomain }}
+          {{- end }}
+          {{- if index (index .Values "docker-registry") "enabled" }}
+          - registry.{{ .Values.clusterDomain }}
           {{- end }}
 {{- end }}
 ---
@@ -59,6 +65,9 @@ spec:
   {{- end }}
   {{- if index (index .Values "silta-downscaler") "enabled" }}
   - downscaler.{{ .Values.clusterDomain }}
+  {{- end }}
+  {{- if index (index .Values "docker-registry") "enabled" }}
+  - registry.{{ .Values.clusterDomain }}
   {{- end }}
   issuerRef:
     name: {{ .Values.ssl.issuer }}

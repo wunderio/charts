@@ -204,3 +204,35 @@ k8sControllerSidecars:
     limits:
       cpu: "200m"
       memory: "256Mi"
+
+# https://github.com/twuni/docker-registry.helm
+docker-registry:
+  enabled: false
+  image:
+    repository: distribution/distribution  
+    tag: 2.8.1
+  service:
+    port: 80
+  persistence:
+    enabled: true
+    size: 10Gi
+    # resources.limits.cpu
+    # resources.limits.memory
+    priorityClassName: "high-priority"
+  secrets:
+    # generate user:passwordhash using "htpasswd -Bbn user password" and keep it safe!
+    # Note: allows multiple sets of credentials, use one per line
+    htpasswd: |
+      broken:auth
+  # haSharedSecret
+  # configData
+  # tlsSecretName: silta-cluster-registry
+  # ingress:
+  #   enabled: false
+  #   # hosts: ["registry.silta.wdr.io"]
+  #   #   tls:
+  #   #     - secretName: silta-cluster-registry
+  #   #       hosts:
+  #   #         - registry.silta.wdr.io
+  #   className: traefik
+

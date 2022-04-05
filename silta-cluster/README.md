@@ -12,6 +12,9 @@ helm repo add jetstack https://charts.jetstack.io
 
 # Wunderio helm chart repository for silta-cluster
 helm repo add wunderio https://storage.googleapis.com/charts.wdr.io
+
+# Docker Registry Helm Chart (optional)
+helm repo add twuni https://helm.twun.io
 ```
 
 ### cert-manager (required for ssl/tls)
@@ -46,12 +49,12 @@ kubectl apply -k github.com/aws/eks-charts/tree/master/stable/aws-calico/crds
 helm install --name aws-calico --namespace kube-system eks/aws-calico
 ```
 
-#### Percona XtraDB Cluster for replicated database support (optional)
+### Percona XtraDB Cluster for replicated database support (optional)
 ```
 kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/main/charts/pxc-operator/crds/crd.yaml
 ```
 
-#### Google Filestore as storage (optional)
+### Google Filestore as storage (optional)
 
 Adds a storageclass, backed by Filestore.
 Filestore is an NFS server managed by Google.
@@ -67,7 +70,6 @@ nfs-subdir-external-provisioner:
   nfs:
     server: x.x.x.x
 ```
-
 
 ## Usage
 
