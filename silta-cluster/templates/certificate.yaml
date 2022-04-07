@@ -16,7 +16,7 @@ spec:
   - keys.{{ .Values.clusterDomain }}
   {{- end }}
   {{- if index (index .Values "silta-downscaler") "enabled" }}
-  - {{ index (index .Values "silta-downscaler") "domain" }}
+  - downscaler.{{ .Values.clusterDomain }}
   {{- end }}
   issuerRef:
     name: {{ .Values.ssl.issuer }}
@@ -35,7 +35,7 @@ spec:
           - keys.{{ .Values.clusterDomain }}
           {{- end }}
           {{- if index (index .Values "silta-downscaler") "enabled" }}
-          - {{ index (index .Values "silta-downscaler") "domain" }}
+          - downscaler.{{ .Values.clusterDomain }}
           {{- end }}
 {{- end }}
 ---
@@ -58,7 +58,7 @@ spec:
   - keys.{{ .Values.clusterDomain }}
   {{- end }}
   {{- if index (index .Values "silta-downscaler") "enabled" }}
-  - {{ index (index .Values "silta-downscaler") "domain" }}
+  - downscaler.{{ .Values.clusterDomain }}
   {{- end }}
   issuerRef:
     name: {{ .Values.ssl.issuer }}

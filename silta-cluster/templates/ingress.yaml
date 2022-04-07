@@ -90,7 +90,7 @@ spec:
           {{- end }}
   {{- end }}
   {{- if index (index .Values "silta-downscaler") "enabled" }}
-  - host: {{ index (index .Values "silta-downscaler") "domain" }}
+  - host: downscaler.{{ .Values.clusterDomain }}
     http:
       paths:
       - path: /
