@@ -1,5 +1,5 @@
 {{- if .Values.ssl.enabled }}
-{{- include "silta-cluster.cert-manager-api-version" . }}
+apiVersion: {{ include "silta-cluster.cert-manager-api-version" . | trim }}
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-staging

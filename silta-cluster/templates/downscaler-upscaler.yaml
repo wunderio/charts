@@ -1,0 +1,96 @@
+{{- if index (index .Values "silta-downscaler") "enabled" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-placeholder-upscaler
+  labels:
+    release: {{ .Release.Name }}
+    deployment: placeholder-upscaler
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 3000
+  selector:
+    release: {{ .Release.Name }}
+    deployment: placeholder-upscaler
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-placeholder-upscaler
+spec:
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
+      deployment: placeholder-upscaler
+  template:
+    metadata:
+      labels:
+        release: {{ .Release.Name }}
+        deployment: placeholder-upscaler
+    spec:
+      enableServiceLinks: false
+      serviceAccountName: {{ .Release.Name }}-downscaler
+      containers:
+      - name: placeholder-upscaler
+        image: '{{ index (index .Values "silta-downscaler") "image" }}:{{ index (index .Values "silta-downscaler") "tag" }}'
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+        livenessProbe:
+          tcpSocket:
+            port: 3000
+        readinessProbe:
+          tcpSocket:
+            port: 3000
+        resources:
+          {{ index (index .Values "silta-downscaler") "resources" | toYaml | nindent 10 }}
+        env:
+          - name: PLACEHOLDER_DOMAIN
+            value: {{ index (index .Values "silta-downscaler") "domain" }}
+          - name: PLACEHOLDER_SERVICE_NAME
+            value: {{ .Release.Name }}-placeholder-upscaler
+          - name: PLACEHOLDER_SERVICE_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+
+---
+apiVersion: {{ include "silta-cluster.ingress-api-version" . | trim }}
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-placeholder-upscaler
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
+    ingress.kubernetes.io/ssl-redirect: "true"
+  labels:
+    release: {{ .Release.Name }}
+    deployment: placeholder-upscaler
+spec:
+  {{- if .Values.ssl.enabled }}
+  tls:
+  - secretName: {{ .Release.Name }}-placeholder-upscaler
+  {{- end }}
+  rules:
+  - host: {{ index (index .Values "silta-downscaler") "domain" }}
+    http:
+      paths:
+      - path: /
+        {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
+        backend:
+          {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Release.Name }}-placeholder-upscaler
+            port: 
+              number: 80
+          {{- else }}
+          serviceName: {{ .Release.Name }}-placeholder-upscaler
+          servicePort: 80
+          {{- end }}
+
+{{- end }}

@@ -1,7 +1,7 @@
 ---
 {{- if .Values.ssl.enabled }}
 {{- if has .Values.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-{{- include "silta-cluster.cert-manager-api-version" . }}
+apiVersion: {{ include "silta-cluster.cert-manager-api-version" . | trim }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt
@@ -14,6 +14,9 @@ spec:
   {{- end }}
   {{- if .Values.sshKeyServer.enabled }}
   - keys.{{ .Values.clusterDomain }}
+  {{- end }}
+  {{- if index (index .Values "silta-downscaler") "enabled" }}
+  - {{ index (index .Values "silta-downscaler") "domain" }}
   {{- end }}
   issuerRef:
     name: {{ .Values.ssl.issuer }}
@@ -31,10 +34,13 @@ spec:
           {{- if .Values.sshKeyServer.enabled }}
           - keys.{{ .Values.clusterDomain }}
           {{- end }}
+          {{- if index (index .Values "silta-downscaler") "enabled" }}
+          - {{ index (index .Values "silta-downscaler") "domain" }}
+          {{- end }}
 {{- end }}
 ---
 {{- else if eq .Values.ssl.issuer "selfsigned" }}
-{{- include "silta-cluster.cert-manager-api-version" . }}
+apiVersion: {{ include "silta-cluster.cert-manager-api-version" . | trim }}
 kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt
@@ -50,6 +56,9 @@ spec:
   {{- end }}
   {{- if .Values.sshKeyServer.enabled }}
   - keys.{{ .Values.clusterDomain }}
+  {{- end }}
+  {{- if index (index .Values "silta-downscaler") "enabled" }}
+  - {{ index (index .Values "silta-downscaler") "domain" }}
   {{- end }}
   issuerRef:
     name: {{ .Values.ssl.issuer }}

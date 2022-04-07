@@ -73,3 +73,22 @@ spec:
           servicePort: 80
           {{- end }}
   {{- end }}
+  {{- if index (index .Values "silta-downscaler") "enabled" }}
+  - host: {{ index (index .Values "silta-downscaler") "domain" }}
+    http:
+      paths:
+      - path: /
+        {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
+        backend:
+          {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Release.Name }}-placeholder-upscaler
+            port: 
+              number: 80
+          {{- else }}
+          serviceName: {{ .Release.Name }}-placeholder-upscaler
+          servicePort: 80
+          {{- end }}
+  {{- end }}

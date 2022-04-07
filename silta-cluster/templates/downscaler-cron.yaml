@@ -1,0 +1,35 @@
+{{- if index (index .Values "silta-downscaler") "enabled" }}
+apiVersion: {{ include "silta-cluster.cron-api-version" . | trim }}
+kind: CronJob
+metadata:
+  name: {{ .Release.Name }}-downscale-cron
+spec:
+  schedule: "{{ index (index .Values "silta-downscaler") "schedule" }}"
+  startingDeadlineSeconds: 3600
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          serviceAccountName: {{ .Release.Name }}-downscaler
+          containers:
+          - name: downscaler-cron
+            image: '{{ index (index .Values "silta-downscaler") "image" }}:{{ index (index .Values "silta-downscaler") "tag" }}'
+            imagePullPolicy: Always
+            command: ["/bin/sh", "-c"]
+            args:
+              - node downscale
+            resources:
+              {{ index (index .Values "silta-downscaler") "resources" | toYaml | nindent 14 }}
+            env:
+              - name: PLACEHOLDER_SERVICE_NAME
+                value: {{ .Release.Name }}-placeholder-upscaler
+              - name: PLACEHOLDER_SERVICE_NAMESPACE
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.namespace
+              - name: DEFAULT_MIN_AGE
+                value: {{ index (index .Values "silta-downscaler") "defaultMinAge" | quote }}
+              - name: RELEASE_MIN_AGE
+                value: '{{ index (index .Values "silta-downscaler") "releaseMinAge" | toJson }}'
+{{- end }}
