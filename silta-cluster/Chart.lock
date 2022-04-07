@@ -17,9 +17,6 @@ dependencies:
 - name: cert-manager
   repository: https://charts.jetstack.io/
   version: v0.10.1
-- name: silta-downscaler
-  repository: file://../silta-downscaler
-  version: 0.1.0
 - name: silta-proxy
   repository: file://../silta-proxy
   version: 0.1.0
@@ -29,5 +26,5 @@ dependencies:
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
   version: 4.0.16
-digest: sha256:33ec6f40004261c42659d21f42468322d0b60785f3094fc695e9c2f7bf507d42
-generated: "2022-03-21T16:04:10.669933327+02:00"
+digest: sha256:24840e0234721fca863f05e09334bc8105c8e75936e66c099d53a8884f36ccab
+generated: "2022-04-07T17:12:17.365005956+03:00"

@@ -1,9 +1,9 @@
 {{- define "silta-cluster.cert-manager-api-version" }}
 {{- if ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
-apiVersion: cert-manager.io/v1
-{{- else -}}
-apiVersion: certmanager.k8s.io/v1alpha1
-{{- end -}}
+cert-manager.io/v1
+{{- else }}
+certmanager.k8s.io/v1alpha1
+{{- end }}
 {{- end }}
 
 {{- define "silta-cluster.cert-manager-solver-http01" }}
@@ -29,5 +29,13 @@ networking.k8s.io/v1beta1
 scheduling.k8s.io/v1
 {{- else }}
 scheduling.k8s.io/v1beta1
+{{- end }}
+{{- end }}
+
+{{- define "silta-cluster.cron-api-version" }}
+{{- if semverCompare ">=1.21" .Capabilities.KubeVersion.Version }}
+batch/v1
+{{- else }}
+batch/v1beta1
 {{- end }}
 {{- end }}

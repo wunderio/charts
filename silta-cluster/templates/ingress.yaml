@@ -1,0 +1,110 @@
+---
+apiVersion: {{ include "silta-cluster.ingress-api-version" . | trim }}
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}
+  annotations:
+    kubernetes.io/ingress.class: {{ .Values.ingress.class | quote }}
+    {{- if .Values.ssl.enabled }}
+    {{- if eq .Values.ingress.class "traefik" }}
+    traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
+    {{- end }}
+    ingress.kubernetes.io/ssl-redirect: "true"
+    {{- else }}
+    {{- if eq .Values.ingress.class "traefik" }}
+    traefik.ingress.kubernetes.io/frontend-entry-points: "http"
+    {{- end }}
+    ingress.kubernetes.io/ssl-redirect: "false"
+    {{- end }}
+    {{- if eq .Values.ingress.class "gce" }}
+    cert-manager.io/cluster-issuer: letsencrypt
+    {{- end }}
+    {{- if .Values.ingress.staticIpAddressName }}
+    kubernetes.io/ingress.global-static-ip-name: {{ .Values.ingress.staticIpAddressName | quote }}
+    {{- end }}
+    {{- if eq .Values.ingress.class "azure/application-gateway" }}
+    cert-manager.io/cluster-issuer: letsencrypt
+    {{- end }}
+    {{- if .Values.ingress.extraAnnotations }}
+    {{- .Values.ingress.extraAnnotations | toYaml | nindent 4 }}
+    {{- end }}
+spec:
+  {{- if .Values.ssl.enabled }}
+  tls:
+  - secretName: {{ .Release.Name }}-tls
+  {{- end }}
+  rules:
+  - host: {{ .Values.clusterDomain }}
+    http:
+      paths:
+      - path: /
+        {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
+        backend:
+          {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Release.Name }}-splash
+            port: 
+              number: 80
+          {{- else }}
+          serviceName: {{ .Release.Name }}-splash
+          servicePort: 80
+          {{- end }}
+  {{- if .Values.deploymentRemover.enabled }}
+  - host: webhooks.{{ .Values.clusterDomain }}
+    http:
+      paths:
+      - path: /
+        {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
+        backend:
+          {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Release.Name }}-deployment-remover
+            port: 
+              number: 80
+          {{- else }}
+          serviceName: {{ .Release.Name }}-deployment-remover
+          servicePort: 80
+          {{- end }}
+  {{- end }}
+  {{- if .Values.sshKeyServer.enabled }}
+  - host: keys.{{ .Values.clusterDomain }}
+    http:
+      paths:
+      - path: /
+        {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
+        backend:
+          {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Release.Name }}-ssh-key-server
+            port: 
+              number: 80
+          {{- else }}
+          serviceName: {{ .Release.Name }}-ssh-key-server
+          servicePort: 80
+          {{- end }}
+  {{- end }}
+  {{- if index (index .Values "silta-downscaler") "enabled" }}
+  - host: downscaler.{{ .Values.clusterDomain }}
+    http:
+      paths:
+      - path: /
+        {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
+        backend:
+          {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Release.Name }}-placeholder-upscaler
+            port: 
+              number: 80
+          {{- else }}
+          serviceName: {{ .Release.Name }}-placeholder-upscaler
+          servicePort: 80
+          {{- end }}
+  {{- end }}

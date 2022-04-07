@@ -114,6 +114,20 @@ You need to supply Github API Personal access token that will be used to get the
 
 This is an exposed webhook that listens for branch delete events, logs in to cluster and removes named deployments using helm. Project code can be inspected at [silta-deployment-remover](https://github.com/wunderio/silta-deployment-remover).
 
+#### Deployment downscaler
+
+How it works:
+
+- CronJob runs the following
+  - Get Ingresses with a `auto-downscale/last-update` annotation, this is used to check which should be downscaled.
+  - The `auto-downscale/services` annotation on the ingress indicates which service should be redirected to the placeholder page.
+  - The `auto-downscale/label-selector` indicates which deployments, statefulsets and cronjobs should be downscaled. This is typically set to `release=<release-name>`.
+    
+- When someone hits the placeholder
+  - Get Ingress matching current hostname
+  - Show message to user with option to re-enable
+  - When upscale is ready, redirect user
+
 #### Rclone storage
 
 Provides persistent volume storageClass `silta-shared`, that allows mounting wide range of remote storage options to cluster pods.

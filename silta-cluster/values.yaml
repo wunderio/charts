@@ -1,6 +1,13 @@
 # Main domain of the cluster.
 clusterDomain: "silta.wdr.io"
 
+ingress:
+  # Options: traefik, gce, azure/application-gateway, etc.
+  class: traefik
+  # Custom ingress annotations
+  extraAnnotations: {}
+  #  networking.gke.io/suppress-firewall-xpn-error: "true"
+
 # https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
 traefik:
   externalTrafficPolicy: Local
@@ -164,6 +171,24 @@ cert-manager:
 
 silta-downscaler:
   enabled: false
+  image: wunderio/silta-downscaler
+  tag: "v0.1"
+  ssl:
+    enabled: true
+    issuer: letsencrypt
+  # A cron schedule to determine when applications will be downscaled.
+  schedule: "0 4,18 * * *"
+  # How long should releases be kept by default.
+  defaultMinAge: 1d
+  # How long should releases with matching names be kept. The last matching rule takes effect.
+  releaseMinAge:
+    "^production": 10y
+    "^(master|main|stage|staging)": 4w
+    "^dependabot": 1h
+  resources:
+    requests:
+      cpu: 10m
+      memory: 50Mi
 
 silta-proxy:
   enabled: false
