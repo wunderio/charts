@@ -4,13 +4,29 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}
   annotations:
-    kubernetes.io/ingress.class: traefik
+    kubernetes.io/ingress.class: {{ .Values.ingress.class | quote }}
     {{- if .Values.ssl.enabled }}
+    {{- if eq .Values.ingress.class "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
+    {{- end }}
     ingress.kubernetes.io/ssl-redirect: "true"
     {{- else }}
+    {{- if eq .Values.ingress.class "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http"
+    {{- end }}
     ingress.kubernetes.io/ssl-redirect: "false"
+    {{- end }}
+    {{- if eq .Values.ingress.class "gce" }}
+    cert-manager.io/cluster-issuer: letsencrypt
+    {{- end }}
+    {{- if .Values.ingress.staticIpAddressName }}
+    kubernetes.io/ingress.global-static-ip-name: {{ .Values.ingress.staticIpAddressName | quote }}
+    {{- end }}
+    {{- if eq .Values.ingress.class "azure/application-gateway" }}
+    cert-manager.io/cluster-issuer: letsencrypt
+    {{- end }}
+    {{- if .Values.ingress.extraAnnotations }}
+    {{- .Values.ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- end }}
 spec:
   {{- if .Values.ssl.enabled }}

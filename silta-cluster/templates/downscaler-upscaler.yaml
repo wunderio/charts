@@ -57,40 +57,4 @@ spec:
               fieldRef:
                 fieldPath: metadata.namespace
 
----
-apiVersion: {{ include "silta-cluster.ingress-api-version" . | trim }}
-kind: Ingress
-metadata:
-  name: {{ .Release.Name }}-placeholder-upscaler
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
-    ingress.kubernetes.io/ssl-redirect: "true"
-  labels:
-    release: {{ .Release.Name }}
-    deployment: placeholder-upscaler
-spec:
-  {{- if .Values.ssl.enabled }}
-  tls:
-  - secretName: {{ .Release.Name }}-placeholder-upscaler
-  {{- end }}
-  rules:
-  - host: {{ index (index .Values "silta-downscaler") "domain" }}
-    http:
-      paths:
-      - path: /
-        {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
-        pathType: Prefix
-        {{- end }}
-        backend:
-          {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
-          service:
-            name: {{ .Release.Name }}-placeholder-upscaler
-            port: 
-              number: 80
-          {{- else }}
-          serviceName: {{ .Release.Name }}-placeholder-upscaler
-          servicePort: 80
-          {{- end }}
-
 {{- end }}
