@@ -1,0 +1,144 @@
+---
+apiVersion: {{ include "silta-cluster.ingress-api-version" . | trim }}
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    {{- if .Values.ssl.enabled }}
+    traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
+    ingress.kubernetes.io/ssl-redirect: "true"
+    {{- else }}
+    traefik.ingress.kubernetes.io/frontend-entry-points: "http"
+    ingress.kubernetes.io/ssl-redirect: "false"
+    {{- end }}
+spec:
+  {{- if .Values.ssl.enabled }}
+  tls:
+  - secretName: {{ .Release.Name }}-tls
+  {{- end }}
+  rules:
+  - host: {{ .Values.clusterDomain }}
+    http:
+      paths:
+      - path: /
+        {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
+        backend:
+          {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Release.Name }}-splash
+            port: 
+              number: 80
+          {{- else }}
+          serviceName: {{ .Release.Name }}-splash
+          servicePort: 80
+          {{- end }}
+  {{- if .Values.deploymentRemover.enabled }}
+  - host: webhooks.{{ .Values.clusterDomain }}
+    http:
+      paths:
+      - path: /
+        {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
+        backend:
+          {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Release.Name }}-deployment-remover
+            port: 
+              number: 80
+          {{- else }}
+          serviceName: {{ .Release.Name }}-deployment-remover
+          servicePort: 80
+          {{- end }}
+  {{- end }}
+  {{- if .Values.sshKeyServer.enabled }}
+  - host: keys.{{ .Values.clusterDomain }}
+    http:
+      paths:
+      - path: /
+        {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
+        backend:
+          {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Release.Name }}-ssh-key-server
+            port: 
+              number: 80
+          {{- else }}
+          serviceName: {{ .Release.Name }}-ssh-key-server
+          servicePort: 80
+          {{- end }}
+  {{- end }}
+---
+{{- if .Values.ssl.enabled }}
+{{- if has .Values.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+{{- include "silta-cluster.cert-manager-api-version" . }}
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-crt
+spec:
+  secretName: {{ .Release.Name }}-tls
+  dnsNames:
+  - {{ .Values.clusterDomain }}
+  {{- if .Values.deploymentRemover.enabled }}
+  - webhooks.{{ .Values.clusterDomain }}
+  {{- end }}
+  {{- if .Values.sshKeyServer.enabled }}
+  - keys.{{ .Values.clusterDomain }}
+  {{- end }}
+  issuerRef:
+    name: {{ .Values.ssl.issuer }}
+    kind: ClusterIssuer
+{{- if not ( .Capabilities.APIVersions.Has "cert-manager.io/v1" ) }}
+  acme:
+    config:
+      - http01:
+          ingress: {{ .Release.Name }}
+        domains:
+          - {{ .Values.clusterDomain }}
+          {{- if .Values.deploymentRemover.enabled }}
+          - webhooks.{{ .Values.clusterDomain }}
+          {{- end }}
+          {{- if .Values.sshKeyServer.enabled }}
+          - keys.{{ .Values.clusterDomain }}
+          {{- end }}
+{{- end }}
+---
+{{- else if eq .Values.ssl.issuer "selfsigned" }}
+{{- include "silta-cluster.cert-manager-api-version" . }}
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-crt
+spec:
+  secretName: {{ .Release.Name }}-tls
+  duration: 2160h
+  renewBefore: 150h 
+  commonName: {{ .Values.clusterDomain }}
+  dnsNames:
+  - {{ .Values.clusterDomain }}
+  {{- if .Values.deploymentRemover.enabled }}
+  - webhooks.{{ .Values.clusterDomain }}
+  {{- end }}
+  {{- if .Values.sshKeyServer.enabled }}
+  - keys.{{ .Values.clusterDomain }}
+  {{- end }}
+  issuerRef:
+    name: {{ .Values.ssl.issuer }}
+    kind: ClusterIssuer
+---
+{{- else if eq .Values.ssl.issuer "custom" }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-tls
+type: kubernetes.io/tls
+data:
+  tls.crt: {{ .Values.ssl.crt | b64enc }}
+  tls.key: {{ .Values.ssl.key | b64enc }}
+---
+{{- end }}
+{{- end }}
