@@ -115,15 +115,6 @@ sshKeyServer:
   apiPassword: ''
   replicas: 1
   resources: {}
-  ssl:
-    enabled: true
-    email: admin@example.com
-    # Available issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
-    issuer: letsencrypt
-    # Used when certificate type is custom
-    # ca: ""
-    # key: ""
-    # crt: ""
 
 # Deployment remover
 deploymentRemover:
@@ -132,15 +123,6 @@ deploymentRemover:
   webhooksSecret: ''
   # Kubernetes resource allocation.
   resources: {}
-  ssl:
-    enabled: true
-    email: admin@example.com
-    # Available issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
-    issuer: letsencrypt
-    # Used when certificate type is custom
-    # ca: ""
-    # key: ""
-    # crt: ""
 
 # GKE Cluster settings
 gke:
@@ -173,9 +155,6 @@ silta-downscaler:
   enabled: false
   image: wunderio/silta-downscaler
   tag: "v0.1"
-  ssl:
-    enabled: true
-    issuer: letsencrypt
   # A cron schedule to determine when applications will be downscaled.
   schedule: "0 4,18 * * *"
   # How long should releases be kept by default.

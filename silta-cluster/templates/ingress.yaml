@@ -24,6 +24,7 @@ metadata:
     {{- end }}
     {{- if eq .Values.ingress.class "azure/application-gateway" }}
     cert-manager.io/cluster-issuer: letsencrypt
+    appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399, 401-404"
     {{- end }}
     {{- if .Values.ingress.extraAnnotations }}
     {{- .Values.ingress.extraAnnotations | toYaml | nindent 4 }}
@@ -32,6 +33,17 @@ spec:
   {{- if .Values.ssl.enabled }}
   tls:
   - secretName: {{ .Release.Name }}-tls
+    hosts: 
+      - {{ .Values.clusterDomain }}
+      {{- if .Values.deploymentRemover.enabled }}
+      - webhooks.{{ .Values.clusterDomain }}
+      {{- end }}
+      {{- if .Values.sshKeyServer.enabled }}
+      - keys.{{ .Values.clusterDomain }}
+      {{- end }}
+      {{- if index (index .Values "silta-downscaler") "enabled" }}
+      - downscaler.{{ .Values.clusterDomain }}
+      {{- end }}
   {{- end }}
   rules:
   - host: {{ .Values.clusterDomain }}
