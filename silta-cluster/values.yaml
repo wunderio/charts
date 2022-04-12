@@ -119,6 +119,9 @@ sshKeyServer:
 # Deployment remover
 deploymentRemover:
   enabled: true
+  replicas: 2
+  image: wunderio/silta-deployment-remover
+  imageTag: v0.1
   # Github webhooks secret
   webhooksSecret: ''
   # Kubernetes resource allocation.
@@ -154,7 +157,7 @@ cert-manager:
 silta-downscaler:
   enabled: false
   image: wunderio/silta-downscaler
-  tag: "v0.1"
+  imageTag: "v0.1"
   # A cron schedule to determine when applications will be downscaled.
   schedule: "0 4,18 * * *"
   # How long should releases be kept by default.
