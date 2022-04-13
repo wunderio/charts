@@ -17,7 +17,7 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-deployment-remover
 spec:
-  replicas: 2
+  replicas: {{ .Values.deploymentRemover.replicas }}
   selector:
     matchLabels:
       name: {{ .Release.Name }}-deployment-remover
@@ -39,7 +39,7 @@ spec:
             value: {{ required "A valid .Values.redis.password entry required!" .Values.redis.password | quote }}
       containers:
       - name: {{ .Release.Name }}-deployment-remover
-        image: wunderio/silta-deployment-remover:v0.1
+        image: '{{ .Values.deploymentRemover.image }}:{{ .Values.deploymentRemover.imageTag }}'
         ports:
           - containerPort: 80
         imagePullPolicy: Always

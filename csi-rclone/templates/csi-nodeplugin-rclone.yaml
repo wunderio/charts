@@ -62,7 +62,6 @@ spec:
                   fieldPath: spec.nodeName
             - name: CSI_ENDPOINT
               value: unix://plugin/csi.sock
-          imagePullPolicy: "Always"
           lifecycle:
             postStart:
               exec:

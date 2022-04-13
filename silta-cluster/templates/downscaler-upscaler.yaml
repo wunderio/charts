@@ -35,7 +35,7 @@ spec:
       serviceAccountName: {{ .Release.Name }}-downscaler
       containers:
       - name: placeholder-upscaler
-        image: '{{ index (index .Values "silta-downscaler") "image" }}:{{ index (index .Values "silta-downscaler") "tag" }}'
+        image: '{{ index (index .Values "silta-downscaler") "image" }}:{{ index (index .Values "silta-downscaler") "imageTag" }}'
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
