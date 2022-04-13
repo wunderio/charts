@@ -43,6 +43,7 @@ metadata:
     
     {{- if eq $ingress.type "azure/application-gateway" }}
     cert-manager.io/cluster-issuer: letsencrypt
+    appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399, 401-404"
     {{- end }}
     
     {{- if $ingress.extraAnnotations }}
@@ -175,6 +176,7 @@ metadata:
     
     {{- if eq $ingress.type "azure/application-gateway" }}
     cert-manager.io/cluster-issuer: letsencrypt
+    appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399, 401-404"
     {{- end }}
     
     {{- if $ingress.extraAnnotations }}
