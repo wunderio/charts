@@ -7,6 +7,7 @@ dependencies:
 - name: traefik
   version: 1.87.x
   repository: file://../legacy_traefik
+  condition: traefik.enabled
 - name: redis
   version: 10.4.x
   repository: https://charts.bitnami.com/bitnami

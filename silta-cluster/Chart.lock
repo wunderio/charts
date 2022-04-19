@@ -13,7 +13,7 @@ dependencies:
   version: 6.0.5
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
-  version: 0.1.11
+  version: 0.1.13
 - name: cert-manager
   repository: https://charts.jetstack.io/
   version: v0.10.1
@@ -26,5 +26,5 @@ dependencies:
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
   version: 4.0.16
-digest: sha256:24840e0234721fca863f05e09334bc8105c8e75936e66c099d53a8884f36ccab
-generated: "2022-04-07T17:12:17.365005956+03:00"
+digest: sha256:c16715bbdf76f0ce5f27b17e7df302236accd4ada8bfe2b1ddec76958d38b410
+generated: "2022-04-19T15:18:19.330660287+03:00"
