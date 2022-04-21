@@ -6,7 +6,7 @@ metadata:
     {{ include "frontend.release_labels" . | indent 4 }}
 data:
   nginx_conf: |
-    user                            nginx;                                                 
+    # user                            nginx;                                                 
     worker_processes                auto;
     worker_rlimit_nofile            10240;
 
@@ -120,7 +120,7 @@ data:
 
     server {                               
         server_name frontend;
-        listen 80;
+        listen 8080;
 
         # Loadbalancer health checks need to be fed with http 200 
         if ($hc_ua) { return 200; }

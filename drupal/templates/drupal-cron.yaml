@@ -1,5 +1,5 @@
 {{- range $index, $job := .Values.php.cron }}
-apiVersion: batch/v1beta1
+apiVersion: {{ include "drupal.cron.api-version" $ | trim }}
 kind: CronJob
 metadata:
   {{- $indexHash := sha256sum $index | trunc 3 }}

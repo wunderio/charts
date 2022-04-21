@@ -43,7 +43,7 @@ ports:
   readOnly: true
   subPath: silta_services_yml
 - name: config
-  mountPath: /usr/local/etc/php-fpm.d/zz-custom.conf
+  mountPath: /tmp/zz-custom.conf
   readOnly: false
   subPath: php_fpm_d_custom
 - name: config
