@@ -8,8 +8,9 @@ ingress:
   extraAnnotations: {}
   #  networking.gke.io/suppress-firewall-xpn-error: "true"
 
-# https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
+# https://github.com/wunderio/charts/blob/master/legacy_traefik/values.yaml
 traefik:
+  enabled: true
   externalTrafficPolicy: Local
   priorityClassName: "high-priority"
   rbac:
