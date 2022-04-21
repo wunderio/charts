@@ -21,6 +21,7 @@ spec:
   externalName: null
   ports:
     - port: 80
+      targetPort: 8080
   selector:
     {{ include "frontend.release_labels" . | indent 4 }}
     deployment: frontend

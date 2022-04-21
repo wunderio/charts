@@ -19,5 +19,6 @@ spec:
   externalTrafficPolicy: Local
   ports:
     - port: 80
+      targetPort: 8080
   selector:
     {{ include "simple.release_labels" . | indent 4 }}

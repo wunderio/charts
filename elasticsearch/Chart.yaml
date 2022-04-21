@@ -1,5 +1,5 @@
 apiVersion: v1
-description: Official Elastic helm chart for Elasticsearch
+description: Official Elastic helm chart for Elasticsearch.
 home: https://github.com/elastic/helm-charts
 maintainers:
 - email: helm-charts@elastic.co

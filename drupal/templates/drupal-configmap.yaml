@@ -75,7 +75,7 @@ data:
 
     include modules/*.conf;
 
-    user                            nginx;
+    # user                            nginx;
     worker_processes                auto;
     worker_rlimit_nofile            10240;
 
@@ -286,7 +286,7 @@ data:
 
     server {
         server_name drupal;
-        listen 80;
+        listen 8080;
 
         # Loadbalancer health checks need to be fed with http 200
         if ($hc_ua) { return 200; }
@@ -522,6 +522,7 @@ data:
 
             location = /robots.txt {
                 add_header  Content-Type  text/plain;
+                access_log  off;
                 try_files $uri @drupal;
             }
 

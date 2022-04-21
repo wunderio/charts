@@ -24,6 +24,7 @@ spec:
   externalName: null
   ports:
     - port: 80
+      targetPort: 8080
   selector:
     {{- include "drupal.release_selector_labels" . | nindent 4 }}
     deployment: drupal
