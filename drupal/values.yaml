@@ -158,7 +158,7 @@ nginx:
   expose_cache_headers: false
 
   # Trust X-Forwarded-For from these hosts for getting external IP
-  realipfrom: 
+  realipfrom:
     gke-internal: 10.0.0.0/8
     gce-health-check-1: 130.211.0.0/22
     gce-health-check-2: 35.191.0.0/16
@@ -227,11 +227,11 @@ php:
     extraConfig: |
 
   # Cron tasks, each of which will be run into a dedicated temporary pod.
-  # When overriding this value, make sure to include the `drush cron` command.
   cron:
     drupal:
       # ~ gets replaced with a random digit between 0 and 9 to prevent having all cron jobs at once.
       schedule: '~ * * * *'
+      # When overriding this value, make sure to include the `drush cron` command.
       command: |
         if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
           drush cron;
@@ -240,7 +240,8 @@ php:
       # Set a nodeSelector specifically for cron jobs.
       nodeSelector: {}
 
-      # Set resources specifically for cron jobs.
+      # Set resources specifically for cron jobs. If not set, they will be
+      # inherited from php.resources.
       resources:
         requests:
           cpu: 500m
@@ -334,7 +335,7 @@ shell:
       url: ''
       username: ''
       password: ''
-  # Static ssh keys 
+  # Static ssh keys
   # Note: cluster administrator support required for duplicating keys in jumphost.
   authorizedKeys: []
 
