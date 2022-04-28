@@ -68,7 +68,7 @@ data:
         gzip_proxied                any;       
         gzip_disable                msie6;                                                                                                                 
                                                                                                                                                           
-        {{ include "frontend.security_headers" $ | indent 4 }}
+        {{ include "frontend.security_headers" $ | indent 6 }}
 
         map_hash_bucket_size 128;
 

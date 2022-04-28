@@ -125,3 +125,38 @@ tests:
     - matchRegex:
         path: data.default_vcl
         pattern: "2.2.2.2"
+
+  - it: tests nginx security headers
+    template: drupal-configmap.yaml
+    set:
+      nginx:
+        security_headers: 
+          foo: bar
+        content_security_policy: "baz"
+    asserts:
+    - matchRegex:
+        path: data.nginx_conf
+        pattern: 'add_header                  X-XSS-Protection "1; mode=block";'
+    - matchRegex:
+        path: data.nginx_conf
+        pattern: 'add_header                  foo bar;'
+    - matchRegex:
+        path: data.nginx_conf
+        pattern: 'add_header                  Content-Security-Policy "baz" always;'
+
+  - it: tests ability to set empty nginx security headers
+    template: drupal-configmap.yaml
+    set:
+      nginx:
+        security_headers: []
+        content_security_policy: ""
+    asserts:
+    - notMatchRegex:
+        path: data.nginx_conf
+        pattern: 'add_header                  X-XSS-Protection "1; mode=block";'
+    - notMatchRegex:
+        path: data.nginx_conf
+        pattern: 'add_header                  header_foo value_bar;'
+    - notMatchRegex:
+        path: data.nginx_conf
+        pattern: 'add_header                  Content-Security-Policy "baz" always;'
