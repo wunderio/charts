@@ -144,6 +144,12 @@ nginx:
       password: demo
 
   # Security headers
+  security_headers:
+    X-Frame-Options: 'SAMEORIGIN'
+    X-Content-Type-Options: 'nosniff'
+    X-XSS-Protection: '"1; mode=block"'
+    Referrer-Policy: '"no-referrer, strict-origin-when-cross-origin" always'
+  
   # includeSubdomains should be used whenever possible, but before enabling it needs to be made sure there are no subdomains not using https:
   hsts_include_subdomains: ""
   #hsts_include_subdomains: " includeSubDomains;"

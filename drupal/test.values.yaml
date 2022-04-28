@@ -20,6 +20,11 @@ varnish:
 memcached:
   enabled: true
 
+redis:
+  enabled: true
+  auth:
+    password: foo
+
 elasticsearch:
   enabled: true
 

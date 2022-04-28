@@ -174,6 +174,12 @@ nginx:
     gce-health-check-2: 35.191.0.0/16
 
   # Security headers
+  security_headers:
+    # X-Frame-Options: 'SAMEORIGIN'
+    # X-Content-Type-Options: 'nosniff'
+    X-XSS-Protection: '"1; mode=block"'
+    Referrer-Policy: '"no-referrer, strict-origin-when-cross-origin" always'
+  
   # includeSubdomains should be used whenever possible, but before enabling it needs to be made sure there are no subdomains not using https:
   hsts_include_subdomains: ""
   #hsts_include_subdomains: " includeSubDomains;"
@@ -470,6 +476,15 @@ mariadb:
         memory: 384M
       limits:
         memory: 512M
+    extraInitContainers: |
+      - name: dbinfo
+        image: busybox:stable
+        command: ["/bin/sh", "-c"]
+        args:
+          - df -h /bitnami/mariadb
+        volumeMounts:
+          - mountPath: /bitnami/mariadb
+            name: data
     affinity:
       nodeAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
@@ -574,6 +589,23 @@ memcached:
     - -m 118
     # MaxItemSize
     - -I 4M
+
+# https://github.com/bitnami/charts/blob/master/bitnami/redis/values.yaml
+redis:
+  enabled: false
+  architecture: standalone
+  auth:
+    # mandatory value
+    password: ""
+  replica:
+    # replicaCount: 1
+    resources:
+      limits: 
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 256Mi
 
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
