@@ -147,7 +147,7 @@ certmanager.k8s.io/v1alpha1
 {{- end }}
 
 {{- define "ingress.api-version" }}
-{{- if semverCompare ">=1.18" .Capabilities.KubeVersion.Version }}
+{{- if ( .Capabilities.APIVersions.Has "networking.k8s.io/v1" ) }}
 networking.k8s.io/v1
 {{- else }}
 networking.k8s.io/v1beta1
@@ -155,7 +155,7 @@ networking.k8s.io/v1beta1
 {{- end }}
 
 {{- define "frontend.cron.api-version" }}
-{{- if semverCompare ">=1.21" .Capabilities.KubeVersion.Version }}
+{{- if ( .Capabilities.APIVersions.Has "batch/v1" ) }}
 batch/v1
 {{- else }}
 batch/v1beta1
@@ -163,7 +163,7 @@ batch/v1beta1
 {{- end }}
 
 {{- define "frontend.autoscaling.api-version" }}
-{{- if semverCompare ">=1.23" .Capabilities.KubeVersion.Version }}
+{{- if ( .Capabilities.APIVersions.Has "autoscaling/v2" ) }}
 autoscaling/v2
 {{- else }}
 autoscaling/v2beta1
