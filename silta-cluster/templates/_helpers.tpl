@@ -17,7 +17,7 @@ http01: {}
 {{- end }}
 
 {{- define "silta-cluster.ingress-api-version" }}
-{{- if semverCompare ">=1.18" .Capabilities.KubeVersion.Version }}
+{{- if and ( ge $.Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "18" ) }}
 networking.k8s.io/v1
 {{- else }}
 networking.k8s.io/v1beta1
@@ -25,7 +25,7 @@ networking.k8s.io/v1beta1
 {{- end }}
 
 {{- define "silta-cluster.priorityclass-api-version" }}
-{{- if semverCompare ">=1.21" .Capabilities.KubeVersion.Version }}
+{{- if and ( ge $.Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "21" ) }}
 scheduling.k8s.io/v1
 {{- else }}
 scheduling.k8s.io/v1beta1
@@ -33,7 +33,7 @@ scheduling.k8s.io/v1beta1
 {{- end }}
 
 {{- define "silta-cluster.cron-api-version" }}
-{{- if semverCompare ">=1.21" .Capabilities.KubeVersion.Version }}
+{{- if and ( ge $.Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "21" ) }}
 batch/v1
 {{- else }}
 batch/v1beta1
