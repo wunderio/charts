@@ -70,9 +70,9 @@ workflows:
   commit:
     jobs:
       - build:
-          context: silta_finland
+          context: silta_dev
       - deploy:
-          context: silta_finland
+          context: silta_dev
           requires:
             - build
           filters:
