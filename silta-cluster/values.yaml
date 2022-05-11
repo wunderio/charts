@@ -216,23 +216,16 @@ docker-registry:
   persistence:
     enabled: true
     size: 10Gi
-    # resources.limits.cpu
-    # resources.limits.memory
-    priorityClassName: "high-priority"
+  resources:  
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 192Mi
   secrets:
     # generate user:passwordhash using "htpasswd -Bbn user password" and keep it safe!
     # Note: allows multiple sets of credentials, use one per line
     htpasswd: |
       broken:auth
-  # haSharedSecret
-  # configData
-  # tlsSecretName: silta-cluster-registry
-  # ingress:
-  #   enabled: false
-  #   # hosts: ["registry.silta.wdr.io"]
-  #   #   tls:
-  #   #     - secretName: silta-cluster-registry
-  #   #       hosts:
-  #   #         - registry.silta.wdr.io
-  #   className: traefik
 
