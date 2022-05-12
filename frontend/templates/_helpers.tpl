@@ -20,7 +20,9 @@ release: {{ .Release.Name }}
 {{- define "frontend.security_headers" }}
   ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.
   {{- range $header, $value := .Values.nginx.security_headers }}
+  {{- if $value }}
   add_header                  {{ $header }} {{ $value }};
+  {{- end }}
   {{- end }}
   add_header                  Strict-Transport-Security "max-age=31536000; {{ .Values.nginx.hsts_include_subdomains }} preload" always;
   {{- if .Values.nginx.content_security_policy }}
@@ -147,7 +149,7 @@ certmanager.k8s.io/v1alpha1
 {{- end }}
 
 {{- define "ingress.api-version" }}
-{{- if semverCompare ">=1.18" .Capabilities.KubeVersion.Version }}
+{{- if and ( ge $.Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "18" ) }}
 networking.k8s.io/v1
 {{- else }}
 networking.k8s.io/v1beta1
@@ -155,7 +157,7 @@ networking.k8s.io/v1beta1
 {{- end }}
 
 {{- define "frontend.cron.api-version" }}
-{{- if semverCompare ">=1.21" .Capabilities.KubeVersion.Version }}
+{{- if and ( ge $.Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "21" ) }}
 batch/v1
 {{- else }}
 batch/v1beta1
@@ -163,7 +165,7 @@ batch/v1beta1
 {{- end }}
 
 {{- define "frontend.autoscaling.api-version" }}
-{{- if semverCompare ">=1.23" .Capabilities.KubeVersion.Version }}
+{{- if and ( ge $.Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "23" ) }}
 autoscaling/v2
 {{- else }}
 autoscaling/v2beta1
