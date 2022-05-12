@@ -12,6 +12,9 @@ helm repo add jetstack https://charts.jetstack.io
 
 # Wunderio helm chart repository for silta-cluster
 helm repo add wunderio https://storage.googleapis.com/charts.wdr.io
+
+# Docker Registry Helm Chart (optional)
+helm repo add twuni https://helm.twun.io
 ```
 
 ### cert-manager (required for ssl/tls)
@@ -46,12 +49,12 @@ kubectl apply -k github.com/aws/eks-charts/tree/master/stable/aws-calico/crds
 helm install --name aws-calico --namespace kube-system eks/aws-calico
 ```
 
-#### Percona XtraDB Cluster for replicated database support (optional)
+### Percona XtraDB Cluster for replicated database support (optional)
 ```
 kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/main/charts/pxc-operator/crds/crd.yaml
 ```
 
-#### Google Filestore as storage (optional)
+### Google Filestore as storage (optional)
 
 Adds a storageclass, backed by Filestore.
 Filestore is an NFS server managed by Google.
@@ -68,6 +71,22 @@ nfs-subdir-external-provisioner:
     server: x.x.x.x
 ```
 
+### Docker image registry
+
+It is possible to enable `docker-registry` component for `silta-cluster`. This allows running local image registry, but there are few extra steps to do:
+
+1. Set username and password at `docker-registry.secrets.htpasswd`. Generate user:passwordhash using `htpasswd -Bbn user password` command.
+2. Allow deployments to use image registry by either setting `imagePullSecrets` in chart values or creating default imagePullSecrets -
+```bash
+kubectl create secret docker-registry silta-registry \
+  --docker-server=registry.[cluster-domain] \
+  --docker-username=registry \
+  --docker-password=silta \
+  --docker-email=silta-registry@[cluster-domain]
+
+kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "silta-registry"}]}' 
+```
+Do the last patch command for the each project namespace that will use images from repository.
 
 ## Usage
 

@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "1.0"
 description: Setup a silta kubernetes cluster.
 name: silta-cluster
-version: 0.2.27
+version: 0.2.28
 dependencies:
 - name: traefik
   version: 1.87.x
@@ -40,4 +40,7 @@ dependencies:
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
   version: 4.0.x
   condition: nfs-subdir-external-provisioner.enabled
-
+- name: docker-registry
+  repository: https://helm.twun.io
+  version: 2.1.x
+  condition: docker-registry.enabled

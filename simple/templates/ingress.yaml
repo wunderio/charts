@@ -54,7 +54,7 @@ metadata:
 spec:
   {{- if $ingress.tls }}
   tls:
-  - secretName: {{ .Release.Name }}-tls
+  - secretName: {{ .Release.Name }}-tls{{- if eq $.Values.ssl.issuer "custom" }}-custom{{- end }}
   {{- end }}
   rules:
   - host: {{ template "simple.domain" . }}
@@ -150,7 +150,7 @@ spec:
   {{- if eq $domain.ingress $ingress_index }}
   {{- if $domain.ssl }}
   {{- if $domain.ssl.enabled }}
-  - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}
+  - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}{{- if eq $domain.ssl.issuer "custom" }}-custom{{- end }}
   {{- end }}
   {{- end }}
   {{- end }}

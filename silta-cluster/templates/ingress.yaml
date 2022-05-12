@@ -49,6 +49,9 @@ spec:
       {{- if index (index .Values "silta-downscaler") "enabled" }}
       - downscaler.{{ .Values.clusterDomain }}
       {{- end }}
+      {{- if index (index .Values "docker-registry") "enabled" }}
+      - registry.{{ .Values.clusterDomain }}
+      {{- end }}
   {{- end }}
   rules:
   - host: {{ .Values.clusterDomain }}
@@ -122,6 +125,25 @@ spec:
               number: 80
           {{- else }}
           serviceName: {{ .Release.Name }}-placeholder-upscaler
+          servicePort: 80
+          {{- end }}
+  {{- end }}
+  {{- if index (index .Values "docker-registry") "enabled" }}
+  - host: registry.{{ .Values.clusterDomain }}
+    http:
+      paths:
+      - path: /
+        {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+        pathType: Prefix
+        {{- end }}
+        backend:
+          {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
+          service:
+            name: {{ .Release.Name }}-docker-registry
+            port: 
+              number: 80
+          {{- else }}
+          serviceName: {{ .Release.Name }}-docker-registry
           servicePort: 80
           {{- end }}
   {{- end }}

@@ -81,7 +81,7 @@ tests:
     template: configmap.yaml
     set:
       nginx:
-        security_headers: []
+        security_headers: null
         content_security_policy: ""
     asserts:
     - notMatchRegex:
@@ -94,3 +94,20 @@ tests:
         path: data.nginx_conf
         pattern: 'add_header                  Content-Security-Policy "baz" always;'
 
+  - it: tests ability to unset a single default nginx security header
+    template: configmap.yaml
+    set:
+      nginx:
+        security_headers:
+          X-XSS-Protection: ""
+          foo: bar
+    asserts:
+    - notMatchRegex:
+        path: data.nginx_conf
+        pattern: 'add_header                  X-XSS-Protection'
+    - matchRegex:
+        path: data.nginx_conf
+        pattern: 'add_header                  Referrer-Policy "no-referrer, strict-origin-when-cross-origin" always;'
+    - matchRegex:
+        path: data.nginx_conf
+        pattern: 'add_header                  foo bar;'
