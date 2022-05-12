@@ -71,6 +71,23 @@ nfs-subdir-external-provisioner:
     server: x.x.x.x
 ```
 
+### Docker image registry
+
+It is possible to enable `docker-registry` component for `silta-cluster`. This allows running local image registry, but there are few extra steps to do:
+
+1. Set username and password at `docker-registry.secrets.htpasswd`. Generate user:passwordhash using `htpasswd -Bbn user password` command.
+2. Allow deployments to use image registry by either setting `imagePullSecrets` in chart values or creating default imagePullSecrets -
+```bash
+kubectl create secret docker-registry silta-registry \
+  --docker-server=registry.[cluster-domain] \
+  --docker-username=registry \
+  --docker-password=silta \
+  --docker-email=silta-registry@[cluster-domain]
+
+kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "silta-registry"}]}' 
+```
+Do the last patch command for the each project namespace that will use images from repository.
+
 ## Usage
 
 Here is an example of how we instantiate and upgrade this helm chart: 
