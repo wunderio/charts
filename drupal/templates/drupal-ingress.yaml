@@ -65,12 +65,12 @@ spec:
     hosts: 
       - {{ include "drupal.domain" . | quote }}
   {{- else }}
-  - secretName: {{ .Release.Name }}-tls
+  - secretName: {{ .Release.Name }}-tls{{- if eq $.Values.ssl.issuer "custom" }}-custom{{- end }}
     hosts: 
       - {{ include "drupal.domain" . | quote }}
   {{- range $index, $prefix := .Values.domainPrefixes }}
   {{ $params := dict "prefix" $prefix -}}
-  - secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+  - secretName: {{ $.Release.Name }}-tls-p{{ $index }}{{- if eq $.Values.ssl.issuer "custom" }}-custom{{- end }}
     hosts: 
       - '{{ template "drupal.domain" (merge $params $ ) }}'
   {{- end }}
@@ -195,7 +195,7 @@ spec:
     hosts: 
       - {{ $domain.hostname | quote }}
   {{- else }}
-  - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}
+  - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}{{- if eq $domain.ssl.issuer "custom" }}-custom{{- end }}
     hosts: 
       - {{ $domain.hostname | quote }}
   {{- end }}

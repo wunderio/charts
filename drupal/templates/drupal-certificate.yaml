@@ -80,7 +80,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ .Release.Name }}-tls
+  name: {{ .Release.Name }}-tls-custom
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 type: kubernetes.io/tls
@@ -148,7 +148,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ $.Release.Name }}-tls-{{ $index }}
+  name: {{ $.Release.Name }}-tls-{{ $index }}-custom
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 type: kubernetes.io/tls
