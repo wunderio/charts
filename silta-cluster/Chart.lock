@@ -26,5 +26,8 @@ dependencies:
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
   version: 4.0.16
-digest: sha256:c16715bbdf76f0ce5f27b17e7df302236accd4ada8bfe2b1ddec76958d38b410
-generated: "2022-04-19T15:18:19.330660287+03:00"
+- name: docker-registry
+  repository: https://helm.twun.io
+  version: 2.1.0
+digest: sha256:954363c0dc5df2e5c9495d88a5b98399c6c5f8da6d0eeedc59e395d0acda9373
+generated: "2022-05-09T13:39:31.991162568+03:00"

@@ -204,3 +204,28 @@ k8sControllerSidecars:
     limits:
       cpu: "200m"
       memory: "256Mi"
+
+# https://github.com/twuni/docker-registry.helm
+docker-registry:
+  enabled: false
+  image:
+    repository: distribution/distribution  
+    tag: 2.8.1
+  service:
+    port: 80
+  persistence:
+    enabled: true
+    size: 10Gi
+  resources:  
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 100m
+      memory: 192Mi
+  secrets:
+    # generate user:passwordhash using "htpasswd -Bbn user password" and keep it safe!
+    # Note: allows multiple sets of credentials, use one per line
+    htpasswd: |
+      broken:auth
+
