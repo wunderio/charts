@@ -6,7 +6,9 @@ metadata:
   labels:
     {{ include "frontend.release_labels" $ | indent 4 }}
 spec:
+  {{- if or (not $service.autoscaling) (not (($service.autoscaling).enabled)) }}
   replicas: {{ default 1 $service.replicas }}
+  {{- end }}
   strategy:
     {{ default $.Values.serviceDefaults.strategy $service.strategy | toYaml }}
   selector:
