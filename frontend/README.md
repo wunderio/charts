@@ -22,3 +22,5 @@ Service containers have following environment variables:
       - DB_NAME: Database name. Set to "frontend" by default.
   - When MongoDB is enabled:
     - MONGODB_HOST: MongoDB server host.
+  - When Instana is enabled:
+    - INSTANA_AGENT_HOST: IP address of host where Instana agent is running.

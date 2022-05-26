@@ -138,6 +138,13 @@ rsync -az /values_mounts/ /backups/current/
 - name: NO_PROXY
   value: .svc.cluster.local,{{ .Release.Name }}-mongodb,{{ .Release.Name }}-es{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 {{- end }}
+{{ if .Values.instana.enabled -}}
+# Instana
+- name: INSTANA_AGENT_HOST
+  valueFrom:
+    fieldRef:
+      fieldPath: status.hostIP
+{{- end }}
 {{- end }}
 
 {{- define "cert-manager.api-version" }}

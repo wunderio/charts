@@ -411,3 +411,9 @@ rabbitmq:
   # Use a low default to prevent unnecessary storage use.
   persistence:
     size: 1Gi
+
+# Add following lines to your node.Dockerfile when enabling instana monitoring
+#   RUN npm install -g @instana/collector
+#   ENV NODE_OPTIONS="--require /usr/local/lib/node_modules/@instana/collector/src/immediate"
+instana:
+  enabled: false
