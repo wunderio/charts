@@ -600,6 +600,7 @@ redis:
     password: ""
   replica:
     # replicaCount: 1
+  master:
     resources:
       limits: 
         cpu: 250m
