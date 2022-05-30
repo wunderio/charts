@@ -1,15 +1,22 @@
 suite: CSI Node Plugin
 templates:
-  - csi-nodeplugin-rclone.yaml
+  - 1.13-csi-nodeplugin-rclone.yaml
+  - 1.22-csi-nodeplugin-rclone.yaml
 tests:
-  - it: is a daemon
-    template: csi-nodeplugin-rclone.yaml
+  - it: is a daemon (1.13)
+    template: 1.13-csi-nodeplugin-rclone.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 18
     asserts:
       - isKind:
           of: DaemonSet
 
-  - it: can set resources
-    template: csi-nodeplugin-rclone.yaml
+  - it: can set resources (1.13)
+    template: 1.13-csi-nodeplugin-rclone.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 18
     set:
       nodePlugin:
         registrar:
