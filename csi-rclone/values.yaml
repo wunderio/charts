@@ -5,7 +5,7 @@ storageClass:
   name: "rclone"
 
 # rclone CSI plugin image release version. https://cloud.docker.com/u/wunderio/repository/docker/wunderio/csi-rclone
-version: v1.2.6
+version: v1.2.8
 
 # use default parameters. You might want set this to false when using as subchart.
 defaultParams: true
@@ -21,7 +21,7 @@ params:
   #remotePathSuffix: "/subpath"
 
   s3-provider: "Minio"
-  s3-endpoint: "http://minio-release.default:9000"
+  s3-endpoint: "http://minio.minio:9000"
   # Default credentials of minio chart https://github.com/helm/charts/tree/master/stable/minio
   s3-access-key-id: "AKIAIOSFODNN7EXAMPLE"
   s3-secret-access-key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"

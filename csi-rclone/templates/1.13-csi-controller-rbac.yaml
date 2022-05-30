@@ -1,6 +1,4 @@
-# This YAML file contains RBAC API objects that are necessary to run external
-# CSI attacher for rclone adapter
-
+{{- if and ( eq .Capabilities.KubeVersion.Major "1") ( le .Capabilities.KubeVersion.Minor "21" ) }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -64,3 +62,4 @@ roleRef:
   kind: ClusterRole
   name: csi-cluster-driver-registrar-role
   apiGroup: rbac.authorization.k8s.io
+{{- end }}

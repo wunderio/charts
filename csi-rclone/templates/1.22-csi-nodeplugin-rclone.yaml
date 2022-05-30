@@ -1,5 +1,4 @@
-# This YAML file contains driver-registrar & csi driver nodeplugin API objects
-# that are necessary to run CSI nodeplugin for rclone
+{{- if and ( eq .Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "22" ) }}
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
@@ -22,7 +21,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: node-driver-registrar
-          image: quay.io/k8scsi/csi-node-driver-registrar:v1.1.0
+          image: k8s.gcr.io/sig-storage/csi-node-driver-registrar:v2.4.0
           lifecycle:
             preStop:
               exec:
@@ -50,11 +49,9 @@ spec:
               add: ["SYS_ADMIN"]
             allowPrivilegeEscalation: true
           image: wunderio/csi-rclone:{{- .Values.version }}
-          imagePullPolicy: Always
           args:
             - "--nodeid=$(NODE_ID)"
             - "--endpoint=$(CSI_ENDPOINT)"
-            - "--v=5"
           env:
             - name: NODE_ID
               valueFrom:
@@ -62,6 +59,7 @@ spec:
                   fieldPath: spec.nodeName
             - name: CSI_ENDPOINT
               value: unix://plugin/csi.sock
+          imagePullPolicy: "Always"
           lifecycle:
             postStart:
               exec:
@@ -92,3 +90,4 @@ spec:
           operator: Exists
         - effect: NoExecute
           operator: Exists
+{{- end }}
