@@ -7,9 +7,6 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   serviceName: "csi-controller-rclone"
-  {{- if .Values.priorityClassName }}
-  priorityClassName: "{{ .Values.priorityClassName }}"
-  {{- end }}
   replicas: 1
   selector:
     matchLabels:
@@ -19,6 +16,9 @@ spec:
       labels:
         app: csi-controller-rclone
     spec:
+      {{- if .Values.priorityClassName }}
+      priorityClassName: "{{ .Values.priorityClassName }}"
+      {{- end }}
       serviceAccountName: csi-controller-rclone
       containers:
         - name: csi-attacher
