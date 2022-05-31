@@ -1,6 +1,4 @@
-# This YAML file contains attacher & csi driver API objects that are necessary
-# to run external CSI attacher for rclone
-
+{{- if and ( eq .Capabilities.KubeVersion.Major "1") ( le .Capabilities.KubeVersion.Minor "21" ) }}
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
@@ -72,3 +70,4 @@ spec:
       volumes:
         - name: socket-dir
           emptyDir: {}
+{{- end }}
