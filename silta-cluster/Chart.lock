@@ -13,7 +13,7 @@ dependencies:
   version: 6.0.5
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
-  version: 0.1.13
+  version: 0.2.3
 - name: cert-manager
   repository: https://charts.jetstack.io/
   version: v0.10.1
@@ -29,5 +29,5 @@ dependencies:
 - name: docker-registry
   repository: https://helm.twun.io
   version: 2.1.0
-digest: sha256:954363c0dc5df2e5c9495d88a5b98399c6c5f8da6d0eeedc59e395d0acda9373
-generated: "2022-05-09T13:39:31.991162568+03:00"
+digest: sha256:144f895aab429ddf0a164a25d8ede55db9e05d96fbb7d284b31b1cfe05e31b73
+generated: "2022-05-31T10:48:24.677550966+03:00"
