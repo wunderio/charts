@@ -1,7 +1,7 @@
 suite: Controller
 templates:
   - 1.13-csi-controller-rclone.yaml
-  - 1.22-csi-controller-rclone.yaml
+  - 1.19-csi-controller-rclone.yaml
 tests:
   - it: is a stateful set (1.13)
     template: 1.13-csi-controller-rclone.yaml
