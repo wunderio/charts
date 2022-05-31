@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "1.0"
 description: Setup a silta kubernetes cluster.
 name: silta-cluster
-version: 0.2.28
+version: 0.2.29
 dependencies:
 - name: traefik
   version: 1.87.x
@@ -21,7 +21,7 @@ dependencies:
   repository: https://helm.min.io/
   condition: minio.enabled
 - name: csi-rclone
-  version: 0.1.x
+  version: 0.2.x
   repository: https://storage.googleapis.com/charts.wdr.io
   condition: csi-rclone.enabled
 - name: cert-manager
