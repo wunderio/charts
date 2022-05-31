@@ -1,22 +1,22 @@
 suite: Controller
 templates:
   - 1.13-csi-controller-rclone.yaml
-  - 1.22-csi-controller-rclone.yaml
+  - 1.19-csi-controller-rclone.yaml
 tests:
-  - it: is a stateful set (1.22)
-    template: 1.22-csi-controller-rclone.yaml
+  - it: is a stateful set (1.19)
+    template: 1.19-csi-controller-rclone.yaml
     capabilities:
       majorVersion: 1
-      minorVersion: 22
+      minorVersion: 19
     asserts:
       - isKind:
           of: StatefulSet
 
-  - it: can set resources (1.22)
-    template: 1.22-csi-controller-rclone.yaml
+  - it: can set resources (1.19)
+    template: 1.19-csi-controller-rclone.yaml
     capabilities:
       majorVersion: 1
-      minorVersion: 22
+      minorVersion: 19
     set:
       controller:
         attacher:
