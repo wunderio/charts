@@ -3,7 +3,7 @@ dependencies:
   repository: file://../legacy_traefik
   version: 1.87.7
 - name: redis
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://storage.googleapis.com/charts.wdr.io
   version: 10.4.4
 - name: pxc-operator
   repository: https://percona.github.io/percona-helm-charts/
@@ -29,5 +29,5 @@ dependencies:
 - name: docker-registry
   repository: https://helm.twun.io
   version: 2.1.0
-digest: sha256:144f895aab429ddf0a164a25d8ede55db9e05d96fbb7d284b31b1cfe05e31b73
-generated: "2022-05-31T10:48:24.677550966+03:00"
+digest: sha256:a0e01e968ec1ba5ae9efaa7e693735adbd7b1b5f18096e002c30ea648f9738dc
+generated: "2022-06-02T21:34:51.058559977+03:00"
