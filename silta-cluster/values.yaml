@@ -13,6 +13,8 @@ traefik:
   enabled: true
   externalTrafficPolicy: Local
   priorityClassName: "high-priority"
+  image: eu.gcr.io/silta-images/traefik
+  imageTag: 1.7.34-mod
   rbac:
     enabled: true
   replicas: 2
