@@ -88,4 +88,3 @@ workflows:
             branches:
               only: 
                 - master
-                - feature/chart-fork
