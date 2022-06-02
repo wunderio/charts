@@ -15,7 +15,7 @@ keywords:
 maintainers:
   - email: containers@bitnami.com
     name: Bitnami
-name: common
+name: bitnami-common
 sources:
   - https://github.com/bitnami/charts
   - http://www.bitnami.com/
