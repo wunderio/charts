@@ -36,6 +36,13 @@ jobs:
             for CHARTFILE in `find . -name Chart.yaml`
             do
               CHART=`dirname $CHARTFILE`
+              
+              # Disable drupal and frontend charts builds temporarily
+              if [ "${CHART}" = "./drupal" ] || [ "${CHART}" = "./frontend" ] || [ "${CHART}" = "./silta-cluster" ]; then
+                echo "skipping ${CHART}"
+                continue
+              fi
+
               helm dependency build $CHART
               helm lint $CHART
               helm unittest $CHART --helm3
@@ -79,4 +86,5 @@ workflows:
             - build
           filters:
             branches:
-              only: master
+              only: 
+                - master
