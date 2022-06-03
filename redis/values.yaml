@@ -230,7 +230,10 @@ master:
   ## Additional Redis configuration for the master nodes
   ## ref: https://redis.io/topics/config
   ##
-  configmap:
+  configmap: |-
+    # Please consider changing PVC accordingly
+    maxmemory 6gb
+    maxmemory-policy allkeys-lru
   ## Redis additional command line flags
   ##
   ## Can be used to specify command line flags, for example:
@@ -238,7 +241,9 @@ master:
   ## extraFlags:
   ##  - "--maxmemory-policy volatile-ttl"
   ##  - "--repl-backlog-size 1024mb"
-  extraFlags: []
+  extraFlags:
+  ##  "--maxmemory 6gb"
+  ##  "--maxmemory-policy allkeys-lru"
   ## Comma-separated list of Redis commands to disable
   ##
   ## Can be used to disable Redis commands for security reasons.
@@ -591,6 +596,9 @@ configmap: |-
   appendonly yes
   # Disable RDB persistence, AOF persistence already enabled.
   save ""
+  # Please consider changing PVC accordingly
+  maxmemory 6gb
+  maxmemory-policy allkeys-lru
 
 ## Sysctl InitContainer
 ## used to perform sysctl operation to modify Kernel settings (needed sometimes to avoid warnings)

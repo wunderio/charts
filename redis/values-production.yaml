@@ -230,7 +230,10 @@ master:
   ## Additional Redis configuration for the master nodes
   ## ref: https://redis.io/topics/config
   ##
-  configmap:
+  configmap: |-
+    # Please consider changing PVC accordingly
+    maxmemory 6gb
+    maxmemory-policy allkeys-lru
   ## Redis additional command line flags
   ##
   ## Can be used to specify command line flags, for example:
@@ -590,7 +593,9 @@ configmap: |-
   appendonly yes
   # Disable RDB persistence, AOF persistence already enabled.
   save ""
-
+  # Please consider changing PVC accordingly
+  maxmemory 6gb
+  maxmemory-policy allkeys-lru
 ## Sysctl InitContainer
 ## used to perform sysctl operation to modify Kernel settings (needed sometimes to avoid warnings)
 sysctlImage:
