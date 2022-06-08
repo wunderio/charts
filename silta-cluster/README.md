@@ -26,7 +26,7 @@ helm install \
   cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --create-namespace \
-  --version v1.6.1 \
+  --version v1.8.0 \
   --set installCRDs=true \
   --set global.logLevel=1
 ```
@@ -101,6 +101,12 @@ helm upgrade --install --wait silta-cluster silta-cluster \
 
 - `local-values.yaml` contains overrides of [chart defaults](values.yaml) 
 
+## Compatibility
+
+- Kubernetes 1.23 requires at least 0.2.31
+- Kubernetes 1.22 requires at least 0.2.30
+- Kubernetes 1.20 requires at least 0.2.18
+
 ## Upgrading
 
 Chart upgrades are managed like a normal helm release, though it's suggested to do helm diff first:
@@ -117,6 +123,8 @@ helm upgrade --install --wait silta-cluster silta-cluster \
 
 ## Upgrade path for older versions:
 
+ - Upgrading silta-cluster chart to 0.2.31 ([docs/Upgrading-to-0.2.31.md](docs/Upgrading-to-0.2.31.md))
+ 
  - Upgrading silta-cluster chart to 0.2.18 ([docs/Upgrading-to-0.2.18.md](docs/Upgrading-to-0.2.18.md))
 
  - Upgrading silta-cluster chart to 0.2.14 ([docs/Upgrading-to-0.2.14.md](docs/Upgrading-to-0.2.14.md))
