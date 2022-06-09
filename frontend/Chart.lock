@@ -1,18 +1,18 @@
 dependencies:
 - name: mariadb
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://storage.googleapis.com/charts.wdr.io
   version: 7.10.4
 - name: elasticsearch
   repository: file://../elasticsearch
   version: 7.8.1
 - name: rabbitmq
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://storage.googleapis.com/charts.wdr.io
   version: 6.17.5
 - name: mongodb
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://storage.googleapis.com/charts.wdr.io
   version: 10.26.4
 - name: silta-release
   repository: file://../silta-release
   version: 0.1.1
-digest: sha256:b3aaf4ef2adc5df31d7cc08159860c2a0402fa4bf8c72fd9db53fa02e0b78ce8
-generated: "2021-12-13T16:23:09.212253546+02:00"
+digest: sha256:fa010b15537422cbbbcd0a06575e348e25e5b4096a8dd66307a5794a417a83d7
+generated: "2022-06-02T21:31:30.85885293+03:00"

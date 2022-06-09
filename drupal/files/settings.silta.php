@@ -30,15 +30,29 @@ if (getenv('PRIVATE_FILES_PATH')) {
  * Set Elasticsearch Helper module configuration if needed.
  */
 if ($elasticsearch_host = getenv('ELASTICSEARCH_HOST')) {
+
+  $elasticsearch_port = 9200;
+
   // Elasticsearch Helper 6.x compatible configuration override.
   $config['elasticsearch_helper.settings']['elasticsearch_helper']['host'] = $elasticsearch_host;
-  $config['elasticsearch_helper.settings']['elasticsearch_helper']['port'] = 9200;
+  $config['elasticsearch_helper.settings']['elasticsearch_helper']['port'] = $elasticsearch_port;
 
   // Elasticsearch Helper 7.x compatible configuration override.
   $config['elasticsearch_helper.settings']['hosts'] = [
     [
       'host' => $elasticsearch_host,
-      'port' => 9200,
+      'port' => $elasticsearch_port,
+    ],
+  ];
+
+  // Enable Drupal Ping to survey the Elasticsearch connection
+  // https://github.com/wunderio/drupal-ping#elasticsearch
+  $settings['ping_elasticsearch_connections'] = [
+    [
+      'severity' => 'warning',
+      'proto' => 'http',
+      'host' => $elasticsearch_host,
+      'port' => $elasticsearch_port,
     ],
   ];
 }
