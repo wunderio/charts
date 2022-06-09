@@ -1,16 +1,16 @@
 dependencies:
 - name: mariadb
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://storage.googleapis.com/charts.wdr.io
   version: 7.5.2
 - name: pxc-db
   repository: https://percona.github.io/percona-helm-charts/
   version: 1.9.1
 - name: memcached
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://storage.googleapis.com/charts.wdr.io
   version: 4.2.27
 - name: redis
   repository: https://charts.bitnami.com/bitnami
-  version: 16.8.7
+  version: 16.8.10
 - name: mailhog
   repository: https://codecentric.github.io/helm-charts
   version: 3.1.3
@@ -20,5 +20,5 @@ dependencies:
 - name: silta-release
   repository: file://../silta-release
   version: 0.1.1
-digest: sha256:4998925a8a4dd89914789dfc4ee934c1ac5179f12f601c8baeb7aee83c6c9c97
-generated: "2022-04-25T08:47:01.004115611+03:00"
+digest: sha256:823cb88a03560c779bcee85b2ba9ec036fbe0cb769108f69339e91906c4f5d0b
+generated: "2022-06-02T16:46:22.620314421+03:00"
