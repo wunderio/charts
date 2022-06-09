@@ -1,10 +1,10 @@
 apiVersion: v2
 name: frontend
-version: 0.2.69
+version: 0.2.70
 dependencies:
 - name: mariadb
   version: 7.10.x
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://storage.googleapis.com/charts.wdr.io
   condition: mariadb.enabled
 - name: elasticsearch
   version: 7.8.x
@@ -13,11 +13,11 @@ dependencies:
   condition: elasticsearch.enabled
 - name: rabbitmq
   version: 6.17.x
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://storage.googleapis.com/charts.wdr.io
   condition: rabbitmq.enabled
 - name: mongodb
   version: 10.26.x
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://storage.googleapis.com/charts.wdr.io
   condition: mongodb.enabled
 - name: silta-release
   version: 0.1.1
