@@ -103,10 +103,11 @@ helm upgrade --install --wait silta-cluster silta-cluster \
 
 ## Compatibility
 
-- Kubernetes 1.23 requires at least 0.2.31
+- Kubernetes 1.24 requires at least 0.2.32
+- Kubernetes 1.23 requires at least 0.2.32
 - Kubernetes 1.22 requires at least 0.2.30
 - Kubernetes 1.20 requires at least 0.2.18
-
+- Should work with kubernetes 1.13+
 ## Upgrading
 
 Chart upgrades are managed like a normal helm release, though it's suggested to do helm diff first:
@@ -123,7 +124,7 @@ helm upgrade --install --wait silta-cluster silta-cluster \
 
 ## Upgrade path for older versions:
 
- - Upgrading silta-cluster chart to 0.2.31 ([docs/Upgrading-to-0.2.31.md](docs/Upgrading-to-0.2.31.md))
+ - Upgrading silta-cluster chart to 0.2.32 ([docs/Upgrading-to-0.2.32.md](docs/Upgrading-to-0.2.32.md))
  
  - Upgrading silta-cluster chart to 0.2.18 ([docs/Upgrading-to-0.2.18.md](docs/Upgrading-to-0.2.18.md))
 

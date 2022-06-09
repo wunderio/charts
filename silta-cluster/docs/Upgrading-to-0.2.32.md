@@ -1,4 +1,4 @@
-# Upgrading silta-cluster chart to 0.2.31
+# Upgrading silta-cluster chart to 0.2.32
 
 ## Cert-manager 1.8.0 upgrade
 
