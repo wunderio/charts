@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "1.0"
 description: Setup a silta kubernetes cluster.
 name: silta-cluster
-version: 0.2.30
+version: 0.2.31
 dependencies:
 - name: traefik
   version: 1.87.x
@@ -33,7 +33,7 @@ dependencies:
   repository: file://../silta-proxy
   condition: silta-proxy.enabled
 - name: instana-agent
-  version: 1.1.x
+  version: 1.2.x
   repository: https://agents.instana.io/helm
   condition: instana-agent.enabled
 - name: nfs-subdir-external-provisioner
