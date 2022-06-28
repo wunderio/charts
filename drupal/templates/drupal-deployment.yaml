@@ -39,6 +39,9 @@ spec:
           exec:
             command: ['/bin/bash', '-c', '/php-fpm-probe.sh']
         lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sleep","10"]
           postStart:
             exec:
               command:
@@ -91,6 +94,10 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 8080
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sleep","10"]
         resources:
           {{- .Values.nginx.resources | toYaml | nindent 10 }}
 
