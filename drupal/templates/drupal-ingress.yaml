@@ -192,11 +192,11 @@ spec:
   {{- if $domain.ssl.enabled }}
   {{- if $domain.ssl.existingTLSSecret }}
   - secretName: {{ $domain.ssl.existingTLSSecret }}
-    hosts: 
+    hosts:
       - {{ $domain.hostname | quote }}
   {{- else }}
   - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}{{- if eq $domain.ssl.issuer "custom" }}-custom{{- end }}
-    hosts: 
+    hosts:
       - {{ $domain.hostname | quote }}
   {{- end }}
   {{- end }}
@@ -211,7 +211,7 @@ spec:
   - host: {{ $domain.hostname | quote }}
     http:
       paths:
-      - path: {{ if eq $ingress.type "gce" }}/*{{ else }}/{{ end }}
+      - path: /{{ if and ( eq $ingress.type "gce" ) ( and ( le $.Capabilities.KubeVersion.Major "1") ( le $.Capabilities.KubeVersion.Minor "18" ) ) }}*{{ end }}
         {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
         pathType: Prefix
         {{- end }}
