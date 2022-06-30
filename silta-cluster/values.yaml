@@ -21,6 +21,8 @@ traefik:
   ssl:
     enabled: true
     enforced: false
+    generateTLS: true
+    defaultCN: "*.silta.wdr.io"
     # Values from Mozilla SSL Configuration Generator
     # https://ssl-config.mozilla.org/#server=traefik&server-version=1.7.20&config=intermediate
     tlsMinVersion: "VersionTLS12"
