@@ -432,8 +432,12 @@ fi
   {{- if eq $mount.enabled true -}}
   if [ -d "/app/reference-data/{{ $index }}" ] && [ -n "$(ls /app/reference-data/{{ $index }})" ]; then
     echo "Importing {{ $index }} files"
-    for f in /app/reference-data/{{ $index }}/*; do
-      rsync -r --temp-dir=/tmp/ $f "{{ $mount.mountPath }}" &
+    # skip subfolders
+    rsync -r --delete --temp-dir=/tmp/ --filter "- */" "/app/reference-data/{{ $index }}/" "{{ $mount.mountPath }}" &
+    # run rsync for each subfolder
+    for f in /app/reference-data/{{ $index }}/*/; do
+      subfolder="$(realpath -s $f)"
+      rsync -r --delete --temp-dir=/tmp/ "${subfolder}" "{{ $mount.mountPath }}" &
     done
   fi
   {{ end -}}

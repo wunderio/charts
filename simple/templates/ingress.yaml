@@ -54,7 +54,9 @@ metadata:
 spec:
   {{- if $ingress.tls }}
   tls:
-  - secretName: {{ .Release.Name }}-tls{{- if eq $.Values.ssl.issuer "custom" }}-custom{{- end }}
+  - secretName: {{ .Release.Name }}-tls
+    hosts: 
+      - {{ template "simple.domain" . }}
   {{- end }}
   rules:
   - host: {{ template "simple.domain" . }}
@@ -150,7 +152,9 @@ spec:
   {{- if eq $domain.ingress $ingress_index }}
   {{- if $domain.ssl }}
   {{- if $domain.ssl.enabled }}
-  - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}{{- if eq $domain.ssl.issuer "custom" }}-custom{{- end }}
+  - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}
+    hosts:
+      - {{ $domain.hostname }}
   {{- end }}
   {{- end }}
   {{- end }}
@@ -163,7 +167,7 @@ spec:
   - host: {{ $domain.hostname }}
     http:
       paths:
-      - path: {{ if eq $ingress.type "gce" }}/*{{ else }}/{{ end }}
+      - path: /{{ if and ( eq $ingress.type "gce" ) ( and ( le $.Capabilities.KubeVersion.Major "1") ( le $.Capabilities.KubeVersion.Minor "18" ) ) }}*{{ end }}
         {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
         pathType: Prefix
         {{- end }}

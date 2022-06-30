@@ -270,3 +270,83 @@ tests:
         equal:
           path: 'metadata.annotations.kubernetes\.io\/ingress\.global-static-ip-name'
           value: 'baz'
+
+  - it: exposeDomains - non-gce ingress path wildcard for kubernetes <1.19
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
+      apiVersions:
+        - cert-manager.io/v1
+        - networking.k8s.io/v1
+    set:
+      exposeDomains:
+        bar:
+          hostname: foo.bar
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.rules[0].http.paths[0].path
+          value: '/'
+
+  - it: exposeDomains - non-gce ingress path without wildcard for kubernetes 1.19+
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 19
+      apiVersions:
+        - cert-manager.io/v1
+        - networking.k8s.io/v1
+    set:
+      exposeDomains:
+        bar:
+          hostname: foo.bar
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.rules[0].http.paths[0].path
+          value: '/'
+
+  - it: exposeDomains - gce ingress path wildcard for kubernetes <1.19
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
+      apiVersions:
+        - cert-manager.io/v1
+        - networking.k8s.io/v1
+    set:
+      exposeDomains:
+        bar:
+          hostname: foo.bar
+          ingress: gce
+      ingress:
+        gce:
+          staticIpAddressName: baz
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.rules[0].http.paths[0].path
+          value: '/*'
+
+  - it: exposeDomains - gce ingress path without wildcard for kubernetes 1.19+
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 19
+      apiVersions:
+        - cert-manager.io/v1
+        - networking.k8s.io/v1
+    set:
+      exposeDomains:
+        bar:
+          hostname: foo.bar
+          ingress: gce
+      ingress:
+        gce:
+          staticIpAddressName: baz
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.rules[0].http.paths[0].path
+          value: '/'

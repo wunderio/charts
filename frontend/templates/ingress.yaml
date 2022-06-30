@@ -60,8 +60,13 @@ spec:
   {{- if $ingress.tls }}
   tls:
   - secretName: {{ .Release.Name }}-tls{{- if eq $.Values.ssl.issuer "custom" }}-custom{{- end }}
+    hosts: 
+      - {{ include "frontend.domain" . | quote }}
   {{- range $index, $prefix := .Values.domainPrefixes }}
+  {{ $params := dict "prefix" $prefix -}}
   - secretName: {{ $.Release.Name }}-tls-p{{ $index }}{{- if eq $.Values.ssl.issuer "custom" }}-custom{{- end }}
+    hosts: 
+      - '{{ template "frontend.domain" (merge $params $ ) }}'
   {{- end }}
   {{- end }}
   rules:
@@ -179,6 +184,8 @@ spec:
   {{- if $domain.ssl }}
   {{- if $domain.ssl.enabled }}
   - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}{{- if eq $domain.ssl.issuer "custom" }}-custom{{- end }}
+    hosts: 
+      - {{ $domain.hostname | quote }}
   {{- end }}
   {{- end }}
   {{- end }}
@@ -191,7 +198,7 @@ spec:
   - host: {{ $domain.hostname }}
     http:
       paths:
-      - path: {{ if eq $ingress.type "gce" }}/*{{ else }}/{{ end }}
+      - path: /{{ if and ( eq $ingress.type "gce" ) ( and ( le $.Capabilities.KubeVersion.Major "1") ( le $.Capabilities.KubeVersion.Minor "18" ) ) }}*{{ end }}
         {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
         pathType: Prefix
         {{- end }}
