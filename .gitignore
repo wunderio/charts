@@ -1,2 +1,4 @@
 *.tgz
 .idea
+k8s-project-repositories
+helm-output.log

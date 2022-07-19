@@ -14,8 +14,9 @@ spec:
   ports:
     - name: ssh
       port: {{ .Values.gitAuth.port }}
+      targetPort: 22
   type: "LoadBalancer"
-  externalTrafficPolicy: Local
+  externalTrafficPolicy: {{ .Values.gitAuth.externalTrafficPolicy }}
 {{- if .Values.gitAuth.loadBalancerIP }}
   loadBalancerIP: {{ .Values.gitAuth.loadBalancerIP }}
 {{- end }}
@@ -58,7 +59,7 @@ spec:
           - name: GITAUTH_PASSWORD
             value: {{ .Values.gitAuth.keyserver.password | default .Values.sshKeyServer.apiPassword | quote }}
           - name: GITAUTH_SCOPE
-            value: {{ required "A valid .Values.gitAuth.scope entry required!" .Values.gitAuth.scope | quote }}
+            value: {{ .Values.gitAuth.scope | quote }}
           - name: OUTSIDE_COLLABORATORS
             value: {{ .Values.gitAuth.outsideCollaborators | default true | quote }}
           {{- end }}

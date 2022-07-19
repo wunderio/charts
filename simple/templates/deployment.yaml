@@ -55,6 +55,9 @@ spec:
           httpGet:
             path: /
             port: 8080
+            httpHeaders:
+              - name: User-Agent
+                value: kube-probe
         resources:
 {{ .Values.nginx.resources | toYaml | indent 10 }}
 

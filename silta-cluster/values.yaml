@@ -4,10 +4,11 @@ clusterDomain: "silta.wdr.io"
 ingress:
   # Options: traefik, gce, azure/application-gateway, etc.
   class: traefik
+  redirect-https: true
   # Custom ingress annotations
   extraAnnotations: {}
   #  networking.gke.io/suppress-firewall-xpn-error: "true"
-
+  
 # https://github.com/wunderio/charts/blob/master/legacy_traefik/values.yaml
 traefik:
   enabled: true
@@ -111,6 +112,7 @@ gitAuth:
   resources: {}
   # The static IP to be used for the exposed endpoint.
   loadBalancerIP: null
+  externalTrafficPolicy: Local
 
 # SSH keyserver (keys.[clusterDomain])
 sshKeyServer:
