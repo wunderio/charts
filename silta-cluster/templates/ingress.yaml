@@ -1,38 +1,52 @@
 ---
+{{- $ingress := .Values.ingress }}
 apiVersion: {{ include "silta-cluster.ingress-api-version" . | trim }}
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}
   annotations:
-    kubernetes.io/ingress.class: {{ .Values.ingress.class | quote }}
+    kubernetes.io/ingress.class: {{ $ingress.class | quote }}
     {{- if .Values.ssl.enabled }}
-    {{- if eq .Values.ingress.class "traefik" }}
+    {{- if eq $ingress.class "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
     {{- end }}
-    ingress.kubernetes.io/ssl-redirect: "true"
+
+    {{- $redirect_https := false }}
+    {{- if (hasKey $ingress "redirect-https") }}
+    {{- $redirect_https = (index $ingress "redirect-https") }}
+    {{- end }}
+    {{- if not $ingress.tls }}
+    {{- $redirect_https = false }}
+    {{- end }}
+    {{- if $redirect_https }}
+    ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- if eq $ingress.type "azure/application-gateway" }}
+    appgw.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- end }}
+    {{- end }}
+    
     {{- if eq ( include "silta-cluster.cert-manager-api-version" . | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
     {{- else }}
     certmanager.k8s.io/acme-http01-edit-in-place: "true"
     {{- end }}
     {{- else }}
-    {{- if eq .Values.ingress.class "traefik" }}
+    {{- if eq $ingress.class "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http"
     {{- end }}
-    ingress.kubernetes.io/ssl-redirect: "false"
     {{- end }}
-    {{- if eq .Values.ingress.class "gce" }}
+    {{- if eq $ingress.class "gce" }}
     cert-manager.io/cluster-issuer: letsencrypt
     {{- end }}
-    {{- if .Values.ingress.staticIpAddressName }}
-    kubernetes.io/ingress.global-static-ip-name: {{ .Values.ingress.staticIpAddressName | quote }}
+    {{- if $ingress.staticIpAddressName }}
+    kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
-    {{- if eq .Values.ingress.class "azure/application-gateway" }}
+    {{- if eq $ingress.class "azure/application-gateway" }}
     cert-manager.io/cluster-issuer: letsencrypt
     appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399, 401-404"
     {{- end }}
-    {{- if .Values.ingress.extraAnnotations }}
-    {{- .Values.ingress.extraAnnotations | toYaml | nindent 4 }}
+    {{- if $ingress.extraAnnotations }}
+    {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- end }}
 spec:
   {{- if .Values.ssl.enabled }}
