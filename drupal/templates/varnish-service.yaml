@@ -4,7 +4,9 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-varnish
   annotations:
+    {{- if (index .Values "silta-release").downscaler.enabled }}
     auto-downscale/down: "false"
+    {{- end }}
     beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}-drupal"}}'
     {{- if .Values.cluster }}
     {{- if .Values.cluster.vpcNative }}
