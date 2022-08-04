@@ -3,7 +3,9 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-drupal
   annotations:
+    {{- if (index .Values "silta-release").downscaler.enabled }}
     auto-downscale/down: "false"
+    {{- end }}
     {{- if eq .Values.cluster.type "gke" }}
     beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}-drupal"}}'
     {{- end }}

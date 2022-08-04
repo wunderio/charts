@@ -41,6 +41,12 @@ spec:
         - name: VARNISH_EXTRA_PARAMS
           value: {{ .Values.varnish.extraParams | quote }}
         {{- end }}
+        livenessProbe:
+          exec:
+            command: ["varnishadm", "-t", "1", "ping"]
+        readinessProbe:
+          exec:
+            command: ["varnishadm", "-t", "1", "ping"]
         resources:
 {{ .Values.varnish.resources | toYaml | indent 10 }}
         volumeMounts:

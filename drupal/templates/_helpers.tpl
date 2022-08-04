@@ -305,7 +305,6 @@ done
 {{- end }}
 
 {{- define "drupal.create-db" }}
-echo "Creating drupal database.";
 mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
 {{- end }}
 
