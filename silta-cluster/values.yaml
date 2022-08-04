@@ -179,6 +179,7 @@ silta-downscaler:
       cpu: 10m
       memory: 50Mi
 
+# https://github.com/wunderio/charts/blob/master/silta-proxy
 silta-proxy:
   enabled: false
 
