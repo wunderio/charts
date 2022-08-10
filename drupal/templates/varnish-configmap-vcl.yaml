@@ -205,6 +205,15 @@ data:
         set beresp.do_gzip = false;   # Don't try to compress it for storage
       }
 
+      # Support for Drupal 8&9 BigPipe
+      if (beresp.http.Surrogate-Control ~ "BigPipe/1.0") {
+        set beresp.do_stream = true;
+        set beresp.ttl = 0s;
+
+        # Varnish gzipping breaks streaming of the first byte response.
+        set beresp.do_gzip = false;
+      }
+
       if (beresp.status == 404) {
         if (beresp.http.isstatic) {
           /*
