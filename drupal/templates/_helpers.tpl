@@ -486,18 +486,19 @@ fi
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true }}
   # File backup for {{ $index }} volume.
+  # If files get changed while the tar command is running, tar will exit with code 1. We ignore this as we want the rest of the job to still get run.
   echo "Starting {{ $index }} volume backup."
-  tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}
+  tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}  || ( export exitcode=$?; [[ $exitcode -eq 1 ]] || exit
   {{- end -}}
   {{- end }}
   {{- end }}
 
   # Delete old backups
   echo "Removing backups older than {{ .Values.backup.retention }} days"
-  # Can't locate directories based on mtime due to storage backend limitations, 
-  # Using folder name for time selection. 
+  # Can't locate directories based on mtime due to storage backend limitations,
+  # Using folder name for time selection.
   retention_time=$(date -d "{{ .Values.backup.retention }} days ago" +%s)
-                  
+
   find /backups -type d -mindepth 1 -maxdepth 1 -print \
   | grep -E '/[0-9-]+$' \
   | while read -r dir
@@ -505,7 +506,7 @@ fi
     # convert dir name into timestamp
     stamp="$(echo "$dir" | sed -re 's%.+/(.+)-(.+)-(.+)-(.+)-(.+)-(.+)$%\1-\2-\3 \4:\5:\6%')"
     stamp="$(date -d "$stamp" '+%s')" || continue
-    
+
     # jump out of the execution block if the directory more recent than retention time
     if [[ "$stamp" -gt "$retention_time" ]]; then
       continue
