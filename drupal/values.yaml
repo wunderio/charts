@@ -505,7 +505,7 @@ varnish:
     requests:
       cpu: 25m
       memory: 32Mi
-  image: eu.gcr.io/silta-images/varnish
+  image: wunderio/silta-varnish
   imageTag: 6-v0.2
   # https://varnish-cache.org/docs/6.6/users-guide/storage-backends.html
   storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
@@ -615,7 +615,7 @@ mailhog:
   enabled: false
   image:
     # Set image repository to "mailhog/mailhog" to reenable logging.
-    repository: eu.gcr.io/silta-images/silta-mailhog
+    repository: wunderio/silta-mailhog
     # Set image tag to "" to reenable logging.
     tag: silent
   resources:
@@ -635,7 +635,7 @@ smtp:
 solr:
   enabled: false
   # Available image tags: https://hub.docker.com/r/geerlingguy/solr/tags
-  image: eu.gcr.io/silta-images/solr
+  image: wunderio/silta-solr
   imageTag: 8
 
   # Solr 4.x and 5.x does not support "-force" argument (optional override)
