@@ -1,5 +1,5 @@
 name: simple
-version: 0.2.32
+version: 0.2.33
 apiVersion: v2
 dependencies:
 - name: silta-release
