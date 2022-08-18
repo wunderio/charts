@@ -1,5 +1,13 @@
 
 
+{{- define "drupal.domainSeperator" -}}
+{{- if .Values.singleSubdomain -}}
+-
+{{- else -}}
+.
+{{- end -}}
+{{- end -}}
+
 {{- define "drupal.domain" -}}
 {{- $projectName := regexReplaceAll "[^[:alnum:]]" (.Values.projectName | default .Release.Namespace) "-"  | trimSuffix "-" | lower }}
 {{- $projectNameHash := sha256sum $projectName | trunc 3 }}
@@ -10,11 +18,11 @@
 {{- if .prefix -}}
 {{- $maxEnvironmentNameLength := int (sub 61 (add (len .Values.clusterDomain) (len $projectName) (len .prefix))) }}
 {{- $environmentName := (ge (len $environmentName) $maxEnvironmentNameLength) | ternary (print ($environmentName | trunc (int (sub $maxEnvironmentNameLength 3))) $environmentNameHash) $environmentName -}}
-{{ .prefix }}.{{ $environmentName }}.{{ $projectName }}.{{ .Values.clusterDomain }}
+{{ .prefix }}{{ include "drupal.domainSeperator" . }}{{ $environmentName }}{{ include "drupal.domainSeperator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
 {{- else -}}
 {{- $maxEnvironmentNameLength := int (sub 62 (add (len .Values.clusterDomain) (len $projectName))) }}
 {{- $environmentName := (ge (len $environmentName) $maxEnvironmentNameLength) | ternary (print ($environmentName | trunc (int (sub $maxEnvironmentNameLength 3))) $environmentNameHash) $environmentName -}}
-{{ $environmentName }}.{{ $projectName }}.{{ .Values.clusterDomain }}
+{{ $environmentName }}{{ include "drupal.domainSeperator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
 {{- end -}}
 {{- end -}}
 
