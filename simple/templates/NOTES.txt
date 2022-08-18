@@ -1,7 +1,16 @@
 {{- $protocol := .Values.ingress.default.tls | ternary "https" "http" -}}
-Deployed {{ .Release.Name }} successfully, your site is available here:
+{{ .Release.Name }} is deployed successfully, your site is available here:
 
   {{ $protocol}}://{{- template "simple.domain" . }}
+  {{- range $index, $domain := .Values.exposeDomains }}
+  {{- if $domain.ssl }}
+  {{- if $domain.ssl.enabled }}
+  https://{{ $domain.hostname }}
+  {{- end }}
+  {{- else }}
+  http://{{ $domain.hostname }}
+  {{- end }}
+  {{- end }}
 
 {{ if .Values.nginx.basicauth.enabled -}}
 Basicauth username: {{ .Values.nginx.basicauth.credentials.username }}
