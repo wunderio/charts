@@ -113,6 +113,10 @@ backendConfig:
 # domainPrefixes: ['en', 'fi']
 domainPrefixes: []
 
+# Domains by default are created following pattern branch.repository.cluster
+# By enabling single subdomain it will be converted to branch-repository.cluster
+singleSubdomain: false
+
 # Settings for default site provided by this deployment
 ssl:
   # Enable HTTPS for this deployment
