@@ -37,12 +37,6 @@ jobs:
             do
               CHART=`dirname $CHARTFILE`
               
-              # Disable drupal and frontend charts builds temporarily
-              if [ "${CHART}" = "./drupal" ] || [ "${CHART}" = "./frontend" ] ; then
-                echo "skipping ${CHART}"
-                continue
-              fi
-
               helm dependency build $CHART
               helm lint $CHART
               helm unittest $CHART --helm3
