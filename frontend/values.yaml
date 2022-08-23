@@ -96,7 +96,7 @@ domainPrefixes: []
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
-  image: 'wunderio/drupal-nginx:v0.1'
+  image: 'wunderio/silta-nginx:v0.1'
 
   replicas: 1
 
