@@ -1,6 +1,6 @@
 # Default values for silta-proxy.
 
-image: eu.gcr.io/silta-images/silta-proxy
+image: wunderio/silta-proxy
 tag: "latest"
 
 service:
