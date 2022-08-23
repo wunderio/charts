@@ -7,7 +7,7 @@ kind: Certificate
 metadata:
   name: {{ .Release.Name }}-crt
   annotations:
-    cert-manager.io/issue-temporary-certificate: "true" 
+    cert-manager.io/issue-temporary-certificate: "true"
     acme.cert-manager.io/http01-override-ingress-name: "{{ $.Release.Name }}-drupal"
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
@@ -34,7 +34,7 @@ kind: Certificate
 metadata:
   name: {{ $.Release.Name }}-crt-p{{ $index }}
   annotations:
-    cert-manager.io/issue-temporary-certificate: "true" 
+    cert-manager.io/issue-temporary-certificate: "true"
     acme.cert-manager.io/http01-override-ingress-name: "{{ $.Release.Name }}-drupal"
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
@@ -66,7 +66,7 @@ metadata:
 spec:
   secretName: {{ .Release.Name }}-tls
   duration: 2160h
-  renewBefore: 150h 
+  renewBefore: 150h
   commonName: {{ template "drupal.domain" . }}
   dnsNames:
   - {{ template "drupal.domain" . }}
@@ -74,6 +74,26 @@ spec:
     name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
 ---
+{{- range $index, $prefix := .Values.domainPrefixes }}
+{{- $params := dict "prefix" $prefix  -}}
+apiVersion: {{ include "cert-manager.api-version" $ | trim }}
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-crt-p{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+spec:
+  secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+  duration: 2160h
+  renewBefore: 150h
+  commonName: {{ include "drupal.domain" (merge $params $ ) }}
+  dnsNames:
+    - '{{ include "drupal.domain" (merge $params $ ) }}'
+  issuerRef:
+    name: {{ $context_ssl.issuer }}
+    kind: ClusterIssuer
+---
+{{- end }}
 
 {{- else if eq $context_ssl.issuer "custom" }}
 {{- if not $context_ssl.existingTLSSecret }}
@@ -89,10 +109,25 @@ data:
   tls.crt: {{ $context_ssl.crt | b64enc }}
   tls.key: {{ $context_ssl.key | b64enc }}
 ---
+{{- range $index, $prefix := .Values.domainPrefixes }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $.Release.Name }}-tls-p{{ $index }}-custom
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+type: kubernetes.io/tls
+data:
+  tls.ca: {{ $context_ssl.ca | b64enc }}
+  tls.crt: {{ $context_ssl.crt | b64enc }}
+  tls.key: {{ $context_ssl.key | b64enc }}
+---
+{{- end }}
+
 {{- end }}
 {{- end }}
 
-# Certificates for exposeDomains 
+# Certificates for exposeDomains
 {{- range $index, $domain := .Values.exposeDomains }}
 {{ $domain := merge $domain $.Values.exposeDomainsDefaults}}
 {{- if $domain.ssl }}
@@ -134,7 +169,7 @@ metadata:
 spec:
   secretName: {{ $.Release.Name }}-tls-{{ $index }}
   duration: 2160h
-  renewBefore: 150h 
+  renewBefore: 150h
   commonName: {{ $domain.hostname | quote }}
   dnsNames:
   - {{ $domain.hostname | quote }}
