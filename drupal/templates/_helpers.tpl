@@ -488,7 +488,7 @@ fi
   # File backup for {{ $index }} volume.
   # If files get changed while the tar command is running, tar will exit with code 1. We ignore this as we want the rest of the job to still get run.
   echo "Starting {{ $index }} volume backup."
-  tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }}  || ( export exitcode=$?; [[ $exitcode -eq 1 ]] || exit
+  tar -czP --exclude=css --exclude=js --exclude=styles -f $BACKUP_LOCATION/{{ $index }}.tar.gz {{ $mount.mountPath }} || ( export exitcode=$?; [[ $exitcode -eq 1 ]] || exit )
   {{- end -}}
   {{- end }}
   {{- end }}
