@@ -91,6 +91,10 @@ spec:
         livenessProbe:
           tcpSocket:
             port: 8080
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sleep", "5"]
         resources:
           {{- .Values.nginx.resources | toYaml | nindent 10 }}
 

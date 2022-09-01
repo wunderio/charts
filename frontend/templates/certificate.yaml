@@ -74,6 +74,26 @@ spec:
     name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
 ---
+{{- range $index, $prefix := .Values.domainPrefixes }}
+{{- $params := dict "prefix" $prefix  -}}
+apiVersion: {{ include "cert-manager.api-version" $ | trim }}
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-crt-p{{ $index }}
+  labels:
+    {{- include "frontend.release_labels" $ | nindent 4 }}
+spec:
+  secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+  duration: 2160h
+  renewBefore: 150h
+  commonName: {{ include "frontend.domain" (merge $params $ ) }}
+  dnsNames:
+    - '{{ include "frontend.domain" (merge $params $ ) }}'
+  issuerRef:
+    name: {{ $context_ssl.issuer }}
+    kind: ClusterIssuer
+---
+{{- end }}
 
 {{- else if eq $context_ssl.issuer "custom" }}
 apiVersion: v1
@@ -88,6 +108,20 @@ data:
   tls.crt: {{ $context_ssl.crt | b64enc }}
   tls.key: {{ $context_ssl.key | b64enc }}
 ---
+{{- range $index, $prefix := .Values.domainPrefixes }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $.Release.Name }}-tls-p{{ $index }}-custom
+  labels:
+    {{- include "frontend.release_labels" $ | nindent 4 }}
+type: kubernetes.io/tls
+data:
+  tls.ca: {{ $context_ssl.ca | b64enc }}
+  tls.crt: {{ $context_ssl.crt | b64enc }}
+  tls.key: {{ $context_ssl.key | b64enc }}
+---
+{{- end }}
 {{- end }}
 
 # Certificates for exposeDomains 

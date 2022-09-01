@@ -94,6 +94,10 @@ backendConfig:
 # domainPrefixes: ['en', 'fi']
 domainPrefixes: []
 
+# Domains by default are created following pattern branch.repository.cluster
+# By enabling single subdomain it will be converted to branch-repository.cluster
+singleSubdomain: false
+
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
   image: 'wunderio/silta-nginx:v0.1'

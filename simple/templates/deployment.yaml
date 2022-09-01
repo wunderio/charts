@@ -58,6 +58,10 @@ spec:
             httpHeaders:
               - name: User-Agent
                 value: kube-probe
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sleep", "5"]
         resources:
 {{ .Values.nginx.resources | toYaml | indent 10 }}
 

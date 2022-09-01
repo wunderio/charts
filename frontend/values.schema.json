@@ -11,6 +11,7 @@
     "exposeDomains": { "type": "object", "items": { "type": "object"}},
     "exposeDomainsDefaults": { "type": "object"},
     "domainPrefixes": { "type": "array", "items": { "type": "string"}},
+    "singleSubdomain": { "type": "boolean"},
     "ssl": { "type": "object" },
     "backendConfig": { "type": ["array","object"], "items": { "type": "object"}},
     "ingress": { "type": "object" },
