@@ -3,7 +3,7 @@ app: {{ .Values.app | quote }}
 release: {{ .Release.Name }}
 {{- end }}
 
-{{- define "simple.domainSeperator" -}}
+{{- define "simple.domainSeparator" -}}
 {{- if .Values.singleSubdomain -}}
 -
 {{- else -}}
@@ -21,7 +21,7 @@ release: {{ .Release.Name }}
 {{- $maxEnvironmentNameLength := int (sub 62 (add (len .Values.clusterDomain) (len $projectName))) }}
 {{- $environmentName := (ge (len $environmentName) $maxEnvironmentNameLength) | ternary (print ($environmentName | trunc (int (sub $maxEnvironmentNameLength 3))) $environmentNameHash) $environmentName -}}
 
-{{ $environmentName }}{{ include "simple.domainSeperator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
+{{ $environmentName }}{{ include "simple.domainSeparator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
 {{- end -}} 
 
 {{- define "simple.referenceEnvironment" -}}

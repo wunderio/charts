@@ -1,6 +1,6 @@
 
 
-{{- define "drupal.domainSeperator" -}}
+{{- define "drupal.domainSeparator" -}}
 {{- if .Values.singleSubdomain -}}
 -
 {{- else -}}
@@ -18,11 +18,11 @@
 {{- if .prefix -}}
 {{- $maxEnvironmentNameLength := int (sub 61 (add (len .Values.clusterDomain) (len $projectName) (len .prefix))) }}
 {{- $environmentName := (ge (len $environmentName) $maxEnvironmentNameLength) | ternary (print ($environmentName | trunc (int (sub $maxEnvironmentNameLength 3))) $environmentNameHash) $environmentName -}}
-{{ .prefix }}{{ include "drupal.domainSeperator" . }}{{ $environmentName }}{{ include "drupal.domainSeperator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
+{{ .prefix }}{{ include "drupal.domainSeparator" . }}{{ $environmentName }}{{ include "drupal.domainSeparator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
 {{- else -}}
 {{- $maxEnvironmentNameLength := int (sub 62 (add (len .Values.clusterDomain) (len $projectName))) }}
 {{- $environmentName := (ge (len $environmentName) $maxEnvironmentNameLength) | ternary (print ($environmentName | trunc (int (sub $maxEnvironmentNameLength 3))) $environmentNameHash) $environmentName -}}
-{{ $environmentName }}{{ include "drupal.domainSeperator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
+{{ $environmentName }}{{ include "drupal.domainSeparator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
 {{- end -}}
 {{- end -}}
 
