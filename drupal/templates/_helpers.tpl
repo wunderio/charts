@@ -173,6 +173,8 @@ imagePullSecrets:
   value: "{{ .Values.projectName | default .Release.Namespace }}"
 - name: ENVIRONMENT_NAME
   value: "{{ .Values.environmentName }}"
+- name: RELEASE_NAME
+  value: "{{ .Release.Name }}"
 - name: DRUSH_OPTIONS_URI
   value: "http://{{- template "drupal.domain" . }}"
 {{- include "drupal.db-env" . }}

@@ -52,6 +52,10 @@ spec:
       - name: nginx
         image: {{ .Values.nginx.image | quote }}
         env:
+        - name: RELEASE_NAME
+          value: "{{ .Release.Name }}"
+        - name: PROJECT_NAME
+          value: "{{ .Values.projectName | default .Release.Namespace }}"
         ports:
         - containerPort: 8080
           name: drupal

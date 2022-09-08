@@ -313,7 +313,7 @@ data:
 
         {{- if .Values.nginx.serverExtraConfig }}
         # Custom configuration gets included here
-        {{- .Values.nginx.serverExtraConfig | nindent 8 }}
+        {{- tpl .Values.nginx.serverExtraConfig . | nindent 8 }}
         {{- end }}
 
         {{- if .Values.mailhog.enabled }}
@@ -354,7 +354,7 @@ data:
 
             # Custom configuration gets included here
             {{ if .Values.nginx.locationExtraConfig }}
-            {{ .Values.nginx.locationExtraConfig | nindent 10 }}
+            {{ tpl .Values.nginx.locationExtraConfig . | nindent 10 }}
             {{- end }}
 
             location ~* /system/files/ {
@@ -680,7 +680,7 @@ data:
 
 {{- if .Values.nginx.extraConfig }}
   extraConfig: |
-  {{ .Values.nginx.extraConfig | nindent 4 }}
+  {{ tpl .Values.nginx.extraConfig . | nindent 4 }}
 {{- end }}
 
 {{ $proxy := ( index .Values "silta-release" ).proxy }}
