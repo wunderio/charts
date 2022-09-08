@@ -6,6 +6,33 @@ capabilities:
   apiVersions:
     - pxc.percona.com/v1
 tests:
+  - it: extraConfig templating
+    template: drupal-configmap.yaml
+    set:
+      nginx.extraConfig: |
+        add_header X-Release-Name extraconfig-{{ .Release.Name }};  
+    asserts:
+    - matchRegex:
+        path: data.extraConfig
+        pattern: "add_header X-Release-Name extraconfig-RELEASE-NAME;"
+  - it: serverExtraConfig templating
+    template: drupal-configmap.yaml
+    set:
+      nginx.serverExtraConfig: |
+        # serverextraconfig test {{ .Release.Name }}  
+    asserts:
+    - matchRegex:
+        path: data.drupal_conf
+        pattern: "# serverextraconfig test RELEASE-NAME"
+  - it: locationExtraConfig templating
+    template: drupal-configmap.yaml
+    set:
+      nginx.locationExtraConfig: |
+        # locationextraconfig test {{ .Release.Name }}  
+    asserts:
+    - matchRegex:
+        path: data.drupal_conf
+        pattern: "# locationextraconfig test RELEASE-NAME"
   - it: populates extraConfig variable and check if its configmap gets mad
     template: drupal-deployment.yaml
     set:
