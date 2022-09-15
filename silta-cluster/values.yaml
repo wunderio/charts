@@ -173,6 +173,7 @@ silta-downscaler:
   releaseMinAge:
     "^production": 10y
     "^(master|main|stage|staging)": 4w
+    "^(dev|develop|development)": 2w 
     "^dependabot": 1h
   resources:
     requests:
