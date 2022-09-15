@@ -397,12 +397,6 @@ data:
                 tcp_nodelay off;
             }
 
-            ## Handle D7 image styles
-            location ~* /files/styles/ {
-                expires 365d;
-                try_files $uri @drupal;
-            }
-
             ## Advanced Help module makes each module provided README available.
             location ~* ^/help/[^/]*/README\.txt$ {
                 try_files $uri @drupal;
@@ -460,7 +454,13 @@ data:
             }
             {{- end }}
             {{- end }}
-            
+
+            ## Handle D7 image styles
+            location ~* /files/styles/ {
+                expires 365d;
+                try_files $uri @drupal;
+            }
+
             ## Serve static files & images directly, without all standard drupal rewrites, php-fpm etc.
             location ~* ^.+\.(?:css|js|jpe?g|gif|png|ico|svg|swf|docx?|xlsx?|tiff?|txt|cgi|bat|pl|dll|exe|class)$ {
                 tcp_nodelay     off;

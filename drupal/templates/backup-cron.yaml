@@ -18,8 +18,8 @@ spec:
   jobTemplate:
     spec:
       # This is a fallback for sidecar termination failure.
-      # Two hours should be enough for backup/validation actions.
-      activeDeadlineSeconds: 7200
+      # Six hours should be enough for backup/validation actions.
+      activeDeadlineSeconds: 21600
       backoffLimit: 2
       template:
         metadata:
