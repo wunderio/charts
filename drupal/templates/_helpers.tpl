@@ -576,6 +576,8 @@ networking.k8s.io/v1beta1
 set -e
 # Trigger lagoon entrypoint scripts if present.
 if [ -f /lagoon/entrypoints.sh ] ; then /lagoon/entrypoints.sh ; fi
+# Trigger silta entrypoint script if present.
+if [ -f /silta/entrypoint.sh ] ; then /silta/entrypoint.sh ; fi
 
 {{- end }}
 
