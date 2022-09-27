@@ -183,7 +183,7 @@ nginx:
     # X-Content-Type-Options: 'nosniff'
     X-XSS-Protection: '"1; mode=block"'
     Referrer-Policy: '"no-referrer, strict-origin-when-cross-origin" always'
-  
+
   # includeSubdomains should be used whenever possible, but before enabling it needs to be made sure there are no subdomains not using https:
   hsts_include_subdomains: ""
   #hsts_include_subdomains: " includeSubDomains;"
@@ -467,6 +467,8 @@ mariadb:
   enabled: true
   replication:
     enabled: false
+  # Disable service links that cause a slow startup.
+  enableServiceLinks: false
   db:
     name: drupal
     user: drupal
@@ -606,7 +608,7 @@ redis:
     # replicaCount: 1
   master:
     resources:
-      limits: 
+      limits:
         cpu: 250m
         memory: 512Mi
       requests:
