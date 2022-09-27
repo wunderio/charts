@@ -37,6 +37,7 @@ spec:
         component: slave
         {{- include "mariadb.podLabels" . | nindent 8 }}
     spec:
+      enableServiceLinks: false
       {{- if .Values.schedulerName }}
       schedulerName: {{ .Values.schedulerName | quote }}
       {{- end }}
