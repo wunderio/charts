@@ -1,0 +1,79 @@
+{{- if index (index .Values "nfs-server") "enabled" }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Release.Name }}-nfs-server
+  namespace: {{ .Release.Namespace }}
+spec:
+  serviceName: {{ .Release.Name }}-nfs-server
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-nfs-server
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-nfs-server
+    spec:
+      enableServiceLinks: false
+      containers:
+      - name: nfs-server
+        image: '{{ index (index .Values "nfs-server") "image" }}:{{ index (index .Values "nfs-server") "imageTag" }}'
+        imagePullPolicy: {{ index (index .Values "nfs-server") "imagePullPolicy" }}
+        # TODO: resources:
+        ports:
+        - name: nfs
+          containerPort: 2049
+        - name: mountd
+          containerPort: 20048
+        - name: rpcbind
+          containerPort: 111
+        securityContext:
+          privileged: true
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: 111
+        readinessProbe:
+          initialDelaySeconds: 10
+          periodSeconds: 20
+          tcpSocket:
+            port: 111
+        resources:
+          {{- index (index .Values "nfs-server") "resources" | toYaml | nindent 10 }}
+        volumeMounts:
+        - name: {{ .Release.Name }}-nfs-server-data
+          mountPath: /exports
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ .Release.Name }}-nfs-server-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      {{- if index (index (index (index .Values "nfs-server") "persistence") "data") "storageClassName" }}
+      storageClassName: {{ index (index (index (index .Values "nfs-server") "persistence") "data") "storageClassName" }}
+      {{- end }}
+      {{- if index (index (index (index .Values "nfs-server") "persistence") "data") "csiDriverName" }}
+      csiDriverName: {{ index (index (index (index .Values "nfs-server") "persistence") "data") "csiDriverName" }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ index (index (index (index .Values "nfs-server") "persistence") "data") "size" }}
+      accessModes: {{ index (index (index (index .Values "nfs-server") "persistence") "data") "accessModes" }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-nfs-server
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+  - name: nfs
+    port: 2049
+  - name: mountd
+    port: 20048
+  - name: rpcbind
+    port: 111
+  selector:
+    app: {{ .Release.Name }}-nfs-server
+
+{{- end }}
