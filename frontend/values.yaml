@@ -358,6 +358,7 @@ mariadb:
               operator: NotIn
               values:
               - static-ip
+  enableServiceLinks: false
 
 elasticsearch:
   enabled: false

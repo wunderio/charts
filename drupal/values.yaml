@@ -500,6 +500,7 @@ mariadb:
               operator: NotIn
               values:
               - static-ip
+  enableServiceLinks: false
 
 varnish:
   # See https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#using-varnish
