@@ -82,6 +82,11 @@ service:
   #   master: 30001
   #   slave: 30002
 
+# The environment variables injected by service links are not used, but can lead to slow boot times when
+# there are many services in the current namespace.
+# If you experience slow pod startups you probably want to set this to `false`.
+enableServiceLinks: true
+
 ## Pods Service Account
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 serviceAccount:
