@@ -13,6 +13,7 @@ spec:
       labels:
         app: csi-nodeplugin-rclone
     spec:
+      enableServiceLinks: false
       serviceAccountName: csi-nodeplugin-rclone
       {{- if .Values.priorityClassName }}
       priorityClassName: "{{ .Values.priorityClassName }}"
@@ -50,6 +51,7 @@ spec:
             allowPrivilegeEscalation: true
           image: wunderio/csi-rclone:{{- .Values.version }}
           args:
+            - "/bin/csi-rclone-plugin"
             - "--nodeid=$(NODE_ID)"
             - "--endpoint=$(CSI_ENDPOINT)"
           env:

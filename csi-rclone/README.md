@@ -6,6 +6,8 @@ This helm chart helps setting up resources for https://github.com/wunderio/csi-r
 
 Service account for setting up resources into kube-system namespace. 
 
+csi-rclone chart version greater than 0.3.0 requires csi-rclone:1.3.0+ images with tini. 1.2.x images will break deployment so value overrides need to be adjusted accordingly!  
+
 ## Usage
 
 1. Set up storage backend. You can use [Minio](https://min.io/), Amazon S3 compatible cloud storage service.
