@@ -55,6 +55,7 @@ jobs:
             && helm repo add percona https://percona.github.io/percona-helm-charts/ \
             && helm repo add elastic https://helm.elastic.co \
             && helm repo add codecentric https://codecentric.github.io/helm-charts \
+            && helm plugin install https://github.com/quintush/helm-unittest --version 0.2.4 \
             && helm repo update
 
       - name: Download and start minikube
@@ -190,6 +191,12 @@ jobs:
           # Dependency build for local chart
           helm dependency build "./drupal"
 
+          # Chart unit tests
+          helm unittest ./drupal --helm3
+
+          # Dry-run drupal chart with test values
+          helm install --dry-run --generate-name ./drupal --values drupal/test.values.yaml
+
           silta ci release deploy \
               --release-name test \
               --chart-name ./drupal \
@@ -237,6 +244,12 @@ jobs:
 
           # Dependency build for local chart
           helm dependency build ./frontend
+
+          # Chart unit tests
+          helm unittest ./frontend --helm3
+
+          # Dry-run drupal chart with test values
+          helm install --dry-run --generate-name ./frontend --values frontend/test.values.yaml
 
           # Tunnel to in-cluster docker registry. Required due to docker push inability to use selfsigned/insecure repositories that ain't local
           # Find a free port. Credit: stefanobaghino / https://unix.stackexchange.com/posts/423052/revisions
@@ -296,6 +309,12 @@ jobs:
 
           # Dependency build for local chart
           helm dependency build ./simple
+
+          # Chart unit tests
+          helm unittest ./simple --helm3
+
+          # Dry-run drupal chart with test values
+          helm install --dry-run --generate-name ./simple --values simple/test.values.yaml
 
           # Build images
           SIMPLE_NGINX_IMAGE=/simple-project-k8s/test-simple-nginx:latest
