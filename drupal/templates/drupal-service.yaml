@@ -7,7 +7,7 @@ metadata:
     auto-downscale/down: "false"
     {{- end }}
     {{- if eq .Values.cluster.type "gke" }}
-    beta.cloud.google.com/backend-config: '{"ports": {"80":"{{ .Release.Name }}-drupal"}}'
+    cloud.google.com/backend-config: '{"ports": {"8080":"{{ .Release.Name }}-drupal"}}'
     {{- end }}
     {{- if .Values.cluster }}
     {{- if .Values.cluster.vpcNative }}
