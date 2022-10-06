@@ -218,14 +218,6 @@ tests:
         equal:
           path: spec.maxReplicas
           value: 3
-      - documentIndex: 1
-        contains:
-          path: spec.metrics
-          content:
-            type: Resource
-            resource:
-              name: cpu
-              targetAverageUtilization: 80
 
   - it: can override autoscale values
     template: services-deployment.yaml
@@ -236,11 +228,6 @@ tests:
           enabled: true
           minReplicas: 5
           maxReplicas: 7
-          metrics:
-            - type: Resource
-              resource:
-                name: cpu
-                targetAverageUtilization: 100
     asserts:
       - documentIndex: 1
         isKind:
@@ -253,14 +240,6 @@ tests:
         equal:
           path: spec.maxReplicas
           value: 7
-      - documentIndex: 1
-        contains:
-          path: spec.metrics
-          content:
-            type: Resource
-            resource:
-              name: cpu
-              targetAverageUtilization: 100
 
   - it: uses RollingUpdate as default service deployment strategy
     template: services-deployment.yaml

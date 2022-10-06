@@ -188,7 +188,9 @@ metadata:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 type: kubernetes.io/tls
 data:
-  ca.crt: {{ $domain.ssl.ca | default "" | b64enc }}
+  {{- if $domain.ssl.ca }}
+  tls.ca: {{ $domain.ssl.ca | default "" | b64enc }}
+  {{- end }}
   tls.crt: {{ $domain.ssl.crt | default "" | b64enc }}
   tls.key: {{ $domain.ssl.key | default "" | b64enc }}
 ---

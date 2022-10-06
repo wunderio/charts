@@ -13,7 +13,7 @@ dependencies:
   version: 6.0.5
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
-  version: 0.2.3
+  version: 0.3.0
 - name: cert-manager
   repository: https://charts.jetstack.io/
   version: v0.10.1
@@ -22,12 +22,12 @@ dependencies:
   version: 0.1.0
 - name: instana-agent
   repository: https://agents.instana.io/helm
-  version: 1.2.43
+  version: 1.2.45
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
-  version: 4.0.16
+  version: 4.0.17
 - name: docker-registry
   repository: https://helm.twun.io
   version: 2.1.0
-digest: sha256:bd174290e2cd1a3cddb76ec7cb66f23e43d9dff30a1093a28fdd09ebf2529cef
-generated: "2022-08-02T13:09:43.482216472+03:00"
+digest: sha256:e8a3970e0824d03301cd433fe596b0feb112c084a7e8bd52db0e3b340bbbb72c
+generated: "2022-10-06T16:22:28.662161118+03:00"

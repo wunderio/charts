@@ -231,11 +231,32 @@ spec:
   minReplicas: {{ default $.Values.serviceDefaults.autoscaling.minReplicas $service.autoscaling.minReplicas }}
   maxReplicas: {{ default $.Values.serviceDefaults.autoscaling.maxReplicas $service.autoscaling.maxReplicas }}
   metrics:
-    {{ if $service.autoscaling.metrics }}
-    {{- toYaml $service.autoscaling.metrics | nindent 4 }}
-    {{ else }}
-    {{- toYaml $.Values.serviceDefaults.autoscaling.metrics | nindent 4 }}
-    {{- end }}
+  {{- $metrics := $.Values.serviceDefaults.autoscaling.metrics }}
+  {{- if $service.autoscaling.metrics }}
+  {{- $metrics = $service.autoscaling.metrics }}
+  {{- end }}
+  {{- if eq ( include "frontend.autoscaling.api-version" $ | trim ) "autoscaling/v2beta1" }}
+  {{- range $metrics }}
+  - type: Resource
+    resource:
+      name: {{ .resource.name }}
+      {{- if .resource.targetAverageUtilization }}
+      targetAverageUtilization: {{ .resource.targetAverageUtilization }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- if eq ( include "frontend.autoscaling.api-version" $ | trim ) "autoscaling/v2" }}
+  {{- range $metrics }}
+  - type: Resource
+    resource:
+      name: {{ .resource.name }}
+      {{- if .resource.targetAverageUtilization }}
+      target:
+        type: Utilization
+        averageUtilization: {{ .resource.targetAverageUtilization }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
 {{- end }}
 {{- end }}
 ---
