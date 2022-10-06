@@ -185,7 +185,9 @@ metadata:
     {{- include "frontend.release_labels" $ | nindent 4 }}
 type: kubernetes.io/tls
 data:
+  {{- if $domain.ssl.ca }}
   ca.crt: {{ $domain.ssl.ca | default "" | b64enc }}
+  {{- end }}
   tls.crt: {{ $domain.ssl.crt | default "" | b64enc }}
   tls.key: {{ $domain.ssl.key | default "" | b64enc }}
 ---

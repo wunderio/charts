@@ -95,6 +95,29 @@ spec:
     name: {{ .Release.Name }}-nginx
   minReplicas: {{ .Values.nginx.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.nginx.autoscaling.maxReplicas }}
+  {{- if .Values.nginx.autoscaling.metrics }}
   metrics:
-    {{- toYaml .Values.nginx.autoscaling.metrics | nindent 4 }}
+  {{- if eq ( include "frontend.autoscaling.api-version" . | trim ) "autoscaling/v2beta1" }}
+  {{- range .Values.nginx.autoscaling.metrics }}
+  - type: Resource
+    resource:
+      name: {{ .resource.name }}
+      {{- if .resource.targetAverageUtilization }}
+      targetAverageUtilization: {{ .resource.targetAverageUtilization }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- if eq ( include "frontend.autoscaling.api-version" . | trim ) "autoscaling/v2" }}
+  {{- range .Values.nginx.autoscaling.metrics }}
+  - type: Resource
+    resource:
+      name: {{ .resource.name }}
+      {{- if .resource.targetAverageUtilization }}
+      target:
+        type: Utilization
+        averageUtilization: {{ .resource.targetAverageUtilization }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
 {{- end }}

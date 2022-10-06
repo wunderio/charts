@@ -109,10 +109,10 @@ nginx:
     minReplicas: 1
     maxReplicas: 3
     metrics:
-      - type: Resource
-        resource:
-          name: cpu
-          targetAverageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 80
 
   # The Kubernetes resources for the nginx container.
   # These values are optimised for development environments.
@@ -208,10 +208,10 @@ services: {}
   #     minReplicas: 1
   #     maxReplicas: 3
   #     metrics:
-  #       - type: Resource
-  #         resource:
-  #           name: cpu
-  #           targetAverageUtilization: 80
+  #     - type: Resource
+  #       resource:
+  #         name: cpu
+  #         targetAverageUtilization: 80
 
   #   resources: 
   #     requests:
@@ -322,10 +322,10 @@ serviceDefaults:
     minReplicas: 1
     maxReplicas: 3
     metrics:
-      - type: Resource
-        resource:
-          name: cpu
-          targetAverageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 80
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
