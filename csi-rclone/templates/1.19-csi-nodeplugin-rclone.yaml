@@ -8,6 +8,10 @@ spec:
   selector:
     matchLabels:
       app: csi-nodeplugin-rclone
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 35%
   template:
     metadata:
       labels:
