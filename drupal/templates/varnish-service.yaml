@@ -7,7 +7,9 @@ metadata:
     {{- if (index .Values "silta-release").downscaler.enabled }}
     auto-downscale/down: "false"
     {{- end }}
-    cloud.google.com/backend-config: '{"ports": {"8080":"{{ .Release.Name }}-drupal"}}'
+    {{- if and (eq .Values.cluster.type "gke") (.Values.backendConfig) }}
+    cloud.google.com/backend-config: '{"default":"{{ .Release.Name }}-drupal"}'
+    {{- end }}
     {{- if .Values.cluster }}
     {{- if .Values.cluster.vpcNative }}
     cloud.google.com/neg: '{"ingress": true}'
@@ -20,8 +22,10 @@ spec:
   type: NodePort
   ports:
   - name: web
+    protocol: TCP
     port: 80
   - name: admin
+    protocol: TCP
     port: 6082 
   selector:
     {{- include "drupal.release_selector_labels" . | nindent 4 }}
