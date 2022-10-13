@@ -1,0 +1,6 @@
+{{ if .Values.nginx.basicauth.realipfrom }}
+{{- fail "nginx.basicauth.realipfrom configuration schema is depreciated migrate configuration to nginx.realipfrom" -}}
+{{- end }}
+{{ if .Values.nginx.basicauth.noauthips }}
+{{- fail "nginx.basicauth.noauthips configuration schema is depreciated migrate configuration to nginx.noauthips" -}}
+{{- end }}

@@ -129,15 +129,6 @@ nginx:
     credentials:
       username: silta
       password: demo
-
-    # Trust X-Forwarded-For from these hosts for getting external IP 
-    # This will be deprecated soon in favor of nginx.realipfrom 
-    # realipfrom: 10.0.0.0/8
-
-    # Add IP addresses that should be excluded from basicauth
-    # This will be deprecated soon in favor of nginx.noauthips 
-    # noauthips:
-    #   gke-internal: 10.0.0.0/8
   
   # Trust X-Forwarded-For from these hosts for getting external IP
   realipfrom: 

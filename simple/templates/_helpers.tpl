@@ -32,11 +32,6 @@ release: {{ .Release.Name }}
   {{- if .Values.nginx.basicauth.enabled }}
   satisfy any;
   allow 127.0.0.1;
-  {{- if .Values.nginx.basicauth.noauthips }}
-  {{- range .Values.nginx.basicauth.noauthips }}
-  allow {{ . }};
-  {{- end }}
-  {{- end }}
   {{- if .Values.nginx.noauthips }}
   {{- range .Values.nginx.noauthips }}
   allow {{ . }};
