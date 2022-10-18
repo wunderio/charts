@@ -48,6 +48,7 @@ spec:
         name: {{ .Release.Name }}-sidecar-controller
     spec:
       serviceAccountName: {{ .Release.Name }}-sidecar-job-controller
+      enableServiceLinks: false
       containers:
         - image: "{{ .Values.k8sControllerSidecars.image.repository }}:{{ .Values.k8sControllerSidecars.image.tag }}"
           imagePullPolicy: {{ .Values.k8sControllerSidecars.image.pullPolicy }}
