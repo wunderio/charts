@@ -37,6 +37,7 @@ spec:
         fsGroup: {{ .Values.securityContext.fsGroup }}
         runAsUser: {{ .Values.securityContext.runAsUser }}
       {{- end }}
+      enableServiceLinks: false
       containers:
         - name: memcached
           {{- if .Values.persistence.enabled }}
