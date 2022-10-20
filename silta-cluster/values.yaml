@@ -196,6 +196,42 @@ nfs-subdir-external-provisioner:
     pathPattern: "${.PVC.namespace}/${.PVC.annotations.storage.silta/storage-path}"
     onDelete: delete
 
+# Uses nfs-subdir-external-provisioner. 
+# see: https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/blob/master/charts/nfs-subdir-external-provisioner/values.yaml
+silta-shared-nfs:
+  enabled: false
+  nfs:
+    server: silta-cluster-nfs-server.silta-cluster.svc.cluster.local
+    path: /
+  storageClass:
+    name: silta-nfs-shared
+    # Set volume bindinng mode - Immediate or WaitForFirstConsumer
+    volumeBindingMode: WaitForFirstConsumer
+    pathPattern: "${.PVC.namespace}/${.PVC.annotations.storage.silta/storage-path}"
+    onDelete: delete
+
+nfs-server:
+  enabled: false
+  image: k8s.gcr.io/volume-nfs
+  imageTag: 0.8
+  imagePullPolicy: IfNotPresent
+  # Kubernetes resource assignments.
+  resources:
+    requests:
+      cpu: 10m
+      memory: 256M
+    limits:
+      cpu: 100m
+      memory: 512M
+  persistence:
+    data:
+      size: 10Gi
+      # storageClassName: standard
+      # Provide driver name if using CSI driver backed storage class (optional).
+      # csiDriverName: csi-driver-name
+      accessModes:
+        - ReadWriteOnce
+
 # This should be replaced when an actual sidecar implementation is available. 
 # https://github.com/kubernetes/enhancements/issues/753#issuecomment-713471597
 k8sControllerSidecars:
