@@ -73,6 +73,7 @@ spec:
         - name: data
           mountPath: "{{ .Values.persistence.path }}"
       {{- end }}
+      enableServiceLinks: false
       containers:
       - name: rabbitmq
         image: {{ template "rabbitmq.image" . }}

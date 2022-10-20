@@ -8,11 +8,16 @@ spec:
   selector:
     matchLabels:
       app: csi-nodeplugin-rclone
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 35%
   template:
     metadata:
       labels:
         app: csi-nodeplugin-rclone
     spec:
+      enableServiceLinks: false
       serviceAccountName: csi-nodeplugin-rclone
       {{- if .Values.priorityClassName }}
       priorityClassName: "{{ .Values.priorityClassName }}"
@@ -51,6 +56,7 @@ spec:
           image: wunderio/csi-rclone:{{- .Values.version }}
           imagePullPolicy: Always
           args:
+            - "/bin/csi-rclone-plugin"
             - "--nodeid=$(NODE_ID)"
             - "--endpoint=$(CSI_ENDPOINT)"
             - "--v=5"

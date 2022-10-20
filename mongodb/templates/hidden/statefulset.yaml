@@ -187,6 +187,7 @@ spec:
               subPath: auto-discovery.sh
         {{- end }}
       {{- end }}
+      enableServiceLinks: false
       containers:
         - name: mongodb
           image: {{ include "mongodb.image" . }}

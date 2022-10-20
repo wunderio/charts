@@ -15,6 +15,7 @@ spec:
       labels:
         app: csi-controller-rclone
     spec:
+      enableServiceLinks: false
       serviceAccountName: csi-controller-rclone
       {{- if .Values.priorityClassName }}
       priorityClassName: "{{ .Values.priorityClassName }}"
@@ -52,6 +53,7 @@ spec:
           image: wunderio/csi-rclone:{{- .Values.version }}
           imagePullPolicy: Always
           args :
+            - "/bin/csi-rclone-plugin"
             - "--nodeid=$(NODE_ID)"
             - "--endpoint=$(CSI_ENDPOINT)"
             - "--v=5"

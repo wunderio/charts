@@ -36,14 +36,6 @@
                 "username": { "type": "string"},
                 "password": { "type": "string"}
               }
-            },
-            "realipfrom": {
-              "type": ["string"],
-              "deprecated": true
-            },
-            "noauthips": {
-              "type": ["object"],
-              "deprecated": true
             }
           },
           "additionalProperties": false

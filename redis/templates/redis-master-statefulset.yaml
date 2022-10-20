@@ -66,6 +66,7 @@ spec:
       {{- if .Values.master.schedulerName }}
       schedulerName: "{{ .Values.master.schedulerName }}"
       {{- end }}
+      enableServiceLinks: false
       containers:
       - name: {{ template "redis.fullname" . }}
         image: "{{ template "redis.image" . }}"

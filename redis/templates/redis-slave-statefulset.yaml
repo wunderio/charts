@@ -72,6 +72,7 @@ spec:
       affinity:
 {{ tpl (toYaml .) $ | indent 8 }}
     {{- end }}
+      enableServiceLinks: false
       containers:
       - name: {{ template "redis.fullname" . }}
         image: {{ template "redis.image" . }}
