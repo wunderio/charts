@@ -12,6 +12,7 @@ spec:
         spec:
           restartPolicy: OnFailure
           serviceAccountName: {{ .Release.Name }}-downscaler
+          enableServiceLinks: false
           containers:
           - name: downscaler-cron
             image: '{{ index (index .Values "silta-downscaler") "image" }}:{{ index (index .Values "silta-downscaler") "imageTag" }}'
