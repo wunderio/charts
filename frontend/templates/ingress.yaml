@@ -1,4 +1,11 @@
 {{- $ingress := .Values.ingress.default }}
+{{- $context_ssl := .Values.ssl }}
+{{- $letsencrypt_in_use := false }}
+{{- if $ingress.tls }}
+{{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+{{- $letsencrypt_in_use = true }}
+{{- end }}
+{{- end }}
 apiVersion: {{ include "ingress.api-version" . | trim }}
 kind: Ingress
 metadata:
@@ -35,13 +42,18 @@ metadata:
     {{- end }}
     
     {{- if eq $ingress.type "gce" }}
+    {{- if $letsencrypt_in_use }}
     cert-manager.io/cluster-issuer: letsencrypt
+    {{- end }}
     {{- end }}
     {{- if $ingress.staticIpAddressName }}
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
 
     {{- if eq $ingress.type "azure/application-gateway" }}
+    {{- if $letsencrypt_in_use }}
+    cert-manager.io/cluster-issuer: letsencrypt
+    {{- end }}
     appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399, 401-404"
     {{- end }}
 
@@ -123,6 +135,19 @@ spec:
   {{- end }}
 {{- end }}
 
+{{- $letsencrypt_in_use := false }}
+{{- range $index, $domain := $.Values.exposeDomains }}
+{{ $domain := merge $domain $.Values.exposeDomainsDefaults}}
+{{- if eq $domain.ingress $ingress_index }}
+{{- if $domain.ssl }}
+{{- if $domain.ssl.enabled }}
+{{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+{{- $letsencrypt_in_use = true }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
 {{- if $ingress_in_use }}
 apiVersion: {{ include "ingress.api-version" $ | trim }}
 kind: Ingress
@@ -160,13 +185,18 @@ metadata:
     {{- end }}
     
     {{- if eq $ingress.type "gce" }}
+    {{- if $letsencrypt_in_use }}
     cert-manager.io/cluster-issuer: letsencrypt
+    {{- end }}
     {{- end }}
     {{- if $ingress.staticIpAddressName }}
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
 
     {{- if eq $ingress.type "azure/application-gateway" }}
+    {{- if $letsencrypt_in_use }}
+    cert-manager.io/cluster-issuer: letsencrypt
+    {{- end }}
     appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399, 401-404"
     {{- end }}
 

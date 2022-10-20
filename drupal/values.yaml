@@ -421,7 +421,6 @@ referenceData:
 
 # Parameters for sanitizing reference data with gdpr-dump.
 # Uses formatters from https://packagist.org/packages/fzaninotto/faker.
-# ! This functionality has been temporary disabled
 gdprDump:
   users_field_data:
     name:
