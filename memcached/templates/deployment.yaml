@@ -36,6 +36,7 @@ spec:
         fsGroup: {{ .Values.securityContext.fsGroup }}
         runAsUser: {{ .Values.securityContext.runAsUser }}
       {{- end }}
+      enableServiceLinks: false
       containers:
         - name: memcached
           image: {{ template "memcached.image" . }}
