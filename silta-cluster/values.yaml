@@ -14,7 +14,7 @@ traefik:
   enabled: true
   externalTrafficPolicy: Local
   priorityClassName: "high-priority"
-  image: eu.gcr.io/silta-images/traefik
+  image: wunderio/silta-traefik
   imageTag: 1.7.34-mod
   rbac:
     enabled: true
@@ -238,7 +238,7 @@ k8sControllerSidecars:
   enabled: true
   replicaCount: 1
   image:
-    repository: eu.gcr.io/silta-images/silta-k8s-controller-sidecars
+    repository: wunderio/silta-k8s-controller-sidecars
     tag: latest
     pullPolicy: IfNotPresent
   resources:
