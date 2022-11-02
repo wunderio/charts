@@ -259,6 +259,12 @@ php:
         limits:
           memory: 512M
 
+  # Pre-installation hook.
+  # This is run before a new environment is created.
+  preinstall:
+    command: |
+      echo "Running preinstall hook"
+
   # Post-installation hook.
   # This is run every time a new environment is created.
   postinstall:
@@ -271,6 +277,12 @@ php:
         memory: 512M
       limits:
         memory: 512M
+
+  # Pre-upgrade hook
+  # This is run before an environment is upgraded.
+  preupgrade:
+    command: |
+      echo "Running pre-upgrade hook"
 
   # Post-upgrade hook.
   # This is run every time a new environment is upgraded.
