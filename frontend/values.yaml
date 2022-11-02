@@ -220,9 +220,21 @@ services: {}
   #     limits:
   #       memory: 512Mi
 
+  #  # Pre-install hook.
+  #  # This is run every time a new environment (most commonly a first deployment for a new branch) is created
+  #  preinstall:
+  #    command: |
+  #      your command goes here
+
   #  # Post-install hook.
   #  # This is run every time a new environment (most commonly a first deployment for a new branch) is created
   #  postinstall:
+  #    command: |
+  #      your command goes here
+
+  #  # Pre-upgrade hook.
+  #  # This is run every time a new release is deployed
+  #  preupgrade:
   #    command: |
   #      your command goes here
 
