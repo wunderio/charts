@@ -142,7 +142,7 @@ spec:
                   values:
                   - frontend-{{ $index }}
       {{- end }}
-{{- if or $service.postupgrade $service.postinstall }}
+{{- if or $service.postupgrade $service.preupgrade $service.postinstall $service.preinstall }}
 ---
 apiVersion: batch/v1
 kind: Job
@@ -153,7 +153,7 @@ metadata:
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
-    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook": "pre-install,post-install,pre-upgrade,post-upgrade"
     "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": "before-hook-creation"
 spec:
@@ -173,8 +173,10 @@ spec:
         args:
         - |
             {{- if $.Release.IsInstall }}
+            {{ $service.preinstall.command }}
             {{ $service.postinstall.command }}
             {{- end }}
+            {{ $service.preupgrade.command }}
             {{ $service.postupgrade.command }}
         volumeMounts:
           {{ if $service.mounts }}

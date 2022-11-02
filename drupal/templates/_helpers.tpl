@@ -352,9 +352,11 @@ done
   {{ end }}
 
   {{ if .Release.IsInstall }}
+    {{ .Values.php.preinstall.command }}
     {{ .Values.php.postinstall.command }}
     rm {{ .Values.webRoot }}/sites/default/files/_installing
   {{ end }}
+  {{ .Values.php.preupgrade.command }}
   {{ .Values.php.postupgrade.command }}
   {{- if .Values.php.postupgrade.afterCommand }}
     {{ .Values.php.postupgrade.afterCommand }}

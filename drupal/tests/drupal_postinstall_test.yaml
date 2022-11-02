@@ -23,7 +23,9 @@ tests:
   - it: runs the right post-install command
     template: post-release.yaml
     set:
+      php.preinstall.command: prefoo
       php.postinstall.command: foo
+      php.preupgrade.command: prebar
       php.postupgrade.command: bar
     asserts:
       - matchRegex:
@@ -31,7 +33,13 @@ tests:
           pattern: 'set -e'
       - matchRegex:
           path: spec.template.spec.containers[0].args[0]
+          pattern: 'prefoo'
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
           pattern: 'foo'
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'prebar'
       - matchRegex:
           path: spec.template.spec.containers[0].args[0]
           pattern: 'bar'
