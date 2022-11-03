@@ -173,9 +173,9 @@ spec:
         args:
         - |
             {{- if $.Release.IsInstall }}
-            {{- toYaml $service.postinstall.command | nindent 10 }}
+            {{- $service.postinstall.command | nindent 10 }}
             {{- end }}
-            {{- toYaml $service.postupgrade.command | nindent 10 }}
+            {{- $service.postupgrade.command | nindent 10 }}
         volumeMounts:
           {{ if $service.mounts }}
           {{- range $index, $mountName := $service.mounts -}}
