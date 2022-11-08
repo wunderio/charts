@@ -218,7 +218,7 @@ data:
     pm.process_idle_timeout = 60s
     pm.max_requests = 500
 
-    access.format = "{\"time_iso8601\":\"%{%Y-%m-%dT%H:%M:%S%z}t\",\"time_sec\":\"%{%s}t\",\"client_ip\":\"%{REMOTE_ADDR}e\",\"script\":\"%f\",\"method\":\"%m\",\"uri\":\"%r\",\"request_uri\":\"%{REQUEST_URI}e\",\"query\":\"%q\",\"status\":\"%s\",\"cpu\":\"%{total}C\",\"duration_ms\":\"%{miliseconds}d\",\"mem_mb\":\"%{megabytes}M\"\"}"
+    access.format = "{\"time_iso8601\":\"%{%Y-%m-%dT%H:%M:%S%z}t\",\"time_sec\":\"%{%s}t\",\"client_ip\":\"%{REMOTE_ADDR}e\",\"script\":\"%f\",\"method\":\"%m\",\"uri\":\"%r\",\"request_uri\":\"%{REQUEST_URI}e\",\"query\":\"%q\",\"status\":\"%s\",\"cpu\":\"%{total}C\",\"duration_ms\":\"%{miliseconds}d\",\"mem_mb\":\"%{megabytes}M\"}"
 
     ; Custom configuration below
     {{ .Values.php.fpm.extraConfig | nindent 4 }}
