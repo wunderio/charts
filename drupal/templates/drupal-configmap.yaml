@@ -104,7 +104,7 @@ data:
         include                     /etc/nginx/mime.types;
         default_type                application/octet-stream;
 
-        log_format main             access-json escape=json '{'
+        log_format main             escape=json '{'
 
                                       # time
                                       '"time_iso8601":"$time_iso8601"'
