@@ -104,9 +104,43 @@ data:
         include                     /etc/nginx/mime.types;
         default_type                application/octet-stream;
 
-        log_format  main            '$remote_addr - $remote_user [$time_local] "$request" '
-                                    '$status $body_bytes_sent "$http_referer" '
-                                    '"$http_user_agent" "$http_x_forwarded_for"';
+        log_format main             access-json escape=json '{'
+
+                                      # time
+                                      '"time_iso8601":"$time_iso8601"'
+                                      ',"time_msec":"$msec"'
+                                      ',"time_local":"$time_local"'
+
+                                      # duration
+                                      ',"request_time":"$request_time"'
+                                      ',"upstream_response_time":"$upstream_response_time"'
+
+                                      # bytes
+                                      ',"body_bytes_sent":"$body_bytes_sent"'
+                                      ',"bytes_sent":"$bytes_sent"'
+                                      ',"request_length":"$request_length"'
+
+                                      # ip/host
+                                      ',"http_host":"$http_host"'
+                                      ',"remote_addr":"$remote_addr"'
+                                      ',"forwarded-for":"$http_x_forwarded_for"'
+                                      ',"real_ip":"$realip_remote_addr"'
+
+                                      # request
+                                      ',"request":"$request"'
+                                      ',"request_method":"$request_method"'
+                                      ',"request_uri":"$request_uri"'
+                                      ',"request_origin":"$http_origin"'
+
+                                      # response
+                                      ',"status":"$status"'
+
+                                      # browser
+                                      ',"http_referer":"$http_referer"'
+                                      ',"http_user_agent":"$http_user_agent"'
+                                      ',"remote_user":"$remote_user"'
+
+                                    '}';
 
         access_log                  /proc/self/fd/1 main;
 
