@@ -108,22 +108,22 @@ data:
 
                                       # time
                                       '"time_iso8601":"$time_iso8601"'
-                                      ',"time_msec":"$msec"'
+                                      ',"time_ms":"$msec"'
                                       ',"time_local":"$time_local"'
 
                                       # duration
-                                      ',"request_time":"$request_time"'
-                                      ',"upstream_response_time":"$upstream_response_time"'
+                                      ',"duration_request_ms":"$request_time"'
+                                      ',"duration_upstream_s":"$upstream_response_time"'
 
                                       # bytes
-                                      ',"body_bytes_sent":"$body_bytes_sent"'
-                                      ',"bytes_sent":"$bytes_sent"'
-                                      ',"request_length":"$request_length"'
+                                      ',"response_body_b":"$body_bytes_sent"'
+                                      ',"response_b":"$bytes_sent"'
+                                      ',"request_b":"$request_length"'
 
                                       # ip/host
                                       ',"http_host":"$http_host"'
                                       ',"remote_addr":"$remote_addr"'
-                                      ',"forwarded-for":"$http_x_forwarded_for"'
+                                      ',"forwarded_for":"$http_x_forwarded_for"'
                                       ',"real_ip":"$realip_remote_addr"'
 
                                       # request
