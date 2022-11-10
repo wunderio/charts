@@ -140,10 +140,10 @@ nginx:
   resources:
     requests:
       cpu: 1m
-      memory: 10M
+      memory: 10Mi
     limits:
       cpu: 500m
-      memory: 250M
+      memory: 250Mi
 
   # Set of values to enable and use http basic authentication
   # It is implemented only for very basic protection (like web crawlers)
@@ -227,9 +227,9 @@ php:
   resources:
     requests:
       cpu: 5m
-      memory: 128M
+      memory: 100Mi
     limits:
-      memory: 512M
+      memory: 500Mi
 
   fpm:
     # Custom php-fpm settings block. May override parameters previously defined.
@@ -255,9 +255,9 @@ php:
       resources:
         requests:
           cpu: 500m
-          memory: 512M
+          memory: 500Mi
         limits:
-          memory: 512M
+          memory: 500Mi
 
   # Post-installation hook.
   # This is run every time a new environment is created.
@@ -268,9 +268,9 @@ php:
     resources:
       requests:
         cpu: 500m
-        memory: 512M
+        memory: 500Mi
       limits:
-        memory: 512M
+        memory: 500Mi
 
   # Post-upgrade hook.
   # This is run every time a new environment is upgraded.
@@ -415,9 +415,9 @@ referenceData:
   resources:
     requests:
       cpu: 1000m
-      memory: 512M
+      memory: 500Mi
     limits:
-      memory: 512M
+      memory: 500Mi
 
 # Parameters for sanitizing reference data with gdpr-dump.
 # Uses formatters from https://packagist.org/packages/fzaninotto/faker.
@@ -457,7 +457,7 @@ backup:
   resources:
     requests:
       cpu: 1000m
-      memory: 512M
+      memory: 500Mi
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
@@ -477,9 +477,9 @@ mariadb:
     resources:
       requests:
         cpu: 25m
-        memory: 384M
+        memory: 400Mi
       limits:
-        memory: 512M
+        memory: 500Mi
     extraInitContainers: |
       - name: dbinfo
         image: busybox:stable
@@ -625,7 +625,7 @@ mailhog:
   resources:
     requests:
       cpu: 1m
-      memory: 10M
+      memory: 10Mi
 
 # Email via SMTP. Configuration is passed to containers as environment variables (SMTP_ADDRESS, SMTP_PORT, ..)
 # see: https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#sending-e-mail
@@ -658,10 +658,10 @@ solr:
   resources:
     requests:
       cpu: 250m
-      memory: 512M
+      memory: 500Mi
     limits:
       cpu: 500m
-      memory: 768M
+      memory: 800Mi
 
   persistence:
     data:
@@ -689,10 +689,10 @@ pxc-db:
     resources:
       requests:
         cpu: 250m
-        memory: 512M
+        memory: 500Mi
       limits:
         cpu: 1000m
-        memory: 1024M
+        memory: 1000Mi
     # User defined MySQL options according to MySQL configuration file syntax
     configuration: |
       [mysqld]
@@ -706,10 +706,10 @@ pxc-db:
     resources:
       requests:
         cpu: 100m
-        memory: 128M
+        memory: 100Mi
       limits:
         cpu: 500m
-        memory: 256M
+        memory: 250Mi
   logcollector:
     enabled: false
   backup:
