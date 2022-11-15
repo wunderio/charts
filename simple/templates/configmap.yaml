@@ -143,6 +143,7 @@ data:
 
         root /var/www/html/web;                                     
         index index.html;
+        port_in_redirect off;
                                                                               
         include fastcgi.conf;
 
