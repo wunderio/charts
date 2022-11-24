@@ -11,3 +11,6 @@
 {{- end }}
 {{- end }}
 {{- end }}
+{{- if .Values.referenceData.ignoreTableContent }}
+{{- fail "referenceData.ignoreTableContent is deprecated. See gdprDump.tables.[cache_*].truncate` key for table data removal." -}}
+{{- end}}

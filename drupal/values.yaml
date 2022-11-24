@@ -140,10 +140,10 @@ nginx:
   resources:
     requests:
       cpu: 1m
-      memory: 10M
+      memory: 10Mi
     limits:
       cpu: 500m
-      memory: 250M
+      memory: 244Mi
 
   # Set of values to enable and use http basic authentication
   # It is implemented only for very basic protection (like web crawlers)
@@ -183,7 +183,7 @@ nginx:
     # X-Content-Type-Options: 'nosniff'
     X-XSS-Protection: '"1; mode=block"'
     Referrer-Policy: '"no-referrer, strict-origin-when-cross-origin" always'
-  
+
   # includeSubdomains should be used whenever possible, but before enabling it needs to be made sure there are no subdomains not using https:
   hsts_include_subdomains: ""
   #hsts_include_subdomains: " includeSubDomains;"
@@ -227,9 +227,9 @@ php:
   resources:
     requests:
       cpu: 5m
-      memory: 128M
+      memory: 122Mi
     limits:
-      memory: 512M
+      memory: 488Mi
 
   fpm:
     # Custom php-fpm settings block. May override parameters previously defined.
@@ -255,9 +255,9 @@ php:
       resources:
         requests:
           cpu: 500m
-          memory: 512M
+          memory: 488Mi
         limits:
-          memory: 512M
+          memory: 488Mi
 
   # Post-installation hook.
   # This is run every time a new environment is created.
@@ -268,9 +268,9 @@ php:
     resources:
       requests:
         cpu: 500m
-        memory: 512M
+        memory: 488Mi
       limits:
-        memory: 512M
+        memory: 488Mi
 
   # Post-upgrade hook.
   # This is run every time a new environment is upgraded.
@@ -391,8 +391,6 @@ referenceData:
   # Update the reference data after deployments on the reference environment.
   updateAfterDeployment: true
 
-  ignoreTableContent: '(cache|cache_.*|sessions|watchdog)'
-
   # Matching folders will not be included in reference data.
   ignoreFolders:
     - css
@@ -415,22 +413,53 @@ referenceData:
   resources:
     requests:
       cpu: 1000m
-      memory: 512M
+      memory: 488Mi
     limits:
-      memory: 512M
+      memory: 488Mi
 
-# Parameters for sanitizing reference data with gdpr-dump.
-# Uses formatters from https://packagist.org/packages/fzaninotto/faker.
+# Parameters for sanitizing reference data with github.com/Smile-SA/gdpr-dump
+# Uses formatters from fakerphp.github.io/formatters 
 gdprDump:
-  users_field_data:
-    name:
-      formatter: name
-    pass:
-      formatter: password
-    mail:
-      formatter: safeEmail
-    init:
-      formatter: clear
+  tables:
+    cache:
+      truncate: true
+    cache_*:
+      truncate: true
+    sessions:
+      truncate: true
+    watchdog:
+      truncate: true
+    commerce_payment_method*:
+      truncate: true
+    users_field_data:
+      converters:
+        mail:
+          converter: 'randomizeEmail'
+          unique: true
+        init:
+          converter: 'fromContext'
+          parameters:
+            key: 'processed_data.mail'
+        name:
+          converter: 'faker'
+          parameters:
+            formatter: 'name'
+        pass:
+          converter: 'randomizeText'
+    commerce_order:
+      converters:
+        mail:
+          converter: 'randomizeEmail'
+          unique: true
+        ip_address:
+          converter: 'faker'
+          parameters:
+            formatter: 'ipv4'
+    commerce_store_field_data:
+      converters:
+        mail:
+          converter: 'randomizeEmail'
+          unique: true
 
 backup:
   # Whether backups should be taken for the current environment.
@@ -457,7 +486,7 @@ backup:
   resources:
     requests:
       cpu: 1000m
-      memory: 512M
+      memory: 488Mi
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
@@ -477,9 +506,9 @@ mariadb:
     resources:
       requests:
         cpu: 25m
-        memory: 384M
+        memory: 366Mi
       limits:
-        memory: 512M
+        memory: 488Mi
     extraInitContainers: |
       - name: dbinfo
         image: busybox:stable
@@ -606,7 +635,7 @@ redis:
     # replicaCount: 1
   master:
     resources:
-      limits: 
+      limits:
         cpu: 250m
         memory: 512Mi
       requests:
@@ -658,10 +687,10 @@ solr:
   resources:
     requests:
       cpu: 250m
-      memory: 512M
+      memory: 488Mi
     limits:
       cpu: 500m
-      memory: 768M
+      memory: 732Mi
 
   persistence:
     data:
@@ -689,10 +718,10 @@ pxc-db:
     resources:
       requests:
         cpu: 250m
-        memory: 512M
+        memory: 488Mi
       limits:
         cpu: 1000m
-        memory: 1024M
+        memory: 977Mi
     # User defined MySQL options according to MySQL configuration file syntax
     configuration: |
       [mysqld]
@@ -706,10 +735,10 @@ pxc-db:
     resources:
       requests:
         cpu: 100m
-        memory: 128M
+        memory: 122Mi
       limits:
         cpu: 500m
-        memory: 256M
+        memory: 244Mi
   logcollector:
     enabled: false
   backup:
