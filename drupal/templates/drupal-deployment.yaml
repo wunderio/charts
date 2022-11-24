@@ -12,6 +12,11 @@ spec:
     matchLabels:
       {{- include "drupal.release_selector_labels" . | nindent 6 }}
       deployment: drupal
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 50%
+      maxSurge: 0%
   template:
     metadata:
       labels:

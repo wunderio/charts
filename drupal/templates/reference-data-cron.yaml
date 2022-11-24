@@ -24,10 +24,6 @@ spec:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
               - name: reference-data-volume
                 mountPath: /app/reference-data
-              - name: config
-                mountPath: /etc/my.cnf.d/gdpr-dump.cnf
-                readOnly: true
-                subPath: gdpr-dump
             command: ["/bin/bash", "-c"]
             args:
               - |
