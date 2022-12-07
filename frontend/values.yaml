@@ -379,7 +379,7 @@ elasticsearch:
   volumeClaimTemplate:
     resources:
       requests:
-        storage: 1G
+        storage: 1Gi
 
   resources:
     requests:
@@ -408,14 +408,14 @@ mongodb:
 
   # Use a low default to prevent unnecessary storage use.
   persistence:
-    size: 1G
+    size: 1Gi
 
 rabbitmq:
   enabled: false
 
   # Use a low default to prevent unnecessary storage use.
   persistence:
-    size: 1G
+    size: 1Gi
 
 # Add following lines to your node.Dockerfile when enabling instana monitoring
 #   RUN npm install -g @instana/collector

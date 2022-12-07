@@ -63,6 +63,7 @@ jobs:
           CLUSTER_DOCKER_REGISTRY=registry.${CLUSTER_DOMAIN}:80
 
           curl -Lo ~/.local/bin/minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x ~/.local/bin/minikube
+          minikube version
           minikube start \
             --kubernetes-version "${{ matrix.kubernetes-version }}" \
             --insecure-registry "${CLUSTER_DOCKER_REGISTRY}" \
@@ -123,6 +124,8 @@ jobs:
 
       - name: silta-cluster chart setup and test
         run: |
+
+          MINIKUBE_IP=$(minikube ip)
           
           helm upgrade --install \
             cert-manager jetstack/cert-manager \
@@ -149,6 +152,7 @@ jobs:
       - name: Build Drupal chart images, deploy and test 
         run: |
 
+          MINIKUBE_IP=$(minikube ip)
           CLUSTER_DOCKER_REGISTRY=registry.${CLUSTER_DOMAIN}:80
 
           # Check out drupal-project-k8s repo or use prebuilt images
@@ -229,6 +233,7 @@ jobs:
       - name: Build Frontend chart images, deploy and test 
         run: |
 
+          MINIKUBE_IP=$(minikube ip)
           CLUSTER_DOCKER_REGISTRY=registry.${CLUSTER_DOMAIN}:80
 
           # Checkout k8s repository
@@ -298,6 +303,7 @@ jobs:
       - name: Build Simple chart images, deploy and test 
         run: |
 
+          MINIKUBE_IP=$(minikube ip)
           CLUSTER_DOCKER_REGISTRY=registry.${CLUSTER_DOMAIN}:80
 
           # Checkout k8s repository
