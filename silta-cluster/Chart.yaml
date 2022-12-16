@@ -2,16 +2,12 @@ apiVersion: v2
 appVersion: "1.0"
 description: Setup a silta kubernetes cluster.
 name: silta-cluster
-version: 0.2.38
+version: 0.2.39
 dependencies:
 - name: traefik
   version: 1.87.x
   repository: file://../legacy_traefik
   condition: traefik.enabled
-- name: redis
-  version: 10.4.x
-  repository: https://storage.googleapis.com/charts.wdr.io
-  condition: deploymentRemover.enabled
 - name: pxc-operator
   version: 1.9.x
   repository: https://percona.github.io/percona-helm-charts/
