@@ -39,6 +39,8 @@ spec:
         env:
           - name: WEBHOOKS_SECRET
             value: {{ required "A valid .Values.deploymentRemover.webhooksSecret entry required!" .Values.deploymentRemover.webhooksSecret | quote }}
+          - name: DEBUG
+            value: {{ .Values.deploymentRemover.debug | quote }}
         resources:
           {{- .Values.deploymentRemover.resources | toYaml | nindent 10 }}
 {{- end }}

@@ -131,6 +131,8 @@ deploymentRemover:
   imageTag: v0.2
   # Github webhooks secret
   webhooksSecret: ''
+  # Debugging mode. Does not remove resources when set to false; see pod logs when enabled.
+  debug: false
   # Kubernetes resource allocation.
   resources: {}
 
