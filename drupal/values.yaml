@@ -356,7 +356,10 @@ shell:
     storage: 1M
 
   # Extend resources defined under php.resources.
-  resources: {}
+  resources:
+    requests:
+      cpu: 5m
+      memory: 64Mi
 
   # Set a restriction on where the shell pod are provisioned.
   # This can be used for example to get a static IP for egress traffic.
