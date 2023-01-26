@@ -1,6 +1,6 @@
 apiVersion: v2
 name: drupal
-version: 0.3.141
+version: 0.3.142
 dependencies:
 - name: mariadb
   version: 7.5.x
@@ -15,7 +15,7 @@ dependencies:
   repository: https://storage.googleapis.com/charts.wdr.io
   condition: memcached.enabled
 - name: redis
-  version: 16.8.x
+  version: 16.13.x
   repository: https://charts.bitnami.com/bitnami
   condition: redis.enabled
 - name: mailhog
