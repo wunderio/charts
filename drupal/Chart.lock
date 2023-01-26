@@ -10,7 +10,7 @@ dependencies:
   version: 4.2.27
 - name: redis
   repository: https://charts.bitnami.com/bitnami
-  version: 16.8.10
+  version: 16.13.2
 - name: mailhog
   repository: https://codecentric.github.io/helm-charts
   version: 5.1.0
@@ -20,5 +20,5 @@ dependencies:
 - name: silta-release
   repository: file://../silta-release
   version: 0.1.1
-digest: sha256:b7aff2317b5ee097ce16c3ee029382368bce5d40a2d991a3e9dea50c051202b9
-generated: "2022-08-01T13:20:22.864690261+03:00"
+digest: sha256:c3512a904de793d2705c98da4735d5ea3d58243442111dfcdf7c7f18b640d7b6
+generated: "2023-01-26T16:58:38.528197461+02:00"
