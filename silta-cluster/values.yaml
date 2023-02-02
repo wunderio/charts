@@ -128,7 +128,7 @@ deploymentRemover:
   enabled: true
   replicas: 2
   image: wunderio/silta-deployment-remover
-  imageTag: v0.1
+  imageTag: v0.2
   # Github webhooks secret
   webhooksSecret: ''
   # Kubernetes resource allocation.
