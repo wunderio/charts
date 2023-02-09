@@ -19,7 +19,7 @@ dependencies:
   version: 0.1.0
 - name: instana-agent
   repository: https://agents.instana.io/helm
-  version: 1.2.48
+  version: 1.2.54
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
   version: 4.0.17
@@ -29,5 +29,5 @@ dependencies:
 - name: docker-registry
   repository: https://helm.twun.io
   version: 2.1.0
-digest: sha256:ce7156158e24193aaabe0a06ec3d9331d92738656ad9d79482ffbaba599280d8
-generated: "2022-12-16T09:13:13.41336618+02:00"
+digest: sha256:774cdca47c56dd9fd18d4ca773628b97d012aef8fbd56bdc47c2f8b9ff1f1898
+generated: "2023-02-09T12:31:56.932447+02:00"
