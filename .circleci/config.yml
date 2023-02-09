@@ -13,8 +13,9 @@ jobs:
       - run:
           name: Cloud login
           command: |
-            printenv GCLOUD_KEY_JSON > "$HOME/gcloud-service-key.json"
-            gcloud auth activate-service-account --key-file="$HOME/gcloud-service-key.json" --project "$GCLOUD_PROJECT_NAME"
+            printenv GCLOUD_KEY_JSON > "${HOME}/gcloud-service-key.json"
+            gcloud auth activate-service-account --key-file="${HOME}/gcloud-service-key.json" --project=${GCLOUD_PROJECT_NAME}
+            gcloud container clusters get-credentials ${CLUSTER_NAME} --region=${GCLOUD_COMPUTE_ZONE} --project=${GCLOUD_PROJECT_NAME}
 
       - run:
           name: Copy index locally
@@ -65,8 +66,9 @@ jobs:
       - run:
           name: Cloud login
           command: |
-            printenv GCLOUD_KEY_JSON > "$HOME/gcloud-service-key.json"
-            gcloud auth activate-service-account --key-file="$HOME/gcloud-service-key.json" --project "$GCLOUD_PROJECT_NAME"
+            printenv GCLOUD_KEY_JSON > "${HOME}/gcloud-service-key.json"
+            gcloud auth activate-service-account --key-file="${HOME}/gcloud-service-key.json" --project=${GCLOUD_PROJECT_NAME}
+            gcloud container clusters get-credentials ${CLUSTER_NAME} --region=${GCLOUD_COMPUTE_ZONE} --project=${GCLOUD_PROJECT_NAME}
 
       - run:
           name: Deploy to Google Cloud Storage
