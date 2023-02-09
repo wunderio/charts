@@ -128,9 +128,11 @@ deploymentRemover:
   enabled: true
   replicas: 2
   image: wunderio/silta-deployment-remover
-  imageTag: v0.1
+  imageTag: v0.2
   # Github webhooks secret
   webhooksSecret: ''
+  # Debugging mode. Does not remove resources when set to false; see pod logs when enabled.
+  debug: false
   # Kubernetes resource allocation.
   resources: {}
 
@@ -140,14 +142,6 @@ gke:
   projectName: '' 
   computeZone: ''
   clusterName: ''
-
-# Redis DB for remover queue
-# https://github.com/helm/charts/tree/master/stable/redis
-redis:
-  password: ''
-  cluster:
-    enabled: false
-    slaveCount: 0
 
 # Percona XtraDB Cluster for replicated database support
 # https://github.com/percona/percona-helm-charts/tree/main/charts/pxc-operator

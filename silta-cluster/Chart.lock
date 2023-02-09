@@ -2,9 +2,6 @@ dependencies:
 - name: traefik
   repository: file://../legacy_traefik
   version: 1.87.7
-- name: redis
-  repository: https://storage.googleapis.com/charts.wdr.io
-  version: 10.4.4
 - name: pxc-operator
   repository: https://percona.github.io/percona-helm-charts/
   version: 1.9.1
@@ -22,7 +19,7 @@ dependencies:
   version: 0.1.0
 - name: instana-agent
   repository: https://agents.instana.io/helm
-  version: 1.2.50
+  version: 1.2.54
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
   version: 4.0.17
@@ -32,5 +29,5 @@ dependencies:
 - name: docker-registry
   repository: https://helm.twun.io
   version: 2.1.0
-digest: sha256:fbbc7125a376ac304d46bf42d809e88676c40e3f0216f18000f33676a327f898
-generated: "2023-01-26T16:58:07.363874967+02:00"
+digest: sha256:774cdca47c56dd9fd18d4ca773628b97d012aef8fbd56bdc47c2f8b9ff1f1898
+generated: "2023-02-09T12:31:56.932447+02:00"
