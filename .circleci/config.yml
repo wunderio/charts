@@ -10,8 +10,10 @@ jobs:
 
     steps:
       - checkout
-      - silta/silta-cli-setup
-      - silta/gcloud-login
+      - run:
+          # Save key and authenticate.
+          printenv GCLOUD_KEY_JSON > "$HOME/gcloud-service-key.json"
+          gcloud auth activate-service-account --key-file="$HOME/gcloud-service-key.json" --project "$GCLOUD_PROJECT_NAME"
 
       - run:
           name: Copy index locally
@@ -59,8 +61,10 @@ jobs:
     steps:
       - restore_cache:
           key: v1-{{ .Revision }}
-      - silta/silta-cli-setup
-      - silta/gcloud-login
+      - run:
+          # Save key and authenticate.
+          printenv GCLOUD_KEY_JSON > "$HOME/gcloud-service-key.json"
+          gcloud auth activate-service-account --key-file="$HOME/gcloud-service-key.json" --project "$GCLOUD_PROJECT_NAME"
 
       - run:
           name: Deploy to Google Cloud Storage
