@@ -1,9 +1,10 @@
 parameters:
   monolog.channel_handlers:
-     # Log to the stdout by default.
-     default: ['stdout']
+     # Log to stderr by default.
+     default: ['stream']
 
 services:
-  monolog.handler.stdout:
+  monolog.handler.stream:
     class: Monolog\Handler\StreamHandler
-    arguments: ['php://stdout']
+    # The minimum logging level DEBUG = 100
+    arguments: ['php://stderr', 100]

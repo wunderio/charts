@@ -43,13 +43,6 @@ spec:
         readinessProbe:
           exec:
             command: ['/bin/bash', '-c', '/php-fpm-probe.sh']
-        lifecycle:
-          postStart:
-            exec:
-              command:
-              - bash
-              - -c
-              - cp /tmp/zz-custom.conf /usr/local/etc/php-fpm.d/zz-custom.conf
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
 
