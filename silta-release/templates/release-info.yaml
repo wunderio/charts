@@ -4,5 +4,6 @@ metadata:
   name: {{ .Release.Name }}-release
   labels:
     release: {{ .Release.Name }}
+    release.silta/config: release-configmap
 data:
   branchName: {{ .Values.branchName | quote }}
