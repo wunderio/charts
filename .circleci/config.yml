@@ -72,10 +72,8 @@ workflows:
   version: 2
   commit:
     jobs:
-      - build:
-          context: silta_finland
+      - build
       - deploy:
-          context: silta_finland
           requires:
             - build
           filters:
