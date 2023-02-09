@@ -8,7 +8,9 @@ spec:
   type: NodePort
   externalTrafficPolicy: Local
   ports:
-    - port: 80
+    - name: web
+      port: 80
+      targetPort: 8080
   selector:
     name: {{ .Release.Name }}-deployment-remover
 ---
@@ -28,28 +30,17 @@ spec:
     spec:
       enableServiceLinks: false
       serviceAccountName: {{ .Release.Name }}-deployment-remover
-      initContainers:
-      - name: wait-redis
-        image: busybox
-        command: ['sh', '-c', 'until echo -e "AUTH $REDIS_PASSWORD\nPING" | nc "$REDIS_HOST" 6379; do echo waiting for redis; sleep 2; done;']
-        env:
-          - name: REDIS_HOST
-            value: {{ .Release.Name }}-redis-master
-          - name: REDIS_PASSWORD
-            value: {{ required "A valid .Values.redis.password entry required!" .Values.redis.password | quote }}
       containers:
       - name: {{ .Release.Name }}-deployment-remover
         image: '{{ .Values.deploymentRemover.image }}:{{ .Values.deploymentRemover.imageTag }}'
         ports:
-          - containerPort: 80
+          - containerPort: 8080
         imagePullPolicy: Always
         env:
           - name: WEBHOOKS_SECRET
             value: {{ required "A valid .Values.deploymentRemover.webhooksSecret entry required!" .Values.deploymentRemover.webhooksSecret | quote }}
-          - name: REDIS_HOST
-            value: {{ .Release.Name }}-redis-master
-          - name: REDIS_PASSWORD
-            value: {{ required "A valid .Values.redis.password entry required!" .Values.redis.password | quote }}
+          - name: DEBUG
+            value: {{ .Values.deploymentRemover.debug | quote }}
         resources:
           {{- .Values.deploymentRemover.resources | toYaml | nindent 10 }}
 {{- end }}
