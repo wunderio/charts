@@ -22,7 +22,7 @@ jobs:
         # Available minikube kubernetes version list: 
         # "minikube config defaults kubernetes-version"
         # and https://kubernetes.io/releases/patch-releases/
-        kubernetes-version: ["v1.21.14", "v1.22.13", "v1.23.10", "v1.24.4", "v1.25.0", "latest"]
+        kubernetes-version: ["v1.20.15", "v1.21.14", "v1.22.17", "v1.23.17", "v1.24.12", "v1.25.8", "1.26.1", "latest"]
     env:
       CLUSTER_DOMAIN: minikube.local.wdr.io
       K8S_PROJECT_REPO_DIR: k8s-project-repositories
@@ -107,11 +107,29 @@ jobs:
                 - ${METALLB_IP_START}-${METALLB_IP_END}
           EOF
 
+          # Patch MetalLB images to use the correct registry
+          # Workaround for https://github.com/metallb/metallb/issues/1862
+          # Remove once this is tagged and released (> v1.29.0)
+          # https://github.com/kubernetes/minikube/pull/16056
+          image="quay.io/metallb/controller:v0.9.6@sha256:6932cf255dd7f06f550c7f106b9a206be95f847ab8cb77aafac7acd27def0b00"
+          kubectl scale -n metallb-system deployment/controller --replicas=0
+          kubectl patch deployment -n metallb-system controller --type=json -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/image", "value": "'${image}'"}]'
+          kubectl scale -n metallb-system deployment/controller --replicas=1
+          image="quay.io/metallb/speaker:v0.9.6@sha256:7a400205b4986acd3d2ff32c29929682b8ff8d830837aff74f787c757176fa9f"
+          kubectl patch daemonset -n metallb-system speaker --type=json -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/image", "value": "'${image}'"}]'
+
           sleep 5
 
           NAMESPACE=metallb-system
           APP=metallb
-          TIMEOUT=20s
+          TIMEOUT=30s
+
+          function metallb_logs() {
+            echo "Timed out waiting for ${COMPONENT} to become ready"
+            kubectl get events -n ${NAMESPACE}
+            kubectl logs --sort-by='.metadata.creationTimestamp' -l app=${APP} -l component=${COMPONENT} -n ${NAMESPACE}
+            exit 1
+          }
 
           for COMPONENT in controller speaker
           do
@@ -119,7 +137,7 @@ jobs:
               --for condition=ready pod \
               -l app=${APP} -l component=${COMPONENT} \
               -n ${NAMESPACE} \
-              --timeout=${TIMEOUT}
+              --timeout=${TIMEOUT} || metallb_logs
           done
 
       - name: silta-cluster chart setup and test
