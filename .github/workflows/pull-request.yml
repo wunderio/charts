@@ -112,7 +112,9 @@ jobs:
           # Remove once this is tagged and released (> v1.29.0)
           # https://github.com/kubernetes/minikube/pull/16056
           image="quay.io/metallb/controller:v0.9.6@sha256:6932cf255dd7f06f550c7f106b9a206be95f847ab8cb77aafac7acd27def0b00"
+          kubectl scale -n metallb-system deployment/controller --replicas=0
           kubectl patch deployment -n metallb-system controller --type=json -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/image", "value": "'${image}'"}]'
+          kubectl scale -n metallb-system deployment/controller --replicas=1
           image="quay.io/metallb/speaker:v0.9.6@sha256:7a400205b4986acd3d2ff32c29929682b8ff8d830837aff74f787c757176fa9f"
           kubectl patch daemonset -n metallb-system speaker --type=json -p='[{"op": "replace", "path": "/spec/template/spec/containers/0/image", "value": "'${image}'"}]'
 
@@ -125,7 +127,7 @@ jobs:
           function metallb_logs() {
             echo "Timed out waiting for ${COMPONENT} to become ready"
             kubectl get events -n ${NAMESPACE}
-            kubectl logs -l app=${APP} -l component=${COMPONENT} -n ${NAMESPACE}
+            kubectl logs --sort-by='.metadata.creationTimestamp' -l app=${APP} -l component=${COMPONENT} -n ${NAMESPACE}
             exit 1
           }
 
