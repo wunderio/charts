@@ -15,7 +15,16 @@ helm repo add wunderio https://storage.googleapis.com/charts.wdr.io
 
 # Docker Registry Helm Chart (optional)
 helm repo add twuni https://helm.twun.io
+
+# ingress-nginx (optional)
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+
+# nginx-stable (optional)
+# CRD's need to be installed manually, see below
+helm repo add nginx-ingress https://helm.nginx.com/stable
 ```
+
+Note: nginx-ingress requires CRD installation before installing the chart. See https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#installing-the-crds for instructions.
 
 ### cert-manager (required for ssl/tls)
 

@@ -5,8 +5,9 @@ metadata:
 spec:
   type: NodePort
   ports:
-    - name: http
+    - name: web
       port: 80
+      targetPort: 8080
   selector:
     name: {{ .Release.Name }}-splash
 ---
@@ -27,7 +28,7 @@ spec:
     spec:
       enableServiceLinks: false
       containers:
-      - image: "wunderio/silta-splash"
+      - image: "wunderio/silta-splash:v0.1"
         name: nginx
         resources:
           {{- .Values.splash.resources | toYaml | nindent 10 }}

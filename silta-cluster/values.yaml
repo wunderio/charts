@@ -8,7 +8,109 @@ ingress:
   # Custom ingress annotations
   extraAnnotations: {}
   #  networking.gke.io/suppress-firewall-xpn-error: "true"
-  
+
+# Community ingress-nginx chart
+# https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
+# https://github.com/kubernetes/ingress-nginx/blob/e4a66fd2f625de3bcc7aaa793b31f529a0662009/charts/ingress-nginx/values.yaml
+ingress-nginx:
+  enabled: false
+  controller:
+    # see autoscaling section below
+    replicaCount: 1
+    service:
+      # loadBalancerIP: 1.2.3.4
+      externalTrafficPolicy: Local
+    # ingressClass: nginx
+    ingressClassResource:
+      default: false
+      # name: nginx
+    watchIngressWithoutClass: false
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 2
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
+    config:
+      # Optional CDN configuration
+      use-proxy-protocol: false
+      use-forwarded-headers: true
+      compute-full-forwarded-for: true
+      # forwarded-for-header: "X-Forwarded-For"
+      # proxy-real-ip-cidr: "1.1.1.1/32, 2.2.2.2/32"
+      # Logging configuration
+      disable-access-log: false
+      disable-http-access-log: false
+      disable-stream-access-log: false
+      # ModSecurity https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#enable-modsecurity
+      # Off by default, enable using ingress annotations
+      enable-modsecurity: false
+      enable-owasp-modsecurity-crs: false
+      # Required minimum configuration since SecRuleEngine is set to "DetectionOnly" by default
+      # modsecurity-snippet: |
+      #   SecRuleEngine On
+      #   SecRequestBodyAccess On
+    priorityClassName: "high-priority"
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "200m"
+        memory: "512Mi"
+  # Splash page
+  defaultBackend:
+    enabled: true
+    name: defaultbackend
+    image:
+      registry: wunderio
+      image: silta-splash
+      tag: "v0.1"
+      readOnlyRootFilesystem: false
+
+# Official nginx chart from nginxinc 
+# https://github.com/nginxinc/kubernetes-ingress/blob/057c6d7e4f2361f5d2ddd897e9995bcb48ed7e32/deployments/helm-chart/values.yaml
+nginx-ingress:
+  enabled: false
+  controller:
+    replicaCount: 1
+    service:
+      # loadBalancerIP: 1.2.3.4
+      externalTrafficPolicy: Local
+    ingressClass: nginx
+    setAsDefaultIngress: false
+    appprotect:
+      enable: false
+      # Sets log level for App Protect WAF. Allowed values: fatal, error, warn, info, debug, trace
+      logLevel: info
+    appprotectdos:
+      enable: false
+      debug: false
+    config:
+      entries:
+        # Optional CDN configuration
+        real-ip-header: "X-Forwarded-For"
+        real-ip-recursive: "True"
+        #set-real-ip-from: "1.1.1.1/32, 2.2.2.2/32"
+        # Logging configuration
+        access-log-off: "False"
+        server-tokens: "False"
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
+    priorityClassName: "high-priority"
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "128Mi"
+      limits:
+        cpu: "200m"
+        memory: "512Mi"
+
+# Traefik 1.7 chart
 # https://github.com/wunderio/charts/blob/master/legacy_traefik/values.yaml
 traefik:
   enabled: true
@@ -158,7 +260,7 @@ cert-manager:
 silta-downscaler:
   enabled: false
   image: wunderio/silta-downscaler
-  imageTag: "v0.1"
+  imageTag: "v0.2"
   # A cron schedule to determine when applications will be downscaled.
   schedule: "0 4,18 * * *"
   # How long should releases be kept by default.
