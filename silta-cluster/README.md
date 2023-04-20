@@ -60,7 +60,8 @@ helm install --name aws-calico --namespace kube-system eks/aws-calico
 
 ### Percona XtraDB Cluster for replicated database support (optional)
 ```
-kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/main/charts/pxc-operator/crds/crd.yaml
+# CRD for pxc-operator 1.9.x. Depends on pxc-operator version in Chart.yaml.
+kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/900c858a92b325c87c564dece1fa04b1a9b0c554/charts/pxc-operator/crds/crd.yaml
 ```
 
 ### Google Filestore as storage (optional)
@@ -117,6 +118,7 @@ helm upgrade --install --wait silta-cluster silta-cluster \
 - Kubernetes 1.22 requires at least 0.2.30
 - Kubernetes 1.20 requires at least 0.2.18
 - Should work with kubernetes 1.13+
+
 ## Upgrading
 
 Chart upgrades are managed like a normal helm release, though it's suggested to do helm diff first:
@@ -142,6 +144,10 @@ helm upgrade --install --wait silta-cluster silta-cluster \
  - Upgrading silta-cluster chart to 0.2.14 ([docs/Upgrading-to-0.2.14.md](docs/Upgrading-to-0.2.14.md))
 
 ## Components 
+
+#### Ingress controller
+
+Silta cluster uses traefik (1) ingress controller by default but it supports running other controllers too. More about compatible ingress controllers can be found in [ingress controller](docs/ingress-controller.md) documentation page.
 
 #### SSH Jumphost
 

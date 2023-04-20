@@ -50,6 +50,11 @@ ingress-nginx:
       # modsecurity-snippet: |
       #   SecRuleEngine On
       #   SecRequestBodyAccess On
+    # Admission webhook is broken in GKE private clusters and requires additional configuration
+    # so we disable it by default. Enable when possible.
+    # Reference: https://github.com/kubernetes/ingress-nginx/issues/5401
+    admissionWebhooks:
+      enabled: false
     priorityClassName: "high-priority"
     resources:
       requests:
