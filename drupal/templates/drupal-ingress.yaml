@@ -36,8 +36,16 @@ metadata:
     {{- end }}
     {{- if $redirect_https }}
     ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- if eq $ingress.type "traefik" }}
+    nginx.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    nginx.org/redirect-to-https: {{ $redirect_https | quote }}
+    {{- end }}
     {{- if eq $ingress.type "azure/application-gateway" }}
     appgw.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- end }}
+    {{- if eq $ingress.type "nginx" }}
+    nginx.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    nginx.org/redirect-to-https: {{ $redirect_https | quote }}
     {{- end }}
     {{- end }}
 
@@ -188,8 +196,16 @@ metadata:
     {{- end }}
     {{- if $redirect_https }}
     ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- if eq $ingress.type "traefik" }}
+    nginx.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    nginx.org/redirect-to-https: {{ $redirect_https | quote }}
+    {{- end }}
     {{- if eq $ingress.type "azure/application-gateway" }}
     appgw.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- end }}
+    {{- if eq $ingress.type "nginx" }}
+    nginx.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    nginx.org/redirect-to-https: {{ $redirect_https | quote }}
     {{- end }}
     {{- end }}
 
@@ -212,6 +228,15 @@ metadata:
     {{- if $ingress.extraAnnotations }}
     {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- end }}
+
+    {{- if (index $.Values "silta-release").downscaler.enabled }}
+    auto-downscale/down: "false"
+    auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
+    auto-downscale/label-selector: "release={{ $.Release.Name }}"
+    auto-downscale/services: {{ include "drupal.servicename" $ }}
+    {{- end }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
   {{- if $ingress.tls }}
   tls:

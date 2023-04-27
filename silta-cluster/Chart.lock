@@ -1,4 +1,10 @@
 dependencies:
+- name: ingress-nginx
+  repository: https://kubernetes.github.io/ingress-nginx
+  version: 4.6.0
+- name: nginx-ingress
+  repository: https://helm.nginx.com/stable
+  version: 0.17.0
 - name: traefik
   repository: file://../legacy_traefik
   version: 1.87.7
@@ -19,15 +25,15 @@ dependencies:
   version: 0.1.0
 - name: instana-agent
   repository: https://agents.instana.io/helm
-  version: 1.2.54
+  version: 1.2.56
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
-  version: 4.0.17
+  version: 4.0.18
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
-  version: 4.0.17
+  version: 4.0.18
 - name: docker-registry
   repository: https://helm.twun.io
   version: 2.1.0
-digest: sha256:774cdca47c56dd9fd18d4ca773628b97d012aef8fbd56bdc47c2f8b9ff1f1898
-generated: "2023-02-09T12:31:56.932447+02:00"
+digest: sha256:ab3d7a7c9720feaa28a4a05f8d7fc76774cf0f6ecb652b04b2851cef2ef63ebb
+generated: "2023-04-12T17:00:32.561406342+03:00"

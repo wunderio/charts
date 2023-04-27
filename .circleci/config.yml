@@ -36,6 +36,10 @@ jobs:
             helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
             # docker-registry
             helm repo add twuni https://helm.twun.io
+            # ingress-nginx
+            helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+            # nginx-ingress
+            helm repo add nginx-stable https://helm.nginx.com/stable
 
             for CHARTFILE in `find . -name Chart.yaml`
             do

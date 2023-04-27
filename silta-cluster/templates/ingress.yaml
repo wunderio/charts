@@ -20,8 +20,16 @@ metadata:
     {{- end }}
     {{- if $redirect_https }}
     ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- if eq $ingress.type "traefik" }}
+    nginx.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    nginx.org/redirect-to-https: {{ $redirect_https | quote }}
+    {{- end }}
     {{- if eq $ingress.type "azure/application-gateway" }}
     appgw.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    {{- end }}
+    {{- if eq $ingress.type "nginx" }}
+    nginx.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
+    nginx.org/redirect-to-https: {{ $redirect_https | quote }}
     {{- end }}
     {{- end }}
     
