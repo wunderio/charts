@@ -101,6 +101,11 @@ helm upgrade --install --wait silta-cluster silta-cluster \
 
 - `local-values.yaml` contains overrides of [chart defaults](values.yaml) 
 
+Make sure silta-cluster namespace has `name=silta-cluster` label set or environment connections will time out.
+```bash
+kubectl label namespace silta-cluster name=silta-cluster
+```
+
 ## Compatibility
 
 - Kubernetes 1.24 requires at least 0.2.32
