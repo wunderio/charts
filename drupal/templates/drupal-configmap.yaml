@@ -14,11 +14,14 @@ data:
     {{ .Values.gdprDump | toYaml | nindent 4 }}
 
   {{- if eq .Values.php.drupalCoreVersion "7" }}
-  settings_silta_php: |{{ .Files.Get "files/settings.silta.d7.php" | nindent 4 }}
+  settings_silta_php: |-
+    {{- .Files.Get "files/settings.silta.d7.php" | nindent 4 }}
   {{- else }}
-  settings_silta_php: |{{ .Files.Get "files/settings.silta.php" | nindent 4 }}
+  settings_silta_php: |-
+    {{- .Files.Get "files/settings.silta.php" | nindent 4 }}
   {{- end }}
-  silta_services_yml: |{{ .Files.Get "files/silta.services.yml" | nindent 4 }}
+  silta_services_yml: |-
+    {{- .Files.Get "files/silta.services.yml" | nindent 4 }}
 
   php_ini: |
     [PHP]
@@ -75,6 +78,7 @@ data:
     ; Custom configuration below
     {{ .Values.php.php_ini.extraConfig | nindent 4 }}
 
+
   nginx_conf: |
 
     include modules/*.conf;
@@ -86,100 +90,99 @@ data:
     error_log                       /proc/self/fd/2 {{ .Values.nginx.loglevel }};
 
     events {
-        worker_connections          10240;
-        multi_accept                on;
+      worker_connections          10240;
+      multi_accept                on;
     }
 
     http {
-        
-        # List of upstream proxies we trust to set X-Forwarded-For correctly.
-        {{- if kindIs "string" .Values.nginx.realipfrom }}
-        set_real_ip_from            {{ .Values.nginx.realipfrom }};
+      # List of upstream proxies we trust to set X-Forwarded-For correctly.
+      {{- if kindIs "string" .Values.nginx.realipfrom }}
+      set_real_ip_from            {{ .Values.nginx.realipfrom }};
+      {{- end }}
+      {{- if kindIs "map" .Values.nginx.realipfrom }}
+      {{- range .Values.nginx.realipfrom }}
+      set_real_ip_from            {{ . }};
+      {{- end }}
+      {{- end }}
+
+      real_ip_header              {{ .Values.nginx.real_ip_header }};
+      real_ip_recursive           on;
+
+      include                     /etc/nginx/mime.types;
+      default_type                application/octet-stream;
+
+      log_format  main            '$remote_addr - $remote_user [$time_local] "$request" '
+                                  '$status $body_bytes_sent "$http_referer" '
+                                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+      access_log                  /proc/self/fd/1 main;
+
+      ssl_session_cache           shared:SSL:10m;
+      ssl_session_timeout         10m;
+
+      send_timeout                60s;
+      sendfile                    on;
+      client_body_timeout         60s;
+      client_header_timeout       60s;
+      ## This value is set to be identical with PHP's post_max_size.
+      client_max_body_size        {{ .Values.php.php_ini.post_max_size }};
+      client_body_buffer_size     128k;
+      client_header_buffer_size   4k;
+      large_client_header_buffers 8 16K;
+      keepalive_timeout           15 10;
+      keepalive_requests          100;
+      reset_timedout_connection   on;
+      tcp_nodelay                 on;
+      tcp_nopush                  on;
+      server_tokens               off;
+
+      ## upload_progress             uploads 1m;
+
+      gzip                        on;
+      gzip_buffers                16 8k;
+      gzip_comp_level             {{ .Values.nginx.comp_level }};
+      gzip_http_version           1.1;
+      gzip_min_length             20;
+      gzip_types                  text/plain text/css application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript image/x-icon application/vnd.ms-fontobject font/opentype application/x-font-ttf application/json image/svg+xml;
+      gzip_vary                   on;
+      gzip_proxied                any;
+      gzip_disable                msie6;
+
+      ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.
+      {{- range $header, $value := .Values.nginx.security_headers }}
+      {{- if $value }}
+      add_header                  {{ $header }} {{ $value }};
+      {{- end }}
+      {{- end }}
+      add_header                  Strict-Transport-Security "max-age=31536000; {{ .Values.nginx.hsts_include_subdomains }} preload" always;
+      {{- if .Values.nginx.content_security_policy }}
+      add_header                  Content-Security-Policy "{{ .Values.nginx.content_security_policy }}" always;
+      {{- end }}
+
+      port_in_redirect off;
+      merge_slashes off;
+
+      types_hash_max_size 8192;
+      server_names_hash_bucket_size 64;
+
+      map_hash_bucket_size 128;
+
+      # Return noindex headers for built-in domains
+      map $http_host $x_robots_tag_header {
+        "~{{ template "drupal.domain" $ }}$" "noindex, nofollow, nosnippet, noarchive";
+        {{- range $index, $prefix := .Values.domainPrefixes }}
+        {{- $params := dict "prefix" $prefix  -}}
+        "~{{ template "drupal.domain" ( merge $params $ ) }}$" "noindex, nofollow, nosnippet, noarchive";
         {{- end }}
-        {{- if kindIs "map" .Values.nginx.realipfrom }}
-        {{- range .Values.nginx.realipfrom }}
-        set_real_ip_from            {{ . }};
-        {{- end }}
-        {{- end }}
+        default  '';
+      }
+      add_header                  X-Robots-Tag $x_robots_tag_header;
 
-        real_ip_header              {{ .Values.nginx.real_ip_header }};
-        real_ip_recursive           on;
+      map $uri $no_slash_uri {
+        ~^/(?<no_slash>.*)$ $no_slash;
+      }
 
-        include                     /etc/nginx/mime.types;
-        default_type                application/octet-stream;
-
-        log_format  main            '$remote_addr - $remote_user [$time_local] "$request" '
-                                    '$status $body_bytes_sent "$http_referer" '
-                                    '"$http_user_agent" "$http_x_forwarded_for"';
-
-        access_log                  /proc/self/fd/1 main;
-
-        ssl_session_cache           shared:SSL:10m;
-        ssl_session_timeout         10m;
-
-        send_timeout                60s;
-        sendfile                    on;
-        client_body_timeout         60s;
-        client_header_timeout       60s;
-        ## This value is set to be identical with PHP's post_max_size.
-        client_max_body_size        {{ .Values.php.php_ini.post_max_size }};
-        client_body_buffer_size     128k;
-        client_header_buffer_size   4k;
-        large_client_header_buffers 8 16K;
-        keepalive_timeout           15 10;
-        keepalive_requests          100;
-        reset_timedout_connection   on;
-        tcp_nodelay                 on;
-        tcp_nopush                  on;
-        server_tokens               off;
-
-        ## upload_progress             uploads 1m;
-
-        gzip                        on;
-        gzip_buffers                16 8k;
-        gzip_comp_level             {{ .Values.nginx.comp_level }};
-        gzip_http_version           1.1;
-        gzip_min_length             20;
-        gzip_types                  text/plain text/css application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript image/x-icon application/vnd.ms-fontobject font/opentype application/x-font-ttf application/json image/svg+xml;
-        gzip_vary                   on;
-        gzip_proxied                any;
-        gzip_disable                msie6;
-
-        ## https://www.owasp.org/index.php/List_of_useful_HTTP_headers.
-        {{- range $header, $value := .Values.nginx.security_headers }}
-        {{- if $value }}
-        add_header                  {{ $header }} {{ $value }};
-        {{- end }}
-        {{- end }}
-        add_header                  Strict-Transport-Security "max-age=31536000; {{ .Values.nginx.hsts_include_subdomains }} preload" always;
-        {{- if .Values.nginx.content_security_policy }}
-        add_header                  Content-Security-Policy "{{ .Values.nginx.content_security_policy }}" always;
-        {{- end }}
-        
-        port_in_redirect off;
-        merge_slashes off;
-
-        types_hash_max_size 8192;
-        server_names_hash_bucket_size 64;
-
-        map_hash_bucket_size 128;
-
-        # Return noindex headers for built-in domains
-        map $http_host $x_robots_tag_header {
-            "~{{ template "drupal.domain" $ }}$" "noindex, nofollow, nosnippet, noarchive";
-            {{- range $index, $prefix := .Values.domainPrefixes }}
-            {{- $params := dict "prefix" $prefix  -}}
-            "~{{ template "drupal.domain" ( merge $params $ ) }}$" "noindex, nofollow, nosnippet, noarchive";
-            {{- end }}
-            default  '';
-        }
-        add_header                  X-Robots-Tag $x_robots_tag_header;
-
-        map $uri $no_slash_uri {
-            ~^/(?<no_slash>.*)$ $no_slash;
-        }
-
-        include conf.d/*.conf;
+      include conf.d/*.conf;
     }
 
   fastcgi_conf: |
@@ -254,19 +257,19 @@ data:
     fastcgi_hide_header 'X-Drupal-Cache-Contexts';
     fastcgi_hide_header 'X-Drupal-Cache-Tags';
     {{- end }}
-    
+
     # Mitigate HTTPoxy
     # https://httpoxy.org/
     fastcgi_param HTTP_PROXY "";
 
     upstream php {
-        server localhost:9000;
+      server localhost:9000;
     }
 
     map $http_x_forwarded_proto $fastcgi_https {
-        default $https;
-        http '';
-        https on;
+      default $https;
+      http '';
+      https on;
     }
 
     {{- if .Values.nginx.redirects }}
@@ -287,399 +290,398 @@ data:
         {{- end }}
     }
     {{- end }}
-    
+
     # List health checks that need to return status 200 here
     map $http_user_agent $hc_ua { default 0; 'GoogleHC/1.0' 1; }
 
     server {
-        server_name drupal;
-        listen 8080;
+      server_name drupal;
+      listen 8080;
 
-        # Loadbalancer health checks need to be fed with http 200
-        if ($hc_ua) { return 200; }
+      # Loadbalancer health checks need to be fed with http 200
+      if ($hc_ua) { return 200; }
 
-        {{- if .Values.nginx.redirects }}
-        # Redirects to specified path if map returns anything
-        if ($redirect_uri) {
-    	    return 301 $redirect_uri;
-        }
-        if ($redirect_uri_local) {
-    	    return 301 $redirect_uri_local;
-        }
+      {{- if .Values.nginx.redirects }}
+      # Redirects to specified path if map returns anything
+      if ($redirect_uri) {
+        return 301 $redirect_uri;
+      }
+      if ($redirect_uri_local) {
+        return 301 $redirect_uri_local;
+      }
+      {{- end }}
+
+      root {{ .Values.webRoot }};
+      index index.php;
+
+      include fastcgi.conf;
+
+      {{- include "drupal.basicauth" . | nindent 4 }}
+
+      {{- if .Values.nginx.serverExtraConfig }}
+      # Custom configuration gets included here
+      {{- tpl .Values.nginx.serverExtraConfig . | nindent 6 }}
+      {{- end }}
+
+      {{- if .Values.mailhog.enabled }}
+      location /mailhog {
+
+        # Auth / whitelist always enabled
+        satisfy any;
+        allow 127.0.0.1;
+        {{- range .Values.nginx.noauthips }}
+        allow {{ . }};
         {{- end }}
+        deny all;
 
-        root {{ .Values.webRoot }};
-        index index.php;
-
-        include fastcgi.conf;
-
-        {{ include "drupal.basicauth" . | indent 6}}
-
-        {{- if .Values.nginx.serverExtraConfig }}
-        # Custom configuration gets included here
-        {{- tpl .Values.nginx.serverExtraConfig . | nindent 8 }}
-        {{- end }}
-
-        {{- if .Values.mailhog.enabled }}
-        location /mailhog {
-
-            # Auth / whitelist always enabled
-            satisfy any;
-            allow 127.0.0.1;
-            {{- range .Values.nginx.noauthips }}
-            allow {{ . }};
-            {{- end }}
-            deny all;
-
-            {{- if gt (len .Values.nginx.noauthips) 1 -}}
-            # Basic auth only offered when at least one extra ip is whitelisted. Prevents using default credentials.
-            auth_basic "Restricted";
-            auth_basic_user_file /etc/nginx/.htaccess;
-            {{- end}}
-
-            rewrite ^/mailhog$ /mailhog/ permanent;
-
-            # Proxy to mailhog container
-            rewrite /mailhog(.*) $1 break;
-            proxy_pass http://{{ .Release.Name }}-mailhog:8025/;
-
-            # Websock connection
-            chunked_transfer_encoding on;
-            proxy_set_header X-NginX-Proxy true;
-            proxy_set_header Upgrade $http_upgrade;
-            proxy_set_header Connection "upgrade";
-            proxy_http_version 1.1;
-            proxy_redirect off;
-            proxy_buffering off;
-        }
+        {{- if gt (len .Values.nginx.noauthips) 1 -}}
+        # Basic auth only offered when at least one extra ip is whitelisted. Prevents using default credentials.
+        auth_basic "Restricted";
+        auth_basic_user_file /etc/nginx/.htaccess;
         {{- end}}
 
-        location / {
+        rewrite ^/mailhog$ /mailhog/ permanent;
 
-            # Custom configuration gets included here
-            {{ if .Values.nginx.locationExtraConfig }}
-            {{ tpl .Values.nginx.locationExtraConfig . | nindent 10 }}
-            {{- end }}
+        # Proxy to mailhog container
+        rewrite /mailhog(.*) $1 break;
+        proxy_pass http://{{ .Release.Name }}-mailhog:8025/;
 
-            location ~* /system/files/ {
-                include fastcgi.conf;
-                fastcgi_param QUERY_STRING q=$uri&$args;
-                fastcgi_param SCRIPT_NAME /index.php;
-                fastcgi_param SCRIPT_FILENAME $document_root/index.php;
-                fastcgi_pass php;
-                log_not_found off;
-            }
+        # Websock connection
+        chunked_transfer_encoding on;
+        proxy_set_header X-NginX-Proxy true;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_http_version 1.1;
+        proxy_redirect off;
+          proxy_buffering off;
+      }
+      {{- end}}
 
-            location ~* /sites/.+/files/private/ {
-                internal;
-            }
+      location / {
 
-            location ~* /sites/.+/files/.+\.txt {
-                access_log off;
-                expires 30d;
-                tcp_nodelay off;
-                open_file_cache off;
-                open_file_cache_valid 45s;
-                open_file_cache_min_uses 2;
-                open_file_cache_errors off;
-            }
+        {{- if .Values.nginx.locationExtraConfig }}
+        # Custom configuration gets included here
+        {{- tpl .Values.nginx.locationExtraConfig . | nindent 8 }}
+        {{- end }}
 
-            location ~* /admin/reports/hacked/.+/diff/ {
-                try_files $uri @drupal;
-            }
+        location ~* /system/files/ {
+          include fastcgi.conf;
+          fastcgi_param QUERY_STRING q=$uri&$args;
+          fastcgi_param SCRIPT_NAME /index.php;
+          fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+          fastcgi_pass php;
+          log_not_found off;
+        }
 
-            location ~* /rss.xml {
-                try_files $uri @drupal-no-args;
-            }
+        location ~* /sites/.+/files/private/ {
+          internal;
+        }
 
-            location ~* /sitemap.xml {
-                try_files $uri @drupal;
-            }
+        location ~* /sites/.+/files/.+\.txt {
+          access_log off;
+          expires 30d;
+          tcp_nodelay off;
+          open_file_cache off;
+          open_file_cache_valid 45s;
+          open_file_cache_min_uses 2;
+          open_file_cache_errors off;
+        }
 
-            location ~* ^.+\.(?:pdf|pptx?)$ {
-                expires 30d;
-                tcp_nodelay off;
-            }
+        location ~* /admin/reports/hacked/.+/diff/ {
+          try_files $uri @drupal;
+        }
 
-            ## Advanced Help module makes each module provided README available.
-            location ~* ^/help/[^/]*/README\.txt$ {
-                try_files $uri @drupal;
-            }
+        location ~* /rss.xml {
+          try_files $uri @drupal-no-args;
+        }
 
-            ## Regular private file serving (i.e. handled by Drupal).
-            location ~ /system/files/ {
-                try_files $uri @drupal;
-                log_not_found off;
-            }
+        location ~* /sitemap.xml {
+          try_files $uri @drupal;
+        }
 
-            ## Allow download of .txt files from files directory
-            location ~* ^/sites/.*/files/(?:.+\.(?:txt)) {
-                tcp_nodelay     off;
-                expires         30d;
-                try_files $uri =404;
-                log_not_found off;
-            }
+        location ~* ^.+\.(?:pdf|pptx?)$ {
+          expires 30d;
+          tcp_nodelay off;
+        }
 
-            ## Replicate the Apache <FilesMatch> directive of Drupal standard
-            ## .htaccess. Disable access to any code files. Return a 404 to curtail
-            ## information disclosure. Hide also the text files.
-            location ~* ^(?:.+\.(?:htaccess|make|txt|engine|inc|info|module|profile|po|sh|.*sql|csv|yml|test|theme|tpl(?:\.php)?|xtmpl|config)|code-style\.pl|/Entries.*|/Repository|/Root|/Tag|/Template)$ {
-                return 404;
-            }
+        ## Advanced Help module makes each module provided README available.
+        location ~* ^/help/[^/]*/README\.txt$ {
+          try_files $uri @drupal;
+        }
 
-            ###
-            ### Advagg_css and Advagg_js support.
-            ###
-            location ~* files/advagg_(?:css|js)/ {
-                expires       max;
-                etag          off;
-                access_log    off;
-                log_not_found off;
-                ## Set the OS file cache.
-                open_file_cache max=3000 inactive=120s;
-                open_file_cache_valid 45s;
-                open_file_cache_min_uses 2;
-                open_file_cache_errors off;
-                add_header Cache-Control "no-transform, public";
-                add_header Last-Modified "Wed, 20 Jan 1988 04:20:42 GMT";
-                add_header Access-Control-Allow-Origin *;
-                add_header X-Header "AdvAgg Generator 2.0 CDN";
-                try_files $uri @drupal;
-            }
+        ## Regular private file serving (i.e. handled by Drupal).
+        location ~ /system/files/ {
+          try_files $uri @drupal;
+          log_not_found off;
+        }
 
-            {{- if .Values.nginx.retry404s }}
-            {{- if kindIs "float64" .Values.nginx.retry404s }}
-            {{- fail ".Values.nginx.retry404s configuration schema has been changed. Please check chart values file for updates." }}
-            {{- end }}
-            # Retry file lookup in {{ .Values.nginx.retry404s.delay }} seconds (fs sync workaround)
-            {{- range .Values.nginx.retry404s.paths }}
-            location ~* {{ . }} {
-                try_files $uri $uri/ @files_delay;
-            }
-            {{- end }}
-            {{- end }}
+        ## Allow download of .txt files from files directory
+        location ~* ^/sites/.*/files/(?:.+\.(?:txt)) {
+          tcp_nodelay     off;
+          expires         30d;
+          try_files $uri =404;
+          log_not_found off;
+        }
 
-            ## Handle D7 image styles
-            location ~* /files/styles/ {
-                expires 365d;
-                try_files $uri @drupal;
-            }
+        ## Replicate the Apache <FilesMatch> directive of Drupal standard
+        ## .htaccess. Disable access to any code files. Return a 404 to curtail
+        ## information disclosure. Hide also the text files.
+        location ~* ^(?:.+\.(?:htaccess|make|txt|engine|inc|info|module|profile|po|sh|.*sql|csv|yml|test|theme|tpl(?:\.php)?|xtmpl|config)|code-style\.pl|/Entries.*|/Repository|/Root|/Tag|/Template)$ {
+          return 404;
+        }
 
-            ## Serve static files & images directly, without all standard drupal rewrites, php-fpm etc.
-            location ~* ^.+\.(?:css|js|jpe?g|gif|png|ico|svg|swf|docx?|xlsx?|tiff?|txt|cgi|bat|pl|dll|exe|class)$ {
-                tcp_nodelay     off;
-                expires         365d;
-                add_header Cache-Control "public";
-                ## Set the OS file cache.
-                {{- if .Values.nginx.open_file_cache.enabled }}
-                open_file_cache max={{ .Values.nginx.open_file_cache.max }} inactive={{ .Values.nginx.open_file_cache.inactive }};
-                {{- else }}
-                open_file_cache off;
-                {{- end }}
-                open_file_cache_valid 45s;
-                open_file_cache_min_uses 2;
-                open_file_cache_errors off;
-                try_files $uri =404;
-            }
-
-            ## PDFs and powerpoint files handling.
-            location ~* ^.+\.(?:pdf|pptx?)$ {
-                expires 30d;
-                ## No need to bleed constant updates. Send the all shebang in one
-                ## fell swoop.
-                tcp_nodelay off;
-            }
-
-            # Configure webfont access
-            location ~* \.(?:ttf|ttc|otf|eot|woff|woff2|font.css)$ {
-                # Uncomment to allow cross domain webfont access
-                # Set cache rules for webfonts.
-                expires 365d;
-                add_header Cache-Control "public";
-                ## Set the OS file cache.
-                {{- if .Values.nginx.open_file_cache.enabled }}
-                open_file_cache max={{ .Values.nginx.open_file_cache.max }} inactive={{ .Values.nginx.open_file_cache.inactive }};
-                {{- else }}
-                open_file_cache off;
-                {{- end }}
-                open_file_cache_valid 45s;
-                open_file_cache_min_uses 2;
-                open_file_cache_errors off;
-                try_files $uri =404;
-                log_not_found off;
-                access_log off;
-            }
-
-            ## Serve bigger media/static/archive files directly, without all standard drupal rewrites, php-fpm etc.
-            location ~* ^.+\.(?:avi|mpe?g|mov|wmv|mp3|mp4|m4a|ogg|flv|wav|midi|zip|tar|t?gz|rar)$ {
-                expires         365d;
-                tcp_nodelay     off;
-                try_files $uri =404;
-                log_not_found off;
-                access_log off;
-            }
-
-            ## Deny bots on never cached uri without 403 response.
-            location ~* ^/(?:user|admin|cart|checkout|logout|abuse|flag) {
-                if ( $http_user_agent ~* (?:crawl|goog|yahoo|spider|bot|yandex|bing|tracker|click|parser) ) {
-                return 444;
-                }
-                try_files $uri @drupal;
-            }
-
-            location = /robots.txt {
-                add_header  Content-Type  text/plain;
-                access_log  off;
-                try_files $uri @drupal;
-            }
-
-            location = /radioactivity_node.php {
-                try_files $uri @drupal;
-            }
-
-            ## Allow radioactivity to work.
-            location ~* /emit.php {
-                include fastcgi.conf;
-                fastcgi_param  SCRIPT_FILENAME    $document_root/sites/all/modules/contrib/radioactivity/emit.php;
-                fastcgi_pass php;
-            }
-
-            # This is cool because no php is touched for static content
-            try_files $uri @drupal;
+        ###
+        ### Advagg_css and Advagg_js support.
+        ###
+        location ~* files/advagg_(?:css|js)/ {
+          expires       max;
+          etag          off;
+          access_log    off;
+          log_not_found off;
+          ## Set the OS file cache.
+          open_file_cache max=3000 inactive=120s;
+          open_file_cache_valid 45s;
+          open_file_cache_min_uses 2;
+          open_file_cache_errors off;
+          add_header Cache-Control "no-transform, public";
+          add_header Last-Modified "Wed, 20 Jan 1988 04:20:42 GMT";
+          add_header Access-Control-Allow-Origin *;
+          add_header X-Header "AdvAgg Generator 2.0 CDN";
+          try_files $uri @drupal;
         }
 
         {{- if .Values.nginx.retry404s }}
-        location @files_delay {
-            internal;
-            echo_sleep {{ .Values.nginx.retry404s.delay }}.0;
-            echo_exec @files_retry;
-        }
-        location @files_retry {
-            internal;
-            # Pass file request to drupal as a final fallback. 
-            try_files $uri @drupal;
+        {{- if kindIs "float64" .Values.nginx.retry404s }}
+        {{- fail ".Values.nginx.retry404s configuration schema has been changed. Please check chart values file for updates." }}
+        {{- end }}
+        # Retry file lookup in {{ .Values.nginx.retry404s.delay }} seconds (fs sync workaround)
+        {{- range .Values.nginx.retry404s.paths }}
+        location ~* {{ . }} {
+          try_files $uri $uri/ @files_delay;
         }
         {{- end }}
+        {{- end }}
 
-        location @drupal {
-            include fastcgi.conf;
-            fastcgi_param QUERY_STRING $query_string;
-            fastcgi_param SCRIPT_NAME /index.php;
-            fastcgi_param SCRIPT_FILENAME $document_root/index.php;
-            fastcgi_pass php;
+        ## Handle D7 image styles
+        location ~* /files/styles/ {
+          expires 365d;
+          try_files $uri @drupal;
         }
 
-        location @drupal-no-args {
-            include fastcgi.conf;
-            fastcgi_param QUERY_STRING q=$uri;
-            fastcgi_param SCRIPT_NAME /index.php;
-            fastcgi_param SCRIPT_FILENAME $document_root/index.php;
-            fastcgi_pass php;
+        ## Serve static files & images directly, without all standard drupal rewrites, php-fpm etc.
+        location ~* ^.+\.(?:css|js|jpe?g|gif|png|ico|svg|swf|docx?|xlsx?|tiff?|txt|cgi|bat|pl|dll|exe|class)$ {
+          tcp_nodelay     off;
+          expires         365d;
+          add_header Cache-Control "public";
+          ## Set the OS file cache.
+          {{- if .Values.nginx.open_file_cache.enabled }}
+          open_file_cache max={{ .Values.nginx.open_file_cache.max }} inactive={{ .Values.nginx.open_file_cache.inactive }};
+          {{- else }}
+          open_file_cache off;
+          {{- end }}
+          open_file_cache_valid 45s;
+          open_file_cache_min_uses 2;
+          open_file_cache_errors off;
+          try_files $uri =404;
         }
 
-        location = /index.php {
-            fastcgi_pass php;
+        ## PDFs and powerpoint files handling.
+        location ~* ^.+\.(?:pdf|pptx?)$ {
+          expires 30d;
+          ## No need to bleed constant updates. Send the all shebang in one
+          ## fell swoop.
+          tcp_nodelay off;
         }
 
-        location ~* ^/core/authorize.php {
-            include fastcgi.conf;
-            fastcgi_param QUERY_STRING $args;
-            fastcgi_param SCRIPT_NAME /core/authorize.php;
-            fastcgi_param SCRIPT_FILENAME $document_root/core/authorize.php;
-            fastcgi_pass php;
+        # Configure webfont access
+        location ~* \.(?:ttf|ttc|otf|eot|woff|woff2|font.css)$ {
+          # Uncomment to allow cross domain webfont access
+          # Set cache rules for webfonts.
+          expires 365d;
+          add_header Cache-Control "public";
+          ## Set the OS file cache.
+          {{- if .Values.nginx.open_file_cache.enabled }}
+          open_file_cache max={{ .Values.nginx.open_file_cache.max }} inactive={{ .Values.nginx.open_file_cache.inactive }};
+          {{- else }}
+          open_file_cache off;
+          {{- end }}
+          open_file_cache_valid 45s;
+          open_file_cache_min_uses 2;
+          open_file_cache_errors off;
+          try_files $uri =404;
+          log_not_found off;
+          access_log off;
         }
 
-        location = /core/modules/statistics/statistics.php {
-            fastcgi_pass php;
+        ## Serve bigger media/static/archive files directly, without all standard drupal rewrites, php-fpm etc.
+        location ~* ^.+\.(?:avi|mpe?g|mov|wmv|mp3|mp4|m4a|ogg|flv|wav|midi|zip|tar|t?gz|rar)$ {
+          expires         365d;
+          tcp_nodelay     off;
+          try_files $uri =404;
+          log_not_found off;
+          access_log off;
         }
 
-        location = /cron {
-            include fastcgi.conf;
-            fastcgi_param QUERY_STRING $args;
-            fastcgi_param SCRIPT_NAME /index.php;
-            fastcgi_param SCRIPT_FILENAME $document_root/index.php;
-            fastcgi_pass php;
+        ## Deny bots on never cached uri without 403 response.
+        location ~* ^/(?:user|admin|cart|checkout|logout|abuse|flag) {
+          if ( $http_user_agent ~* (?:crawl|goog|yahoo|spider|bot|yandex|bing|tracker|click|parser) ) {
+            return 444;
+          }
+          try_files $uri @drupal;
         }
 
-        location ~* ^/update.php {
-            include fastcgi.conf;
-            fastcgi_param QUERY_STRING $args;
-            fastcgi_param SCRIPT_NAME /update.php;
-            fastcgi_param SCRIPT_FILENAME $document_root/update.php;
-            fastcgi_pass php;
+        location = /robots.txt {
+          add_header  Content-Type  text/plain;
+          access_log  off;
+          try_files $uri @drupal;
         }
 
-        location ~* ^/.well-known/ {
-            allow all;
+        location = /radioactivity_node.php {
+          try_files $uri @drupal;
         }
 
-        location @empty {
-            expires 30d;
-            empty_gif;
+        ## Allow radioactivity to work.
+        location ~* /emit.php {
+          include fastcgi.conf;
+          fastcgi_param  SCRIPT_FILENAME    $document_root/sites/all/modules/contrib/radioactivity/emit.php;
+          fastcgi_pass php;
         }
 
-        location = /authorize.php {
-            include fastcgi.conf;
-            fastcgi_param  SCRIPT_FILENAME    $document_root/authorize.php;
-            fastcgi_pass php;
-        }
+        # This is cool because no php is touched for static content
+        try_files $uri @drupal;
+      }
 
-        ## Disallow these update scripts as they are not used in current workflow, Drupal 7/8.
-        location ~ ^/(update.php|core/update.php) {
-            return 404;
-        }
+      {{- if .Values.nginx.retry404s }}
+      location @files_delay {
+        internal;
+        echo_sleep {{ .Values.nginx.retry404s.delay }}.0;
+        echo_exec @files_retry;
+      }
+      location @files_retry {
+        internal;
+        # Pass file request to drupal as a final fallback. 
+        try_files $uri @drupal;
+      }
+      {{- end }}
 
-        ## Disallow these install cripts as they are not used in current workflow, Drupal 7/8.
-        location ~ ^/(install.php|core/install.php) {
-            return 404;
-        }
+      location @drupal {
+        include fastcgi.conf;
+        fastcgi_param QUERY_STRING $query_string;
+        fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+        fastcgi_pass php;
+      }
 
-        ## Allow running _ping.php
-        location = /_ping.php {
-            include fastcgi.conf;
-            fastcgi_param  SCRIPT_FILENAME    $document_root/_ping.php;
-            fastcgi_pass php;
-            access_log off;
-        }
-        # Following directive is commented out since it produces notes in logs
-        # on every http request where parameter q= is not present
-        # to be removed completely after more tests and verification that it
-        # brings no negative impact on funct. for majority of drupal deployments
-        # # Handle autocomplete to-cleanURLs policy
-        # if ( $args ~* "^q=(?<query_value>.*)" ) {
-        #     rewrite ^/index.php$ $host/?q=$query_value? permanent;
-        # }
+      location @drupal-no-args {
+        include fastcgi.conf;
+        fastcgi_param QUERY_STRING q=$uri;
+        fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+        fastcgi_pass php;
+      }
 
-        ## Disallow access to patches directory.
-        location ^~ /patches { return 404; }
+      location = /index.php {
+        fastcgi_pass php;
+      }
 
-        ## Disallow access to drush backup directory.
-        location ^~ /backup { return 404; }
+      location ~* ^/core/authorize.php {
+        include fastcgi.conf;
+        fastcgi_param QUERY_STRING $args;
+        fastcgi_param SCRIPT_NAME /core/authorize.php;
+        fastcgi_param SCRIPT_FILENAME $document_root/core/authorize.php;
+        fastcgi_pass php;
+      }
 
-        ## Most sites won't have configured favicon
-        ## and since its always grabbed, turn it off in access log
-        ## and turn off it's not-found error in the error log
-        location = /favicon.ico { access_log off; log_not_found off; try_files /favicon.ico @empty; }
+      location = /core/modules/statistics/statistics.php {
+        fastcgi_pass php;
+      }
 
-        ## Same for apple-touch-icon files
-        location = /apple-touch-icon.png { access_log off; log_not_found off; }
-        location = /apple-touch-icon-precomposed.png { access_log off; log_not_found off; }
+      location = /cron {
+        include fastcgi.conf;
+        fastcgi_param QUERY_STRING $args;
+        fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+        fastcgi_pass php;
+      }
 
-        ## Return an in memory 1x1 transparent GIF.
-        location @empty {
-            expires 30d;
-            empty_gif;
-        }
+      location ~* ^/update.php {
+        include fastcgi.conf;
+        fastcgi_param QUERY_STRING $args;
+        fastcgi_param SCRIPT_NAME /update.php;
+        fastcgi_param SCRIPT_FILENAME $document_root/update.php;
+        fastcgi_pass php;
+      }
 
-        ## Rather than just denying .ht* in the config, why not deny
-        ## access to all .invisible files
-        location ~ /\. { return 404; access_log off; log_not_found off; }
+      location ~* ^/.well-known/ {
+        allow all;
+      }
 
-        ## Any other attempt to access PHP files returns a 404.
-        location ~* ^.+\.php$ {
-            return 404;
-        }
+      location @empty {
+        expires 30d;
+        empty_gif;
+      }
 
+      location = /authorize.php {
+        include fastcgi.conf;
+        fastcgi_param  SCRIPT_FILENAME    $document_root/authorize.php;
+        fastcgi_pass php;
+      }
+
+      ## Disallow these update scripts as they are not used in current workflow, Drupal 7/8.
+      location ~ ^/(update.php|core/update.php) {
+        return 404;
+      }
+
+      ## Disallow these install cripts as they are not used in current workflow, Drupal 7/8.
+      location ~ ^/(install.php|core/install.php) {
+        return 404;
+      }
+
+      ## Allow running _ping.php
+      location = /_ping.php {
+        include fastcgi.conf;
+        fastcgi_param  SCRIPT_FILENAME    $document_root/_ping.php;
+        fastcgi_pass php;
+        access_log off;
+      }
+      # Following directive is commented out since it produces notes in logs
+      # on every http request where parameter q= is not present
+      # to be removed completely after more tests and verification that it
+      # brings no negative impact on funct. for majority of drupal deployments
+      # # Handle autocomplete to-cleanURLs policy
+      # if ( $args ~* "^q=(?<query_value>.*)" ) {
+      #   rewrite ^/index.php$ $host/?q=$query_value? permanent;
+      # }
+
+      ## Disallow access to patches directory.
+      location ^~ /patches { return 404; }
+
+      ## Disallow access to drush backup directory.
+      location ^~ /backup { return 404; }
+
+      ## Most sites won't have configured favicon
+      ## and since its always grabbed, turn it off in access log
+      ## and turn off it's not-found error in the error log
+      location = /favicon.ico { access_log off; log_not_found off; try_files /favicon.ico @empty; }
+
+      ## Same for apple-touch-icon files
+      location = /apple-touch-icon.png { access_log off; log_not_found off; }
+      location = /apple-touch-icon-precomposed.png { access_log off; log_not_found off; }
+
+      ## Return an in memory 1x1 transparent GIF.
+      location @empty {
+        expires 30d;
+        empty_gif;
+      }
+
+      ## Rather than just denying .ht* in the config, why not deny
+      ## access to all .invisible files
+      location ~ /\. { return 404; access_log off; log_not_found off; }
+
+      ## Any other attempt to access PHP files returns a 404.
+      location ~* ^.+\.php$ {
+        return 404;
+      }
     }
 
 {{- if .Values.nginx.extraConfig }}
@@ -698,10 +700,10 @@ data:
     #!/bin/bash
     
     # Prevent requests during the site installation process.
-    if [ {{ include "drupal.installation-in-progress-test" $ }} ]; then 
-        exit 1; 
+    if [ {{ include "drupal.installation-in-progress-test" $ }} ]; then
+      exit 1;
     fi
-
+    
     # Ping php-fpm process
     SCRIPT_NAME=/ping \
     SCRIPT_FILENAME=/ping \

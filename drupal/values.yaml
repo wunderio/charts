@@ -89,6 +89,10 @@ ingress:
             period: 1s
             average: 32
             burst: 90
+      nginx.ingress.kubernetes.io/limit-rps: "32"
+      nginx.ingress.kubernetes.io/limit-rpm: "300"
+      nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
+      nginx.ingress.kubernetes.io/limit-connections: "20"
   gce:
     type: gce
     # The name of the reserved static IP address.
@@ -421,7 +425,7 @@ referenceData:
       memory: 488Mi
 
 # Parameters for sanitizing reference data with github.com/Smile-SA/gdpr-dump
-# Uses formatters from fakerphp.github.io/formatters 
+# Uses formatters from fakerphp.github.io/formatters
 gdprDump:
   tables:
     cache:
