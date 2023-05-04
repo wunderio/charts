@@ -33,4 +33,6 @@ spec:
                 value: {{ index (index .Values "silta-downscaler") "defaultMinAge" | quote }}
               - name: RELEASE_MIN_AGE
                 value: '{{ index (index .Values "silta-downscaler") "releaseMinAge" | toJson }}'
+              - name: PLACEHOLDER_PROXY_IMAGE
+                value: '{{ index (index (index .Values "silta-downscaler") "proxy") "image" }}:{{ index (index (index .Values "silta-downscaler") "proxy") "imageTag" }}'
 {{- end }}
