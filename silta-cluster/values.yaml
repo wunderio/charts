@@ -280,6 +280,9 @@ silta-downscaler:
     requests:
       cpu: 10m
       memory: 50Mi
+  proxy:
+    image: wunderio/silta-downscaler
+    imageTag: v0.2-proxy
 
 # https://github.com/wunderio/charts/blob/master/silta-proxy
 silta-proxy:
