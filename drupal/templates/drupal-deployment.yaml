@@ -43,6 +43,10 @@ spec:
         readinessProbe:
           exec:
             command: ['/bin/bash', '-c', '/php-fpm-probe.sh']
+        lifecycle:
+          preStop:
+            exec:
+              command: [ "/bin/sleep", "15" ]
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
 
@@ -83,7 +87,7 @@ spec:
           mountPath: /etc/nginx/conf.d/misc.conf
           readOnly: true
           subPath: extraConfig
-        {{- end }}  
+        {{- end }}
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
           mountPath: /etc/nginx/.htaccess
@@ -96,7 +100,7 @@ spec:
         lifecycle:
           preStop:
             exec:
-              command: ["/bin/sleep", "5"]
+              command: ["/bin/sleep", "15"]
         resources:
           {{- .Values.nginx.resources | toYaml | nindent 10 }}
 

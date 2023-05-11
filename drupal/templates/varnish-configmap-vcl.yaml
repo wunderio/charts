@@ -183,7 +183,7 @@ data:
         set beresp.http.x-ttl = "10m";
       }
 
-      if (bereq.url ~ "\.(jpg|jpeg|gif|png|svg|ico|css|js|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|flv|swf|html|htm|otf)\??.*$") {
+      if (bereq.url ~ "\.(jpg|jpeg|gif|png|svg|ico|webp|css|js|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|flv|swf|html|htm|otf)\??.*$") {
         # Strip any cookies before static files are inserted into cache.
         unset beresp.http.set-cookie;
         if(beresp.status == 200){
@@ -395,7 +395,7 @@ data:
         return (pass);
       }
 
-      if (req.url ~ "\.(png|gif|jpg|tif|tiff|ico|swf|css|js|pdf|doc|xls|ppt|zip)(\?.*)?$") {
+      if (req.url ~ "\.(png|gif|jpg|tif|tiff|ico|webp|swf|css|js|pdf|doc|xls|ppt|zip)(\?.*)?$") {
         // Forcing a lookup with static file requests
         return (hash);
       }
@@ -420,7 +420,7 @@ data:
       }
 
       if (req.http.Cookie) {
-        if (req.url ~ "\.(png|gif|jpg|svg|tif|tiff|ico|swf|css|js|pdf|doc|xls|ppt|zip|woff|eot|ttf|bmp|bz2)$") {
+        if (req.url ~ "\.(png|gif|jpg|svg|tif|tiff|ico|webp|swf|css|js|pdf|doc|xls|ppt|zip|woff|eot|ttf|bmp|bz2)$") {
           # Static file request do not vary on cookies
           unset req.http.Cookie;
           return (hash);
@@ -441,7 +441,7 @@ data:
       }
 
       if (req.http.Accept-Encoding) {
-        if (req.url ~ "\.(jpg|png|gif|svg|tif|tiff|ico|gz|tgz|bz2|tbz|mp3|ogg|swf|zip|pdf|woff|eot|ttf)(\?.*)?$") {
+        if (req.url ~ "\.(jpg|png|gif|svg|tif|tiff|ico|webp|gz|tgz|bz2|tbz|mp3|ogg|swf|zip|pdf|woff|eot|ttf)(\?.*)?$") {
           # No point in compressing these
           unset req.http.Accept-Encoding;
         } elsif (req.http.Accept-Encoding ~ "gzip") {
