@@ -469,7 +469,7 @@ data:
         }
 
         ## Serve static files & images directly, without all standard drupal rewrites, php-fpm etc.
-        location ~* ^.+\.(?:css|js|jpe?g|gif|png|ico|svg|swf|docx?|xlsx?|tiff?|txt|cgi|bat|pl|dll|exe|class)$ {
+        location ~* ^.+\.(?:css|js|jpe?g|gif|png|ico|webp|svg|swf|docx?|xlsx?|tiff?|txt|cgi|bat|pl|dll|exe|class)$ {
           tcp_nodelay     off;
           expires         365d;
           add_header Cache-Control "public";
@@ -559,7 +559,7 @@ data:
       }
       location @files_retry {
         internal;
-        # Pass file request to drupal as a final fallback. 
+        # Pass file request to drupal as a final fallback.
         try_files $uri @drupal;
       }
       {{- end }}
@@ -698,12 +698,12 @@ data:
 
   php-fpm-probe.sh: |
     #!/bin/bash
-    
+
     # Prevent requests during the site installation process.
     if [ {{ include "drupal.installation-in-progress-test" $ }} ]; then
       exit 1;
     fi
-    
+
     # Ping php-fpm process
     SCRIPT_NAME=/ping \
     SCRIPT_FILENAME=/ping \
