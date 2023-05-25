@@ -755,3 +755,9 @@ pxc-db:
   secrets:
     passwords:
       root: drupal
+
+# Logging configurations for services that support them.
+# BETA feature, currently only supported by drupal-cron.
+logging:
+  # Currently supported formats are "default" and "json".
+  format: default

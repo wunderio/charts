@@ -33,13 +33,70 @@ spec:
             args:
               - |
                 {{- include "cron.entrypoints" $ | nindent 16 }}
-                set -ex
-                if [ ! {{ include "drupal.installation-in-progress-test" $ }} ]
-                then
-                {{ $job.command | nindent 18 }}
-                else
+                set -x
+                if [ {{ include "drupal.installation-in-progress-test" $ }} ]; then
                   exit 1
                 fi
+
+                # By default run a cron job in a very simple manner.
+                if [ '{{ $.Values.logging.format }}' == 'default' ]; then
+                  {{ $job.command | nindent 18 }}
+                  exit
+                fi
+
+                if [ '{{ $.Values.logging.format }}' != 'json' ]; then
+                  echo 'Incorrect value in silta.yml: logging.format: Expecting "default" or "json", found "{{ $.Values.logging.format }}".' 1>&2
+                  exit 1
+                fi
+
+                # Disable debugging while setting up things.
+                # Don't output the set command itself.
+                { set +x ; } 2>/dev/null
+
+                # Make temporary files names unique by using $$, which is
+                # the PID of the current running shell.
+                script="/tmp/cron.$$"
+                stats="/tmp/stats.$$"
+                output="/tmp/output.$$"
+                output_json="/tmp/output_json.$$"
+
+                # We need to save the executable command(s) into a file,
+                # because the 'time' can execute only command files,
+                # not the shell constructs.
+                cat << CMD > "${script}"
+                #!/bin/bash
+                set -x
+                {{ $job.command | nindent 16 }}
+                CMD
+                chmod 755 "${script}"
+
+                # The execution of the actual cron command.
+                # For backward compatibility reasons send the output to stdout as well (tee).
+                /usr/bin/time -f '"duration_s":%e,"peak_mem_kb":%M' -o "${stats}" "${script}" 2>&1 \
+                | tee "${output}"
+
+                # It's tricky to get the exit code of a random command from a pipeline.
+                # It is highly shell-dependent.
+                exit_code="${PIPESTATUS[0]}"
+
+                # If the exit code is non-zero,
+                # the output file contains also a warning, which is not JSON.
+                # Get rid of this by extracting only the stats.
+                stats="$(grep -E '"duration_s".*"peak_mem_kb"' ${stats})"
+
+                # Convert the command output to JSON.
+                php -r 'print json_encode(file_get_contents("/dev/stdin"))."\n";' < "${output}" > "${output_json}"
+
+                cron_name="{{ $index }}"
+
+                # Assemble the JSON output.
+                cat << JSON
+                {"cron_name":"${cron_name}",${stats},"exit_code":${exit_code},"output":$(cat "${output_json}")}
+                JSON
+
+                # Use the exit code of the actual cron command.
+                exit "$exit_code"
+
             resources:
               {{ if $job.resources }}
               {{- $job.resources | toYaml | nindent 14 }}
