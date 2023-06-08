@@ -53,7 +53,7 @@ autoscaling:
 #     hostname: www.example.com
 #   example_no_https:
 #    hostname: insecure.example.com
-#      ssl: 
+#      ssl:
 #        enabled: false
 exposeDomains: {}
 
@@ -122,8 +122,8 @@ nginx:
       cpu: 1m
       memory: 5M
 
-  loglevel: error 
-  
+  loglevel: error
+
   # Set of values to enable and use http basic authentication
   # It is implemented only for very basic protection (like web crawlers)
   basicauth:
@@ -133,9 +133,9 @@ nginx:
     credentials:
       username: silta
       password: demo
-  
+
   # Trust X-Forwarded-For from these hosts for getting external IP
-  realipfrom: 
+  realipfrom:
     gke-internal: 10.0.0.0/8
     gce-health-check-1: 130.211.0.0/22
     gce-health-check-2: 35.191.0.0/16
@@ -160,7 +160,7 @@ nginx:
   #content_security_policy: "upgrade-insecure-requests; default-src https: data: 'unsafe-inline' 'unsafe-eval'; frame-ancestors 'self'; base-uri 'self'; object-src 'self'; connect-src wss: https:"
 
 
-  # Extra configuration block in server context. 
+  # Extra configuration block in server context.
   serverExtraConfig: |
 
   # Extra configuration block in location context.
@@ -168,3 +168,20 @@ nginx:
 
   # Extra configuration to pass to nginx as a file
   extraConfig: |
+
+# Fastly Signal Sciences support
+# https://docs.fastly.com/signalsciences/
+signalsciences:
+  enabled: false
+  accesskeyid: ""
+  secretaccesskey: ""
+  image: signalsciences/sigsci-agent
+  imageTag: 4.40.0
+  # sidecar container resources
+  resources:
+    requests:
+      cpu: 20m
+      memory: 40Mi
+    limits:
+      cpu: 40m
+      memory: 80Mi
