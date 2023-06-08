@@ -38,6 +38,14 @@ spec:
           mountPath: /etc/nginx/conf.d/frontend.conf # mount nginx-conf configmap volume to /etc/nginx
           readOnly: true
           subPath: frontend_conf
+        {{- if .Values.signalsciences.enabled }}
+        - name: nginx-conf
+          mountPath: /etc/nginx/modules/nginx_signalsciences.conf
+          readOnly: true
+          subPath: nginx_signalsciences_conf
+        - name: sigsci-tmp
+          mountPath: /sigsci/tmp
+        {{- end }}
         {{- if .Values.nginx.extraConfig }}
         - name: config
           # provide empty configuration file in /etc/nginx/conf.d for users to populate
@@ -63,6 +71,36 @@ spec:
               command: ["/bin/sleep", "5"]
         resources:
           {{ .Values.nginx.resources | toYaml | nindent 10 }}
+
+      {{- if .Values.signalsciences.enabled }}
+      # Signal Services container
+      - name: sigsci
+        image: {{ .Values.signalsciences.image }}:{{ .Values.signalsciences.imageTag }}
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: SIGSCI_ACCESSKEYID
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-secrets-frontend
+                key: signalsciences_accesskeyid
+          - name: SIGSCI_SECRETACCESSKEY
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Release.Name }}-secrets-frontend
+                key: signalsciences_secretaccesskey
+        securityContext:
+          readOnlyRootFilesystem: true
+        volumeMounts:
+          - name: sigsci-tmp
+            mountPath: /sigsci/tmp
+        lifecycle:
+          preStop:
+            exec:
+              command: [ "/bin/sleep", "30" ]
+        resources:
+            {{- .Values.signalsciences.resources | toYaml | nindent 10 }}
+        {{- end }}
+
       volumes:
         - name: nginx-conf
           configMap:
@@ -72,6 +110,10 @@ spec:
                 path: nginx_conf
               - key: frontend_conf
                 path: frontend_conf
+              {{- if .Values.signalsciences.enabled }}
+              - key: nginx_signalsciences_conf
+                path: nginx_signalsciences_conf
+              {{- end }}
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
           secret:
@@ -79,6 +121,10 @@ spec:
             items:
               - key: .htaccess
                 path: .htaccess
+        {{- end }}
+        {{- if .Values.signalsciences.enabled }}
+        - name: sigsci-tmp
+          emptyDir: { }
         {{- end }}
 ---
 {{- if .Values.nginx.autoscaling.enabled }}

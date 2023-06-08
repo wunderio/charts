@@ -5,20 +5,34 @@ metadata:
   labels:
     {{ include "frontend.release_labels" . | indent 4 }}
 data:
+  {{- if .Values.signalsciences.enabled }}
+  nginx_signalsciences_conf: |
+    load_module /etc/nginx/modules/ngx_http_sigsci_module.so;
+    load_module /etc/nginx/modules/ndk_http_module.so;
+  {{- end }}
+
   nginx_conf: |
-    # user                            nginx;                                                 
+
+    include modules/*.conf;
+
+    # user                            nginx;
     worker_processes                auto;
     worker_rlimit_nofile            10240;
 
-    error_log                       /proc/self/fd/2 {{ .Values.nginx.loglevel }};                                 
-                                                                                          
-    events {                                                                               
-        worker_connections          10240;                                                  
-        multi_accept                on;                                                    
-    }                                                                                      
-                                                                                          
+    error_log                       /proc/self/fd/2 {{ .Values.nginx.loglevel }};
+
+    events {
+        worker_connections          10240;
+        multi_accept                on;
+    }
+
     http {
-        
+
+        {{- if .Values.signalsciences.enabled }}
+        # Signal sciences agent socket
+        sigsci_agent_host unix:/sigsci/tmp/sigsci.sock;
+        {{- end }}
+
         # List of upstream proxies we trust to set X-Forwarded-For correctly.
         {{- if kindIs "string" .Values.nginx.realipfrom }}
         set_real_ip_from            {{ .Values.nginx.realipfrom }};
@@ -31,43 +45,43 @@ data:
 
         real_ip_header              {{ .Values.nginx.real_ip_header }};
 
-        include                     /etc/nginx/mime.types;                                 
-        default_type                application/octet-stream;                              
-                                                                                          
+        include                     /etc/nginx/mime.types;
+        default_type                application/octet-stream;
+
         log_format  main            '$remote_addr - $remote_user [$time_local] "$request" '
                                     '$status $body_bytes_sent "$http_referer" '
                                     '"$http_user_agent" "$http_x_forwarded_for"';
-                                                            
-                                                                                                              
+
+
         access_log                  /proc/self/fd/1 main;
-                                              
-        send_timeout                60s;       
-        sendfile                    on;        
-        client_body_timeout         60s;       
-        client_header_timeout       60s;                                                                                                                   
-        client_max_body_size        32m;                                                                                                                   
-        client_body_buffer_size     16k;                                                                                                                   
-        client_header_buffer_size   4k;                                                                                                                    
-        large_client_header_buffers 8 16K;                                                                                                                 
-        keepalive_timeout           75s;                                                                                                                   
-        keepalive_requests          100;                                                                                                                   
-        reset_timedout_connection   off;                                                                                                                   
-        tcp_nodelay                 on;                                                                                                                    
-        tcp_nopush                  on;                                                                                                                    
-        server_tokens               off;                                                                                                                   
-                                                                                                                                                          
-        ## upload_progress             uploads 1m;          
-                                              
-        gzip                        on;                      
-        gzip_buffers                16 8k;     
-        gzip_comp_level             1;         
-        gzip_http_version           1.1;       
-        gzip_min_length             20;        
+
+        send_timeout                60s;
+        sendfile                    on;
+        client_body_timeout         60s;
+        client_header_timeout       60s;
+        client_max_body_size        32m;
+        client_body_buffer_size     16k;
+        client_header_buffer_size   4k;
+        large_client_header_buffers 8 16K;
+        keepalive_timeout           75s;
+        keepalive_requests          100;
+        reset_timedout_connection   off;
+        tcp_nodelay                 on;
+        tcp_nopush                  on;
+        server_tokens               off;
+
+        ## upload_progress             uploads 1m;
+
+        gzip                        on;
+        gzip_buffers                16 8k;
+        gzip_comp_level             1;
+        gzip_http_version           1.1;
+        gzip_min_length             20;
         gzip_types                  text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascrip
-        gzip_vary                   on;                                                                                                                    
-        gzip_proxied                any;       
-        gzip_disable                msie6;                                                                                                                 
-                                                                                                                                                          
+        gzip_vary                   on;
+        gzip_proxied                any;
+        gzip_disable                msie6;
+
         {{ include "frontend.security_headers" $ | indent 6 }}
 
         map_hash_bucket_size 128;
@@ -82,21 +96,21 @@ data:
         }
         add_header                  X-Robots-Tag $x_robots_tag_header;
 
-        map $uri $no_slash_uri {                                                                                                                           
-            ~^/(?<no_slash>.*)$ $no_slash;                                                                                                                 
+        map $uri $no_slash_uri {
+            ~^/(?<no_slash>.*)$ $no_slash;
         }
 
         # List health checks that need to return status 200 here
-        map $http_user_agent $hc_ua { default 0; 'GoogleHC/1.0' 1; }                                                             
-                                                                                                                                                          
-        include conf.d/*.conf;                                                                                                                             
-    }     
+        map $http_user_agent $hc_ua { default 0; 'GoogleHC/1.0' 1; }
+
+        include conf.d/*.conf;
+    }
 
   frontend_conf: |
-    map $http_x_forwarded_proto $fastcgi_https {                                                        
-        default $https;                                            
-        http '';                          
-        https on;                          
+    map $http_x_forwarded_proto $fastcgi_https {
+        default $https;
+        http '';
+        https on;
     }
 
     {{- if .Values.nginx.redirects }}
@@ -118,11 +132,11 @@ data:
     }
     {{- end }}
 
-    server {                               
+    server {
         server_name frontend;
         listen 8080;
 
-        # Loadbalancer health checks need to be fed with http 200 
+        # Loadbalancer health checks need to be fed with http 200
         if ($hc_ua) { return 200; }
 
         {{- if .Values.nginx.redirects }}
@@ -133,11 +147,11 @@ data:
         if ($redirect_uri_local) {
     	    return 301 $redirect_uri_local;
         }
-        {{- end }}          
-                                        
+        {{- end }}
+
         root /app/web;
         index index.html;
-                                                                              
+
         include fastcgi.conf;
 
         # Custom configuration gets included here
@@ -146,7 +160,7 @@ data:
         {{- range $index, $service := .Values.services }}
         {{ if $service.exposedRoute }}
         location {{ $service.exposedRoute }} {
-        
+
           {{ if $.Values.nginx.extra_conditions }}
           {{ $.Values.nginx.extra_conditions | nindent 10 }}
           {{- end}}
@@ -157,7 +171,7 @@ data:
           {{- end }}
 
           {{ include "frontend.basicauth" $ | indent 6}}
-          
+
           location = {{ $service.exposedRoute }}/robots.txt {
             access_log off;
           }
@@ -204,11 +218,11 @@ data:
           add_header              Front-End-Https   on;
 
           {{ include "frontend.security_headers" $ | indent 6 }}
-    
+
           {{- range $header_name, $header_value := $.Values.nginx.extra_headers }}
           add_header {{ $header_name }} {{ $header_value }};
           {{- end }}
-        }    
+        }
         {{- end }}
         {{- end }}
     }
