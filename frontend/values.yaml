@@ -36,7 +36,7 @@ app: frontend
 #     hostname: www.example.com
 #   example_no_https:
 #    hostname: insecure.example.com
-#      ssl: 
+#      ssl:
 #        enabled: false
 exposeDomains: {}
 
@@ -84,7 +84,7 @@ ingress:
     #   networking.gke.io/suppress-firewall-xpn-error: "true"
 
 # Infrastructure related settings.
-cluster: 
+cluster:
   type: gke
   vpcNative: false
 
@@ -104,7 +104,7 @@ singleSubdomain: false
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
-  image: 'wunderio/silta-nginx:v0.1'
+  image: 'wunderio/silta-nginx:v0.2'
 
   replicas: 1
 
@@ -125,13 +125,13 @@ nginx:
       cpu: 1m
       memory: 10Mi
 
-  loglevel: error 
+  loglevel: error
 
   # Header containing real IP address
   real_ip_header: X-Forwarded-For
 
   # Trust X-Forwarded-For from these hosts for getting external IP
-  realipfrom: 
+  realipfrom:
     gke-internal: 10.0.0.0/8
     gce-health-check-1: 130.211.0.0/22
     gce-health-check-2: 35.191.0.0/16
@@ -140,7 +140,7 @@ nginx:
   # Note that the key is only used for documentation purposes.
   noauthips:
     gke-internal: 10.0.0.0/8
-  
+
   # Set of values to enable and use http basic authentication
   # It is implemented only for very basic protection (like web crawlers)
   basicauth:
@@ -157,7 +157,7 @@ nginx:
     X-Content-Type-Options: 'nosniff'
     X-XSS-Protection: '"1; mode=block"'
     Referrer-Policy: '"no-referrer, strict-origin-when-cross-origin" always'
-  
+
   # includeSubdomains should be used whenever possible, but before enabling it needs to be made sure there are no subdomains not using https:
   hsts_include_subdomains: ""
   #hsts_include_subdomains: " includeSubDomains;"
@@ -195,12 +195,12 @@ services: {}
   #   # When you use exposedRoute, nginx proxies request to service:[/exposedRoute] path.
   #   # This means, you have to implement this path in your application.
   #   #exposedRoute: '/'
-    
+
   #   # How many instances of the Frontend pod should be in our Kubernetes deployment.
   #   # A single pod (the default value) is good for development environments to minimise resource usage.
   #   # Multiple pods make sense for high availability.
   #   replicas: 1
-  
+
   #   # Use storage mountpoints (defined in the mounts section) for this service.
   #   mounts:
   #     - files
@@ -217,7 +217,7 @@ services: {}
   #         name: cpu
   #         targetAverageUtilization: 80
 
-  #   resources: 
+  #   resources:
   #     requests:
   #       cpu: 200m
   #       memory: 128Mi
@@ -266,7 +266,7 @@ mounts: {}
 #    csiDriverName: csi-rclone
 #    accessModes: ReadWriteMany
 
-# Provide SSH access based on GitHub public keys and repository access. 
+# Provide SSH access based on GitHub public keys and repository access.
 # Note: Shell only works when the base image wunderio/silta-node is used!
 shell:
   enabled: false
@@ -426,3 +426,20 @@ rabbitmq:
 #   ENV NODE_OPTIONS="--require /usr/local/lib/node_modules/@instana/collector/src/immediate"
 instana:
   enabled: false
+
+# Fastly Signal Sciences support
+# https://docs.fastly.com/signalsciences/
+signalsciences:
+  enabled: false
+  accesskeyid: ""
+  secretaccesskey: ""
+  image: signalsciences/sigsci-agent
+  imageTag: 4.40.0
+  # sidecar container resources
+  resources:
+    requests:
+      cpu: 20m
+      memory: 40Mi
+    limits:
+      cpu: 40m
+      memory: 80Mi

@@ -756,6 +756,23 @@ pxc-db:
     passwords:
       root: drupal
 
+# Fastly Signal Sciences support
+# https://docs.fastly.com/signalsciences/
+signalsciences:
+  enabled: false
+  accesskeyid: ""
+  secretaccesskey: ""
+  image: signalsciences/sigsci-agent
+  imageTag: 4.40.0
+  # sidecar container resources
+  resources:
+    requests:
+      cpu: 20m
+      memory: 40Mi
+    limits:
+      cpu: 40m
+      memory: 80Mi
+
 # Logging configurations for services that support them.
 # BETA feature, currently only supported by drupal-cron.
 logging:
