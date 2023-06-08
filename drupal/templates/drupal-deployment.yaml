@@ -81,6 +81,14 @@ spec:
           mountPath: /etc/nginx/fastcgi.conf
           readOnly: true
           subPath: fastcgi_conf
+        {{- if .Values.signalsciences.enabled }}
+        - name: config
+          mountPath: /etc/nginx/modules/nginx_signalsciences.conf
+          readOnly: true
+          subPath: nginx_signalsciences_conf
+        - name: sigsci-tmp
+          mountPath: /sigsci/tmp
+        {{- end }}  
         {{- if .Values.nginx.extraConfig }}
         - name: config
           # provide empty configuration file in /etc/nginx/conf.d for users to populate
@@ -104,6 +112,35 @@ spec:
         resources:
           {{- .Values.nginx.resources | toYaml | nindent 10 }}
 
+      {{- if .Values.signalsciences.enabled }}
+      # Signal Services container
+      - name: sigsci
+        image: {{ .Values.signalsciences.image }}:{{ .Values.signalsciences.imageTag }}
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: SIGSCI_ACCESSKEYID
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-secrets-drupal
+              key: signalsciences_accesskeyid
+        - name: SIGSCI_SECRETACCESSKEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-secrets-drupal
+              key: signalsciences_secretaccesskey
+        securityContext:
+          readOnlyRootFilesystem: true
+        volumeMounts:
+        - name: sigsci-tmp
+          mountPath: /sigsci/tmp
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sleep", "30"]
+        resources:
+          {{- .Values.signalsciences.resources | toYaml | nindent 10 }}
+      {{- end }}
+
       volumes:
         {{- include "drupal.volumes" . | nindent 8}}
         {{- if .Values.nginx.basicauth.enabled }}
@@ -113,6 +150,10 @@ spec:
             items:
               - key: .htaccess
                 path: .htaccess
+        {{- end }}
+        {{- if .Values.signalsciences.enabled }}
+        - name: sigsci-tmp
+          emptyDir: {}
         {{- end }}
       {{- include "drupal.imagePullSecrets" . | nindent 6 }}
       nodeSelector:
