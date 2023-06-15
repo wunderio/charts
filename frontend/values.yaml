@@ -442,4 +442,4 @@ signalsciences:
       memory: 40Mi
     limits:
       cpu: 40m
-      memory: 80Mi
+      memory: 300Mi
