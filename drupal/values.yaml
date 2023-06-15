@@ -771,7 +771,7 @@ signalsciences:
       memory: 40Mi
     limits:
       cpu: 40m
-      memory: 80Mi
+      memory: 300Mi
 
 # Logging configurations for services that support them.
 # BETA feature, currently only supported by drupal-cron.
