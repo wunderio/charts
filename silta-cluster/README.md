@@ -60,8 +60,8 @@ helm install --name aws-calico --namespace kube-system eks/aws-calico
 
 ### Percona XtraDB Cluster for replicated database support (optional)
 ```
-# CRD for pxc-operator 1.9.x. Depends on pxc-operator version in Chart.yaml.
-kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/900c858a92b325c87c564dece1fa04b1a9b0c554/charts/pxc-operator/crds/crd.yaml
+# CRD for pxc-operator 1.12.x. Depends on pxc-operator version in Chart.yaml.
+kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/dcfc35a1158862da60a89010e4cabaa2b94560f5/charts/ps-operator/crds/crd.yaml
 ```
 
 ### Google Filestore as storage (optional)
@@ -139,6 +139,8 @@ helm upgrade --install --wait silta-cluster silta-cluster \
 ```
 
 ## Upgrade path for older versions:
+
+ - Upgrading silta-cluster chart to 0.2.43 ([docs/Upgrading-to-0.2.43.md](docs/Upgrading-to-0.2.43.md))
 
  - Upgrading silta-cluster chart to 0.2.36 ([docs/Upgrading-to-0.2.36.md](docs/Upgrading-to-0.2.36.md))
  
