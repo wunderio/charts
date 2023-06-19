@@ -68,6 +68,12 @@
     },
     "silta-release": {
       "type": "object"
+    },
+    "signalsciences": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
     }
   }
 }
