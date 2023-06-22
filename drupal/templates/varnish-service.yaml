@@ -24,9 +24,11 @@ spec:
   - name: web
     protocol: TCP
     port: 80
+    targetPort: 80
   - name: admin
     protocol: TCP
-    port: 6082 
+    port: 6082
+    targetPort: 6082
   selector:
     {{- include "drupal.release_selector_labels" . | nindent 4 }}
     service: varnish
