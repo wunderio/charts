@@ -473,8 +473,8 @@ data:
         {{- end }}
         {{- end }}
 
-        ## Handle D7 image styles
-        location ~* /files/styles/ {
+        ## Passes image style and asset generation to PHP.
+        location ~ ^(/[a-z\-]+)?/sites/.*/files/(css|js|styles)/ {
           expires 365d;
           try_files $uri @drupal;
         }
@@ -545,6 +545,9 @@ data:
           add_header  Content-Type  text/plain;
           access_log  off;
           try_files $uri @drupal;
+          {{- if .Values.signalsciences.enabled }}
+          sigsci_enabled off;
+          {{- end }}
         }
 
         location = /radioactivity_node.php {
@@ -654,6 +657,9 @@ data:
         fastcgi_param  SCRIPT_FILENAME    $document_root/_ping.php;
         fastcgi_pass php;
         access_log off;
+        {{- if .Values.signalsciences.enabled }}
+        sigsci_enabled off;
+        {{- end }}
       }
       # Following directive is commented out since it produces notes in logs
       # on every http request where parameter q= is not present

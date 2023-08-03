@@ -1,0 +1,29 @@
+suite: drupal php env
+templates:
+  - shell-deployment.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
+tests:
+  - it: uses fallback drush options uri value when not provided
+    template: shell-deployment.yaml
+    set:
+      environmentName: "testing"
+      projectName: "example"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DRUSH_OPTIONS_URI
+            value: http://testing.example.silta.wdr.io
+  - it: uses provided drush options uri value when it is provided in php.env
+    template: shell-deployment.yaml
+    set:
+      php.env:
+        DRUSH_OPTIONS_URI: http://some-custom.example.com
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: DRUSH_OPTIONS_URI
+            value: http://some-custom.example.com

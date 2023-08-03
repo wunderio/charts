@@ -66,10 +66,14 @@ spec:
         {{- include "services.env" (dict "Values" $.Values "Release" $.Release "service" $service) | nindent 8 }}
         {{- range $key, $val := $service.env }}
         - name: {{ $key }}
+        {{- if kindIs "string" $val }}
           value: {{ $val | quote }}
+        {{- else }}
+          {{ $val | toYaml | indent 12 | trim }}
+        {{- end }}
         {{- end }}
         resources:
-          {{ if $service.resources -}}
+          {{- if $service.resources -}}
           {{ merge $service.resources $.Values.serviceDefaults.resources | toYaml | nindent 10 }}
           {{ else -}}
           {{ $.Values.serviceDefaults.resources | toYaml | nindent 10 }}
@@ -80,8 +84,16 @@ spec:
         {{ $mount := (index $.Values.mounts $mountName) }}
         {{- if eq $mount.enabled true }}
         - name: frontend-{{ $mountName }}
+        {{- if hasKey $mount "secretName" }}
+          secret:
+            secretName: {{ $mount.secretName }}
+        {{- else if hasKey $mount "configMapName" }}
+          configMap:
+            name: {{ $mount.configMapName }}
+        {{- else }}
           persistentVolumeClaim:
             claimName: {{ $.Release.Name }}-{{ $mountName }}
+        {{- end }}
         {{- end }}
         {{- end }}
         {{- end }}
@@ -194,7 +206,11 @@ spec:
         {{- include "services.env" (dict "Values" $.Values "Release" $.Release "service" $service) | nindent 8 }}
         {{- range $key, $val := $service.env }}
         - name: {{ $key }}
+        {{- if kindIs "string" $val }}
           value: {{ $val | quote }}
+        {{- else }}
+          {{ $val | toYaml | indent 4 | trim }}
+        {{- end }}
         {{- end }}
       volumes:
         {{ if $service.mounts }}
@@ -202,8 +218,16 @@ spec:
         {{ $mount := (index $.Values.mounts $mountName) }}
         {{- if eq $mount.enabled true }}
         - name: frontend-{{ $mountName }}
+        {{- if hasKey $mount "secretName" }}
+          secret:
+            secretName: {{ $mount.secretName }}
+        {{- else if hasKey $mount "configMapName" }}
+          configMap:
+            name: {{ $mount.configMapName }}
+        {{- else }}
           persistentVolumeClaim:
             claimName: {{ $.Release.Name }}-{{ $mountName }}
+        {{- end }}
         {{- end }}
         {{- end }}
         {{- end }}
