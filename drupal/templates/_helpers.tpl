@@ -255,7 +255,7 @@ imagePullSecrets:
 # Environment overrides via values file
 {{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}
-{{- if kindIs "string" $val }}
+{{- if or (kindIs "string" $val) (kindIs "int" $val) (kindIs "float64" $val) }}
   value: {{ $val | quote }}
 {{- else }}
   {{ $val | toYaml | indent 4 | trim }}
