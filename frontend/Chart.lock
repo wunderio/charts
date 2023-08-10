@@ -4,7 +4,7 @@ dependencies:
   version: 7.10.4
 - name: elasticsearch
   repository: file://../elasticsearch
-  version: 7.8.1
+  version: 8.5.1
 - name: rabbitmq
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 6.17.5
@@ -14,5 +14,5 @@ dependencies:
 - name: silta-release
   repository: file://../silta-release
   version: 0.1.1
-digest: sha256:fa010b15537422cbbbcd0a06575e348e25e5b4096a8dd66307a5794a417a83d7
-generated: "2022-06-02T21:31:30.85885293+03:00"
+digest: sha256:36a9a51a6b7d740f560956390f2213b730169518a38ee8bf5ce96ab96214eb28
+generated: "2023-08-10T12:48:07.064125+03:00"
