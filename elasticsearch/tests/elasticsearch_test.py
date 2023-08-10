@@ -45,10 +45,10 @@ def test_defaults():
         {"name": "discovery.seed_hosts", "value": uname + "-headless"},
         {"name": "network.host", "value": "0.0.0.0"},
         {"name": "cluster.name", "value": clusterName},
-        {"name": "ES_JAVA_OPTS", "value": "-Xmx1g -Xms1g"},
-        {"name": "node.master", "value": "true"},
-        {"name": "node.data", "value": "true"},
-        {"name": "node.ingest", "value": "true"},
+        {
+            "name": "node.roles",
+            "value": "master,data,data_content,data_hot,data_warm,data_cold,ingest,ml,remote_cluster_client,transform,",
+        },
     ]
 
     c = r["statefulset"][uname]["spec"]["template"]["spec"]["containers"][0]
@@ -72,7 +72,7 @@ def test_defaults():
     assert c["readinessProbe"]["timeoutSeconds"] == 5
 
     assert "curl" in c["readinessProbe"]["exec"]["command"][-1]
-    assert "http://127.0.0.1:9200" in c["readinessProbe"]["exec"]["command"][-1]
+    assert "https://127.0.0.1:9200" in c["readinessProbe"]["exec"]["command"][-1]
 
     # Resources
     assert c["resources"] == {
@@ -118,6 +118,7 @@ def test_defaults():
     assert s["metadata"]["name"] == uname
     assert s["metadata"]["annotations"] == {}
     assert s["spec"]["type"] == "ClusterIP"
+    assert s["spec"]["publishNotReadyAddresses"] == False
     assert len(s["spec"]["ports"]) == 2
     assert s["spec"]["ports"][0] == {"name": "http", "port": 9200, "protocol": "TCP"}
     assert s["spec"]["ports"][1] == {
@@ -141,6 +142,7 @@ def test_defaults():
     assert "tolerations" not in r["statefulset"][uname]["spec"]["template"]["spec"]
     assert "nodeSelector" not in r["statefulset"][uname]["spec"]["template"]["spec"]
     assert "ingress" not in r
+    assert "hostAliases" not in r["statefulset"][uname]["spec"]["template"]["spec"]
 
 
 def test_increasing_the_replicas():
@@ -171,55 +173,10 @@ imageTag: 6.2.4
     )
 
 
-def test_set_discovery_hosts_to_custom_master_service():
+def test_set_initial_master_nodes():
     config = """
-esMajorVersion: 6
-masterService: "elasticsearch-custommaster"
-"""
-    r = helm_template(config)
-    env = r["statefulset"][uname]["spec"]["template"]["spec"]["containers"][0]["env"]
-    assert {
-        "name": "discovery.zen.ping.unicast.hosts",
-        "value": "elasticsearch-custommaster-headless",
-    } in env
-
-
-def test_set_master_service_to_default_nodegroup_name_if_not_set():
-    config = """
-esMajorVersion: 6
-nodeGroup: "data"
-"""
-    r = helm_template(config)
-    env = r["statefulset"]["elasticsearch-data"]["spec"]["template"]["spec"][
-        "containers"
-    ][0]["env"]
-    assert {
-        "name": "discovery.zen.ping.unicast.hosts",
-        "value": "elasticsearch-master-headless",
-    } in env
-
-
-def test_set_master_service_to_default_nodegroup_name_with_custom_cluster_name():
-    config = """
-esMajorVersion: 6
-clusterName: "custom"
-nodeGroup: "data"
-"""
-    r = helm_template(config)
-    env = r["statefulset"]["custom-data"]["spec"]["template"]["spec"]["containers"][0][
-        "env"
-    ]
-    assert {
-        "name": "discovery.zen.ping.unicast.hosts",
-        "value": "custom-master-headless",
-    } in env
-
-
-def test_set_initial_master_nodes_when_using_v_7():
-    config = """
-esMajorVersion: 7
 roles:
-  master: "true"
+  - master
 """
     r = helm_template(config)
     env = r["statefulset"][uname]["spec"]["template"]["spec"]["containers"][0]["env"]
@@ -234,11 +191,10 @@ roles:
         assert e["name"] != "discovery.zen.minimum_master_nodes"
 
 
-def test_dont_set_initial_master_nodes_if_not_master_when_using_es_version_7():
+def test_dont_set_initial_master_nodes_if_not_master():
     config = """
-esMajorVersion: 7
 roles:
-  master: "false"
+  - data
 """
     r = helm_template(config)
     env = r["statefulset"][uname]["spec"]["template"]["spec"]["containers"][0]["env"]
@@ -246,11 +202,10 @@ roles:
         assert e["name"] != "cluster.initial_master_nodes"
 
 
-def test_set_discovery_seed_host_when_using_v_7():
+def test_set_discovery_seed_host():
     config = """
-esMajorVersion: 7
 roles:
-  master: "true"
+  - master
 """
     r = helm_template(config)
     env = r["statefulset"][uname]["spec"]["template"]["spec"]["containers"][0]["env"]
@@ -261,17 +216,6 @@ roles:
 
     for e in env:
         assert e["name"] != "discovery.zen.ping.unicast.hosts"
-
-
-def test_enabling_machine_learning_role():
-    config = """
-roles:
-  ml: "true"
-"""
-    r = helm_template(config)
-    env = r["statefulset"][uname]["spec"]["template"]["spec"]["containers"][0]["env"]
-
-    assert {"name": "node.ml", "value": "true"} in env
 
 
 def test_adding_extra_env_vars():
@@ -418,10 +362,7 @@ sysctlInitContainer:
   enabled: false
 """
     r = helm_template(config)
-    initContainers = r["statefulset"][uname]["spec"]["template"]["spec"][
-        "initContainers"
-    ]
-    assert initContainers is None
+    assert "initContainers" not in r["statefulset"][uname]["spec"]["template"]["spec"]
 
 
 def test_sysctl_init_container_enabled():
@@ -492,7 +433,10 @@ persistence:
         "volumeClaimTemplates"
     ][0]["metadata"]["labels"]
     statefulset_labels = r["statefulset"][uname]["metadata"]["labels"]
-    assert volume_claim_template_labels == statefulset_labels
+    expected_labels = statefulset_labels
+    # heritage label shouldn't be present in volumeClaimTemplates labels
+    expected_labels.pop("heritage")
+    assert volume_claim_template_labels == expected_labels
 
 
 def test_adding_a_secret_mount():
@@ -508,9 +452,10 @@ secretMounts:
         "mountPath": "/usr/share/elasticsearch/config/certs",
         "name": "elastic-certificates",
     }
-    assert s["volumes"] == [
-        {"name": "elastic-certificates", "secret": {"secretName": "elastic-certs"}}
-    ]
+    assert {
+        "name": "elastic-certificates",
+        "secret": {"secretName": "elastic-certs"},
+    } in s["volumes"]
 
 
 def test_adding_a_secret_mount_with_subpath():
@@ -639,26 +584,6 @@ initResources:
     }
 
 
-def test_adding_resources_to_sidecar_container():
-    config = """
-masterTerminationFix: true
-sidecarResources:
-  limits:
-    cpu: "100m"
-    memory: "128Mi"
-  requests:
-    cpu: "100m"
-    memory: "128Mi"
-"""
-    r = helm_template(config)
-    i = r["statefulset"][uname]["spec"]["template"]["spec"]["containers"][1]
-
-    assert i["resources"] == {
-        "requests": {"cpu": "100m", "memory": "128Mi"},
-        "limits": {"cpu": "100m", "memory": "128Mi"},
-    }
-
-
 def test_adding_a_node_affinity():
     config = """
 nodeAffinity:
@@ -694,6 +619,66 @@ ingress:
   enabled: true
   annotations:
     kubernetes.io/ingress.class: nginx
+  hosts:
+    - host: elasticsearch.elastic.co
+      paths:
+        - path: /
+    - host: ''
+      paths:
+        - path: /
+        - path: /mypath
+          servicePort: 8888
+    - host: elasticsearch.hello.there
+      paths:
+        - path: /
+          servicePort: 9999
+  tls:
+  - secretName: elastic-co-wildcard
+    hosts:
+     - elasticsearch.elastic.co
+"""
+
+    r = helm_template(config)
+    assert uname in r["ingress"]
+    i = r["ingress"][uname]["spec"]
+    assert i["tls"][0]["hosts"][0] == "elasticsearch.elastic.co"
+    assert i["tls"][0]["secretName"] == "elastic-co-wildcard"
+
+    assert i["rules"][0]["host"] == "elasticsearch.elastic.co"
+    assert i["rules"][0]["http"]["paths"][0]["path"] == "/"
+    assert i["rules"][0]["http"]["paths"][0]["backend"]["service"]["name"] == uname
+    assert (
+        i["rules"][0]["http"]["paths"][0]["backend"]["service"]["port"]["number"]
+        == 9200
+    )
+    assert i["rules"][1]["host"] == None
+    assert i["rules"][1]["http"]["paths"][0]["path"] == "/"
+    assert i["rules"][1]["http"]["paths"][0]["backend"]["service"]["name"] == uname
+    assert (
+        i["rules"][1]["http"]["paths"][0]["backend"]["service"]["port"]["number"]
+        == 9200
+    )
+    assert i["rules"][1]["http"]["paths"][1]["path"] == "/mypath"
+    assert i["rules"][1]["http"]["paths"][1]["backend"]["service"]["name"] == uname
+    assert (
+        i["rules"][1]["http"]["paths"][1]["backend"]["service"]["port"]["number"]
+        == 8888
+    )
+    assert i["rules"][2]["host"] == "elasticsearch.hello.there"
+    assert i["rules"][2]["http"]["paths"][0]["path"] == "/"
+    assert i["rules"][2]["http"]["paths"][0]["backend"]["service"]["name"] == uname
+    assert (
+        i["rules"][2]["http"]["paths"][0]["backend"]["service"]["port"]["number"]
+        == 9999
+    )
+
+
+def test_adding_a_deprecated_ingress_rule():
+    config = """
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
   path: /
   hosts:
     - elasticsearch.elastic.co
@@ -711,8 +696,11 @@ ingress:
 
     assert i["rules"][0]["host"] == "elasticsearch.elastic.co"
     assert i["rules"][0]["http"]["paths"][0]["path"] == "/"
-    assert i["rules"][0]["http"]["paths"][0]["backend"]["serviceName"] == uname
-    assert i["rules"][0]["http"]["paths"][0]["backend"]["servicePort"] == 9200
+    assert i["rules"][0]["http"]["paths"][0]["backend"]["service"]["name"] == uname
+    assert (
+        i["rules"][0]["http"]["paths"][0]["backend"]["service"]["port"]["number"]
+        == 9200
+    )
 
 
 def test_changing_the_protocol():
@@ -781,6 +769,37 @@ esConfig:
     )
 
 
+def test_adding_in_jvm_options():
+    config = """
+esJvmOptions:
+    processors.options: |
+        -XX:ActiveProcessorCount=3
+"""
+    r = helm_template(config)
+    c = r["configmap"][uname + "-jvm-options"]["data"]
+
+    assert "processors.options" in c
+
+    assert "-XX:ActiveProcessorCount=3" in c["processors.options"]
+
+    s = r["statefulset"][uname]["spec"]["template"]["spec"]
+
+    assert {
+        "configMap": {"name": "elasticsearch-master-jvm-options"},
+        "name": "esjvmoptions",
+    } in s["volumes"]
+    assert {
+        "mountPath": "/usr/share/elasticsearch/config/jvm.options.d/processors.options",
+        "name": "esjvmoptions",
+        "subPath": "processors.options",
+    } in s["containers"][0]["volumeMounts"]
+
+    assert (
+        "configchecksum"
+        in r["statefulset"][uname]["spec"]["template"]["metadata"]["annotations"]
+    )
+
+
 def test_dont_add_data_volume_when_persistance_is_disabled():
     config = """
 persistence:
@@ -788,12 +807,12 @@ persistence:
 """
     r = helm_template(config)
     assert "volumeClaimTemplates" not in r["statefulset"][uname]["spec"]
-    assert (
-        r["statefulset"][uname]["spec"]["template"]["spec"]["containers"][0][
-            "volumeMounts"
-        ]
-        == None
-    )
+    assert {
+        "name": "elasticsearch-master",
+        "mountPath": "/usr/share/elasticsearch/data",
+    } not in r["statefulset"][uname]["spec"]["template"]["spec"]["containers"][0][
+        "volumeMounts"
+    ]
 
 
 def test_priority_class_name():
@@ -828,6 +847,34 @@ schedulerName: "stork"
     )
 
 
+def test_disabling_non_headless_service():
+    config = ""
+
+    r = helm_template(config)
+
+    assert uname in r["service"]
+
+    config = """
+service:
+  enabled: false
+"""
+
+    r = helm_template(config)
+
+    assert uname not in r["service"]
+
+
+def test_enabling_service_publishNotReadyAddresses():
+    config = """
+    service:
+      publishNotReadyAddresses: true
+    """
+
+    r = helm_template(config)
+
+    assert r["service"][uname]["spec"]["publishNotReadyAddresses"] == True
+
+
 def test_adding_a_nodePort():
     config = ""
 
@@ -860,6 +907,23 @@ def test_adding_a_loadBalancerIP():
     r = helm_template(config)
 
     assert r["service"][uname]["spec"]["loadBalancerIP"] == "12.4.19.81"
+
+
+def test_adding_an_externalTrafficPolicy():
+    config = ""
+
+    r = helm_template(config)
+
+    assert "externalTrafficPolicy" not in r["service"][uname]["spec"]
+
+    config = """
+    service:
+      externalTrafficPolicy: Local
+    """
+
+    r = helm_template(config)
+
+    assert r["service"][uname]["spec"]["externalTrafficPolicy"] == "Local"
 
 
 def test_adding_a_label_on_non_headless_service():
@@ -919,23 +983,6 @@ service:
     assert ranges[1] == "192.168.1.0/24"
 
 
-def test_master_termination_fixed_enabled():
-    config = ""
-
-    r = helm_template(config)
-
-    assert len(r["statefulset"][uname]["spec"]["template"]["spec"]["containers"]) == 1
-
-    config = """
-    masterTerminationFix: true
-    """
-
-    r = helm_template(config)
-
-    c = r["statefulset"][uname]["spec"]["template"]["spec"]["containers"][1]
-    assert c["name"] == "elasticsearch-master-graceful-termination-handler"
-
-
 def test_lifecycle_hooks():
     config = ""
     r = helm_template(config)
@@ -958,55 +1005,36 @@ def test_esMajorVersion_detect_default_version():
     config = ""
 
     r = helm_template(config)
-    assert r["statefulset"][uname]["metadata"]["annotations"]["esMajorVersion"] == "7"
+    assert r["statefulset"][uname]["metadata"]["annotations"]["esMajorVersion"] == "8"
 
 
-def test_esMajorVersion_default_to_7_if_not_elastic_image():
+def test_esMajorVersion_default_to_8_if_not_elastic_image():
     config = """
     image: notElastic
     imageTag: 1.0.0
     """
 
     r = helm_template(config)
-    assert r["statefulset"][uname]["metadata"]["annotations"]["esMajorVersion"] == "7"
+    assert r["statefulset"][uname]["metadata"]["annotations"]["esMajorVersion"] == "8"
 
 
-def test_esMajorVersion_default_to_7_if_no_version_is_found():
+def test_esMajorVersion_default_to_8_if_no_version_is_found():
     config = """
     imageTag: not_a_number
     """
 
     r = helm_template(config)
-    assert r["statefulset"][uname]["metadata"]["annotations"]["esMajorVersion"] == "7"
-
-
-def test_esMajorVersion_set_to_6_based_on_image_tag():
-    config = """
-    imageTag: 6.8.1
-    """
-
-    r = helm_template(config)
-    assert r["statefulset"][uname]["metadata"]["annotations"]["esMajorVersion"] == "6"
+    assert r["statefulset"][uname]["metadata"]["annotations"]["esMajorVersion"] == "8"
 
 
 def test_esMajorVersion_always_wins():
     config = """
     esMajorVersion: 7
-    imageTag: 6.0.0
+    imageTag: 8.0.0
     """
 
     r = helm_template(config)
     assert r["statefulset"][uname]["metadata"]["annotations"]["esMajorVersion"] == "7"
-
-
-def test_esMajorVersion_parse_image_tag_for_oss_image():
-    config = """
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss
-    imageTag: 6.3.2
-    """
-
-    r = helm_template(config)
-    assert r["statefulset"][uname]["metadata"]["annotations"]["esMajorVersion"] == "6"
 
 
 def test_set_pod_security_context():
@@ -1102,13 +1130,6 @@ labels:
 
 
 def test_keystore_enable():
-    config = ""
-
-    r = helm_template(config)
-    s = r["statefulset"][uname]["spec"]["template"]["spec"]
-
-    assert s["volumes"] == None
-
     config = """
 keystore:
   - secretName: test
@@ -1344,3 +1365,140 @@ fullnameOverride: "customfullName"
         "name": "cluster.initial_master_nodes",
         "value": "customfullName-0," + "customfullName-1," + "customfullName-2,",
     } in env
+
+
+def test_hostaliases():
+    config = """
+hostAliases:
+- ip: "127.0.0.1"
+  hostnames:
+  - "foo.local"
+  - "bar.local"
+"""
+    r = helm_template(config)
+    hostAliases = r["statefulset"][uname]["spec"]["template"]["spec"]["hostAliases"]
+    assert {"ip": "127.0.0.1", "hostnames": ["foo.local", "bar.local"]} in hostAliases
+
+
+def test_network_policy():
+    config = """
+networkPolicy:
+  http:
+    enabled: true
+    explicitNamespacesSelector:
+      # Accept from namespaces with all those different rules (from whitelisted Pods)
+      matchLabels:
+        role: frontend-http
+      matchExpressions:
+        - {key: role, operator: In, values: [frontend-http]}
+    additionalRules:
+      - podSelector:
+          matchLabels:
+            role: frontend-http
+      - podSelector:
+          matchExpressions:
+            - key: role
+              operator: In
+              values:
+                - frontend-http
+  transport:
+    enabled: true
+    allowExternal: true
+    explicitNamespacesSelector:
+      matchLabels:
+        role: frontend-transport
+      matchExpressions:
+        - {key: role, operator: In, values: [frontend-transport]}
+    additionalRules:
+      - podSelector:
+          matchLabels:
+            role: frontend-transport
+      - podSelector:
+          matchExpressions:
+            - key: role
+              operator: In
+              values:
+                - frontend-transport
+
+"""
+    r = helm_template(config)
+    ingress = r["networkpolicy"][uname]["spec"]["ingress"]
+    pod_selector = r["networkpolicy"][uname]["spec"]["podSelector"]
+    http = ingress[0]
+    transport = ingress[1]
+    assert http["from"] == [
+        {
+            "podSelector": {
+                "matchLabels": {"elasticsearch-master-http-client": "true"}
+            },
+            "namespaceSelector": {
+                "matchExpressions": [
+                    {"key": "role", "operator": "In", "values": ["frontend-http"]}
+                ],
+                "matchLabels": {"role": "frontend-http"},
+            },
+        },
+        {"podSelector": {"matchLabels": {"role": "frontend-http"}}},
+        {
+            "podSelector": {
+                "matchExpressions": [
+                    {"key": "role", "operator": "In", "values": ["frontend-http"]}
+                ]
+            }
+        },
+    ]
+    assert http["ports"][0]["port"] == 9200
+    assert transport["from"] == [
+        {
+            "podSelector": {
+                "matchLabels": {"elasticsearch-master-transport-client": "true"}
+            },
+            "namespaceSelector": {
+                "matchExpressions": [
+                    {"key": "role", "operator": "In", "values": ["frontend-transport"]}
+                ],
+                "matchLabels": {"role": "frontend-transport"},
+            },
+        },
+        {"podSelector": {"matchLabels": {"role": "frontend-transport"}}},
+        {
+            "podSelector": {
+                "matchExpressions": [
+                    {"key": "role", "operator": "In", "values": ["frontend-transport"]}
+                ]
+            }
+        },
+        {"podSelector": {"matchLabels": {"app": "elasticsearch-master"}}},
+    ]
+    assert transport["ports"][0]["port"] == 9300
+    assert pod_selector == {
+        "matchLabels": {
+            "app": "elasticsearch-master",
+        }
+    }
+
+
+def test_default_automount_sa_token():
+    config = """
+"""
+    r = helm_template(config)
+    assert (
+        r["statefulset"][uname]["spec"]["template"]["spec"][
+            "automountServiceAccountToken"
+        ]
+        == True
+    )
+
+
+def test_disable_automount_sa_token():
+    config = """
+rbac:
+  automountToken: false
+"""
+    r = helm_template(config)
+    assert (
+        r["statefulset"][uname]["spec"]["template"]["spec"][
+            "automountServiceAccountToken"
+        ]
+        == False
+    )

@@ -19,6 +19,18 @@ we make it compatible by overriding the following templates.
 {{- end -}}
 
 {{/*
+We don't use roles for elasticsearch 6 and having them set in later 
+chart versions, breaks deployment. So we add conditional on it.
+*/}}
+{{- define "elasticsearch.roles" -}}
+{{- if gt (int (include "elasticsearch.esMajorVersion" .)) 6 }}
+{{- range $.Values.roles -}}
+{{ . }},
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 The mariadb chart switched to an incompatible naming scheme,
 we make it compatible by overriding the following templates.
 */}}

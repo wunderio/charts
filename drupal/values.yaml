@@ -577,6 +577,7 @@ varnish:
     .connect_timeout        = 10s;
     .between_bytes_timeout  = 10s;
 
+# https://github.com/elastic/helm-charts/blob/2fd64d0af65f14df7aa01da591919460dabac4b3/elasticsearch/values.yaml
 elasticsearch:
   enabled: false
 
@@ -588,6 +589,16 @@ elasticsearch:
   minimumMasterNodes: 1
   maxUnavailable: 0
   clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
+
+  # Note: "roles" definition is ignored for 6.x images due to subchart compatability reasons.
+
+  # Drupal integration module still requires non-ssl connection
+  # related param: elasticsearch.extraEnvs[xpack.security.enabled]
+  createCert: false
+  protocol: http
+  extraEnvs:
+    - name: xpack.security.enabled
+      value: "false"
 
   # Disable service links that cause a slow startup.
   enableServiceLinks: false
@@ -603,7 +614,7 @@ elasticsearch:
   resources:
     requests:
       cpu: 200m
-      memory: 512Mi
+      memory: 640Mi
     limits:
       memory: 1Gi
 

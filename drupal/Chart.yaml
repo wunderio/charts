@@ -1,6 +1,6 @@
 apiVersion: v2
 name: drupal
-version: 0.5.2
+version: 0.6.0
 dependencies:
 - name: mariadb
   version: 7.5.x
@@ -23,8 +23,9 @@ dependencies:
   repository: https://codecentric.github.io/helm-charts
   condition: mailhog.enabled
 - name: elasticsearch
-  version: 7.8.x
-#  repository: https://helm.elastic.co
+  version: 8.5.x
+  # repository: https://helm.elastic.co
+  # Forked at https://github.com/elastic/helm-charts/commit/2fd64d0af65f14df7aa01da591919460dabac4b3
   repository: file://../elasticsearch
   condition: elasticsearch.enabled
 - name: silta-release
