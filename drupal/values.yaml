@@ -3,6 +3,10 @@ silta-release:
   # Enable downscaler by default. See https://github.com/wunderio/charts/blob/master/silta-downscaler/
   downscaler:
     enabled: true
+    # Allows to modify How long should This release be active until downscaled.
+    # value examples: 10y, 4w, 1h Defaults to values used in silta-downscaler chart.
+    # https://github.com/wunderio/charts/blob/master/silta-downscaler/values.yaml
+    releaseMinAge: ''
 
 # Main domain of the cluster.
 # Subdomains of this domain will be created automatically for each environment.
@@ -286,7 +290,7 @@ php:
       if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then
         drush cache-clear all || true
       else
-        drush cache-rebuild || true
+        drush eval "drupal_flush_all_caches();" || true
       fi
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
         drush updatedb -y

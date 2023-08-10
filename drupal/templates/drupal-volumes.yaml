@@ -2,6 +2,7 @@
 #Trimmed release name to fit *it*, sha256sum(7 chars), $index and '-' separators together into a single 63 character string
 {{- $releaseNameTrimmed := substr 0 (int (sub 54 (len $index))) $.Release.Name }}
 {{- if eq $mount.enabled true }}
+{{- if and (not (hasKey $mount "configMapName")) (not (hasKey $mount "secretName")) -}}
 {{- if eq $mount.storageClassName "silta-shared" }}
 # Mount-enabled: {{ $mount.enabled  }}
 apiVersion: v1
@@ -48,6 +49,7 @@ spec:
 {{- end }}
 ---
 {{- end -}}
+{{- end }}
 {{- end }}
 
 {{- if .Values.referenceData.enabled }}

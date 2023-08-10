@@ -1,5 +1,6 @@
 {{- range $index, $mount := .Values.mounts }}
 {{- if $mount.enabled }}
+{{- if and (not (hasKey $mount "configMapName")) (not (hasKey $mount "secretName")) -}}
 {{- if eq $mount.storageClassName "silta-shared" }}
 # Mount-enabled: {{ $mount.enabled  }}
 apiVersion: v1
@@ -45,6 +46,7 @@ spec:
 {{- end }}
 ---
 {{- end -}}
+{{- end }}
 {{- end }}
 
 {{- if $.Values.shell.enabled }}

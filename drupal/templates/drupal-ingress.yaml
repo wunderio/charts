@@ -57,23 +57,26 @@ metadata:
     {{- if $ingress.staticIpAddressName }}
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
-    
+
     {{- if eq $ingress.type "azure/application-gateway" }}
     {{- if $letsencrypt_in_use }}
     cert-manager.io/cluster-issuer: letsencrypt
     {{- end }}
     appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399, 401-404"
     {{- end }}
-    
+
     {{- if $ingress.extraAnnotations }}
     {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- end }}
-    
+
     {{- if (index .Values "silta-release").downscaler.enabled }}
     auto-downscale/down: "false"
     auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
     auto-downscale/label-selector: "release={{ .Release.Name }}"
     auto-downscale/services: {{ include "drupal.servicename" . }}
+    {{- if and (index .Values "silta-release").downscaler.releaseMinAge (ne (index .Values "silta-release").downscaler.releaseMinAge "") }}
+    auto-downscale/min-age: {{(index .Values "silta-release").downscaler.releaseMinAge}}
+    {{- end }}
     {{- end }}
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
@@ -82,16 +85,16 @@ spec:
   tls:
   {{- if .Values.ssl.existingTLSSecret }}
   - secretName: {{ .Values.ssl.existingTLSSecret }}
-    hosts: 
+    hosts:
       - {{ include "drupal.domain" . | quote }}
   {{- else }}
   - secretName: {{ .Release.Name }}-tls{{- if eq $.Values.ssl.issuer "custom" }}-custom{{- end }}
-    hosts: 
+    hosts:
       - {{ include "drupal.domain" . | quote }}
   {{- range $index, $prefix := .Values.domainPrefixes }}
   {{ $params := dict "prefix" $prefix -}}
   - secretName: {{ $.Release.Name }}-tls-p{{ $index }}{{- if eq $.Values.ssl.issuer "custom" }}-custom{{- end }}
-    hosts: 
+    hosts:
       - '{{ template "drupal.domain" (merge $params $ ) }}'
   {{- end }}
   {{- end }}
@@ -108,7 +111,7 @@ spec:
           {{- if eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1" }}
           service:
             name: {{ include "drupal.servicename" . }}
-            port: 
+            port:
               number: 80
           {{- else }}
           serviceName: {{ include "drupal.servicename" . }}
@@ -127,7 +130,7 @@ spec:
           {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
           service:
             name: {{ include "drupal.servicename" $ }}
-            port: 
+            port:
               number: 80
           {{- else }}
           serviceName: {{ include "drupal.servicename" $ }}
@@ -136,7 +139,7 @@ spec:
 {{- end }}
 ---
 
-# Ingresses for exposeDomains 
+# Ingresses for exposeDomains
 {{- range $ingress_index, $ingress := $.Values.ingress }}
 
 {{- $ingress := mergeOverwrite (deepCopy $.Values.ingress.default) $ingress }}
@@ -186,7 +189,7 @@ metadata:
     traefik.ingress.kubernetes.io/frontend-entry-points: "http"
     {{- end }}
     {{- end }}
-    
+
     {{- $redirect_https := false }}
     {{- if (hasKey $ingress "redirect-https") }}
     {{- $redirect_https = (index $ingress "redirect-https") }}
@@ -217,14 +220,14 @@ metadata:
     {{- if $ingress.staticIpAddressName }}
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
-    
+
     {{- if eq $ingress.type "azure/application-gateway" }}
     {{- if $letsencrypt_in_use }}
     cert-manager.io/cluster-issuer: letsencrypt
     {{- end }}
     appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399, 401-404"
     {{- end }}
-    
+
     {{- if $ingress.extraAnnotations }}
     {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- end }}
@@ -234,6 +237,9 @@ metadata:
     auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
     auto-downscale/label-selector: "release={{ $.Release.Name }}"
     auto-downscale/services: {{ include "drupal.servicename" $ }}
+    {{- if and (index $.Values "silta-release").downscaler.releaseMinAge (ne (index $.Values "silta-release").downscaler.releaseMinAge "") }}
+    auto-downscale/min-age: {{(index $.Values "silta-release").downscaler.releaseMinAge}}
+    {{- end }}
     {{- end }}
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
@@ -274,7 +280,7 @@ spec:
           {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
           service:
             name: {{ include "drupal.servicename" $ }}
-            port: 
+            port:
               number: 80
           {{- else }}
           serviceName: {{ include "drupal.servicename" $ }}
