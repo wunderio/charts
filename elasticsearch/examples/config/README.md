@@ -1,6 +1,6 @@
 # Config
 
-This example deploy a single node Elasticsearch 7.8.1-SNAPSHOT with authentication and
+This example deploy a single node Elasticsearch 8.5.1 with authentication and
 custom [values][].
 
 
@@ -23,5 +23,5 @@ custom [values][].
 You can also run [goss integration tests][] using `make test`
 
 
-[goss integration tests]: https://github.com/elastic/helm-charts/tree/7.8/elasticsearch/examples/config/test/goss.yaml
-[values]: https://github.com/elastic/helm-charts/tree/7.8/elasticsearch/examples/config/values.yaml
+[goss integration tests]: https://github.com/elastic/helm-charts/tree/main/elasticsearch/examples/config/test/goss.yaml
+[values]: https://github.com/elastic/helm-charts/tree/main/elasticsearch/examples/config/values.yaml

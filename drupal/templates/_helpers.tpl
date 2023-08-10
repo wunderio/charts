@@ -331,7 +331,7 @@ mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -e "CREATE DATABASE IF NOT EXISTS $DB_N
 {{- define "drupal.wait-for-elasticsearch-command" }}
 TIME_WAITING=0
 echo -n "Waiting for Elasticsearch.";
-until curl --silent --connect-timeout 2 "$ELASTICSEARCH_HOST:9200" ; do
+until curl --silent --connect-timeout 2 "{{ .Values.elasticsearch.protocol }}://${ELASTICSEARCH_HOST}:9200" -k ; do
   echo -n "."
   sleep 5
   TIME_WAITING=$((TIME_WAITING+5))

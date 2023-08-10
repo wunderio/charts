@@ -2,7 +2,8 @@ default: test
 
 include ../../../helpers/examples.mk
 
-RELEASE := elasticsearch
+RELEASE := helm-es-networkpolicy
+TIMEOUT := 1200s
 
 install:
 	helm upgrade --wait --timeout=$(TIMEOUT) --install --values values.yaml $(RELEASE) ../../
