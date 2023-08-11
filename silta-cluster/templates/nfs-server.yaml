@@ -1,4 +1,5 @@
-{{- if index (index .Values "nfs-server") "enabled" }}
+{{- $nfsserver := index .Values "nfs-server" }}
+{{- if $nfsserver.enabled }}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -18,9 +19,8 @@ spec:
       enableServiceLinks: false
       containers:
       - name: nfs-server
-        image: '{{ index (index .Values "nfs-server") "image" }}:{{ index (index .Values "nfs-server") "imageTag" }}'
-        imagePullPolicy: {{ index (index .Values "nfs-server") "imagePullPolicy" }}
-        # TODO: resources:
+        image: '{{ $nfsserver.image }}:{{ $nfsserver.imageTag }}'
+        imagePullPolicy: {{ $nfsserver.imagePullPolicy }}
         ports:
         - name: nfs
           containerPort: 2049
@@ -40,25 +40,74 @@ spec:
           tcpSocket:
             port: 111
         resources:
-          {{- index (index .Values "nfs-server") "resources" | toYaml | nindent 10 }}
+          {{- $nfsserver.resources | toYaml | nindent 10 }}
         volumeMounts:
+        {{- if $nfsserver.persistence.rclone.enabled }}
+        - name: exports
+          mountPath: /exports
+          mountPropagation: Bidirectional
+        {{- else }}
         - name: {{ .Release.Name }}-nfs-server-data
           mountPath: /exports
+        {{- end }}
+      {{- if $nfsserver.persistence.rclone.enabled }}
+      - name: rclone
+        image: {{ $nfsserver.persistence.rclone.image }}
+        imagePullPolicy: {{ $nfsserver.persistence.rclone.imagePullPolicy }}
+        # TODO: cache modes and other options + expose flags in values.yaml
+        command: [
+          "/usr/local/bin/rclone", 
+          "mount", 
+          "backend:{{ $nfsserver.persistence.rclone.remotePath }}", 
+          "/exports", 
+          "--allow-non-empty", 
+          "--allow-other",
+          {{- range $key, $value := $nfsserver.persistence.rclone.params }}
+          "--{{ $key }}={{ $value }}",
+          {{- end }}
+        ]
+        securityContext:
+          # Required by fuse mount
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        resources:
+          {{- $nfsserver.persistence.rclone.resources | toYaml | nindent 10 }}
+        volumeMounts:
+          - name: rclone-config
+            mountPath: /config/rclone/rclone.conf
+            subPath: rclone.conf
+          - name: exports
+            mountPath: /exports
+            mountPropagation: Bidirectional
+      {{- end }}
+      volumes:
+      - name: rclone-config
+        configMap:
+          name: {{ .Release.Name }}-nfs-server-rclone-config
+      {{- if $nfsserver.persistence.rclone.enabled}}
+      - name: exports
+        emptyDir: {}
+      {{- end }}
+
+  {{- if not $nfsserver.persistence.rclone.enabled }}
   volumeClaimTemplates:
   - metadata:
       name: {{ .Release.Name }}-nfs-server-data
     spec:
       accessModes: [ "ReadWriteOnce" ]
-      {{- if index (index (index (index .Values "nfs-server") "persistence") "data") "storageClassName" }}
-      storageClassName: {{ index (index (index (index .Values "nfs-server") "persistence") "data") "storageClassName" }}
+      {{- if $nfsserver.persistence.data.storageClassName }}
+      storageClassName: {{ $nfsserver.persistence.data.storageClassName }}
       {{- end }}
-      {{- if index (index (index (index .Values "nfs-server") "persistence") "data") "csiDriverName" }}
-      csiDriverName: {{ index (index (index (index .Values "nfs-server") "persistence") "data") "csiDriverName" }}
+      {{- if $nfsserver.persistence.data.csiDriverName }}
+      csiDriverName: {{ $nfsserver.persistence.data.csiDriverName }}
       {{- end }}
       resources:
         requests:
-          storage: {{ index (index (index (index .Values "nfs-server") "persistence") "data") "size" }}
-      accessModes: {{ index (index (index (index .Values "nfs-server") "persistence") "data") "accessModes" }}
+          storage: {{ $nfsserver.persistence.data.size }}
+      accessModes: {{ $nfsserver.persistence.data.accessModes }}
+  {{- end }}
 ---
 apiVersion: v1
 kind: Service
@@ -75,5 +124,18 @@ spec:
     port: 111
   selector:
     app: {{ .Release.Name }}-nfs-server
+
+{{- if $nfsserver.persistence.rclone.enabled }}
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Release.Name }}-nfs-server-rclone-config
+  namespace: {{ .Release.Namespace }}
+data:
+  rclone.conf: |
+    [backend]
+    {{- $nfsserver.persistence.rclone.backend_config | nindent 4 }}
+{{- end }}
 
 {{- end }}
