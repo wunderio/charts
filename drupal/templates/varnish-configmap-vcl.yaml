@@ -379,6 +379,19 @@ data:
         return (pass);
       }
 
+      {{- if .Values.nginx.status_page.enabled }}
+      // No varnish for nginx status page
+      if (req.url ~ "^/nginx_status$") {
+        return (pass);
+      }
+      if (req.url ~ "^/nginx_vts$") {
+        return (pass);
+      }
+      if (req.url ~ "^/php_status$") {
+        return (pass);
+      }
+      {{- end }}
+
       {{- if .Values.mailhog.enabled }}
       // No varnish for mailhog
       if (req.url ~ "^/mailhog$") {
