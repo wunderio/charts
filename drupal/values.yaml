@@ -206,6 +206,8 @@ nginx:
   #   paths:
   #     - "^/sites/[^/]+/files/(?:css|js)/"
 
+  # Nginx status pages will be available at /nginx_status and /nginx_vts,
+  # accessible from nginx.noauthips and localhost.
   status_page:
     enabled: true
 
@@ -247,6 +249,8 @@ php:
     # This will be put under [www] process pool.
     extraConfig: |
 
+    # PHP-FPM status page will be available at /php_status, accessible
+    # from nginx.noauthips and localhost.
     status_page:
       enabled: true
 
