@@ -206,6 +206,11 @@ nginx:
   #   paths:
   #     - "^/sites/[^/]+/files/(?:css|js)/"
 
+  # Nginx status pages will be available at /nginx_status and /nginx_vts,
+  # accessible from nginx.noauthips and localhost.
+  status_page:
+    enabled: true
+
   # Allow load-balancer to pod session affinity for consecutive requests. Does not work with varnish enabled.
   sessionAffinity: false
 
@@ -243,6 +248,11 @@ php:
     # Custom php-fpm settings block. May override parameters previously defined.
     # This will be put under [www] process pool.
     extraConfig: |
+
+    # PHP-FPM status page will be available at /php_status, accessible
+    # from nginx.noauthips and localhost.
+    status_page:
+      enabled: true
 
   # Cron tasks, each of which will be run into a dedicated temporary pod.
   cron:

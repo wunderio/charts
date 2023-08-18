@@ -5,7 +5,9 @@ metadata:
   labels:
     {{ include "simple.release_labels" . | indent 4 }}
   annotations:
+    {{- if (index .Values "silta-release").downscaler.enabled }}
     auto-downscale/down: "false"
+    {{- end }}
     {{- if .Values.cluster }}
     {{- if and (eq .Values.cluster.type "gke") (.Values.backendConfig) }}
     cloud.google.com/backend-config: '{"default":"{{ .Release.Name }}-simple"}'

@@ -81,6 +81,12 @@ spec:
           mountPath: /etc/nginx/fastcgi.conf
           readOnly: true
           subPath: fastcgi_conf
+        {{- if .Values.nginx.status_page.enabled }}
+        - name: config
+          mountPath: /etc/nginx/modules/nginx_status.conf
+          readOnly: true
+          subPath: nginx_status_conf
+        {{- end }}
         {{- if .Values.signalsciences.enabled }}
         - name: config
           mountPath: /etc/nginx/modules/nginx_signalsciences.conf

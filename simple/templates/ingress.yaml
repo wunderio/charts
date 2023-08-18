@@ -68,6 +68,13 @@ metadata:
     {{- if $ingress.extraAnnotations }}
     {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- end }}
+
+    {{- if (index .Values "silta-release").downscaler.enabled }}
+    auto-downscale/down: "false"
+    auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
+    auto-downscale/label-selector: "release={{ .Release.Name }}"
+    auto-downscale/services: {{ .Release.Name }}-simple
+    {{- end }}
   labels:
     {{ include "simple.release_labels" . | indent 4 }}
 spec:
@@ -186,6 +193,13 @@ metadata:
     
     {{- if $ingress.extraAnnotations }}
     {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
+    {{- end }}
+
+    {{- if (index $.Values "silta-release").downscaler.enabled }}
+    auto-downscale/down: "false"
+    auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
+    auto-downscale/label-selector: "release={{ $.Release.Name }}"
+    auto-downscale/services: {{ $.Release.Name }}-simple
     {{- end }}
   labels:
     {{ include "simple.release_labels" $ | indent 4 }}
