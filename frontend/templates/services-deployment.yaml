@@ -66,7 +66,7 @@ spec:
         {{- include "services.env" (dict "Values" $.Values "Release" $.Release "service" $service) | nindent 8 }}
         {{- range $key, $val := $service.env }}
         - name: {{ $key }}
-        {{- if or (kindIs "string" $val) (kindIs "int" $val) (kindIs "float64" $val) (kindIs "bool" $val) }}
+        {{- if or (kindIs "string" $val) (kindIs "int" $val) (kindIs "float64" $val) (kindIs "bool" $val) (kindIs "invalid" $val) }}
           value: {{ $val | quote }}
         {{- else }}
           {{ $val | toYaml | indent 12 | trim }}
@@ -206,7 +206,7 @@ spec:
         {{- include "services.env" (dict "Values" $.Values "Release" $.Release "service" $service) | nindent 8 }}
         {{- range $key, $val := $service.env }}
         - name: {{ $key }}
-        {{- if or (kindIs "string" $val) (kindIs "int" $val) (kindIs "float64" $val) (kindIs "bool" $val) }}
+        {{- if or (kindIs "string" $val) (kindIs "int" $val) (kindIs "float64" $val) (kindIs "bool" $val) (kindIs "invalid" $val) }}
           value: {{ $val | quote }}
         {{- else }}
           {{ $val | toYaml | indent 4 | trim }}
