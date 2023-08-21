@@ -354,17 +354,18 @@ data:
         
         stub_status on;
       }
-      location /nginx_vts {
-        satisfy any;
-        allow 127.0.0.1;
-        {{- range .Values.nginx.noauthips }}
-        allow {{ . }};
-        {{- end }}
-        deny all;
+      # Disabled until base images images are updated
+      # location /nginx_vts {
+      #   satisfy any;
+      #   allow 127.0.0.1;
+      #   {{- range .Values.nginx.noauthips }}
+      #   allow {{ . }};
+      #   {{- end }}
+      #   deny all;
 
-        vhost_traffic_status_display;
-        vhost_traffic_status_display_format html;
-      }
+      #   vhost_traffic_status_display;
+      #   vhost_traffic_status_display_format html;
+      # }
       {{- end }}
 
       {{- if .Values.php.fpm.status_page.enabled }}
