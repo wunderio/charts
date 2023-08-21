@@ -111,9 +111,9 @@ data:
       sigsci_agent_host unix:/sigsci/tmp/sigsci.sock;
       {{- end }}
 
-      {{- if .Values.nginx.status_page.enabled }}
-      vhost_traffic_status_zone;
-      {{- end }}
+      # {{- if .Values.nginx.status_page.enabled }}
+      # vhost_traffic_status_zone;
+      # {{- end }}
 
       # List of upstream proxies we trust to set X-Forwarded-For correctly.
       {{- if kindIs "string" .Values.nginx.realipfrom }}
