@@ -5,7 +5,7 @@
 1. Upgrade CRD's:
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/859cbbb5f54ba30df12e758e10e3f941bf4cc956/charts/ps-operator/crds/crd.yaml
+kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/dcfc35a1158862da60a89010e4cabaa2b94560f5/charts/pxc-operator/crds/crd.yaml
 ```
 
 Remove old validating webhook configuration:
