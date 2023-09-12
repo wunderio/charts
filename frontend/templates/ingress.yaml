@@ -11,7 +11,9 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-nginx
   annotations:
+    {{- if or (eq $ingress.type "gce") (eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1beta1") }}
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
+    {{- end }}
     {{- if $ingress.tls }}
     {{- if eq ( include "cert-manager.api-version" . | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
@@ -40,7 +42,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
     nginx.org/redirect-to-https: {{ $redirect_https | quote }}
     {{- end }}
-    {{- if eq $ingress.type "azure/application-gateway" }}
+    {{- if or (eq $ingress.type "azure/application-gateway") (eq $ingress.type "azure-application-gateway") }}
     appgw.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
     {{- end }}
     {{- if eq $ingress.type "nginx" }}
@@ -58,7 +60,7 @@ metadata:
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
 
-    {{- if eq $ingress.type "azure/application-gateway" }}
+    {{- if or (eq $ingress.type "azure/application-gateway") (eq $ingress.type "azure-application-gateway") }}
     {{- if $letsencrypt_in_use }}
     cert-manager.io/cluster-issuer: letsencrypt
     {{- end }}
@@ -78,6 +80,9 @@ metadata:
   labels:
     {{ include "frontend.release_labels" . | indent 4 }}
 spec:
+  {{- if and (ne $ingress.type "gce" ) (eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1") }}
+  ingressClassName: {{ regexReplaceAll "[^[:alnum:]]" $ingress.type "-" | quote }}
+  {{- end }}
   {{- if $ingress.tls }}
   tls:
   - secretName: {{ .Release.Name }}-tls{{- if eq $.Values.ssl.issuer "custom" }}-custom{{- end }}
@@ -163,7 +168,9 @@ kind: Ingress
 metadata:
   name: {{ $.Release.Name }}-nginx-{{ $ingress_index }}
   annotations:
+    {{- if or (eq $ingress.type "gce") (eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1beta1") }}
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
+    {{- end }}
     {{- if $ingress.tls }}
     {{- if eq ( include "cert-manager.api-version" $ | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
@@ -192,7 +199,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
     nginx.org/redirect-to-https: {{ $redirect_https | quote }}
     {{- end }}
-    {{- if eq $ingress.type "azure/application-gateway" }}
+    {{- if or (eq $ingress.type "azure/application-gateway") (eq $ingress.type "azure-application-gateway") }}
     appgw.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
     {{- end }}
     {{- if eq $ingress.type "nginx" }}
@@ -210,7 +217,7 @@ metadata:
     kubernetes.io/ingress.global-static-ip-name: {{ $ingress.staticIpAddressName | quote }}
     {{- end }}
 
-    {{- if eq $ingress.type "azure/application-gateway" }}
+    {{- if or (eq $ingress.type "azure/application-gateway") (eq $ingress.type "azure-application-gateway") }}
     {{- if $letsencrypt_in_use }}
     cert-manager.io/cluster-issuer: letsencrypt
     {{- end }}
@@ -230,6 +237,9 @@ metadata:
   labels:
     {{ include "frontend.release_labels" $ | indent 4 }}
 spec:
+  {{- if and (ne $ingress.type "gce" ) (eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1") }}
+  ingressClassName: {{ regexReplaceAll "[^[:alnum:]]" $ingress.type "-" | quote }}
+  {{- end }}
   {{- if $ingress.tls }}
   tls:
   {{- range $domain_index, $domain := $.Values.exposeDomains }}
