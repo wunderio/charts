@@ -8,6 +8,9 @@ tests:
           of: Ingress
 
   - it: uses traefik ingress class
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
     asserts:
       - equal:
           path: 'metadata.annotations.kubernetes\.io/ingress\.class'
@@ -103,6 +106,9 @@ tests:
 
   - it: exposeDomains - uses default ingress type and has correct hostname
     template: ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
     set:
       ingress:
         default:
