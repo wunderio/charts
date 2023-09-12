@@ -21,7 +21,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
-  type: NodePort
+  type: ClusterIP
   # We explicitly unset this, in case the application is currently downscaled.
   externalName: null
   ports:
