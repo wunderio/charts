@@ -55,7 +55,7 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: PXC_DB_HOST
-            value: RELEASE-NAME-haproxy-replicas
+            value: RELEASE-NAME-proxysql
   - it: does not set db environments when dbms are disabled
     template: drupal-deployment.yaml
     set:
@@ -71,7 +71,7 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: PXC_DB_HOST
-            value: RELEASE-NAME-haproxy-replicas
+            value: RELEASE-NAME-proxysql
   - it: sets correct db host when mariadb enabled and primary db
     template: drupal-deployment.yaml
     set:
@@ -95,6 +95,6 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: DB_HOST
-            value: RELEASE-NAME-haproxy-replicas
+            value: RELEASE-NAME-proxysql
 
   

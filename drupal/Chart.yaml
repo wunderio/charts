@@ -7,7 +7,7 @@ dependencies:
   repository: https://storage.googleapis.com/charts.wdr.io
   condition: mariadb.enabled,drupal.mariadb.enabled,global.mariadb.enabled
 - name: pxc-db
-  version: 1.9.x
+  version: 1.12.x
   repository: https://percona.github.io/percona-helm-charts/
   condition: pxc-db.enabled
 - name: memcached
