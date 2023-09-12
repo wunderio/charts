@@ -29,8 +29,8 @@ ingress-nginx:
       enabled: false
       minReplicas: 1
       maxReplicas: 10
-      targetCPUUtilizationPercentage: 70
-      targetMemoryUtilizationPercentage: 70
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
     config:
       # Optional CDN configuration
       use-proxy-protocol: false
@@ -42,6 +42,12 @@ ingress-nginx:
       disable-access-log: false
       disable-http-access-log: false
       disable-stream-access-log: false
+      upstream-keepalive-requests: 16378
+      upstream-keepalive-connections: 4096
+      keep-alive-requests: 16378
+      use-geoip: false
+      use-gzip: false
+      gzip-level: 1
       # ModSecurity https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#enable-modsecurity
       # Off by default, enable using ingress annotations
       enable-modsecurity: false
