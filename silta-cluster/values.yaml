@@ -251,7 +251,7 @@ gke:
   clusterName: ''
 
 # Percona XtraDB Cluster for replicated database support
-# https://github.com/percona/percona-helm-charts/tree/main/charts/pxc-operator
+# https://github.com/percona/percona-helm-charts/blob/859cbbb5f54ba30df12e758e10e3f941bf4cc956/charts/pxc-operator/values.yaml
 pxc-operator:
   enabled: false
   watchAllNamespaces: true
