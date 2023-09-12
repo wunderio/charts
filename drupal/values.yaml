@@ -781,6 +781,15 @@ pxc-db:
   secrets:
     passwords:
       root: drupal
+      pmmserver: drupal
+      root: drupal
+      xtrabackup: drupal
+      monitor: drupal
+      clustercheck: drupal
+      proxyadmin: drupal
+      pmmserver: drupal
+      operator: drupal
+      replication: drupal
 
 # Fastly Signal Sciences support
 # https://docs.fastly.com/signalsciences/
