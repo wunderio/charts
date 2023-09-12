@@ -1,13 +1,13 @@
 apiVersion: v2
 name: drupal
-version: 0.7.4
+version: 0.8.0
 dependencies:
 - name: mariadb
   version: 7.5.x
   repository: https://storage.googleapis.com/charts.wdr.io
   condition: mariadb.enabled,drupal.mariadb.enabled,global.mariadb.enabled
 - name: pxc-db
-  version: 1.9.x
+  version: 1.12.x
   repository: https://percona.github.io/percona-helm-charts/
   condition: pxc-db.enabled
 - name: memcached

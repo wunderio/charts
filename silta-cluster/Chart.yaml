@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "1.0"
 description: Setup a silta kubernetes cluster.
 name: silta-cluster
-version: 0.2.42
+version: 0.2.43
 # kubeVersion: '>=1.20.0-0'
 dependencies:
 - name: ingress-nginx
@@ -20,7 +20,7 @@ dependencies:
   repository: file://../legacy_traefik
   condition: traefik.enabled
 - name: pxc-operator
-  version: 1.9.x
+  version: 1.12.x
   repository: https://percona.github.io/percona-helm-charts/
   condition: pxc-operator.enabled
 - name: minio

@@ -11,11 +11,28 @@ tests:
       - isKind:
           of: Ingress
 
-  - it: uses traefik ingress class
+  - it: uses traefik ingress class (pre 1.18)
     template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
+      apiVersions:
+        - networking.k8s.io/v1beta1
     asserts:
       - equal:
           path: 'metadata.annotations.kubernetes\.io/ingress\.class'
+          value: 'traefik'
+
+  - it: uses traefik ingress class (1.18+)
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 22
+      apiVersions:
+        - networking.k8s.io/v1
+    asserts:
+      - equal:
+          path: 'spec.ingressClassName'
           value: 'traefik'
 
   - it: sets correct hostname for deployment
@@ -172,8 +189,13 @@ tests:
          path: spec.rules[3].host
          value: '*.foo.bar.baz'
 
-  - it: exposeDomains - uses default ingress type and has correct hostname
+  - it: exposeDomains - uses default ingress type and has correct hostname (pre 1.18)
     template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
+      apiVersions:
+        - networking.k8s.io/v1beta1
     set:
       ingress:
         default:
@@ -186,7 +208,27 @@ tests:
         equal:
           path: 'metadata.annotations.kubernetes\.io/ingress\.class'
           value: 'foo'
-  
+
+  - it: exposeDomains - uses default ingress type and has correct hostname (1.18+)
+    template: drupal-ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 22
+      apiVersions:
+        - networking.k8s.io/v1
+    set:
+      ingress:
+        default:
+          type: foo
+      exposeDomains:
+        bar:
+          hostname: bar.baz
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: 'spec.ingressClassName'
+          value: 'foo'
+
   - it: exposeDomains - has correct hostname
     template: drupal-ingress.yaml
     set:

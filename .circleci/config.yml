@@ -11,6 +11,10 @@ jobs:
     steps:
       - checkout
       - run:
+          name: "Update GCloud tools"
+          command: |
+            sudo apt-get update && sudo apt-get install google-cloud-sdk google-cloud-sdk-gke-gcloud-auth-plugin kubectl
+      - run:
           name: Cloud login
           command: |
             printenv GCLOUD_KEY_JSON > "${HOME}/gcloud-service-key.json"
@@ -67,6 +71,10 @@ jobs:
     steps:
       - restore_cache:
           key: v1-{{ .Revision }}
+      - run:
+          name: "Update GCloud tools"
+          command: |
+            sudo apt-get update && sudo apt-get install google-cloud-sdk google-cloud-sdk-gke-gcloud-auth-plugin kubectl
       - run:
           name: Cloud login
           command: |

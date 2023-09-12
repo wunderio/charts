@@ -143,11 +143,11 @@ imagePullSecrets:
 - name: PXC_DB_NAME
   value: "drupal"
 - name: PXC_DB_HOST
-  value: {{ include "pxc-database.fullname" . }}-haproxy-replicas
+  value: {{ include "pxc-database.fullname" . }}-proxysql
 - name: PXC_DB_PASS
   valueFrom:
     secretKeyRef:
-      name: internal-{{ include "pxc-database.fullname" . }}
+      name: {{ include "pxc-database.fullname" . }}
       key: root
 {{- end }}
 {{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
@@ -169,11 +169,11 @@ imagePullSecrets:
 - name: DB_NAME
   value: "drupal"
 - name: DB_HOST
-  value: {{ include "pxc-database.fullname" . }}-haproxy-replicas
+  value: {{ include "pxc-database.fullname" . }}-proxysql
 - name: DB_PASS
   valueFrom:
     secretKeyRef:
-      name: internal-{{ include "pxc-database.fullname" . }}
+      name: {{ include "pxc-database.fullname" . }}
       key: root
 {{- end }}
 {{- end }}

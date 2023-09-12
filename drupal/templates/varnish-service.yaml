@@ -19,7 +19,7 @@ metadata:
     {{- include "drupal.release_labels" . | nindent 4 }}
     service: varnish
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: web
     protocol: TCP

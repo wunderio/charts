@@ -738,7 +738,7 @@ db:
   primary: mariadb
 
 # Percona XtraDB Cluster
-# see: https://github.com/percona/percona-helm-charts/blob/main/charts/pxc-db/values.yaml
+# see: https://github.com/percona/percona-helm-charts/blob/4ec113774f41a31167c2f9efd4c93f3d387e7f04/charts/pxc-db/values.yaml
 pxc-db:
   enabled: false
   allowUnsafeConfigurations: false
@@ -762,8 +762,10 @@ pxc-db:
       # https://www.percona.com/doc/percona-xtradb-cluster/8.0/features/pxc-strict-mode.html
       pxc_strict_mode=PERMISSIVE
     persistence:
+      enabled: true
       size: 8Gi
-  haproxy:
+  proxysql:
+    enabled: true
     resources:
       requests:
         cpu: 100m
@@ -774,12 +776,20 @@ pxc-db:
   logcollector:
     enabled: false
   backup:
-    # Error: admission webhook "validationwebhook.pxc.percona.com" denied the request: json: unknown field "enabled"
-    #enabled: false
-    schedule: []
+    enabled: false
+    # schedule: []
   secrets:
     passwords:
       root: drupal
+      pmmserver: drupal
+      root: drupal
+      xtrabackup: drupal
+      monitor: drupal
+      clustercheck: drupal
+      proxyadmin: drupal
+      pmmserver: drupal
+      operator: drupal
+      replication: drupal
 
 # Fastly Signal Sciences support
 # https://docs.fastly.com/signalsciences/
