@@ -1,4 +1,5 @@
 {{- if .Values.backup.enabled }}
+{{- if eq .Values.backup.storageClassName "silta-shared" }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -20,6 +21,7 @@ spec:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/backups
   {{- end }}
 ---
+{{- end }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

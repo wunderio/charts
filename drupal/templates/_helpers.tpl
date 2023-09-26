@@ -665,3 +665,9 @@ autoscaling/v2
 autoscaling/v2beta1
 {{- end }}
 {{- end }}
+
+{{- define "masking.prefix-alert" -}}
+{{ if $.Values.domainPrefixes }}
+{{ fail "Cannot use domain prefixes together with domain masking"}}
+{{- end -}}
+{{- end -}}
