@@ -1,5 +1,6 @@
 {{- if .Values.shell.enabled }}
 {{- $releaseNameTrimmed := substr 0 (int (sub 54 (len "ssh-keys"))) $.Release.Name }}
+{{- if eq .Values.shell.mount.storageClassName "silta-shared" }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -22,6 +23,8 @@ spec:
       umask: "077"
   {{- end }}
 ---
+{{- end }}
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

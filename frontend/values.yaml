@@ -336,6 +336,9 @@ serviceDefaults:
 # see: https://github.com/bitnami/charts/blob/master/bitnami/mariadb/values.yaml
 mariadb:
   enabled: false
+  image:
+    # https://hub.docker.com/r/bitnami/mariadb/tags
+    tag: 10.6.15-debian-11-r24
   replication:
     enabled: false
   db:

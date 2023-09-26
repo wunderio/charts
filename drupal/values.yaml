@@ -514,6 +514,9 @@ backup:
 # see: https://github.com/bitnami/charts/blob/91fcd1eb5d00c33cc74e24502a85ce656ac1e963/bitnami/mariadb/values.yaml
 mariadb:
   enabled: true
+  image:
+    # https://hub.docker.com/r/bitnami/mariadb/tags
+    tag: 10.6.15-debian-11-r24
   replication:
     enabled: false
   db:
@@ -813,3 +816,10 @@ signalsciences:
 logging:
   # Currently supported formats are "default" and "json".
   format: default
+
+# Obfuscate parts of the full domain name.
+# Available values for maskSubdomains are:
+# - releaseName (scrambles release name subdomain, e.g., xxx.project.silta.tld)
+# - projectName (scrambles project name subdomain, e.g., release.yyy.silta.tld)
+# - both (obfuscates both, e.g., zzz.silta.tld)
+# maskSubdomains: both
