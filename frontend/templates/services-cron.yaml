@@ -51,9 +51,7 @@ spec:
             args:
               - |
                  set -ex
-                 echo "starting cron run"
                  {{ $job.command | nindent 18 }}
-                 echo "cron run completed"
             resources:
               {{- if $job.resources }}
               {{- if $service.resources }}
