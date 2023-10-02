@@ -1,7 +1,7 @@
 # Default values for silta-proxy.
 
 image: wunderio/silta-proxy
-tag: "latest"
+tag: "v1.0.0"
 
 service:
   port: 80
