@@ -14,5 +14,5 @@ dependencies:
 - name: silta-release
   repository: file://../silta-release
   version: 1.0.0
-digest: sha256:0787b483c6151b4587c0a74d2731ca1a7d70b8c2989b50bc42217acbf6cc92ce
-generated: "2023-10-03T09:50:50.597099681+03:00"
+digest: sha256:7b090077d70021edfb2479e8efaa4079246a09c3d9fb7d1ae56a93ae37240d82
+generated: "2023-10-03T12:01:47.209153798+03:00"

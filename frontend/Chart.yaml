@@ -21,5 +21,5 @@ dependencies:
   repository: https://storage.googleapis.com/charts.wdr.io
   condition: mongodb.enabled
 - name: silta-release
-  version: ~1.0
+  version: ^1.x
   repository: file://../silta-release

@@ -29,5 +29,5 @@ dependencies:
   repository: file://../elasticsearch
   condition: elasticsearch.enabled
 - name: silta-release
-  version: ~1.0
+  version: ^1.x
   repository: file://../silta-release

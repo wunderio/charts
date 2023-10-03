@@ -3,5 +3,5 @@ version: 1.0.0
 apiVersion: v2
 dependencies:
 - name: silta-release
-  version: ~1.0
+  version: ^1.x
   repository: file://../silta-release
