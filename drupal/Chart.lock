@@ -19,6 +19,6 @@ dependencies:
   version: 8.5.1
 - name: silta-release
   repository: file://../silta-release
-  version: 0.1.1
-digest: sha256:b5c776cbbac5c741a1e2befab11e3785e4d1ccafb70e8200a7164e327acf45a2
-generated: "2023-08-10T15:06:24.019320526+03:00"
+  version: 1.0.0
+digest: sha256:3137b02da39f1e4b06311c354138f7824e4a360e89441b65aab62e6e05ee4f7b
+generated: "2023-10-03T09:52:56.461179771+03:00"
