@@ -563,7 +563,7 @@ varnish:
       cpu: 25m
       memory: 32Mi
   image: wunderio/silta-varnish
-  imageTag: 6-v0.2
+  imageTag: 6-v1
   # https://varnish-cache.org/docs/6.6/users-guide/storage-backends.html
   storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
   # https://varnish-cache.org/docs/6.6/reference/varnishd.html#list-of-parameters
@@ -685,7 +685,7 @@ mailhog:
     # Set image repository to "mailhog/mailhog" to reenable logging.
     repository: wunderio/silta-mailhog
     # Set image tag to "" to reenable logging.
-    tag: silent
+    tag: v1
   resources:
     requests:
       cpu: 1m
@@ -704,7 +704,7 @@ solr:
   enabled: false
   # Available image tags: https://hub.docker.com/r/geerlingguy/solr/tags
   image: wunderio/silta-solr
-  imageTag: 8
+  imageTag: 8-v1
 
   # Solr 4.x and 5.x does not support "-force" argument (optional override)
   command: ["/opt/solr/bin/solr"]

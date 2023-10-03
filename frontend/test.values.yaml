@@ -19,8 +19,8 @@ services:
   node:
     # This value needs to be present, but is not validated to be a correct docker image
     image: test/test:version
-  autoscaling:
-    enabled: true
+    autoscaling:
+      enabled: true
 
 shell:
   enabled: true
