@@ -22,10 +22,10 @@ dependencies:
   version: v0.10.1
 - name: silta-proxy
   repository: file://../silta-proxy
-  version: 0.1.0
+  version: 1.0.0
 - name: instana-agent
   repository: https://agents.instana.io/helm
-  version: 1.2.60
+  version: 1.2.63
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
   version: 4.0.18
@@ -35,5 +35,5 @@ dependencies:
 - name: docker-registry
   repository: https://helm.twun.io
   version: 2.1.0
-digest: sha256:51d38d96c703e2f23494cf807b68269381b0b4bebb3e27d01cbf052756c2a1b9
-generated: "2023-06-14T17:03:54.963571814+03:00"
+digest: sha256:367bf2925addbbacf66409319ea1e713b188a90021b2a2192feca1972ff3d8d9
+generated: "2023-10-03T08:47:20.026604507+03:00"
