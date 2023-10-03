@@ -35,5 +35,5 @@ dependencies:
 - name: docker-registry
   repository: https://helm.twun.io
   version: 2.1.0
-digest: sha256:367bf2925addbbacf66409319ea1e713b188a90021b2a2192feca1972ff3d8d9
-generated: "2023-10-03T08:47:20.026604507+03:00"
+digest: sha256:fb2fe9eb5977fac511c9912962a6a2e785b617e5ccd7d9e76e63df09cec7a4be
+generated: "2023-10-03T12:34:05.780123539+03:00"
