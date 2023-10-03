@@ -11,7 +11,7 @@
     "silta-release": { "type": "object" },
     "replicas": { "type": "integer" },
     "autoscaling": {
-      "type": "object", 
+      "type": "object",
       "properties": {
         "enabled": { "type": "boolean" },
         "minReplicas": { "type": "integer" },
@@ -20,14 +20,14 @@
       }
     },
     "exposeDomains": {
-      "type": "object", 
+      "type": "object",
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "name": { "type": "string" },
           "hostname": { "type": "string" },
-          "ssl": { 
+          "ssl": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
@@ -98,7 +98,7 @@
       }
     },
     "backendConfig": {
-      "type": [ "array", "object" ], 
+      "type": [ "array", "object" ],
       "items": { "type": "object" }
     },
     "nginx": {
@@ -152,6 +152,7 @@
         "real_ip_header": { "type": "string"},
         "security_headers": { "type": [ "object", "array" ] },
         "hsts_include_subdomains": { "type": "string" },
+        "content_security_policy": { "type": "string" },
         "serverExtraConfig": { "type": "string" },
         "locationExtraConfig": { "type": "string" },
         "extraConfig": { "type": "string" },
