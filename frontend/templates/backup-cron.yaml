@@ -21,7 +21,7 @@ spec:
           enableServiceLinks: false
           initContainers:
             - name: backup-linking
-              image: wunderio/silta-rsync:latest
+              image: wunderio/silta-rsync:v1
               command: ["/bin/bash", "-c"]
               args:
                 - |
@@ -39,7 +39,7 @@ spec:
                   name: shared-data
           containers:
           - name: backup
-            image: wunderio/silta-rsync:latest
+            image: wunderio/silta-rsync:v1
             volumeMounts:
               {{- range $index, $mount := $.Values.mounts -}}
               {{- if eq $mount.enabled true }}

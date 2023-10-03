@@ -13,6 +13,6 @@ dependencies:
   version: 10.26.4
 - name: silta-release
   repository: file://../silta-release
-  version: 0.1.1
-digest: sha256:36a9a51a6b7d740f560956390f2213b730169518a38ee8bf5ce96ab96214eb28
-generated: "2023-08-10T12:48:07.064125+03:00"
+  version: 1.0.0
+digest: sha256:0787b483c6151b4587c0a74d2731ca1a7d70b8c2989b50bc42217acbf6cc92ce
+generated: "2023-10-03T09:50:50.597099681+03:00"
