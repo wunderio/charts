@@ -36,7 +36,7 @@ dependencies:
   repository: https://charts.jetstack.io/
   condition: cert-manager.enabled
 - name: silta-proxy
-  version: 1.0.0
+  version: ~1.0
   repository: file://../silta-proxy
   condition: silta-proxy.enabled
 - name: instana-agent
