@@ -305,6 +305,9 @@ nfs-subdir-external-provisioner:
     name: nfs-shared
     pathPattern: "${.PVC.namespace}/${.PVC.annotations.storage.silta/storage-path}"
     onDelete: delete
+  image:
+    repository: docker.io/wunderio/nfs-subdir-external-provisioner
+    tag: v4.0
 
 # Uses nfs-subdir-external-provisioner. 
 # see: https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/blob/master/charts/nfs-subdir-external-provisioner/values.yaml
