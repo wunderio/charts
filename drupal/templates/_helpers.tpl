@@ -312,7 +312,7 @@ imagePullSecrets:
 {{- define "drupal.wait-for-db-command" }}
 TIME_WAITING=0
 echo "Waiting for database.";
-until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --silent; do
+until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} --silent; do
   echo -n "."
   sleep 5
   TIME_WAITING=$((TIME_WAITING+5))
@@ -325,7 +325,7 @@ done
 {{- end }}
 
 {{- define "drupal.create-db" }}
-mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
+mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
 {{- end }}
 
 {{- define "drupal.wait-for-elasticsearch-command" }}

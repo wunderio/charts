@@ -11,7 +11,7 @@ $databases['default']['default'] = [
   'username' => getenv('DB_USER'),
   'password' => getenv('DB_PASS'),
   'host' => getenv('DB_HOST'),
-  'port' => '3306',
+  'port' => empty(getenv('DB_PORT')) ? '3306' : getenv('DB_PORT'),
   'driver' => 'mysql',
   'prefix' => '',
 ];
