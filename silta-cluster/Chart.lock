@@ -1,7 +1,7 @@
 dependencies:
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
-  version: 4.6.1
+  version: 4.8.3
 - name: nginx-ingress
   repository: https://helm.nginx.com/stable
   version: 0.17.1
@@ -25,7 +25,7 @@ dependencies:
   version: 1.0.0
 - name: instana-agent
   repository: https://agents.instana.io/helm
-  version: 1.2.63
+  version: 1.2.65
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
   version: 4.0.18
@@ -35,5 +35,5 @@ dependencies:
 - name: docker-registry
   repository: https://helm.twun.io
   version: 2.1.0
-digest: sha256:fb2fe9eb5977fac511c9912962a6a2e785b617e5ccd7d9e76e63df09cec7a4be
-generated: "2023-10-03T12:34:05.780123539+03:00"
+digest: sha256:fffbd69dd208d90985edae032e112ec0730c5a59fac581aeaf7d4fa7d18c8edd
+generated: "2023-10-30T09:56:32.099681313+02:00"
