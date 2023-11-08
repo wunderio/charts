@@ -16,7 +16,8 @@ environmentName: ""
 app: simple
 
 silta-release:
-  # Enable downscaler by default. See https://github.com/wunderio/charts/blob/master/silta-downscaler/
+  # Enable downscaler by default. See downscaler section
+  # in https://github.com/wunderio/charts/blob/master/silta-cluster/values.yaml
   downscaler:
     enabled: true
 
