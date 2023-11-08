@@ -6,6 +6,7 @@ silta-release:
     # Allows to modify How long should This release be active until downscaled.
     # Value examples: 10y, 4w, 1h
     # releaseMinAge: '1w'
+    releaseMinAge: ''
 
 # Main domain of the cluster.
 # Subdomains of this domain will be created automatically for each environment.
