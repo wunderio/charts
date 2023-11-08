@@ -3,8 +3,7 @@ silta-release:
   # Enable downscaler by default.
   downscaler:
     enabled: true
-    # Allows to modify How long should This release be active until downscaled.
-    # Value examples: 10y, 4w, 1h
+    # Allows to modify How long should This release be active until downscaled. Value examples: 10y, 4w, 1h
     # releaseMinAge: '1w'
     releaseMinAge: ''
 
