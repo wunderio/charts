@@ -1,12 +1,8 @@
 # Subchart with few functionality that is reused for our other charts
 silta-release:
-  # Enable downscaler by default. See downscaler section in https://github.com/wunderio/charts/blob/master/silta-cluster/values.yaml
+  # Enable downscaler by default.
   downscaler:
     enabled: true
-    # Allows to modify How long should This release be active until downscaled.
-    # value examples: 10y, 4w, 1h Defaults to values used in silta-cluster chart.
-    # See downscaler section in https://github.com/wunderio/charts/blob/master/silta-cluster/values.yaml
-    releaseMinAge: ''
 
 # Main domain of the cluster.
 # Subdomains of this domain will be created automatically for each environment.
