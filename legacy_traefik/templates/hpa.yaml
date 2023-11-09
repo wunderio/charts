@@ -20,5 +20,25 @@ spec:
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
-{{ toYaml .Values.autoscaling.metrics | indent 4 }}
+  {{- if semverCompare "^1.25-0" .Capabilities.KubeVersion.GitVersion }}
+  {{- range .Values.autoscaling.metrics }}
+  - type: Resource
+    resource:
+      name: {{ .resource.name }}
+      {{- if .resource.targetAverageUtilization }}
+      target:
+        type: Utilization
+        averageUtilization: {{ .resource.targetAverageUtilization }}
+      {{- end }}
+  {{- end }}
+  {{- else }}
+  {{- range .Values.autoscaling.metrics }}
+  - type: Resource
+    resource:
+      name: {{ .resource.name }}
+      {{- if .resource.targetAverageUtilization }}
+      targetAverageUtilization: {{ .resource.targetAverageUtilization }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
 {{- end }}
