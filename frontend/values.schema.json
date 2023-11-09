@@ -202,6 +202,7 @@
           "exposedRoute": { "type": "string" },
           "replicas": { "type": "integer" },
           "mounts": { "type": "array" },
+          "readinessProbe": { "type": "object" },
           "livenessProbe": { "type": "object" },
           "strategy": { "type": "object" },
           "autoscaling": {
