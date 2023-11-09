@@ -155,7 +155,7 @@ data:
         include fastcgi.conf;
 
         # Custom configuration gets included here
-        {{- .Values.nginx.serverExtraConfig | nindent 8 -}}
+        {{- tpl .Values.nginx.serverExtraConfig . | nindent 8 -}}
 
         {{- range $index, $service := .Values.services }}
         {{ if $service.exposedRoute }}
@@ -167,7 +167,7 @@ data:
 
           # Custom configuration gets included here
           {{ if $.Values.nginx.locationExtraConfig }}
-          {{ $.Values.nginx.locationExtraConfig | nindent 10 }}
+          {{ tpl $.Values.nginx.locationExtraConfig $ | nindent 10 }}
           {{- end }}
 
           {{ include "frontend.basicauth" $ | indent 6}}
@@ -232,5 +232,5 @@ data:
 
   {{- if .Values.nginx.extraConfig }}
   extraConfig: |
-    {{ .Values.nginx.extraConfig | nindent 4 }}
+    {{ tpl .Values.nginx.extraConfig . | nindent 4 }}
   {{- end }}
