@@ -54,7 +54,6 @@ spec:
       - name: rclone
         image: {{ $nfsserver.persistence.rclone.image }}
         imagePullPolicy: {{ $nfsserver.persistence.rclone.imagePullPolicy }}
-        # TODO: cache modes and other options + expose flags in values.yaml
         command: [
           "/usr/local/bin/rclone", 
           "mount", 
@@ -82,11 +81,11 @@ spec:
             mountPath: /exports
             mountPropagation: Bidirectional
       {{- end }}
+      {{- if $nfsserver.persistence.rclone.enabled }}
       volumes:
       - name: rclone-config
         configMap:
           name: {{ .Release.Name }}-nfs-server-rclone-config
-      {{- if $nfsserver.persistence.rclone.enabled}}
       - name: exports
         emptyDir: {}
       {{- end }}
@@ -137,5 +136,7 @@ data:
     [backend]
     {{- $nfsserver.persistence.rclone.backend_config | nindent 4 }}
 {{- end }}
+
+---
 
 {{- end }}

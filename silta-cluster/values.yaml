@@ -317,7 +317,7 @@ silta-shared-nfs:
     server: silta-cluster-nfs-server.silta-cluster.svc.cluster.local
     path: /
   storageClass:
-    name: silta-nfs-shared
+    name: silta-shared-nfs
     # Set volume bindinng mode - Immediate or WaitForFirstConsumer
     volumeBindingMode: WaitForFirstConsumer
     pathPattern: "${.PVC.namespace}/${.PVC.annotations.storage.silta/storage-path}"
