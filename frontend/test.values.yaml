@@ -28,6 +28,9 @@ shell:
 elasticsearch:
   enabled: true
 
+mailhog:
+  enabled: true
+
 mongodb:
   enabled: true
 

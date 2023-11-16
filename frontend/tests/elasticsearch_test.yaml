@@ -1,4 +1,4 @@
-suite: drupal elasticsearch
+suite: frontend elasticsearch
 templates:
   - services-deployment.yaml
   - configmap.yaml
@@ -6,7 +6,7 @@ capabilities:
   apiVersions:
     - pxc.percona.com/v1
 tests:
-  - it: sets elasticsearch hostname in drupal environment if elasticsearch is enabled
+  - it: sets elasticsearch hostname in environment if elasticsearch is enabled
     template: services-deployment.yaml
     set:
       services.node.enabled: true
@@ -18,7 +18,7 @@ tests:
             name: ELASTICSEARCH_HOST
             value: RELEASE-NAME-es
 
-  - it: sets no elasticsearch hostname in drupal environment if elasticsearch is disabled
+  - it: sets no elasticsearch hostname in environment if elasticsearch is disabled
     template: services-deployment.yaml
     set:
       services.node.enabled: true

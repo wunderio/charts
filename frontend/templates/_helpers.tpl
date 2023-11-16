@@ -145,6 +145,13 @@ rsync -az /values_mounts/ /backups/current/
     fieldRef:
       fieldPath: status.hostIP
 {{- end }}
+{{- if .Values.mailhog.enabled }}
+{{- if contains "mailhog" .Release.Name -}}
+{{- fail "Do not use 'mailhog' in release name or deployment will fail" -}}
+{{- end }}
+- name: MAILHOG_ADDRESS
+  value: "{{ .Release.Name }}-mailhog:1025"
+{{- end }}
 {{- end }}
 
 {{- define "cert-manager.api-version" }}
