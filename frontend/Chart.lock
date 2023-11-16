@@ -2,6 +2,9 @@ dependencies:
 - name: mariadb
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 7.10.4
+- name: mailhog
+  repository: https://codecentric.github.io/helm-charts
+  version: 5.1.0
 - name: elasticsearch
   repository: file://../elasticsearch
   version: 8.5.1
@@ -14,5 +17,5 @@ dependencies:
 - name: silta-release
   repository: file://../silta-release
   version: 1.0.0
-digest: sha256:7b090077d70021edfb2479e8efaa4079246a09c3d9fb7d1ae56a93ae37240d82
-generated: "2023-10-03T12:01:47.209153798+03:00"
+digest: sha256:c356de05b806d3ca439e2eeea4ee23b206e8c4912818806ae6c65227005c3757
+generated: "2023-11-13T13:00:16.425472744+02:00"

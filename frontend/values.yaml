@@ -452,3 +452,17 @@ signalsciences:
     limits:
       cpu: 40m
       memory: 300Mi
+
+# Mailhog service overrides
+# see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
+mailhog:
+  enabled: false
+  image:
+    # Set image repository to "mailhog/mailhog" to reenable logging.
+    repository: wunderio/silta-mailhog
+    # Set image tag to "" to reenable logging.
+    tag: v1
+  resources:
+    requests:
+      cpu: 1m
+      memory: 10M
