@@ -5,6 +5,7 @@ metadata:
   name: {{ $.Release.Name }}-{{ $index }}
   labels:
     {{ include "frontend.release_labels" $ | indent 4 }}
+    silta-frontend: service
 spec:
   {{- if or (not $service.autoscaling) (not (($service.autoscaling).enabled)) }}
   replicas: {{ default 1 $service.replicas }}
@@ -20,6 +21,7 @@ spec:
       labels:
         {{ include "frontend.release_labels" $ | indent 8 }}
         deployment: frontend-{{ $index }}
+        silta-frontend: service
         {{ if $.Values.shell.enabled -}}
         silta-ingress: allow
         {{- end }}

@@ -1,5 +1,5 @@
 {{- range $serviceName, $service := .Values.services }}
-{{ if $service.cron }}
+{{- if $service.cron }}
 {{- range $jobName, $job := $service.cron }}
 
 apiVersion: {{ include "frontend.cron.api-version" $ | trim }}
@@ -28,7 +28,7 @@ spec:
           - name: {{ $jobName }}-cron
             image: {{ $service.image | quote }}
             volumeMounts:
-              {{ if $service.mounts }}
+              {{- if $service.mounts }}
               {{- range $index, $mountName := $service.mounts -}}
               {{ $mount := (index $.Values.mounts $mountName) }}
               {{- if eq $mount.enabled true }}
@@ -55,17 +55,33 @@ spec:
             resources:
               {{- if $job.resources }}
               {{- if $service.resources }}
-              {{ merge $job.resources (merge $service.resources $.Values.serviceDefaults.resources) | toYaml | nindent 14 }}
+              {{- if ($.Values.cronJobDefaults).resources }}
+              {{- merge $job.resources (merge $.Values.cronJobDefaults.resources (merge $service.resources $.Values.serviceDefaults.resources)) | toYaml | nindent 14 }}
               {{- else }}
-              {{ merge $job.resources $.Values.serviceDefaults.resources | toYaml | nindent 14 }}
+              {{- merge $job.resources (merge $service.resources $.Values.serviceDefaults.resources) | toYaml | nindent 14 }}
+              {{- end }}
+              {{- else }}
+              {{- if ($.Values.cronJobDefaults).resources }}
+              {{- merge $job.resources (merge $.Values.cronJobDefaults.resources $.Values.serviceDefaults.resources) | toYaml | nindent 14 }}
+              {{- else }}
+              {{- merge $job.resources $.Values.serviceDefaults.resources | toYaml | nindent 14 }}
+              {{- end }}
               {{- end }}
               {{- else if $service.resources }}
-              {{ merge $service.resources $.Values.serviceDefaults.resources | toYaml | nindent 14 }}
+              {{- if ($.Values.cronJobDefaults).resources }}
+              {{- merge $.Values.cronJobDefaults.resources (merge $service.resources $.Values.serviceDefaults.resources) | toYaml | nindent 14 }}
               {{- else }}
-              {{ $.Values.serviceDefaults.resources | toYaml | nindent 14 }}
+              {{- merge $service.resources $.Values.serviceDefaults.resources | toYaml | nindent 14 }}
+              {{- end }}
+              {{- else }}
+              {{- if ($.Values.cronJobDefaults).resources }}
+              {{- merge $.Values.cronJobDefaults.resources $.Values.serviceDefaults.resources | toYaml | nindent 14 }}
+              {{- else }}
+              {{- $.Values.serviceDefaults.resources | toYaml | nindent 14 }}
+              {{- end }}
               {{- end }}
           volumes:
-            {{ if $service.mounts }}
+            {{- if $service.mounts }}
             {{- range $index, $mountName := $service.mounts -}}
             {{ $mount := (index $.Values.mounts $mountName) }}
             {{- if eq $mount.enabled true }}
@@ -76,19 +92,26 @@ spec:
             {{- end }}
             {{- end }}
           restartPolicy: OnFailure
-
-          {{ if or $job.nodeSelector $service.nodeSelector -}}
+          {{- if or $job.nodeSelector $service.nodeSelector ($.Values.cronJobDefaults).nodeSelector }}
           nodeSelector:
-            {{ if $job.nodeSelector }}
+            {{- if $job.nodeSelector }}
             {{- $job.nodeSelector | toYaml | nindent 12 }}
-            {{ else }}
+            {{- else }}
+            {{- if ($.Values.cronJobDefaults).nodeSelector }}
+            {{- $.Values.cronJobDefaults.nodeSelector | toYaml | nindent 12 }}
+            {{- else }}
             {{- $service.nodeSelector | toYaml | nindent 12 }}
             {{- end }}
+            {{- end }}
           tolerations:
-            {{ if $job.nodeSelector }}
+            {{- if $job.nodeSelector }}
             {{- include "frontend.tolerations" $job.nodeSelector | nindent 12 }}
-            {{ else }}
+            {{- else }}
+            {{- if ($.Values.cronJobDefaults).nodeSelector }}
+            {{- include "frontend.tolerations" $.Values.cronJobDefaults.nodeSelector | nindent 12 }}
+            {{- else }}
             {{- include "frontend.tolerations" $service.nodeSelector | nindent 12 }}
+            {{- end }}
             {{- end }}
           {{- end }}
 ---
