@@ -331,6 +331,17 @@ serviceDefaults:
         name: cpu
         targetAverageUtilization: 80
 
+# Provide defaults for all cron jobs. This will override serviceDefaults when defined.
+cronJobDefaults:
+  # resources:
+  #   requests:
+  #     cpu: 100m
+  #     memory: 122Mi
+  #   limits:
+  #     memory: 122Mi
+  # nodeSelector:
+  #   cloud.google.com/gke-nodepool: static-ip
+
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
 # see: https://github.com/bitnami/charts/blob/master/bitnami/mariadb/values.yaml

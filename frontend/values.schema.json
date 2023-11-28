@@ -341,6 +341,36 @@
         }
       }
     },
+    "cronJobDefaults": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "resources": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": ["integer", "string"] },
+                "memory": { "type": "string" }
+              }
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": ["integer", "string"] },
+                "memory": { "type": "string" }
+              }
+            }
+          }
+        },
+        "nodeSelector": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
     "shell": { 
       "type": "object",
       "additionalProperties": false,

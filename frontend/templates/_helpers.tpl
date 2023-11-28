@@ -30,7 +30,7 @@ release: {{ .Release.Name }}
   {{- end }}
 {{- end }}
 
-{{- define "frontend.tolerations" -}}
+{{- define "frontend.tolerations" }}
 {{- range $key, $label := $ }}
 - key: {{ $key }}
   operator: Equal
