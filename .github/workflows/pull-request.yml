@@ -50,7 +50,6 @@ jobs:
             && helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner \
             && helm repo add twun https://helm.twun.io \
             && helm repo add bitnami https://charts.bitnami.com/bitnami \
-            && helm repo add minio https://helm.min.io/ \
             && helm repo add wunderio https://storage.googleapis.com/charts.wdr.io \
             && helm repo add percona https://percona.github.io/percona-helm-charts/ \
             && helm repo add elastic https://helm.elastic.co \

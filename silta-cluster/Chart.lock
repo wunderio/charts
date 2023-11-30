@@ -12,7 +12,7 @@ dependencies:
   repository: https://percona.github.io/percona-helm-charts/
   version: 1.12.2
 - name: minio
-  repository: https://helm.min.io/
+  repository: file://../forked/minio/minio-6.0.5
   version: 6.0.5
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
@@ -25,7 +25,7 @@ dependencies:
   version: 1.0.0
 - name: instana-agent
   repository: https://agents.instana.io/helm
-  version: 1.2.65
+  version: 1.2.66
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
   version: 4.0.18
@@ -35,5 +35,5 @@ dependencies:
 - name: docker-registry
   repository: https://helm.twun.io
   version: 2.1.0
-digest: sha256:fffbd69dd208d90985edae032e112ec0730c5a59fac581aeaf7d4fa7d18c8edd
-generated: "2023-10-30T09:56:32.099681313+02:00"
+digest: sha256:df6f7b163fe7389617d938a7f80da42bd46ca249820e5e32313ff7abedfa8b21
+generated: "2023-11-30T11:31:16.305257237+02:00"
