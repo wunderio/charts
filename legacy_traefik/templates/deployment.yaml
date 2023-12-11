@@ -96,7 +96,7 @@ spec:
             path: /ping
             port: "{{ .Values.pingEntryPoint | default "http" }}"
           failureThreshold: 1
-          initialDelaySeconds: 10
+          initialDelaySeconds: 45
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 2
