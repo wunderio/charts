@@ -22,7 +22,7 @@ jobs:
         # Available minikube kubernetes version list: 
         # "minikube config defaults kubernetes-version"
         # and https://kubernetes.io/releases/patch-releases/
-        kubernetes-version: ["v1.20.15", "v1.21.14", "v1.22.17", "v1.23.17", "v1.24.12", "v1.25.8", "1.26.1", "latest"]
+        kubernetes-version: ["v1.22.17", "v1.23.17", "v1.24.17", "v1.25.16", "1.26.11", "1.27.8", "1.28.4", "latest"]
     env:
       CLUSTER_DOMAIN: minikube.local.wdr.io
       K8S_PROJECT_REPO_DIR: k8s-project-repositories
