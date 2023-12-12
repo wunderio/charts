@@ -5,7 +5,8 @@ appVersion: 4.4.9
 dependencies:
   - name: bitnami-common
     alias: common
-    repository: https://storage.googleapis.com/charts.wdr.io
+    repository: file://../mongodb-10.26.4-common
+    # repository: https://storage.googleapis.com/charts.wdr.io
     tags:
       - bitnami-common
     version: 1.x.x

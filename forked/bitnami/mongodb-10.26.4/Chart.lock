@@ -1,0 +1,6 @@
+dependencies:
+- name: bitnami-common
+  repository: file://../mongodb-10.26.4-common
+  version: 1.9.0
+digest: sha256:e23efe4a282dbe94ac7c2826782f110dd645c03b0e65c9b93d2d46f4400c9f80
+generated: "2023-12-12T18:16:32.574645996+02:00"
