@@ -1,0 +1,6 @@
+dependencies:
+- name: common
+  repository: file://../postgresql-13.2.24-common
+  version: 2.13.3
+digest: sha256:054846a91114077afb4b7a795f8929f9e2b0e252e533530a8293651561eb9799
+generated: "2023-12-12T18:03:04.709548628+02:00"
