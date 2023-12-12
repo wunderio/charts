@@ -15,10 +15,10 @@ dependencies:
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 10.26.4
 - name: postgresql
-  repository: https://charts.bitnami.com/bitnami
-  version: 13.2.23
+  repository: https://storage.googleapis.com/charts.wdr.io
+  version: 13.2.24
 - name: silta-release
   repository: file://../silta-release
   version: 1.0.0
-digest: sha256:65fdb7bf8bb3fd0f284f5bc4325d0c8fe9feb47e64d162dca955b01bc5ee9fb2
-generated: "2023-12-01T19:20:38.495950175+02:00"
+digest: sha256:95eb80d5b21e1fb9cf5c0bf1b917801d027df824b84fcb6cd4d377fcb6a542b4
+generated: "2023-12-12T18:45:46.652661621+02:00"
