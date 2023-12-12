@@ -187,11 +187,11 @@ spec:
         args:
         - |
             {{- if $.Release.IsInstall }}
-            {{- if $service.postinstall.command }}
+            {{- if ($service.postinstall).command }}
             {{- $service.postinstall.command | nindent 10 }}
             {{- end }}
             {{- end }}
-            {{- if $service.postupgrade.command }}
+            {{- if ($service.postupgrade).command }}
             {{- $service.postupgrade.command | nindent 10 }}
             {{- end }}
         volumeMounts:

@@ -436,6 +436,12 @@
         }
       }
     },
+    "postgresql": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
     "elasticsearch": {
       "type": "object",
       "properties": {
