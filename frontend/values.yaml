@@ -433,13 +433,13 @@ mongodb:
   persistence:
     size: 1Gi
 
-# # Posgresql overrides
-# # see: https://github.com/bitnami/charts/blob/c3dc56f3679650f1012e497b8a5e71d94dac163e/bitnami/postgresql/values.yaml
-# postgresql:
-#   enabled: false
-#   # Use a low default to prevent unnecessary storage use.
-#   persistence:
-#     size: 1Gi
+# Posgresql overrides
+# see: https://github.com/bitnami/charts/blob/c3dc56f3679650f1012e497b8a5e71d94dac163e/bitnami/postgresql/values.yaml
+postgresql:
+  enabled: false
+  # Use a low default to prevent unnecessary storage use.
+  persistence:
+    size: 1Gi
 
 rabbitmq:
   enabled: false
