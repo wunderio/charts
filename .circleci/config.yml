@@ -28,6 +28,18 @@ jobs:
             gsutil -m rsync -d -r gs://charts.wdr.io /tmp/charts
 
       - run:
+          name: Helm upgrade test
+          command: |
+            export HELM_VERSION=v3.9.2
+            export FILENAME=helm-${HELM_VERSION}-linux-amd64.tar.gz
+            export HELM_URL=https://get.helm.sh/${FILENAME}
+
+            curl -o /tmp/$FILENAME ${HELM_URL} \
+              && tar -zxvf /tmp/${FILENAME} -C /tmp \
+              && rm /tmp/${FILENAME} \
+              && sudo mv /tmp/linux-amd64/helm /bin/helm 
+
+      - run:
           name: Build charts
           command: |
             set -o xtrace
