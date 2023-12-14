@@ -22,7 +22,19 @@
 {{- else -}}
 {{- $maxEnvironmentNameLength := int (sub 62 (add (len .Values.clusterDomain) (len $projectName))) }}
 {{- $environmentName := (ge (len $environmentName) $maxEnvironmentNameLength) | ternary (print ($environmentName | trunc (int (sub $maxEnvironmentNameLength 3))) $environmentNameHash) $environmentName -}}
+{{- if not (hasKey $.Values "maskSubdomains") -}}
 {{ $environmentName }}{{ include "drupal.domainSeparator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
+{{- else if eq $.Values.maskSubdomains "both" -}}
+{{- include "masking.prefix-alert" . -}}
+{{- $environmentNameString := sha256sum (print $environmentName (include "drupal.domainSeparator" $ ) $projectName) | trunc 25 }}
+{{- $environmentNameString -}}.{{ .Values.clusterDomain }}
+{{- else if eq $.Values.maskSubdomains "projectName" -}}
+{{- include "masking.prefix-alert" . -}}
+{{ $environmentName }}{{ include "drupal.domainSeparator" . }}{{ sha256sum $projectName | trunc 10 }}.{{ .Values.clusterDomain }}
+{{- else if eq $.Values.maskSubdomains "releaseName" -}}
+{{- include "masking.prefix-alert" . -}}
+{{ sha256sum $environmentName | trunc 10 }}{{ include "drupal.domainSeparator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 

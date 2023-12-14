@@ -183,7 +183,7 @@ data:
         set beresp.http.x-ttl = "10m";
       }
 
-      if (bereq.url ~ "\.(jpg|jpeg|gif|png|svg|ico|webp|css|js|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|flv|swf|html|htm|otf)\??.*$") {
+      if (bereq.url ~ "^[^?]*\.(jpg|jpeg|gif|png|svg|ico|webp|css|js|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|flv|swf|html|htm|otf)(\?.*)?$") {
         # Strip any cookies before static files are inserted into cache.
         unset beresp.http.set-cookie;
         if(beresp.status == 200){
@@ -378,6 +378,19 @@ data:
       if (req.url ~ "_ping.php") {
         return (pass);
       }
+
+      {{- if .Values.nginx.status_page.enabled }}
+      // No varnish for nginx status page
+      if (req.url ~ "^/nginx_status$") {
+        return (pass);
+      }
+      if (req.url ~ "^/nginx_vts$") {
+        return (pass);
+      }
+      if (req.url ~ "^/php_status$") {
+        return (pass);
+      }
+      {{- end }}
 
       {{- if .Values.mailhog.enabled }}
       // No varnish for mailhog

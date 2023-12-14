@@ -2,4 +2,4 @@ apiVersion: v2
 appVersion: "1.0"
 name: silta-proxy
 description: An HTTP proxy to provide a static egress IP for Silta clusters.
-version: 0.1.0
+version: 1.0.0

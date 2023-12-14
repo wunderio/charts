@@ -35,14 +35,138 @@ tests:
     template: drupal-deployment.yaml
     set:
       php.env:
-        foo: bar
+        string_with_double_quotes: "This is a string."
+        string_with_single_quotes: 'This is a string.'
+        string_without_quotes: This is a string.
+        special_char_with_double_quotes: "This is a\nstring.\n"
+        special_char_with_single_quotes: 'This is a\nstring.\n'
+        special_char_without_quotes: This is a\nstring.\n
+        integer_without_quotes: 12345
+        integer_with_double_quotes: "12345"
+        integer_with_single_quotes: '12345'
+        float_without_quotes: 3.14159
+        float_with_double_quotes: "3.14159"
+        float_with_single_quotes: '3.14159'
+        boolean_without_quotes: true
+        boolean_with_double_quotes: "true"
+        boolean_with_single_quotes: 'true'
+        boolean_on: on
+        boolean_off: off
+        value_from_secret:
+          valueFrom:
+            secretKeyRef:
+              name: secret-resource
+              key: somefield
+        value_from_configmap:
+          valueFrom:
+            configMapKeyRef:
+              name: configmap-resource
+              key: somefield
       environmentName: baz
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
           content:
-            name: foo
-            value: bar
+            name: string_with_double_quotes
+            value: This is a string.
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: string_with_single_quotes
+            value: This is a string.
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: string_without_quotes
+            value: This is a string.
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: special_char_with_double_quotes
+            value:  |
+              This is a
+              string.
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: special_char_with_single_quotes
+            value: This is a\nstring.\n
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: special_char_without_quotes
+            value: This is a\nstring.\n
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: integer_without_quotes
+            value: "12345"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: integer_with_double_quotes
+            value: "12345"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: integer_with_single_quotes
+            value: "12345"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: float_without_quotes
+            value: "3.14159"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: float_with_double_quotes
+            value: "3.14159"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: float_with_single_quotes
+            value: "3.14159"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: boolean_without_quotes
+            value: "true"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: boolean_with_double_quotes
+            value: "true"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: boolean_with_single_quotes
+            value: "true"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: boolean_on
+            value: "true"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: boolean_off
+            value: "false"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: value_from_secret
+            valueFrom:
+              secretKeyRef:
+                name: secret-resource
+                key: somefield
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: value_from_configmap
+            valueFrom:
+              configMapKeyRef:
+                name: configmap-resource
+                key: somefield
       - contains:
           path: spec.template.spec.containers[0].env
           content:
@@ -160,7 +284,7 @@ tests:
       - equal:
           path: spec.template.spec.containers[1].resources.limits.memory
           value: 2G
- 
+
   - it: sets varnish environment variables if varnish is enabled
     template: drupal-deployment.yaml
     set:
@@ -184,7 +308,7 @@ tests:
               secretKeyRef:
                 key: control_key
                 name: RELEASE-NAME-secrets-varnish
-  
+
   - it: does not have varnish environment variables if varnish is disabled
     template: drupal-deployment.yaml
     set:

@@ -24,8 +24,9 @@ spec:
         deployment: drupal
         silta-ingress: allow
       annotations:
-        # We use a checksum to redeploy the pods when the configMap changes.
+        # Recreate pods when the configMap or secret changes.
         configMap-checksum: {{ include (print $.Template.BasePath "/drupal-configmap.yaml") . | sha256sum }}
+        secrets-checksum: {{ include (print $.Template.BasePath "/drupal-secret.yaml") . | sha256sum }}
     spec:
       enableServiceLinks: false
       containers:
@@ -81,6 +82,12 @@ spec:
           mountPath: /etc/nginx/fastcgi.conf
           readOnly: true
           subPath: fastcgi_conf
+        {{- if .Values.nginx.status_page.enabled }}
+        - name: config
+          mountPath: /etc/nginx/modules/nginx_status.conf
+          readOnly: true
+          subPath: nginx_status_conf
+        {{- end }}
         {{- if .Values.signalsciences.enabled }}
         - name: config
           mountPath: /etc/nginx/modules/nginx_signalsciences.conf

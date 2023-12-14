@@ -154,8 +154,42 @@ data:
 
         include fastcgi.conf;
 
+        {{- if .Values.mailhog.enabled }}
+        location /mailhog {
+
+          # Auth / whitelist always enabled
+          satisfy any;
+          allow 127.0.0.1;
+          {{- range .Values.nginx.noauthips }}
+          allow {{ . }};
+          {{- end }}
+          deny all;
+
+          {{- if gt (len .Values.nginx.noauthips) 1 -}}
+          # Basic auth only offered when at least one extra ip is whitelisted. Prevents using default credentials.
+          auth_basic "Restricted";
+          auth_basic_user_file /etc/nginx/.htaccess;
+          {{- end}}
+
+          rewrite ^/mailhog$ /mailhog/ permanent;
+
+          # Proxy to mailhog container
+          rewrite /mailhog(.*) $1 break;
+          proxy_pass http://{{ .Release.Name }}-mailhog:8025/;
+
+          # Websock connection
+          chunked_transfer_encoding on;
+          proxy_set_header X-NginX-Proxy true;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection "upgrade";
+          proxy_http_version 1.1;
+          proxy_redirect off;
+            proxy_buffering off;
+        }
+        {{- end}}
+
         # Custom configuration gets included here
-        {{- .Values.nginx.serverExtraConfig | nindent 8 -}}
+        {{- tpl .Values.nginx.serverExtraConfig . | nindent 8 -}}
 
         {{- range $index, $service := .Values.services }}
         {{ if $service.exposedRoute }}
@@ -167,13 +201,16 @@ data:
 
           # Custom configuration gets included here
           {{ if $.Values.nginx.locationExtraConfig }}
-          {{ $.Values.nginx.locationExtraConfig | nindent 10 }}
+          {{ tpl $.Values.nginx.locationExtraConfig $ | nindent 10 }}
           {{- end }}
 
           {{ include "frontend.basicauth" $ | indent 6}}
 
           location = {{ $service.exposedRoute }}/robots.txt {
             access_log off;
+            {{- if $.Values.signalsciences.enabled }}
+            sigsci_enabled off;
+            {{- end }}
           }
 
           ## Most sites won't have configured favicon
@@ -229,5 +266,5 @@ data:
 
   {{- if .Values.nginx.extraConfig }}
   extraConfig: |
-    {{ .Values.nginx.extraConfig | nindent 4 }}
+    {{ tpl .Values.nginx.extraConfig . | nindent 4 }}
   {{- end }}

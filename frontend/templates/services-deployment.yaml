@@ -5,6 +5,7 @@ metadata:
   name: {{ $.Release.Name }}-{{ $index }}
   labels:
     {{ include "frontend.release_labels" $ | indent 4 }}
+    silta-frontend: service
 spec:
   {{- if or (not $service.autoscaling) (not (($service.autoscaling).enabled)) }}
   replicas: {{ default 1 $service.replicas }}
@@ -20,6 +21,7 @@ spec:
       labels:
         {{ include "frontend.release_labels" $ | indent 8 }}
         deployment: frontend-{{ $index }}
+        silta-frontend: service
         {{ if $.Values.shell.enabled -}}
         silta-ingress: allow
         {{- end }}
@@ -66,7 +68,7 @@ spec:
         {{- include "services.env" (dict "Values" $.Values "Release" $.Release "service" $service) | nindent 8 }}
         {{- range $key, $val := $service.env }}
         - name: {{ $key }}
-        {{- if or (kindIs "string" $val) (kindIs "int" $val) (kindIs "float64" $val) (kindIs "bool" $val) }}
+        {{- if or (kindIs "string" $val) (kindIs "int" $val) (kindIs "float64" $val) (kindIs "bool" $val) (kindIs "invalid" $val) }}
           value: {{ $val | quote }}
         {{- else }}
           {{ $val | toYaml | indent 12 | trim }}
@@ -185,9 +187,13 @@ spec:
         args:
         - |
             {{- if $.Release.IsInstall }}
+            {{- if ($service.postinstall).command }}
             {{- $service.postinstall.command | nindent 10 }}
             {{- end }}
+            {{- end }}
+            {{- if ($service.postupgrade).command }}
             {{- $service.postupgrade.command | nindent 10 }}
+            {{- end }}
         volumeMounts:
           {{ if $service.mounts }}
           {{- range $index, $mountName := $service.mounts -}}
@@ -206,7 +212,7 @@ spec:
         {{- include "services.env" (dict "Values" $.Values "Release" $.Release "service" $service) | nindent 8 }}
         {{- range $key, $val := $service.env }}
         - name: {{ $key }}
-        {{- if or (kindIs "string" $val) (kindIs "int" $val) (kindIs "float64" $val) (kindIs "bool" $val) }}
+        {{- if or (kindIs "string" $val) (kindIs "int" $val) (kindIs "float64" $val) (kindIs "bool" $val) (kindIs "invalid" $val) }}
           value: {{ $val | quote }}
         {{- else }}
           {{ $val | toYaml | indent 4 | trim }}

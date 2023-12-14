@@ -2,32 +2,134 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "replicas": { "type": "integer" },
-    "autoscaling": { "type": "object" },
     "clusterDomain": { "type": "string" },
     "projectName": { "type": "string" },
     "environmentName": { "type": "string" },
     "branchName": { "type": "string" },
     "imagePullSecrets": { "type": "array" },
     "app": { "type": "string" },
-    "exposeDomains": { "type": "object", "items": { "type": "object"}},
-    "exposeDomainsDefaults": { "type": "object"},
-    "singleSubdomain": { "type": "boolean"},
-    "ssl": { "type": "object" },
-    "backendConfig": { "type": ["array","object"], "items": { "type": "object"}},
-    "ingress": { "type": "object" },
-    "cluster": {
+    "silta-release": { "type": "object" },
+    "replicas": { "type": "integer" },
+    "autoscaling": {
       "type": "object",
       "properties": {
-        "vpcNative": { "type": "boolean"}
+        "enabled": { "type": "boolean" },
+        "minReplicas": { "type": "integer" },
+        "maxReplicas": { "type": "integer" },
+        "targetCPUUtilizationPercentage": { "type": "integer" }
       }
+    },
+    "exposeDomains": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "name": { "type": "string" },
+          "hostname": { "type": "string" },
+          "ssl": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "enabled": { "type": "boolean" },
+              "issuer": { "type": "string" },
+              "ca": { "type": "string" },
+              "key": { "type": "string" },
+              "crt": { "type": "string" }
+            }
+          },
+          "ingress": { "type": "string" }
+        }
+      }
+    },
+    "exposeDomainsDefaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ssl": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "issuer": { "type": "string" },
+            "ca": { "type": "string" },
+            "key": { "type": "string" },
+            "crt": { "type": "string" }
+          }
+       },
+        "ingress": { "type": "string" }
+      }
+    },
+    "singleSubdomain": { "type": "boolean"},
+    "ssl": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "issuer": { "type": "string" },
+        "ca": { "type": "string" },
+        "key": { "type": "string" },
+        "crt": { "type": "string" }
+      }
+    },
+    "ingress": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "type": { "type": "string" },
+          "tls": { "type": "boolean" },
+          "redirect-https": { "type": "boolean" },
+          "staticIpAddressName": { "type": "string" },
+          "extraAnnotations": {
+            "type": "object",
+            "additionalProperties": { "type": "string" }
+          }
+        }
+      }
+    },
+    "cluster": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": { "type": "string" },
+        "vpcNative": { "type": "boolean" }
+      }
+    },
+    "backendConfig": {
+      "type": [ "array", "object" ],
+      "items": { "type": "object" }
     },
     "nginx": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
         "image": { "type": "string"},
+        "resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": ["integer", "string"] },
+                "memory": { "type": "string" }
+              }
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": ["integer", "string"] },
+                "memory": { "type": "string" }
+              }
+            }
+          }
+        },
+        "loglevel": { "type": "string"},
         "basicauth": {
           "type": "object",
+          "additionalProperties": false,
           "properties": {
             "enabled": { "type": "boolean"},
             "credentials": {
@@ -37,8 +139,7 @@
                 "password": { "type": "string"}
               }
             }
-          },
-          "additionalProperties": false
+          }
         },
         "realipfrom": {
           "type": ["string", "object"],
@@ -47,16 +148,57 @@
         "noauthips": {
           "type": "object",
           "additionalProperties": { "type": "string"}
+        },
+        "real_ip_header": { "type": "string"},
+        "security_headers": { "type": [ "object", "array" ] },
+        "hsts_include_subdomains": { "type": "string" },
+        "content_security_policy": { "type": "string" },
+        "serverExtraConfig": { "type": "string" },
+        "locationExtraConfig": { "type": "string" },
+        "extraConfig": { "type": "string" },
+        "redirects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "type": { "type": "string" }
+            }
+          }
         }
       }
     },
-    "silta-release": {
-      "type": "object"
-    },
     "signalsciences": {
       "type": "object",
+      "additionalProperties": false,
       "properties": {
-        "enabled": { "type": "boolean" }
+        "enabled": { "type": "boolean" },
+        "accesskeyid": { "type": "string" },
+        "secretaccesskey": { "type": "string" },
+        "image": { "type": "string" },
+        "imageTag": { "type": "string" },
+        "resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": ["integer", "string"] },
+                "memory": { "type": "string" }
+              }
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": ["integer", "string"] },
+                "memory": { "type": "string" }
+              }
+            }
+          }
+        }
       }
     }
   }

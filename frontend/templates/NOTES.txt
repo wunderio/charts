@@ -19,6 +19,16 @@ Deployed {{ .Release.Name }} successfully, your site is available here:
   Basicauth password: {{ .Values.nginx.basicauth.credentials.password }}
   {{- end }}
 
+{{- if .Values.mailhog.enabled }}
+  
+Mailhog available at:
+
+  http://{{- template "frontend.domain" . }}/mailhog
+  {{- range $index, $domain := .Values.exposeDomains }}
+  http://{{ $domain.hostname }}/mailhog
+  {{- end }}
+{{- end }}
+
 {{ if $.Values.shell.enabled }}
 SSH connection (limited access through VPN):
   {{ range $index, $service := .Values.services }}

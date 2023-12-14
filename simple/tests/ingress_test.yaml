@@ -7,10 +7,21 @@ tests:
       - isKind:
           of: Ingress
 
-  - it: uses traefik ingress class
+  - it: uses traefik ingress class (1.17)
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
     asserts:
       - equal:
           path: 'metadata.annotations.kubernetes\.io/ingress\.class'
+          value: 'traefik'
+  - it: uses traefik ingress class (1.18+)
+    capabilities:
+      majorVersion: 1
+      minorVersion: 18
+    asserts:
+      - equal:
+          path: 'spec.ingressClassName'
           value: 'traefik'
 
   - it: sets correct hostname for deployment
@@ -101,8 +112,11 @@ tests:
           path: spec.rules[0].host
           value: 'feature-my-projecdb6.client-fi-longclient-longpra6b.silta.wdr.io'
 
-  - it: exposeDomains - uses default ingress type and has correct hostname
+  - it: exposeDomains - uses default ingress type and has correct hostname (1.17)
     template: ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 17
     set:
       ingress:
         default:
@@ -114,6 +128,24 @@ tests:
       - documentIndex: 1
         equal:
           path: 'metadata.annotations.kubernetes\.io/ingress\.class'
+          value: 'foo'
+  
+  - it: exposeDomains - uses default ingress type and has correct hostname (1.18+)
+    template: ingress.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 18
+    set:
+      ingress:
+        default:
+          type: foo
+      exposeDomains:
+        bar:
+          hostname: bar.baz
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: 'spec.ingressClassName'
           value: 'foo'
   
   - it: exposeDomains - has correct hostname

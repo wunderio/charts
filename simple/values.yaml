@@ -15,10 +15,9 @@ environmentName: ""
 # The app label added to our Kubernetes resources.
 app: simple
 
-# Configuration for the wunderio/silta-release subchart.
 silta-release:
   downscaler:
-    enabled: false
+    enabled: true
 
 # How many instances of the resulting pod should be in our Kubernetes deployment.
 # A single pod (the default value) is good for development environments to minimise resource usage.

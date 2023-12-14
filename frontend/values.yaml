@@ -104,7 +104,7 @@ singleSubdomain: false
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
-  image: 'wunderio/silta-nginx:v0.2'
+  image: 'wunderio/silta-nginx:1.17-v1'
 
   replicas: 1
 
@@ -331,11 +331,25 @@ serviceDefaults:
         name: cpu
         targetAverageUtilization: 80
 
+# Provide defaults for all cron jobs. This will override serviceDefaults when defined.
+cronJobDefaults:
+  # resources:
+  #   requests:
+  #     cpu: 100m
+  #     memory: 122Mi
+  #   limits:
+  #     memory: 122Mi
+  # nodeSelector:
+  #   cloud.google.com/gke-nodepool: static-ip
+
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
 # see: https://github.com/bitnami/charts/blob/master/bitnami/mariadb/values.yaml
 mariadb:
   enabled: false
+  image:
+    # https://hub.docker.com/r/bitnami/mariadb/tags
+    tag: 10.6.15-debian-11-r24
   replication:
     enabled: false
   db:
@@ -376,6 +390,12 @@ elasticsearch:
   maxUnavailable: 0
   clusterHealthCheckParams: 'wait_for_status=yellow&timeout=1s'
 
+  createCert: false
+  protocol: http
+  extraEnvs:
+    - name: xpack.security.enabled
+      value: "false"
+
   # This value should be slightly less than 50% of the requested memory.
   esJavaOpts: -Xmx220m -Xms220m
   xpack:
@@ -388,7 +408,7 @@ elasticsearch:
   resources:
     requests:
       cpu: 200m
-      memory: 512Mi
+      memory: 640Mi
     limits:
       memory: 1Gi
 
@@ -404,7 +424,6 @@ elasticsearch:
 
 # These settings are not optimized. To see which overrides are available see:
 # https://github.com/bitnami/charts/blob/master/bitnami/mongodb/values.yaml
-
 mongodb:
   enabled: false
   image:
@@ -413,6 +432,14 @@ mongodb:
   # Use a low default to prevent unnecessary storage use.
   persistence:
     size: 1Gi
+
+# # Posgresql overrides
+# # see: https://github.com/bitnami/charts/blob/c3dc56f3679650f1012e497b8a5e71d94dac163e/bitnami/postgresql/values.yaml
+# postgresql:
+#   enabled: false
+#   # Use a low default to prevent unnecessary storage use.
+#   persistence:
+#     size: 1Gi
 
 rabbitmq:
   enabled: false
@@ -443,3 +470,17 @@ signalsciences:
     limits:
       cpu: 40m
       memory: 300Mi
+
+# Mailhog service overrides
+# see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
+mailhog:
+  enabled: false
+  image:
+    # Set image repository to "mailhog/mailhog" to reenable logging.
+    repository: wunderio/silta-mailhog
+    # Set image tag to "" to reenable logging.
+    tag: v1
+  resources:
+    requests:
+      cpu: 1m
+      memory: 10M
