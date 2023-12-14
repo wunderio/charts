@@ -30,7 +30,7 @@ jobs:
       - run:
           name: Helm upgrade test
           command: |
-            export HELM_VERSION=v3.9.2
+            export HELM_VERSION=v3.13.3
             export FILENAME=helm-${HELM_VERSION}-linux-amd64.tar.gz
             export HELM_URL=https://get.helm.sh/${FILENAME}
 
