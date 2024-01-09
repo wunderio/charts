@@ -248,6 +248,7 @@
             "properties": {
               "schedule": { "type": "string" },
               "command": { "type": "string" },
+              "backoffLimit": { "type": "integer" },
               "nodeSelector": { "type": ["object", "null"] },
               "resources": {
                 "type": "object",

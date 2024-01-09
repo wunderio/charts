@@ -267,6 +267,9 @@ php:
       # Set a nodeSelector specifically for cron jobs.
       nodeSelector: {}
 
+      # Specify a how many attempts should be made before considering a cron job as failed.
+      backoffLimit: 1
+
       # Set resources specifically for cron jobs. If not set, they will be
       # inherited from php.resources.
       resources:
