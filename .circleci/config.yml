@@ -7,6 +7,7 @@ jobs:
 
   build:
     executor: silta/silta
+    resource_class: small
 
     steps:
       - checkout
@@ -67,6 +68,7 @@ jobs:
 
   deploy:
     executor: silta/silta
+    resource_class: small
 
     steps:
       - restore_cache:
