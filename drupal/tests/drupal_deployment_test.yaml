@@ -332,3 +332,18 @@ tests:
               secretKeyRef:
                 key: control_key
                 name: RELEASE-NAME-secrets-varnish
+  - it: can set timezone for php and nginx containers
+    template: drupal-deployment.yaml
+    set:
+      timezone: 'Foo/Bar'
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TZ
+            value: Foo/Bar
+      - contains:
+          path: spec.template.spec.containers[1].env
+          content:
+            name: TZ
+            value: Foo/Bar

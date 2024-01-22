@@ -106,6 +106,7 @@
         "vpcNative": { "type": "boolean" }
       }
     },
+    "timezone": { "type": "string" },
     "nginx": {
       "type": "object",
       "additionalProperties": false,
@@ -243,7 +244,7 @@
         "cron": {
           "type": "object",
           "additionalProperties": {
-            "type": "object",
+            "type": ["object", "null"],
             "additionalProperties": false,
             "properties": {
               "schedule": { "type": "string" },

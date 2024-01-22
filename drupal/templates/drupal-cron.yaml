@@ -1,4 +1,5 @@
 {{- range $index, $job := .Values.php.cron }}
+{{- if $job }}
 apiVersion: {{ include "drupal.cron.api-version" $ | trim }}
 kind: CronJob
 metadata:
@@ -9,6 +10,11 @@ metadata:
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
+  {{- if $.Values.timezone }}
+  {{- if eq ( include "drupal.cron.timezone-support" $ ) "true" }}
+  timeZone: {{ $.Values.timezone | quote }}
+  {{- end }}
+  {{- end }}
   schedule: {{ $job.schedule | replace "~" (randNumeric 1) | quote }}
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 3600
@@ -123,4 +129,5 @@ spec:
 
           {{- include "drupal.imagePullSecrets" $ | nindent 10 }}
 ---
+{{- end }}
 {{- end }}

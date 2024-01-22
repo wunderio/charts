@@ -115,6 +115,11 @@ backendConfig:
   securityPolicy:
     name: "silta-ingress"
 
+# Timezone to be used by the services that support it.
+# List of timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List (use the TZ identifier column)
+# The default timezone for most container images is UTC.
+timezone: ""
+
 # Add prefixes to the generated per-branch domains, to be used for projects that need to respond
 # on multiple domains, for example using Drupal's domain module, or using different domains for different languages.
 # domainPrefixes: ['en', 'fi']

@@ -61,7 +61,7 @@ spec:
           subPath: authorizedKeys
           readOnly: true
         {{- if .Values.backup.enabled }}
-        - name: {{ .Release.Name }}-backups
+        - name: {{ .Release.Name }}-backup
           mountPath: /backups
           readOnly: true
         {{- end }}
@@ -88,9 +88,9 @@ spec:
         configMap:
           name: {{ .Release.Name }}-shell
       {{- if .Values.backup.enabled }}
-      - name: {{ .Release.Name }}-backups
+      - name: {{ .Release.Name }}-backup
         persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-backups
+          claimName: {{ .Release.Name }}-backup
       {{- end }}
       {{- include "drupal.imagePullSecrets" . | nindent 6 }}
 {{- end }}
