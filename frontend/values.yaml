@@ -88,6 +88,11 @@ cluster:
   type: gke
   vpcNative: false
 
+# Timezone to be used by the services that support it.
+# List of timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List (use the TZ identifier column)
+# The default timezone for most container images is UTC.
+timezone: ""
+
 # backendConfig customizations for main service
 backendConfig:
   securityPolicy:

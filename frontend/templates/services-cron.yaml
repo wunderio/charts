@@ -1,7 +1,6 @@
 {{- range $serviceName, $service := .Values.services }}
 {{- if $service.cron }}
 {{- range $jobName, $job := $service.cron }}
-
 apiVersion: {{ include "frontend.cron.api-version" $ | trim }}
 kind: CronJob
 metadata:
@@ -9,6 +8,11 @@ metadata:
   labels:
     {{- include "frontend.release_labels" $ | nindent 4 }}
 spec:
+  {{- if $.Values.timezone }}
+  {{- if eq ( include "frontend.cron.timezone-support" $ ) "true" }}
+  timeZone: {{ $.Values.timezone | quote }}
+  {{- end }}
+  {{- end }}
   schedule: {{ $job.schedule | replace "~" (randNumeric 1) | quote }}
   concurrencyPolicy: {{ default "Forbid" $job.concurrencyPolicy }}
   startingDeadlineSeconds: 3600

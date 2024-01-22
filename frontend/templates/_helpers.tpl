@@ -71,6 +71,10 @@ rsync -az /values_mounts/ /backups/current/
 - name: "{{ $index }}_HOST"
   value: "{{ $.Release.Name }}-{{ $index }}:{{ default $.Values.serviceDefaults.port $service.port }}"
 {{- end }}
+{{- if .Values.timezone }}
+- name: TZ
+  value: {{ .Values.timezone | quote }}
+{{- end }}
 # Elasticsearch
 {{- if .Values.elasticsearch.enabled }}
 - name: ELASTICSEARCH_HOST
@@ -175,6 +179,12 @@ networking.k8s.io/v1beta1
 batch/v1
 {{- else }}
 batch/v1beta1
+{{- end }}
+{{- end }}
+
+{{- define "frontend.cron.timezone-support" }}
+{{- if and ( ge $.Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "25" ) }}true
+{{- else }}false
 {{- end }}
 {{- end }}
 

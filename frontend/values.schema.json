@@ -96,7 +96,7 @@
         "vpcNative": { "type": "boolean" }
       }
     },
-    
+    "timezone": { "type": "string" },
     "nginx": {
       "type": "object",
       "additionalProperties": false,
