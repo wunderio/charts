@@ -9,6 +9,11 @@ metadata:
     {{- include "drupal.release_labels" . | nindent 4 }}
     cronjob-type: backup
 spec:
+  {{- if .Values.timezone }}
+  {{- if eq ( include "drupal.cron.timezone-support" . ) "true" }}
+  timeZone: {{ .Values.timezone | quote }}
+  {{- end }}
+  {{- end }}
   schedule: {{ .Values.backup.schedule | replace "~" (randNumeric 1) | quote }}
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 3600
@@ -32,7 +37,7 @@ spec:
             {{- include "drupal.php-container" . | nindent 12 }}
             volumeMounts:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
-              - name: {{ .Release.Name }}-backups
+              - name: {{ .Release.Name }}-backup
                 mountPath: /backups
             command: ["/bin/bash", "-c"]
             args:
@@ -56,9 +61,9 @@ spec:
           restartPolicy: Never
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}
-            - name: {{ .Release.Name }}-backups
+            - name: {{ .Release.Name }}-backup
               persistentVolumeClaim:
-                claimName: {{ .Release.Name }}-backups
+                claimName: {{ .Release.Name }}-backup
           {{- include "drupal.imagePullSecrets" . | nindent 10 }}
 {{- end }}
 

@@ -23,6 +23,35 @@ tests:
           path: spec.jobTemplate.spec.template.spec.containers[0].image
           value: 'drupal-12345'
 
+  - it: can set timezone
+    template: drupal-cron.yaml
+    set:
+      timezone: 'Foo/Bar'
+    capabilities:
+      majorVersion: 1
+      minorVersion: 25
+    asserts:
+      - equal:
+          path: spec.timeZone
+          value: 'Foo/Bar'
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: TZ
+            value: Foo/Bar
+
+  # notExists is not supported in the current version of the test framework
+  # - it: timezone is not set for api versions that do not support it
+  #   template: drupal-cron.yaml
+  #   capabilities:
+  #     majorVersion: 1
+  #     minorVersion: 24
+  #   set:
+  #     timezone: 'Foo/Bar'
+  #   asserts:
+  #     - notExists:
+  #         path: spec.timeZone
+
   - it: sets environment variables correctly
     template: drupal-cron.yaml
     set:

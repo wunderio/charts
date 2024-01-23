@@ -6,6 +6,11 @@ metadata:
   labels:
     cronjob-type: backup
 spec:
+  {{- if .Values.timezone }}
+  {{- if eq ( include "frontend.cron.timezone-support" . ) "true" }}
+  timeZone: {{ .Values.timezone | quote }}
+  {{- end }}
+  {{- end }}
   schedule: {{ .Values.backup.schedule | replace "~" (randNumeric 1) | quote }}
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 3600

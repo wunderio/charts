@@ -191,6 +191,10 @@ imagePullSecrets:
 - name: DRUSH_OPTIONS_URI
   value: "http://{{- template "drupal.domain" . }}"
 {{- end }}
+{{- if .Values.timezone }}
+- name: TZ
+  value: {{ .Values.timezone | quote }}
+{{- end }}
 {{- include "drupal.db-env" . }}
 - name: ERROR_LEVEL
   value: {{ .Values.php.errorLevel }}
@@ -655,6 +659,12 @@ if [ -f /silta/entrypoint.sh ] ; then /silta/entrypoint.sh ; fi
 batch/v1
 {{- else }}
 batch/v1beta1
+{{- end }}
+{{- end }}
+
+{{- define "drupal.cron.timezone-support" }}
+{{- if and ( ge $.Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "25" ) }}true
+{{- else }}false
 {{- end }}
 {{- end }}
 
