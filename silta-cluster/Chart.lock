@@ -25,7 +25,7 @@ dependencies:
   version: 1.0.0
 - name: instana-agent
   repository: https://agents.instana.io/helm
-  version: 1.2.66
+  version: 1.2.67
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
   version: 4.0.18
@@ -35,5 +35,8 @@ dependencies:
 - name: docker-registry
   repository: https://helm.twun.io
   version: 2.1.0
-digest: sha256:df6f7b163fe7389617d938a7f80da42bd46ca249820e5e32313ff7abedfa8b21
-generated: "2023-11-30T11:31:16.305257237+02:00"
+- name: mariadb-operator
+  repository: https://mariadb-operator.github.io/mariadb-operator
+  version: 0.24.0
+digest: sha256:6ef3a65bed254bc1fa940155b704d02e21f51dd08ffae66b070085bae9d60d0f
+generated: "2024-01-23T14:44:52.922679344+02:00"

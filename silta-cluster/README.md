@@ -64,6 +64,17 @@ helm install --name aws-calico --namespace kube-system eks/aws-calico
 kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/dcfc35a1158862da60a89010e4cabaa2b94560f5/charts/pxc-operator/crds/crd.yaml
 ```
 
+### Mysql operator for replicated database support (optional)
+MariaDB operator is bundled with the chart, but it still requires a separate helm repository to be added.
+```
+helm repo add mariadb-operator https://mariadb-operator.github.io/mariadb-operator
+helm repo update
+``````
+
+CRD for mariadb-operator available at https://github.com/mariadb-operator/mariadb-operator/tree/main/deploy/crds, install it with `kubectl apply --server-side` (ommiting `--server-side` might cause error "metadata.annotations: Too long: must have at most 262144 bytes").
+```
+kubectl apply -f https://raw.githubusercontent.com/mariadb-operator/mariadb-operator/729fa16dfd6584db5095fef276d3b677d9aee475/deploy/crds/crds.yaml -n silta-cluster --server-side
+```
 ### Google Filestore as storage (optional)
 
 Adds a storageclass, backed by Filestore.

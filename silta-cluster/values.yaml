@@ -262,6 +262,21 @@ pxc-operator:
   enabled: false
   watchAllNamespaces: true
 
+# MySQL Operator for replicated database support
+# see: https://github.com/mariadb-operator/mariadb-operator/blob/729fa16dfd6584db5095fef276d3b677d9aee475/deploy/charts/mariadb-operator/values.yaml
+mariadb-operator:
+  enabled: false
+  ha:
+    enabled: false
+    replicas: 1
+  webhook:
+    cert:
+      certManager:
+        enabled: true
+    # Fixes webhook connection issue: "failed to call webhook: connect: connection refused" on private GKE clusters.
+    # Requires firewall rule: https://cloud.google.com/kubernetes-engine/docs/how-to/private-clusters#add_firewall_rules
+    port: 8443
+
 # Cert manager moved to subchart, see installation instructions.
 # Installs v0.10.1 when explicitly enabled, but it 
 # does not work on kubernetes 1.20+

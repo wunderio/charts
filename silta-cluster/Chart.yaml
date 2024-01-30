@@ -57,3 +57,7 @@ dependencies:
   repository: https://helm.twun.io
   version: 2.1.x
   condition: docker-registry.enabled
+- name: mariadb-operator
+  repository: https://mariadb-operator.github.io/mariadb-operator
+  version: 0.24.x
+  condition: mariadb-operator.enabled
