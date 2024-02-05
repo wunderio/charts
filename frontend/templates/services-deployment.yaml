@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: {{ $.Release.Name }}-{{ $index }}
   labels:
-    {{ include "frontend.release_labels" $ | indent 4 }}
+    {{- include "frontend.release_labels" $ | nindent 4 }}
     silta-frontend: service
 spec:
   {{- if or (not $service.autoscaling) (not (($service.autoscaling).enabled)) }}
@@ -14,12 +14,12 @@ spec:
     {{ default $.Values.serviceDefaults.strategy $service.strategy | toYaml }}
   selector:
     matchLabels:
-      {{ include "frontend.release_labels" $ | indent 6 }}
+      {{- include "frontend.release_selector_labels" $ | nindent 6 }}
       deployment: frontend-{{ $index }}
   template:
     metadata:
       labels:
-        {{ include "frontend.release_labels" $ | indent 8 }}
+        {{- include "frontend.release_labels" $ | nindent 8 }}
         deployment: frontend-{{ $index }}
         silta-frontend: service
         {{ if $.Values.shell.enabled -}}
@@ -163,7 +163,7 @@ kind: Job
 metadata:
   name: "{{ $.Release.Name }}-{{ $index }}-post-release"
   labels:
-    {{ include "frontend.release_labels" $ | indent 4 }}
+    {{- include "frontend.release_labels" $ | nindent 4 }}
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
@@ -176,7 +176,7 @@ spec:
   template:
     metadata:
       labels:
-        {{ include "frontend.release_labels" $ | indent 8 }}
+        {{- include "frontend.release_labels" $ | nindent 8 }}
     spec:
       restartPolicy: Never
       enableServiceLinks: false

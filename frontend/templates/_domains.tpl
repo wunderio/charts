@@ -41,3 +41,19 @@ www-admin@ssh.{{ .Values.clusterDomain }}
 {{- define "frontend.shellHost" -}}
 www-admin@{{ template "frontend.environment.hostname" . }}-shell.{{ .Release.Namespace }}
 {{- end -}}
+
+{{- define "frontend.endpoint" }}
+{{- if .Values.varnish.enabled }}
+{{- .Release.Name }}-varnish.{{ .Release.Namespace }}.svc.cluster.local:80
+{{- else -}}
+{{- .Release.Name }}-nginx.{{ .Release.Namespace }}.svc.cluster.local:80
+{{- end -}}
+{{- end -}}
+
+{{- define "frontend.servicename" }}
+{{- if .Values.varnish.enabled }}
+{{- .Release.Name }}-varnish
+{{- else -}}
+{{- .Release.Name }}-nginx
+{{- end -}}
+{{- end -}}

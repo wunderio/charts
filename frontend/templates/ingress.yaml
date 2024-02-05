@@ -75,10 +75,10 @@ metadata:
     auto-downscale/down: "false"
     auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
     auto-downscale/label-selector: "release={{ .Release.Name }}"
-    auto-downscale/services: {{ .Release.Name }}-nginx
+    auto-downscale/services: {{ include "frontend.servicename" $ }}
     {{- end }}
   labels:
-    {{ include "frontend.release_labels" . | indent 4 }}
+    {{- include "frontend.release_labels" $ | nindent 4 }}
 spec:
   {{- if and (ne $ingress.type "gce" ) (eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1") }}
   ingressClassName: {{ regexReplaceAll "[^[:alnum:]]" $ingress.type "-" | quote }}
@@ -106,11 +106,11 @@ spec:
         backend:
           {{- if eq ( include "ingress.api-version" . | trim ) "networking.k8s.io/v1" }}
           service:
-            name: {{ .Release.Name }}-nginx
+            name: {{ include "frontend.servicename" $ }}
             port: 
               number: 80
           {{- else }}
-          serviceName: {{ .Release.Name }}-nginx
+          serviceName: {{ include "frontend.servicename" $ }}
           servicePort: 80
           {{- end }}
 {{- range $index, $prefix := .Values.domainPrefixes }}
@@ -125,11 +125,11 @@ spec:
         backend:
           {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
           service:
-            name: {{ $.Release.Name }}-nginx
+            name: {{ include "frontend.servicename" $ }}
             port: 
               number: 80
           {{- else }}
-          serviceName: {{ $.Release.Name }}-nginx
+          serviceName: {{ include "frontend.servicename" $ }}
           servicePort: 80
           {{- end }}
 {{- end }}
@@ -232,7 +232,7 @@ metadata:
     auto-downscale/down: "false"
     auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
     auto-downscale/label-selector: "release={{ $.Release.Name }}"
-    auto-downscale/services: {{ $.Release.Name }}-nginx
+    auto-downscale/services: {{ include "frontend.servicename" $ }}
     {{- end }}
   labels:
     {{ include "frontend.release_labels" $ | indent 4 }}
@@ -269,11 +269,11 @@ spec:
         backend:
           {{- if eq ( include "ingress.api-version" $ | trim ) "networking.k8s.io/v1" }}
           service:
-            name: {{ $.Release.Name }}-nginx
+            name: {{ include "frontend.servicename" $ }}
             port: 
               number: 80
           {{- else }}
-          serviceName: {{ $.Release.Name }}-nginx
+          serviceName: {{ include "frontend.servicename" $ }}
           servicePort: 80
           {{- end }}
   {{- end }}

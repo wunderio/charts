@@ -3,17 +3,17 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-nginx
   labels:
-    {{ include "frontend.release_labels" . | indent 4 }}
+    {{- include "frontend.release_labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.nginx.replicas }}
   selector:
     matchLabels:
-      {{ include "frontend.release_labels" . | indent 6 }}
+      {{- include "frontend.release_selector_labels" $ | nindent 6 }}
       deployment: frontend
   template:
     metadata:
       labels:
-        {{ include "frontend.release_labels" . | indent 8 }}
+        {{- include "frontend.release_labels" . | nindent 8 }}
         deployment: frontend
         silta-ingress: allow
       annotations:

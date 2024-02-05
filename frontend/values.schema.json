@@ -420,6 +420,42 @@
         }
       }
     },
+    "varnish": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "image": { "type": "string" },
+        "imageTag": { "type": "string" },
+        "imagePullPolicy": { "type": "string" },
+        "storageBackend": { "type": "string" },
+        "extraParams": { "type": "string" },
+        "vcl_recv": { "type": "string" },
+        "vcl_backend_response": { "type": "string" },
+        "status_500_html": { "type": "string" },
+        "backend_config": { "type": "string" },
+        "resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": ["integer", "string"]},
+                "memory": { "type": "string" }
+              }
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": ["integer", "string"] },
+                "memory": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
     "mariadb": {
       "type": "object",
       "properties": {

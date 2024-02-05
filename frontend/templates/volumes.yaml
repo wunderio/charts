@@ -78,7 +78,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: {{ $.Release.Name }}-shell-keys
   labels:
-    {{ include "frontend.release_labels" $ | indent 4 }}
+    {{- include "frontend.release_labels" $ | nindent 4 }}
   annotations:
     storage.silta/storage-path: {{ $.Values.environmentName | default $.Release.Name }}/shell-keys
 spec:

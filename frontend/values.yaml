@@ -383,6 +383,52 @@ mariadb:
               - static-ip
   enableServiceLinks: false
 
+varnish:
+  enabled: false
+  resources:
+    requests:
+      cpu: 25m
+      memory: 32Mi
+  image: wunderio/silta-varnish
+  imageTag: 7-v1
+  imagePullPolicy: IfNotPresent
+  # https://varnish-cache.org/docs/7.4/reference/varnishd.html#storage-backend
+  storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
+  # https://varnish-cache.org/docs/7.4/reference/varnishd.html#list-of-parameters
+  extraParams: ""
+  # Custom caching code for vcl_recv subroutine.
+  vcl_recv: |
+    # Deny special pages to bots
+    if (req.url ~ "^/(?:user|admin|cart|checkout|logout|abuse|flag|.*\?rate=)" && req.http.user-agent ~ "(?:crawl|goog|yahoo|spider|bot|Yandex|bing|tracker|click|parser|ltx71|urllib)") {
+      return (synth( 403, "Forbidden"));
+    }
+
+    # Do not cache anything
+    return (pass);
+    
+  # Custom caching code for vcl_backend_response subroutine.
+  vcl_backend_response: |
+
+  # Custom html code for 50x pages and backend failures.
+  status_500_html: ""
+  # https://varnish-cache.org/docs/7.4/reference/vcl-backend.html
+  backend_config: |
+    .max_connections = 300;
+    .probe = {
+      .request =
+          "HEAD / HTTP/1.1"
+          "User-Agent: Varnish"
+          "Connection: close"
+          "Host: localhost";
+      .interval  = 5s;
+      .timeout   = 5s;
+      .window    = 5;
+      .threshold = 3;
+    }
+    .first_byte_timeout     = 300s;
+    .connect_timeout        = 10s;
+    .between_bytes_timeout  = 10s;
+
 elasticsearch:
   enabled: false
 
@@ -438,13 +484,13 @@ mongodb:
   persistence:
     size: 1Gi
 
-# # Posgresql overrides
-# # see: https://github.com/bitnami/charts/blob/c3dc56f3679650f1012e497b8a5e71d94dac163e/bitnami/postgresql/values.yaml
-# postgresql:
-#   enabled: false
-#   # Use a low default to prevent unnecessary storage use.
-#   persistence:
-#     size: 1Gi
+# Posgresql overrides
+# see: https://github.com/bitnami/charts/blob/c3dc56f3679650f1012e497b8a5e71d94dac163e/bitnami/postgresql/values.yaml
+postgresql:
+  enabled: false
+  # Use a low default to prevent unnecessary storage use.
+  persistence:
+    size: 1Gi
 
 rabbitmq:
   enabled: false
