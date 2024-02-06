@@ -317,7 +317,7 @@ silta-shared-nfs:
     server: silta-cluster-nfs-server.silta-cluster.svc.cluster.local
     path: /
   storageClass:
-    name: silta-nfs-shared
+    name: silta-shared-nfs
     # Set volume bindinng mode - Immediate or WaitForFirstConsumer
     volumeBindingMode: WaitForFirstConsumer
     pathPattern: "${.PVC.namespace}/${.PVC.annotations.storage.silta/storage-path}"
@@ -336,7 +336,35 @@ nfs-server:
     limits:
       cpu: 100m
       memory: 512M
-  persistence:
+  persistence:    
+    rclone:
+      enabled: false
+      image: rclone/rclone:1.63
+      # bucket
+      remotePath: ""
+      # rclone config file content (except [remote] header)
+      # https://rclone.org/docs/#config-config-file
+      backend_config: |
+        # type = google cloud storage
+        # project_number = test-project-123
+        # service_account_credentials = { escaped json, convert newlines to \n }
+        # location = region
+        # links = true
+        # gcs_directory_markers = true
+        # bucket_policy_only = true
+      # rclone mount commmand flags
+      # https://rclone.org/commands/rclone_mount/
+      params:
+        cache-chunk-clean-interval: 15m
+        dir-cache-time: 5s
+        vfs-cache-mode: writes
+        cache-info-age: 72h
+        allow-non-empty: true
+        allow-other: true
+      resources:
+        requests:
+          cpu: 10m
+          memory: 128M
     data:
       size: 10Gi
       # storageClassName: standard
