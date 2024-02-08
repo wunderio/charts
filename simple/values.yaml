@@ -114,6 +114,9 @@ backendConfig:
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
 
+  # Magic header for CDN (string). If not empty then it goes to varnish and nginx config
+  x_proxy_auth: ""
+
   # The Kubernetes resources for the nginx container.
   # These values are optimised for development environments.
   resources:

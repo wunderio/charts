@@ -289,6 +289,7 @@ data:
       # which backend to use.
       # also used to modify the request
       {{- if ne .Values.nginx.x_proxy_auth "" }}
+      # Block request if CDN header is set and does not match defined value
       if (req.http.x-proxy-auth != "{{ .Values.nginx.x_proxy_auth }}") {
         return (synth(403, "Not allowed."));
       }

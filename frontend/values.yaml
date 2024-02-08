@@ -111,6 +111,9 @@ singleSubdomain: false
 nginx:
   image: 'wunderio/silta-nginx:1.17-v1'
 
+  # Magic header for CDN (string). If not empty then it goes to varnish and nginx config
+  x_proxy_auth: ""
+
   replicas: 1
 
   autoscaling:
