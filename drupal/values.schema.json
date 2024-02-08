@@ -106,7 +106,6 @@
         "vpcNative": { "type": "boolean" }
       }
     },
-    "xProxyAuth": { "type": "string" },
     "timezone": { "type": "string" },
     "nginx": {
       "type": "object",
@@ -160,6 +159,7 @@
           }
         },
         "real_ip_header": { "type": "string" },
+        "x_proxy_auth": { "type": "string" },
         "resources": {
           "type": "object",
           "additionalProperties": false,

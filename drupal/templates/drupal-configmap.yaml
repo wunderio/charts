@@ -420,8 +420,8 @@ data:
       {{- end}}
 
       location / {
-        {{- if ne .Values.xProxyAuth "" }}
-        if ($http_x-proxy-auth != "{{ .Values.xProxyAuth }}") {
+        {{- if ne .Values.nginx.x_proxy_auth "" }}
+        if ($http_x-proxy-auth != "{{ .Values.nginx.x_proxy_auth }}") {
           return 403;
         }
         {{- end}}

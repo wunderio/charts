@@ -140,12 +140,12 @@ ssl:
   # key: ""
   # crt: ""
 
-# Magic header for CDN (string). If not empty added to varnish and nginx config
-xProxyAuth: ""
-
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
+
+  # Magic header for CDN (string). If not empty then it goes to varnish and nginx config
+  x_proxy_auth: ""
 
   # Possible Values: debug, info, notice, warn, error, crit, alert, or emerg.
   loglevel: error

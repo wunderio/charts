@@ -288,8 +288,8 @@ data:
       # Its purpose is to decide whether or not to serve the request, how to do it, and, if applicable,
       # which backend to use.
       # also used to modify the request
-      {{- if ne .Values.xProxyAuth "" }}
-      if (req.http.x-proxy-auth != "{{ .Values.xProxyAuth }}") {
+      {{- if ne .Values.nginx.x_proxy_auth "" }}
+      if (req.http.x-proxy-auth != "{{ .Values.nginx.x_proxy_auth }}") {
         return (synth(403, "Not allowed."));
       }
       {{- end }}
