@@ -140,6 +140,9 @@ ssl:
   # key: ""
   # crt: ""
 
+# Magic header for CDN (string). If not empty added to varnish and nginx config
+xProxyAuth: ""
+
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
@@ -794,12 +797,10 @@ pxc-db:
     passwords:
       root: drupal
       pmmserver: drupal
-      root: drupal
       xtrabackup: drupal
       monitor: drupal
       clustercheck: drupal
       proxyadmin: drupal
-      pmmserver: drupal
       operator: drupal
       replication: drupal
 

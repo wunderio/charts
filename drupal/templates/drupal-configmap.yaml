@@ -415,11 +415,16 @@ data:
         proxy_set_header Connection "upgrade";
         proxy_http_version 1.1;
         proxy_redirect off;
-          proxy_buffering off;
+        proxy_buffering off;
       }
       {{- end}}
 
       location / {
+        {{- if ne .Values.xProxyAuth "" }}
+        if ($http_x-proxy-auth != "{{ .Values.xProxyAuth }}") {
+          return 403;
+        }
+        {{- end}}
 
         {{- if .Values.nginx.locationExtraConfig }}
         # Custom configuration gets included here

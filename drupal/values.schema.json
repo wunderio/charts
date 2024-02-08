@@ -106,6 +106,7 @@
         "vpcNative": { "type": "boolean" }
       }
     },
+    "xProxyAuth": { "type": "string" },
     "timezone": { "type": "string" },
     "nginx": {
       "type": "object",
