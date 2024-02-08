@@ -105,7 +105,7 @@ data:
 
       {{- if ne .Values.nginx.x_proxy_auth "" }}
       # Verify if x_proxy_auth value is correct
-      map $http_x_proxy_auth $xpa { default 0; '{{ .Values.nginx.x_proxy_auth }}' 1; }
+      map $http_x_proxy_auth $proxy_auth { default 0; '{{ .Values.nginx.x_proxy_auth }}' 1; }
       {{- end}}
 
       include conf.d/*.conf;
@@ -149,7 +149,7 @@ data:
 
       {{- if ne .Values.nginx.x_proxy_auth "" }}
       # Block request if magic header is set and does not match required value
-      if (!$xpa) { return 403; }
+      if (!$proxy_auth) { return 403; }
       {{- end}}
 
       {{- if .Values.nginx.redirects }}

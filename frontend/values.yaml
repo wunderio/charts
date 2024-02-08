@@ -111,7 +111,7 @@ singleSubdomain: false
 nginx:
   image: 'wunderio/silta-nginx:1.17-v1'
 
-  # Magic header for CDN (string). If not empty then it goes to varnish and nginx config
+  # Requires "X-Proxy-Auth" header from upstream when value is non-empty string.
   x_proxy_auth: ""
 
   replicas: 1
