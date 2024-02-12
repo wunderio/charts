@@ -326,7 +326,7 @@ data:
       if ($hc_ua) { return 200; }
       {{- if ne .Values.nginx.x_proxy_auth "" }}
       # Block request if proxy header is set but does not match required value
-      if (!$proxy_auth) { return 403; }
+      if ($proxy_auth = 0) { return 403; }
       {{- end}}
 
       {{- if .Values.nginx.redirects }}
