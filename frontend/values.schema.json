@@ -135,6 +135,7 @@
         },
         "loglevel": { "type": "string" },
         "real_ip_header": { "type": "string" },
+        "x_proxy_auth": { "type": "string" },
         "realipfrom": {
           "type": ["string","object"],
           "additionalProperties": { "type": "string" }

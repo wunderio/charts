@@ -111,6 +111,9 @@ singleSubdomain: false
 nginx:
   image: 'wunderio/silta-nginx:1.17-v1'
 
+  # Requires "X-Proxy-Auth" header from upstream when value is non-empty string.
+  x_proxy_auth: ""
+
   replicas: 1
 
   autoscaling:

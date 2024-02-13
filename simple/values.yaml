@@ -114,6 +114,9 @@ backendConfig:
 nginx:
   image: 'you need to pass in a value for nginx.image to your helm chart'
 
+  # Requires "X-Proxy-Auth" header from upstream when value is non-empty string.
+  x_proxy_auth: ""
+
   # The Kubernetes resources for the nginx container.
   # These values are optimised for development environments.
   resources:
