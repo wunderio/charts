@@ -38,6 +38,13 @@ data:
 
     # Client side
     sub vcl_recv {
+      {{- if ne .Values.nginx.x_proxy_auth "" }}
+      # Block request if proxy header is set but does not match defined value
+      if (req.http.x-proxy-auth != "{{ .Values.nginx.x_proxy_auth }}") {
+        return (synth(403, "Not allowed."));
+      }
+      {{- end }}
+
       # Require a valid host header
       if (req.http.host ~ "[[:upper:]]") {
         set req.http.host = req.http.host.lower();

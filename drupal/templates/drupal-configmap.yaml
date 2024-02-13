@@ -313,6 +313,10 @@ data:
 
     # List health checks that need to return status 200 here
     map $http_user_agent $hc_ua { default 0; 'GoogleHC/1.0' 1; }
+    {{- if ne .Values.nginx.x_proxy_auth "" }}
+    # Verify if x_proxy_auth value is correct
+    map $http_x_proxy_auth $proxy_auth { default 0; '{{ .Values.nginx.x_proxy_auth }}' 1; }
+    {{- end}}
 
     server {
       server_name drupal;
@@ -320,6 +324,10 @@ data:
 
       # Loadbalancer health checks need to be fed with http 200
       if ($hc_ua) { return 200; }
+      {{- if ne .Values.nginx.x_proxy_auth "" }}
+      # Block request if proxy header is set but does not match required value
+      if ($proxy_auth = 0) { return 403; }
+      {{- end}}
 
       {{- if .Values.nginx.redirects }}
       # Redirects to specified path if map returns anything
@@ -415,7 +423,7 @@ data:
         proxy_set_header Connection "upgrade";
         proxy_http_version 1.1;
         proxy_redirect off;
-          proxy_buffering off;
+        proxy_buffering off;
       }
       {{- end}}
 
