@@ -170,6 +170,77 @@ ssl:
   # ca: ""
   # key: ""
   # crt: ""
+
+# Community ingress-nginx chart
+# https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
+# https://github.com/kubernetes/ingress-nginx/blob/e4a66fd2f625de3bcc7aaa793b31f529a0662009/charts/ingress-nginx/values.yaml
+# This is a duplicate of the ingress-nginx chart, but with a different name, meant to immitate traefik ingress class and replace it.
+nginx-traefik:
+  enabled: false
+  controller:
+    # see autoscaling section below
+    replicaCount: 1
+    service:
+      # loadBalancerIP: 1.2.3.4
+      externalTrafficPolicy: Local
+    ingressClass: traefik
+    ingressClassResource:
+      default: false
+      name: traefik
+    watchIngressWithoutClass: false
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
+    config:
+      # Optional CDN configuration
+      use-proxy-protocol: false
+      use-forwarded-headers: true
+      compute-full-forwarded-for: true
+      # forwarded-for-header: "X-Forwarded-For"
+      # proxy-real-ip-cidr: "1.1.1.1/32, 2.2.2.2/32"
+      # Logging configuration
+      disable-access-log: false
+      disable-http-access-log: false
+      disable-stream-access-log: false
+      upstream-keepalive-requests: 16378
+      upstream-keepalive-connections: 4096
+      keep-alive-requests: 16378
+      use-geoip: false
+      use-gzip: false
+      gzip-level: 1
+      # ModSecurity https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#enable-modsecurity
+      # Off by default, enable using ingress annotations
+      enable-modsecurity: false
+      enable-owasp-modsecurity-crs: false
+      # Required minimum configuration since SecRuleEngine is set to "DetectionOnly" by default
+      # modsecurity-snippet: |
+      #   SecRuleEngine On
+      #   SecRequestBodyAccess On
+    # Admission webhook is broken in GKE private clusters and requires additional configuration
+    # so we disable it by default. Enable when possible.
+    # Reference: https://github.com/kubernetes/ingress-nginx/issues/5401
+    admissionWebhooks:
+      enabled: false
+    priorityClassName: "high-priority"
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+      limits:
+        cpu: 1
+        memory: 1Gi
+  # Splash page
+  defaultBackend:
+    enabled: true
+    name: defaultbackend
+    image:
+      registry: wunderio
+      image: silta-splash
+      tag: "v1"
+      readOnlyRootFilesystem: false
   
 # https://github.com/wunderio/charts/blob/master/csi-rclone/values.yaml
 csi-rclone:
