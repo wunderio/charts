@@ -180,6 +180,9 @@ nginx:
   # Extra configuration to pass to nginx as a file
   extraConfig: |
 
+  # Override proxy_pass target container with another container in the same deployment.
+  proxy_pass_to_container: ""
+
   # DEPRECATED. Please use serverExtraConfig instead
   extra_headers: {}
 

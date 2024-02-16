@@ -184,7 +184,8 @@
             "delay": { "type": "integer" },
             "paths": { "type": "array" }
           }
-        }
+        },
+        "proxy_pass_to_container": { "type": "string" }
       }
     },
     "services": { 
