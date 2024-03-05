@@ -47,7 +47,7 @@ spec:
           mountPath: /sigsci/tmp
         {{- end }}
         {{- if .Values.nginx.extraConfig }}
-        - name: config
+        - name: nginx-conf
           # provide empty configuration file in /etc/nginx/conf.d for users to populate
           mountPath: /etc/nginx/conf.d/misc.conf
           readOnly: true
