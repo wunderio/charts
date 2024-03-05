@@ -252,6 +252,7 @@
               "command": { "type": "string" },
               "backoffLimit": { "type": "integer" },
               "nodeSelector": { "type": ["object", "null"] },
+              "php_ini": { "type": "string" },
               "resources": {
                 "type": "object",
                 "additionalProperties": false,

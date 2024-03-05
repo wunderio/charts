@@ -272,6 +272,15 @@ php:
           drush cron;
         fi
 
+    # Add custom php.ini file overrides for the cronjob.
+    # Use the same syntax as in php.ini file
+    # Example:
+    # php_ini: |
+        # [PHP]
+        # memory_limit=128M
+
+    # php_ini: |
+
       # Set a nodeSelector specifically for cron jobs.
       nodeSelector: {}
 
