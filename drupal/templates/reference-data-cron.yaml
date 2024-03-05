@@ -6,6 +6,8 @@ metadata:
   name: {{ .Release.Name }}-refdata
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
+    cronjob: "true"
+    cronjob-type: reference-data
 spec:
   {{- if .Values.timezone }}
   {{- if eq ( include "drupal.cron.timezone-support" . ) "true" }}
@@ -20,6 +22,11 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            {{- include "drupal.release_labels" . | nindent 12 }}
+            cronjob: "true"
+            cronjob-type: reference-data
         spec:
           enableServiceLinks: false
           containers:

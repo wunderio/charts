@@ -8,6 +8,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
     cronjob-type: backup
+    cronjob: "true"
 spec:
   {{- if .Values.timezone }}
   {{- if eq ( include "drupal.cron.timezone-support" . ) "true" }}
@@ -30,6 +31,10 @@ spec:
         metadata:
           annotations:
             nrmitchi.com/sidecars: mariadb
+          labels:
+            {{- include "drupal.release_labels" . | nindent 12 }}
+            cronjob-type: backup
+            cronjob: "true"
         spec:
           enableServiceLinks: false
           containers:
