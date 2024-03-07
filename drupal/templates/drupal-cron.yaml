@@ -42,7 +42,7 @@ spec:
                 mountPath: /usr/local/etc/php/conf.d/silta_cron.ini
                 readOnly: true
                 subPath: php_ini_{{ $index }}
-              {{ end }}
+              {{- end }}
             command: ["/bin/bash", "-c"]
             args:
               - |
