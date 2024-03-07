@@ -785,8 +785,9 @@ data:
     > /dev/null
 
 {{- range $index, $job := .Values.php.cron -}}
-{{ if $job.php_ini }}
+{{- $jobExists := $job | default dict }}
+{{- if $jobExists.php_ini }}
   php_ini_{{ $index }}: |
-    {{- tpl $job.php_ini . | nindent 4 }}
+    {{- tpl $jobExists.php_ini . | nindent 4 }}
 {{- end }}
 {{- end }}
