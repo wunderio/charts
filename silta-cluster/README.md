@@ -58,6 +58,10 @@ kubectl apply -k github.com/aws/eks-charts/tree/master/stable/aws-calico/crds
 helm install --name aws-calico --namespace kube-system eks/aws-calico
 ```
 
+### ingress-nginx load balancer on GKE private cluster
+
+When using GKE private cluster, enabling `ingress-nginx` (and `nginx-traefik`) will require additional steps. See [gcs vendor page](https://github.com/wunderio/silta/blob/master/docs/vendor-gcs.md#ingress-nginx-load-balancer-on-gke-private-cluster) in silta documentation for instructions.
+
 ### Percona XtraDB Cluster for replicated database support (optional)
 ```
 # CRD for pxc-operator 1.12.x. Depends on pxc-operator version in Chart.yaml.

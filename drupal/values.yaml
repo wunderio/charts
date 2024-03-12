@@ -349,6 +349,7 @@ php:
     upload_max_filesize: 60M
     post_max_size: 60M
     memory_limit: 256M
+    max_execution_time: 60
     # Custom php settings block. May override parameters previously defined.
     # Note: include correct php ini section, i.e. "[PHP]" or "[Date]".
     extraConfig: |
