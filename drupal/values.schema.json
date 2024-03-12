@@ -324,6 +324,7 @@
             "upload_max_filesize": { "type": "string" },
             "post_max_size": { "type": "string" },
             "memory_limit": { "type": "string" },
+            "max_execution_time": { "type": "integer" },
             "extraConfig": { "type": "string" }
           }
         },
