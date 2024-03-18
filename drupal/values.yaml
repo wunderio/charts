@@ -482,9 +482,8 @@ gdprDump:
           parameters:
             key: 'processed_data.mail'
         name:
-          converter: 'faker'
-          parameters:
-            formatter: 'name'
+          converter: 'randomizeText'
+          unique: true
         pass:
           converter: 'randomizeText'
     commerce_order:
