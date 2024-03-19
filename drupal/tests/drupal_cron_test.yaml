@@ -119,19 +119,43 @@ tests:
           limits:
             cpu: 234m
             memory: 2G
+
+  - it: uses default resource requests and limits overriden by cronJobDefaults resources
+    template: drupal-cron.yaml
+    set:
+      php:
+        # Unset cron-specific resources.
+        cron:
+          drupal:
+            resources: null
+        resources:
+          requests:
+            cpu: 111m
+            memory: 1G
+          limits:
+            cpu: 222m
+            memory: 2G
+        cronJobDefaults:
+          resources:
+            requests:
+              cpu: 333m
+              memory: 3G
+            limits:
+              cpu: 444m
+              memory: 4G
     asserts:
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu
-          value: 123m
+          value: 333m
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.memory
-          value: 1G
+          value: 3G
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.cpu
-          value: 234m
+          value: 444m
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.memory
-          value: 2G
+          value: 4G
 
   - it: takes custom resource requests and limits
     template: drupal-cron.yaml
