@@ -261,6 +261,16 @@ php:
     status_page:
       enabled: true
 
+  cronJobDefaults:
+    # resources:
+    #   requests:
+    #     cpu: 500m
+    #     memory: 488Mi
+    #   limits:
+    #     memory: 488Mi
+    # nodeSelector:
+    #   cloud.google.com/gke-nodepool: static-ip
+
   # Cron tasks, each of which will be run into a dedicated temporary pod.
   cron:
     drupal:

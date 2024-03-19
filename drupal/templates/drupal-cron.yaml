@@ -112,25 +112,48 @@ spec:
                 exit "$exit_code"
 
             resources:
-              {{ if $job.resources }}
-              {{- $job.resources | toYaml | nindent 14 }}
-              {{ else }}
+              {{- if $job.resources }}
+              {{- if ($.Values.php.cronJobDefaults).resources }}
+              {{- merge $job.resources (merge $.Values.php.cronJobDefaults.resources $.Values.php.resources) | toYaml | nindent 14 }}
+              {{- else }}
+              {{- merge $job.resources $.Values.php.resources | toYaml | nindent 14 }}
+              {{- end }}
+              {{- else }}
+              {{- if ($.Values.php.cronJobDefaults).resources }}
+              {{- merge $.Values.php.cronJobDefaults.resources $.Values.php.resources | toYaml | nindent 14 }}
+              {{- else }}
               {{- $.Values.php.resources | toYaml | nindent 14 }}
+              {{- end }}
               {{- end }}
           restartPolicy: Never
           nodeSelector:
-            {{ if $job.nodeSelector }}
-            {{- $job.nodeSelector | toYaml | nindent 12 }}
-            {{ else }}
+            {{- if $job.nodeSelector }}
+            {{- if ($.Values.php.cronJobDefaults).nodeSelector }}
+            {{- merge $job.nodeSelector (merge $.Values.php.cronJobDefaults.nodeSelector $.Values.php.nodeSelector) | toYaml | nindent 12 }}
+            {{- else }}
+            {{- merge $job.nodeSelector $.Values.php.nodeSelector | toYaml | nindent 12 }}
+            {{- end }}
+            {{- else }}
+            {{- if ($.Values.php.cronJobDefaults).nodeSelector }}
+            {{- merge $.Values.php.cronJobDefaults.nodeSelector $.Values.php.nodeSelector | toYaml | nindent 12 }}
+            {{- else }}
             {{- $.Values.php.nodeSelector | toYaml | nindent 12 }}
             {{- end }}
+            {{- end }}
           tolerations:
-            {{ if $job.nodeSelector }}
-            {{- include "drupal.tolerations" $job.nodeSelector | nindent 12 }}
-            {{ else }}
+            {{- if $job.nodeSelector }}
+            {{- if ($.Values.php.cronJobDefaults).nodeSelector }}
+            {{- include "drupal.tolerations" (merge $job.nodeSelector (merge $.Values.php.cronJobDefaults.nodeSelector $.Values.php.nodeSelector)) | nindent 12 }}
+            {{- else }}
+            {{- include "drupal.tolerations" (merge $job.nodeSelector $.Values.php.nodeSelector) | nindent 12 }}
+            {{- end }}
+            {{- else }}
+            {{- if ($.Values.php.cronJobDefaults).nodeSelector }}
+            {{- include "drupal.tolerations" (merge $.Values.php.cronJobDefaults.nodeSelector $.Values.php.nodeSelector) | nindent 12 }}
+            {{- else }}
             {{- include "drupal.tolerations" $.Values.php.nodeSelector | nindent 12 }}
             {{- end }}
-
+            {{- end }}
           volumes:
             {{- include "drupal.volumes" $ | nindent 12 }}
 
