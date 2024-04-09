@@ -12,13 +12,13 @@ dependencies:
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 6.17.5
 - name: mongodb
-  repository: https://storage.googleapis.com/charts.wdr.io
-  version: 10.26.4
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 14.12.3
 - name: postgresql
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 13.2.24
 - name: silta-release
   repository: file://../silta-release
   version: 1.0.0
-digest: sha256:95eb80d5b21e1fb9cf5c0bf1b917801d027df824b84fcb6cd4d377fcb6a542b4
-generated: "2023-12-13T16:17:41.789630834+02:00"
+digest: sha256:ce1f9c915208446fda93af256bf502b3cd71d978ae2806c0e988c5d2a8b02ca6
+generated: "2024-03-05T15:38:09.328520813+02:00"

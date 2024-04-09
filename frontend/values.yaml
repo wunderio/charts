@@ -477,12 +477,17 @@ elasticsearch:
           - static-ip
 
 # These settings are not optimized. To see which overrides are available see:
-# https://github.com/bitnami/charts/blob/master/bitnami/mongodb/values.yaml
+# https://github.com/bitnami/charts/blob/43306df9f67a6c38743cac362676317aa7a8318e/bitnami/mongodb/values.yaml
 mongodb:
   enabled: false
   image:
-    tag: 5.0.3
-
+    tag: 6.0
+  initdbScripts:
+    setFeatureCompatibilityVersion.js: |
+      db.adminCommand({ setFeatureCompatibilityVersion: "6.0" });
+  updateStrategy:
+    type: Recreate
+  enableServiceLinks: false
   # Use a low default to prevent unnecessary storage use.
   persistence:
     size: 1Gi

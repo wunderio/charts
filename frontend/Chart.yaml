@@ -21,8 +21,8 @@ dependencies:
   repository: https://storage.googleapis.com/charts.wdr.io
   condition: rabbitmq.enabled
 - name: mongodb
-  version: 10.26.x
-  repository: https://storage.googleapis.com/charts.wdr.io
+  version: 14.12.x
+  repository: oci://registry-1.docker.io/bitnamicharts
   condition: mongodb.enabled
 - name: postgresql
   version: 13.2.x
