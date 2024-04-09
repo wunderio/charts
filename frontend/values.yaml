@@ -481,10 +481,12 @@ elasticsearch:
 mongodb:
   enabled: false
   image:
-    tag: 6.0
+    tag: "6.0"
   initdbScripts:
     setFeatureCompatibilityVersion.js: |
       db.adminCommand({ setFeatureCompatibilityVersion: "6.0" });
+  auth:
+    enabled: false
   updateStrategy:
     type: Recreate
   enableServiceLinks: false
