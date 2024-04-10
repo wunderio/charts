@@ -185,7 +185,7 @@ nginx-traefik:
       externalTrafficPolicy: Local
     ingressClass: traefik
     ingressClassResource:
-      default: false
+      default: true
       name: traefik
     watchIngressWithoutClass: false
     autoscaling:
