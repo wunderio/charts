@@ -64,7 +64,7 @@ ingress:
     redirect-https: true
     extraAnnotations:
       traefik.ingress.kubernetes.io/rate-limit: |
-        extractorfunc: request.host
+        extractorfunc: client.ip
         rateset:
           default:
             period: 5s
