@@ -252,6 +252,12 @@ nginx-traefik:
       limits:
         cpu: 1
         memory: 1Gi
+    metrics:
+      enabled: false
+      service:
+        annotations:
+          prometheus.io/scrape: "true"
+          prometheus.io/port: "10254"
   # Splash page
   defaultBackend:
     enabled: true
