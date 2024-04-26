@@ -227,6 +227,10 @@ nginx-traefik:
       # Tackles https://github.com/kubernetes/ingress-nginx/issues/5030
       variables-hash-bucket-size: "256"
       variables-hash-max-size: "2048"
+      # Different error codes to distinguish rate limit states
+      limit-req-status-code: 420
+      limit-conn-status-code:  529
+      global-rate-limit-status-code: 429
       # ModSecurity https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#enable-modsecurity
       # Off by default, enable using ingress annotations
       enable-modsecurity: false
