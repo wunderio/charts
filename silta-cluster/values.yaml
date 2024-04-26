@@ -194,6 +194,11 @@ nginx-traefik:
       maxReplicas: 10
       targetCPUUtilizationPercentage: 80
       targetMemoryUtilizationPercentage: 80
+    # https://github.com/kubernetes/ingress-nginx/issues/6928
+    minReadySeconds: 10
+    # https://github.com/kubernetes/ingress-nginx/issues/6928
+    extraArgs:
+      shutdown-grace-period: 30
     config:
       # Optional CDN configuration
       use-proxy-protocol: false
