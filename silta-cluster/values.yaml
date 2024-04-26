@@ -222,6 +222,11 @@ nginx-traefik:
       client-header-timeout: 120
       client-body-timeout: 120
       proxy-read-timeout: 120
+      # Tackles https://github.com/kubernetes/ingress-nginx/issues/8488
+      lua-shared-dicts: "certificate_data: 100"
+      # Tackles https://github.com/kubernetes/ingress-nginx/issues/5030
+      variables-hash-bucket-size: "256"
+      variables-hash-max-size: "2048"
       # ModSecurity https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#enable-modsecurity
       # Off by default, enable using ingress annotations
       enable-modsecurity: false
