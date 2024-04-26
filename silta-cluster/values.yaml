@@ -216,6 +216,12 @@ nginx-traefik:
       use-geoip: false
       use-gzip: false
       gzip-level: 1
+      # default is too low (1m)
+      proxy-body-size: 0
+      # Extends client timeouts
+      client-header-timeout: 120
+      client-body-timeout: 120
+      proxy-read-timeout: 120
       # ModSecurity https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#enable-modsecurity
       # Off by default, enable using ingress annotations
       enable-modsecurity: false
