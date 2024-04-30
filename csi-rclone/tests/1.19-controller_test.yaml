@@ -34,3 +34,19 @@ tests:
       - equal:
           path: spec.template.spec.containers[1].resources.requests.cpu
           value: 789m
+
+  - it: can set service account annotations (1.19)
+    template: 1.19-csi-controller-rbac.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 19
+    set:
+      controller:
+        serviceAccount:
+          annotations:
+            hello: world
+    asserts:
+      - equal:
+          path: metadata.annotations
+          value:
+            hello: world

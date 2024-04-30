@@ -34,3 +34,19 @@ tests:
       - equal:
           path: spec.template.spec.containers[1].resources.requests.cpu
           value: 456m
+
+  - it: can set service account annotations (1.13)
+    template: 1.13-csi-nodeplugin-rbac.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 18
+    set:
+      nodePlugin:
+        serviceAccount:
+          annotations:
+            hello: world
+    asserts:
+      - equal:
+          path: metadata.annotations
+          value:
+            hello: world
