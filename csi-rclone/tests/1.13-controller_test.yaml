@@ -44,6 +44,7 @@ tests:
 
   - it: can set service account annotations (1.13)
     template: 1.13-csi-nodeplugin-rbac.yaml
+    documentIndex: 0
     capabilities:
       majorVersion: 1
       minorVersion: 18
