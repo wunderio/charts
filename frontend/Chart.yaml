@@ -32,3 +32,7 @@ dependencies:
 - name: silta-release
   version: ^1.x
   repository: file://../silta-release
+- name: redis
+  version: 19.1.5
+  repository: oci://registry-1.docker.io/bitnamicharts
+  condition: redis.enabled

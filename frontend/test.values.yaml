@@ -38,6 +38,12 @@ mongodb:
 rabbitmq:
   enabled: true
 
+redis:
+  enabled: true
+  auth:
+    password: "foo"
+
+
 mounts:
   files:
     enabled: true

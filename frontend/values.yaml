@@ -70,10 +70,10 @@ ingress:
             period: 5s
             average: 150
             burst: 200
-      nginx.ingress.kubernetes.io/limit-rps: "32"
+      nginx.ingress.kubernetes.io/limit-rps: "60"
       nginx.ingress.kubernetes.io/limit-rpm: "300"
-      nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
-      nginx.ingress.kubernetes.io/limit-connections: "20"
+      nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+      nginx.ingress.kubernetes.io/limit-connections: "100"
   gce:
     type: gce
     # The name of the reserved static IP address.
@@ -545,3 +545,25 @@ mailhog:
     requests:
       cpu: 1m
       memory: 10M
+
+# Redis
+# https://github.com/bitnami/charts/blob/master/bitnami/redis/values.yaml
+redis:
+  enabled: false
+  architecture: standalone
+  auth:
+    # mandatory value
+    password: ""
+  replica:
+    # replicaCount: 1
+    autoscaling:
+      enabled: false
+  master:
+    resources:
+      limits:
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 256Mi
+
