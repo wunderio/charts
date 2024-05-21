@@ -5,6 +5,10 @@ kind: ServiceAccount
 metadata:
   name: csi-nodeplugin-rclone
   namespace: {{ .Release.Namespace }}
+{{- with .Values.nodePlugin.serviceAccount.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
