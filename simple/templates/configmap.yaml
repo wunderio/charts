@@ -99,7 +99,7 @@ data:
             "~{{ template "simple.domain" $ }}$" "noindex, nofollow, nosnippet, noarchive";
             default  '';
         }
-        add_header                  X-Robots-Tag $x_robots_tag_header;
+        add_header                  X-Robots-Tag $x_robots_tag_header always;
 
         map $uri $no_slash_uri {
             ~^/(?<no_slash>.*)$ $no_slash;

@@ -31,10 +31,10 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 3
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      targetAverageUtilization: 80
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 80
 
 # Domain names that will be mapped to this deployment.
 # Example of exposing 2 additional domains for this deployment, each with its own certificate.
@@ -81,16 +81,16 @@ ingress:
     redirect-https: true
     extraAnnotations:
       traefik.ingress.kubernetes.io/rate-limit: |
-        extractorfunc: request.host
+        extractorfunc: client.ip
         rateset:
           default:
             period: 5s
             average: 150
             burst: 200
-      nginx.ingress.kubernetes.io/limit-rps: "32"
+      nginx.ingress.kubernetes.io/limit-rps: "60"
       nginx.ingress.kubernetes.io/limit-rpm: "300"
-      nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
-      nginx.ingress.kubernetes.io/limit-connections: "20"
+      nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+      nginx.ingress.kubernetes.io/limit-connections: "60"
   gce:
     type: gce
     # The name of the reserved static IP address.
