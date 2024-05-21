@@ -185,7 +185,7 @@ nginx-traefik:
       externalTrafficPolicy: Local
     ingressClass: traefik
     ingressClassResource:
-      default: false
+      default: true
       name: traefik
     watchIngressWithoutClass: false
     autoscaling:
@@ -194,6 +194,11 @@ nginx-traefik:
       maxReplicas: 10
       targetCPUUtilizationPercentage: 80
       targetMemoryUtilizationPercentage: 80
+    # https://github.com/kubernetes/ingress-nginx/issues/6928
+    minReadySeconds: 10
+    # https://github.com/kubernetes/ingress-nginx/issues/6928
+    extraArgs:
+      shutdown-grace-period: 30
     config:
       # Optional CDN configuration
       use-proxy-protocol: false
@@ -211,6 +216,21 @@ nginx-traefik:
       use-geoip: false
       use-gzip: false
       gzip-level: 1
+      # default is too low (1m)
+      proxy-body-size: 0
+      # Extends client timeouts
+      client-header-timeout: 120
+      client-body-timeout: 120
+      proxy-read-timeout: 120
+      # Tackles https://github.com/kubernetes/ingress-nginx/issues/8488
+      lua-shared-dicts: "certificate_data: 100"
+      # Tackles https://github.com/kubernetes/ingress-nginx/issues/5030
+      variables-hash-bucket-size: "256"
+      variables-hash-max-size: "2048"
+      # Different error codes to distinguish rate limit states
+      limit-req-status-code: 420
+      limit-conn-status-code:  529
+      global-rate-limit-status-code: 429
       # ModSecurity https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#enable-modsecurity
       # Off by default, enable using ingress annotations
       enable-modsecurity: false
@@ -232,6 +252,12 @@ nginx-traefik:
       limits:
         cpu: 1
         memory: 1Gi
+    metrics:
+      enabled: false
+      service:
+        annotations:
+          prometheus.io/scrape: "true"
+          prometheus.io/port: "10254"
   # Splash page
   defaultBackend:
     enabled: true
