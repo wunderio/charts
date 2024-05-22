@@ -196,7 +196,7 @@ data:
         {{- end }}
         default  '';
       }
-      add_header                  X-Robots-Tag $x_robots_tag_header;
+      add_header X-Robots-Tag $x_robots_tag_header always;
 
       map $uri $no_slash_uri {
         ~^/(?<no_slash>.*)$ $no_slash;
@@ -519,6 +519,7 @@ data:
           add_header Last-Modified "Wed, 20 Jan 1988 04:20:42 GMT";
           add_header Access-Control-Allow-Origin *;
           add_header X-Header "AdvAgg Generator 2.0 CDN";
+          add_header X-Robots-Tag $x_robots_tag_header always;
           try_files $uri @drupal;
         }
 
@@ -545,6 +546,7 @@ data:
           tcp_nodelay     off;
           expires         365d;
           add_header Cache-Control "public";
+          add_header X-Robots-Tag $x_robots_tag_header always;
           ## Set the OS file cache.
           {{- if .Values.nginx.open_file_cache.enabled }}
           open_file_cache max={{ .Values.nginx.open_file_cache.max }} inactive={{ .Values.nginx.open_file_cache.inactive }};
@@ -571,6 +573,7 @@ data:
           # Set cache rules for webfonts.
           expires 365d;
           add_header Cache-Control "public";
+          add_header X-Robots-Tag $x_robots_tag_header always;
           ## Set the OS file cache.
           {{- if .Values.nginx.open_file_cache.enabled }}
           open_file_cache max={{ .Values.nginx.open_file_cache.max }} inactive={{ .Values.nginx.open_file_cache.inactive }};
@@ -604,6 +607,7 @@ data:
 
         location = /robots.txt {
           add_header  Content-Type  text/plain;
+          add_header X-Robots-Tag $x_robots_tag_header always;
           access_log  off;
           try_files $uri @drupal;
           {{- if .Values.signalsciences.enabled }}

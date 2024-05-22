@@ -94,7 +94,7 @@ data:
           {{- end }}
           default  '';
       }
-      add_header                  X-Robots-Tag $x_robots_tag_header;
+      add_header X-Robots-Tag $x_robots_tag_header always;
 
       map $uri $no_slash_uri {
           ~^/(?<no_slash>.*)$ $no_slash;
@@ -207,6 +207,8 @@ data:
       {{- range $index, $service := .Values.services }}
       {{- if $service.exposedRoute }}
       location {{ $service.exposedRoute }} {
+
+        add_header X-Robots-Tag $x_robots_tag_header always;
 
         {{- if $.Values.nginx.extra_conditions }}
         {{- $.Values.nginx.extra_conditions | nindent 8 }}

@@ -50,6 +50,10 @@ spec:
           - name: shell-keys
             mountPath: /etc/ssh/keys
           {{- end }}
+        {{- if $service.lifecycle }}
+        lifecycle:
+        {{- toYaml $service.lifecycle | nindent 10 }}
+        {{- end }}
         livenessProbe:
         {{- if $service.livenessProbe }}
         {{- toYaml $service.livenessProbe | nindent 10 }}
