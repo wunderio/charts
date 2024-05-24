@@ -48,6 +48,7 @@ ingress-nginx:
       use-geoip: false
       use-gzip: false
       gzip-level: 1
+      proxy-buffer-size: 8k
       # ModSecurity https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#enable-modsecurity
       # Off by default, enable using ingress annotations
       enable-modsecurity: false
@@ -216,6 +217,7 @@ nginx-traefik:
       use-geoip: false
       use-gzip: false
       gzip-level: 1
+      proxy-buffer-size: 8k
       # default is too low (1m)
       proxy-body-size: 0
       # Extends client timeouts
