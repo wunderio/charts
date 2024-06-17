@@ -3,10 +3,15 @@ version: 2.1
 orbs:
   silta: silta/silta@1
 
+executors:
+  cicd82:
+    docker:
+      - image: wunderio/silta-cicd:circleci-php8.2-node20-composer2-helm-unittest-upgrade-test20240614
+
 jobs:
 
   build:
-    executor: silta/silta
+    executor: cicd82
     resource_class: small
 
     steps:
@@ -52,7 +57,7 @@ jobs:
               
               helm dependency build $CHART
               helm lint $CHART
-              helm unittest $CHART --helm3
+              helm unittest $CHART
               if [ -f "$CHART/test.values.yaml" ]; then
                 helm install --dry-run --generate-name --values "$CHART/test.values.yaml" $CHART
               fi
@@ -67,7 +72,7 @@ jobs:
             - /tmp/charts
 
   deploy:
-    executor: silta/silta
+    executor: cicd82
     resource_class: small
 
     steps:
