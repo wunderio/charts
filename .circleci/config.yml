@@ -3,15 +3,10 @@ version: 2.1
 orbs:
   silta: silta/silta@1
 
-executors:
-  cicd82:
-    docker:
-      - image: wunderio/silta-cicd:circleci-php8.2-node20-composer2-helm-unittest-upgrade-test20240614
-
 jobs:
 
   build:
-    executor: cicd82
+    executor: silta/silta
     resource_class: small
 
     steps:
@@ -72,7 +67,7 @@ jobs:
             - /tmp/charts
 
   deploy:
-    executor: cicd82
+    executor: silta/silta
     resource_class: small
 
     steps:
