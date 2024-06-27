@@ -121,7 +121,7 @@ kubectl label namespace silta-cluster name=silta-cluster
 ```
 
 ## Compatibility
-
+- More recent versions are tested frequently, see versions and test results in [github actions page](https://github.com/wunderio/charts/actions/workflows/pull-request.yml?query=branch%3Amaster).
 - Kubernetes 1.24 requires at least 0.2.32
 - Kubernetes 1.23 requires at least 0.2.32
 - Kubernetes 1.22 requires at least 0.2.30
@@ -133,7 +133,9 @@ kubectl label namespace silta-cluster name=silta-cluster
 Chart upgrades are managed like a normal helm release, though it's suggested to do helm diff first:
 
 ```
-helm diff upgrade silta-cluster silta-cluster --namespace silta-cluster \
+helm diff upgrade silta-cluster silta-cluster \
+    --repo "https://storage.googleapis.com/charts.wdr.io" \
+    --namespace silta-cluster \
     --values local-values.yaml
     
 helm upgrade --install --wait silta-cluster silta-cluster \
@@ -158,11 +160,11 @@ helm upgrade --install --wait silta-cluster silta-cluster \
 
 #### Ingress controller
 
-Silta cluster uses traefik (1) ingress controller by default but it supports running other controllers too. More about compatible ingress controllers can be found in [ingress controller](docs/ingress-controller.md) documentation page.
+Silta cluster uses traefik (1) ingress controller by default but it supports running other controllers too. More about compatible ingress controllers can be found in [ingress controller](docs/ingress-controller.md) documentation page. Traefik is still kept for non-breaking updates, but it's highly suggested to use nginx load balancer instead. If it's impossible to migrate to nginx, look into `nginx-traefik` section of [chart values file](https://github.com/wunderio/charts/blob/master/silta-cluster/values.yaml).
 
 #### SSH Jumphost
 
-SSH Jumphost authentication is based on [sshd-gitAuth](https://github.com/wunderio/sshd-gitauth) project that will authorize users based on their SSH private key. The key whitelist is built by listing all users that belong to a certain github organisation.
+SSH Jumphost authentication is based on [sshd-gitAuth](https://github.com/wunderio/sshd-gitauth) project that will authorize users based on their SSH private key. The key whitelist is built by listing all users that belong to a certain github organisation and allowing acccess to projects when user has at least `push` permission to the repository.
 
 You need to supply Github API Personal access token that will be used to get the list of organisation users. The access can be read only, following permissions are sufficient for the task: `public_repo, read:org, read:public_key, repo:status`.
 
@@ -181,8 +183,8 @@ How it works:
     
 - When someone hits the placeholder
   - Get Ingress matching current hostname
-  - Show message to user with option to re-enable
-  - When upscale is ready, redirect user
+  - Show message to user with option to upscale the deployment
+  - When resources are scaled to original values and in ready state, page is reloaded.
 
 #### Rclone storage
 
