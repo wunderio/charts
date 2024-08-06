@@ -52,7 +52,7 @@ jobs:
               
               helm dependency build $CHART
               helm lint $CHART
-              helm unittest $CHART --helm3
+              helm unittest $CHART
               if [ -f "$CHART/test.values.yaml" ]; then
                 helm install --dry-run --generate-name --values "$CHART/test.values.yaml" $CHART
               fi
