@@ -378,8 +378,8 @@ silta-downscaler:
   # How long should releases with matching names be kept. The last matching rule takes effect.
   releaseMinAge:
     "^production": 10y
-    "^(master|main|stage|staging)": 4w
-    "^(dev|develop|development)": 2w 
+    "^(master|main|stage|staging)": 8w
+    "^(dev|develop|development)": 4w 
     "^dependabot": 1h
   resources:
     requests:
