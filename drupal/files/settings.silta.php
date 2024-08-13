@@ -93,6 +93,15 @@ if (getenv('VARNISH_ADMIN_HOST')) {
 }
 
 /**
+ * Override clamav config when clamav environment variables are defined.
+ */
+if (getenv('CLAMAV_HOST')) {
+  $config['clamav.settings']['scan_mode'] = 0;
+  $config['clamav.settings']['mode_daemon_tcpip']['hostname'] = getenv('CLAMAV_HOST');
+  $config['clamav.settings']['mode_daemon_tcpip']['port'] = getenv('CLAMAV_PORT');
+}
+
+/**
  * Use our own services override.
  *
  * Add monolog config

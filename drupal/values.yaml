@@ -768,6 +768,20 @@ solr:
       accessModes:
         - ReadWriteOnce
 
+# ClamAV daemon for virus scanning.
+clamav:
+  enabled: false
+  # Available image tags: https://hub.docker.com/r/clamav/clamav/
+  image: clamav/clamav
+  imageTag: stable
+  freshclamExtraConfig: ""
+  resources:
+    requests:
+      cpu: 1
+      memory: 2Gi
+    limits:
+      cpu: 1500m
+      memory: 3Gi
 db:
   # Available options: mariadb, pxc-db
   primary: mariadb

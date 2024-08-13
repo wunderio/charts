@@ -256,6 +256,12 @@ imagePullSecrets:
 - name: SOLR_HOST
   value: {{ .Release.Name }}-solr
 {{- end }}
+{{- if .Values.clamav.enabled }}
+- name: CLAMAV_HOST
+  value: {{ .Release.Name }}-clamav
+- name: CLAMAV_PORT
+  value: "3310"
+{{- end }}
 # Environment overrides via values file
 {{- range $key, $val := .Values.php.env }}
 - name: {{ $key }}
@@ -285,9 +291,9 @@ imagePullSecrets:
 - name: HTTPS_PROXY
   value: "{{ $proxy.url }}:{{ $proxy.port }}"
 - name: no_proxy
-  value: 127.0.0.1,localhost,.svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-redis,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: 127.0.0.1,localhost,.svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-redis,{{ .Release.Name }}-es,{{ .Release.Name }}-clamav,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 - name: NO_PROXY
-  value: 127.0.0.1,localhost,.svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-redis,{{ .Release.Name }}-es,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
+  value: 127.0.0.1,localhost,.svc.cluster.local,{{ .Release.Name }}-memcached,{{ .Release.Name }}-redis,{{ .Release.Name }}-es,{{ .Release.Name }}-clamav,{{ .Release.Name }}-varnish,{{ .Release.Name }}-solr{{ if $proxy.no_proxy }},{{$proxy.no_proxy}}{{ end }}
 {{- end }}
 {{- end }}
 

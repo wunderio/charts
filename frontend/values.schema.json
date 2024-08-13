@@ -258,6 +258,14 @@
               "command": { "type": "string" }
             }
           },
+          "nginx": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "denyDotFiles": { "type": "boolean" },
+              "locationExtraConfig": { "type": "string" }
+            }
+          },
           "cron": {
             "type": "object",
             "additionalProperties": {
@@ -311,6 +319,13 @@
       "additionalProperties": false,
       "properties": {
         "port": { "type": "integer" },
+        "nginx": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "denyDotFiles": { "type": "boolean" }
+          }
+        },
         "resources": {
           "type": "object",
           "additionalProperties": false,
