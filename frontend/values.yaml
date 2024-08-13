@@ -264,6 +264,12 @@ services: {}
   #   nodeSelector:
   #     cloud.google.com/gke-nodepool: static-ip
 
+  #  nginx:
+  #    denyDotFiles: true
+  #    locationExtraConfig: |
+  #      # Extra nginx configuration snippet for this service location block.
+
+
 # Configure the dynamically mounted volumes
 mounts: {}
 #  files:
@@ -320,6 +326,9 @@ backup:
 # Note that only keys used here can be overridden.
 serviceDefaults:
   port: 3000
+  nginx:
+    # Deny access to .dotfiles by default.
+    denyDotFiles: true
   resources:
     requests:
       cpu: 2m

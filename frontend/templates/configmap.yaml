@@ -95,7 +95,7 @@ data:
           default  '';
       }
       add_header X-Robots-Tag $x_robots_tag_header always;
-
+      
       map $uri $no_slash_uri {
           ~^/(?<no_slash>.*)$ $no_slash;
       }
@@ -219,6 +219,11 @@ data:
         {{- tpl $.Values.nginx.locationExtraConfig $ | nindent 8 }}
         {{- end }}
 
+        # Service specific configuration
+        {{- if ($service.nginx).locationExtraConfig }}
+        {{- tpl $service.nginx.locationExtraConfig $ | nindent 8 }}
+        {{- end }}
+
         {{- include "frontend.basicauth" $ | trim | nindent 8 }}
 
         location = {{ $service.exposedRoute }}/robots.txt {
@@ -237,9 +242,10 @@ data:
         location = {{ $service.exposedRoute }}/apple-touch-icon.png { access_log off; log_not_found off; }
         location = {{ $service.exposedRoute }}/apple-touch-icon-precomposed.png { access_log off; log_not_found off; }
 
-        ## Rather than just denying .ht* in the config, why not deny
-        ## access to all .invisible files
+        {{- if (mergeOverwrite (deepCopy $.Values.serviceDefaults.nginx) ($service.nginx)).denyDotFiles }}
+        ## Deny access to all .invisible files and turn off logging
         location ~ /\. { return 404; access_log off; log_not_found off; }
+        {{- end }}
 
         # Pass the request on to frontend.
         proxy_pass http://{{ $.Release.Name }}-{{ $index }}:{{ default $.Values.serviceDefaults.port $service.port }}{{ $service.exposedRoute }};
