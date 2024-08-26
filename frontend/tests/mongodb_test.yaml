@@ -1,28 +1,28 @@
 suite: MongoDB
 templates:
-  - services-deployment.yaml
+  - configmap.yaml
   - services-cron.yaml
+  - services-deployment.yaml
 tests:
-  # FIXME: This test fails because bitnami's common subchart uses multiline helm/sprig snippet that does not work with current unittest version. 
-  # - it: gets exposed when enabled
-  #   template: services-deployment.yaml
-  #   set:
-  #     services.foo:
-  #       image: 'bar'
-  #       cron:
-  #         foo:
-  #           command: echo "Hello world"
-  #           schedule: '1 2 3 * *'
-  #     mongodb.enabled: true
-  #   asserts:
-  #     - contains:
-  #         path: spec.template.spec.containers[0].env
-  #         content:
-  #           name: MONGODB_HOST
-  #           value: RELEASE-NAME-mongodb
-  #     - template: services-cron.yaml
-  #       contains:
-  #         path: spec.jobTemplate.spec.template.spec.containers[0].env
-  #         content:
-  #           name: MONGODB_HOST
-  #           value: RELEASE-NAME-mongodb
+  - it: gets exposed when enabled
+    template: services-deployment.yaml
+    set:
+      services.foo:
+        image: 'bar'
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+      mongodb.enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: MONGODB_HOST
+            value: RELEASE-NAME-mongodb
+      - template: services-cron.yaml
+        contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: MONGODB_HOST
+            value: RELEASE-NAME-mongodb

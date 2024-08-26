@@ -17,7 +17,7 @@ tests:
         - networking.k8s.io/v1beta1
     asserts:
       - equal:
-          path: 'metadata.annotations.kubernetes\.io/ingress\.class'
+          path: metadata.annotations['kubernetes.io/ingress.class']
           value: 'traefik'
 
   - it: uses traefik ingress class (1.18+)
@@ -36,18 +36,18 @@ tests:
     template: ingress.yaml
     set:
       environmentName: 'foo'
-      projectName: 'bar' 
-      clusterDomain: 'baz' 
+      projectName: 'bar'
+      clusterDomain: 'baz'
     asserts:
       - equal:
           path: spec.rules[0].host
           value: 'foo.bar.baz'
-  
+
   - it: sets correct hostname for deployment when projectName is absent
     template: ingress.yaml
     set:
       environmentName: 'foo'
-      clusterDomain: 'baz' 
+      clusterDomain: 'baz'
     asserts:
       - equal:
           path: spec.rules[0].host
@@ -78,7 +78,7 @@ tests:
       - equal:
           path: spec.rules[0].http.paths[0].backend.service.name
           value: 'RELEASE-NAME-nginx'
-  
+
   - it: uses correct ingress api version (1.17)
     template: ingress.yaml
     capabilities:
@@ -169,7 +169,7 @@ tests:
     asserts:
       - documentIndex: 1
         equal:
-          path: 'metadata.annotations.kubernetes\.io/ingress\.class'
+          path: metadata.annotations['kubernetes.io/ingress.class']
           value: 'foo'
 
   - it: exposeDomains - uses default ingress type and has correct hostname (1.18+)
@@ -191,7 +191,7 @@ tests:
         equal:
           path: 'spec.ingressClassName'
           value: 'foo'
-  
+
   - it: exposeDomains - has correct hostname
     template: ingress.yaml
     set:
@@ -203,6 +203,18 @@ tests:
         equal:
           path: spec.rules[0].host
           value: 'foo.bar'
+
+  - it: exposeDomains - ssl redirect is enabled by default
+    template: ingress.yaml
+    set:
+      exposeDomains:
+        foo:
+          hostname: foo.bar
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: metadata.annotations['ingress.kubernetes.io/ssl-redirect']
+          value: 'true'
 
   - it: exposeDomains - can disable ssl for a certain ingress
     template: ingress.yaml
@@ -218,12 +230,11 @@ tests:
     asserts:
       - documentIndex: 1
         equal:
-          path: 'metadata.annotations.traefik\.ingress\.kubernetes\.io\/frontend-entry-points'
+          path: metadata.annotations['traefik.ingress.kubernetes.io/frontend-entry-points']
           value: 'http'
       - documentIndex: 1
-        equal:
-          path: 'ingress\.kubernetes\.io\/ssl-redirect'
-          value: null
+        notExists:
+          path: ingress.kubernetes.io/ssl-redirect
 
   - it: exposeDomains - can disable ssl redirect
     template: ingress.yaml
@@ -237,11 +248,10 @@ tests:
           ingress: nossl
     asserts:
       - documentIndex: 1
-        equal:
-          path: 'metadata.annotations.ingress\.kubernetes\.io\/ssl-redirect'
-          value: null
+        notExists:
+          path: metadata.annotations['ingress.kubernetes.io/ssl-redirect']
 
-  - it: exposeDomains - multiple hostnames can use the same ingress 
+  - it: exposeDomains - multiple hostnames can use the same ingress
     template: ingress.yaml
     set:
       exposeDomains:
@@ -249,7 +259,7 @@ tests:
           hostname: foo.baz
         bar:
           hostname: bar.baz
-        
+
     asserts:
       - documentIndex: 1
         equal:
@@ -273,5 +283,5 @@ tests:
     asserts:
       - documentIndex: 1
         equal:
-          path: 'metadata.annotations.kubernetes\.io\/ingress\.global-static-ip-name'
+          path: metadata.annotations['kubernetes.io/ingress.global-static-ip-name']
           value: 'baz'
