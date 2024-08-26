@@ -1,10 +1,11 @@
 suite: drupal private files
 templates:
+  - drupal-configmap.yaml
+  - drupal-cron.yaml
   - drupal-deployment.yaml
+  - drupal-secret.yaml
   - drupal-volumes.yaml
   - post-release.yaml
-  - drupal-cron.yaml
-  - drupal-configmap.yaml
 capabilities:
   apiVersions:
     - pxc.percona.com/v1

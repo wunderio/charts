@@ -20,7 +20,7 @@ tests:
         - networking.k8s.io/v1beta1
     asserts:
       - equal:
-          path: 'metadata.annotations.kubernetes\.io/ingress\.class'
+          path: metadata.annotations['kubernetes.io/ingress.class']
           value: 'traefik'
 
   - it: uses traefik ingress class (1.18+)
@@ -39,18 +39,18 @@ tests:
     template: drupal-ingress.yaml
     set:
       environmentName: 'foo'
-      projectName: 'bar' 
-      clusterDomain: 'baz' 
+      projectName: 'bar'
+      clusterDomain: 'baz'
     asserts:
       - equal:
           path: spec.rules[0].host
           value: 'foo.bar.baz'
-  
+
   - it: sets correct hostname for deployment when projectName is absent
     template: drupal-ingress.yaml
     set:
       environmentName: 'foo'
-      clusterDomain: 'baz' 
+      clusterDomain: 'baz'
     asserts:
       - equal:
           path: spec.rules[0].host
@@ -81,7 +81,7 @@ tests:
       - equal:
           path: spec.rules[0].http.paths[0].backend.service.name
           value: 'RELEASE-NAME-drupal'
-  
+
   - it: directs traefik requests to varnish service when varnish is enabled (cm 0.8)
     template: drupal-ingress.yaml
     set:
@@ -206,7 +206,7 @@ tests:
     asserts:
       - documentIndex: 1
         equal:
-          path: 'metadata.annotations.kubernetes\.io/ingress\.class'
+          path: metadata.annotations['kubernetes.io/ingress.class']
           value: 'foo'
 
   - it: exposeDomains - uses default ingress type and has correct hostname (1.18+)
@@ -241,6 +241,18 @@ tests:
           path: spec.rules[0].host
           value: 'foo.bar'
 
+  - it: exposeDomains - ssl redirect is enabled by default
+    template: drupal-ingress.yaml
+    set:
+      exposeDomains:
+        foo:
+          hostname: foo.bar
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: metadata.annotations['ingress.kubernetes.io/ssl-redirect']
+          value: 'true'
+
   - it: exposeDomains - can disable ssl for a certain ingress
     template: drupal-ingress.yaml
     set:
@@ -255,12 +267,11 @@ tests:
     asserts:
       - documentIndex: 1
         equal:
-          path: 'metadata.annotations.traefik\.ingress\.kubernetes\.io\/frontend-entry-points'
+          path: metadata.annotations['traefik.ingress.kubernetes.io/frontend-entry-points']
           value: 'http'
       - documentIndex: 1
-        equal:
-          path: 'ingress\.kubernetes\.io\/ssl-redirect'
-          value: null
+        notExists:
+          path: metadata.annotations['ingress.kubernetes.io/ssl-redirect']
 
   - it: exposeDomains - can disable ssl redirect
     template: drupal-ingress.yaml
@@ -274,11 +285,10 @@ tests:
           ingress: nossl
     asserts:
       - documentIndex: 1
-        equal:
-          path: 'metadata.annotations.ingress\.kubernetes\.io\/ssl-redirect'
-          value: null
+        notExists:
+          path: metadata.annotations['ingress.kubernetes.io/ssl-redirect']
 
-  - it: exposeDomains - multiple hostnames can use the same ingress 
+  - it: exposeDomains - multiple hostnames can use the same ingress
     template: drupal-ingress.yaml
     set:
       exposeDomains:
@@ -286,7 +296,7 @@ tests:
           hostname: foo.baz
         bar:
           hostname: bar.baz
-        
+
     asserts:
       - documentIndex: 1
         equal:
@@ -310,7 +320,7 @@ tests:
     asserts:
       - documentIndex: 1
         equal:
-          path: 'metadata.annotations.kubernetes\.io\/ingress\.global-static-ip-name'
+          path: metadata.annotations['kubernetes.io/ingress.global-static-ip-name']
           value: 'baz'
 
   - it: exposeDomains - non-gce ingress path wildcard for kubernetes <1.19

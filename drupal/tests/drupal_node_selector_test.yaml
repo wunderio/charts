@@ -1,9 +1,11 @@
 suite: node selector test
 templates:
-  - drupal-deployment.yaml
-  - drupal-cron.yaml
-  - shell-deployment.yaml
   - drupal-configmap.yaml
+  - drupal-cron.yaml
+  - drupal-deployment.yaml
+  - drupal-secret.yaml
+  - shell-configmap.yaml
+  - shell-deployment.yaml
 capabilities:
   apiVersions:
     - pxc.percona.com/v1

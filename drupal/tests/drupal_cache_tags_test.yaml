@@ -1,7 +1,7 @@
 suite: drupal cache tag exposure
 templates:
-  - varnish-configmap-vcl.yaml
   - drupal-configmap.yaml
+  - varnish-configmap-vcl.yaml
 capabilities:
   apiVersions:
     - pxc.percona.com/v1
