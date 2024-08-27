@@ -1,7 +1,7 @@
 dependencies:
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
-  version: 4.10.0
+  version: 4.10.4
 - name: nginx-ingress
   repository: https://helm.nginx.com/stable
   version: 0.17.1
@@ -10,7 +10,7 @@ dependencies:
   version: 1.87.7
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
-  version: 4.10.0
+  version: 4.10.4
 - name: pxc-operator
   repository: https://percona.github.io/percona-helm-charts/
   version: 1.12.2
@@ -18,8 +18,8 @@ dependencies:
   repository: file://../forked/minio/minio-6.0.5
   version: 6.0.5
 - name: csi-rclone
-  repository: https://storage.googleapis.com/charts.wdr.io
-  version: 0.3.1
+  repository: file://../csi-rclone
+  version: 1.0.0
 - name: cert-manager
   repository: https://charts.jetstack.io/
   version: v0.10.1
@@ -28,7 +28,7 @@ dependencies:
   version: 1.0.0
 - name: instana-agent
   repository: https://agents.instana.io/helm
-  version: 1.2.71
+  version: 1.2.73
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
   version: 4.0.18
@@ -38,5 +38,5 @@ dependencies:
 - name: docker-registry
   repository: https://helm.twun.io
   version: 2.1.0
-digest: sha256:a5b82b04cb36e9c55428cb7c1b860c62abae5175c08d6b99a7a5934ea6f8e906
-generated: "2024-03-14T13:57:48.971718393+02:00"
+digest: sha256:c7ff69f37389d474c7449b4458c727c634e7529ce9fda4aed60c13fa9643b798
+generated: "2024-08-27T13:59:48.177657684+03:00"

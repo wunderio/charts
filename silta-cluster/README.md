@@ -146,6 +146,8 @@ helm upgrade --install --wait silta-cluster silta-cluster \
 
 ## Upgrade path for older versions:
 
+ - Upgrading silta-cluster chart to 1.8.0 ([docs/Upgrading-to-1.8.0.md](docs/Upgrading-to-1.8.0.md))
+
  - Upgrading silta-cluster chart to 0.2.43 ([docs/Upgrading-to-0.2.43.md](docs/Upgrading-to-0.2.43.md))
 
  - Upgrading silta-cluster chart to 0.2.36 ([docs/Upgrading-to-0.2.36.md](docs/Upgrading-to-0.2.36.md))

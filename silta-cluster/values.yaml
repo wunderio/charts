@@ -280,6 +280,7 @@ csi-rclone:
   defaultParams: false
   storageClass:
     name: "silta-shared"
+    pathPattern: "${.PVC.namespace}/${.PVC.annotations.storage.silta/storage-path}"
   # params:
   #   remote: "s3"
   #   remotePath: "projectname"
