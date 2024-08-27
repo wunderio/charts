@@ -1,4 +1,4 @@
-{{- if and ( eq .Capabilities.KubeVersion.Major "1") ( eq $.Capabilities.KubeVersion.Minor "19" ) }}
+{{- if and ( eq .Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "20" ) }}
 
 kind: StatefulSet
 apiVersion: apps/v1
@@ -22,19 +22,35 @@ spec:
       {{- end }}
       serviceAccountName: csi-controller-rclone
       containers:
-        - name: csi-attacher
-          image: k8s.gcr.io/sig-storage/csi-attacher:v3.4.0
+        - name: csi-provisioner
+          image: registry.k8s.io/sig-storage/csi-provisioner:v5.0.2
           args:
-            - "--v=5"
             - "--csi-address=$(ADDRESS)"
-            - "--leader-election"
+            - "--extra-create-metadata"
+            # - "--leader-election"
+            - "--v=1"
           env:
             - name: ADDRESS
-              value: /csi/csi.sock
+              value: /plugin/csi.sock
           imagePullPolicy: "Always"
           volumeMounts:
             - name: socket-dir
-              mountPath: /csi
+              mountPath: /plugin
+          resources:
+            {{- .Values.controller.provisioner.resources | toYaml | nindent 12 }}
+        - name: csi-attacher
+          image: k8s.gcr.io/sig-storage/csi-attacher:v3.4.0
+          args:
+            - "--csi-address=$(ADDRESS)"
+            # - "--leader-election"
+            - "--v=1"
+          env:
+            - name: ADDRESS
+              value: /plugin/csi.sock
+          imagePullPolicy: "Always"
+          volumeMounts:
+            - name: socket-dir
+              mountPath: /plugin
           resources:
             {{- .Values.controller.attacher.resources | toYaml | nindent 12 }}
         - name: rclone
@@ -43,6 +59,7 @@ spec:
             - "/bin/csi-rclone-plugin"
             - "--nodeid=$(NODE_ID)"
             - "--endpoint=$(CSI_ENDPOINT)"
+            - "--v=1"
           env:
             - name: NODE_ID
               valueFrom:

@@ -1,4 +1,4 @@
-{{- if and ( eq .Capabilities.KubeVersion.Major "1") ( eq $.Capabilities.KubeVersion.Minor "19" ) }}
+{{- if and ( eq .Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "20" ) }}
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
@@ -32,7 +32,7 @@ spec:
               exec:
                 command: ["/bin/sh", "-c", "rm -rf /registration/csi-rclone /registration/csi-rclone-reg.sock"]
           args:
-            - --v=5
+            - --v=1
             - --csi-address=/plugin/csi.sock
             - --kubelet-registration-path={{ .Values.nodePlugin.kubeletBasePath }}/plugins/csi-rclone/csi.sock
           env:
@@ -58,6 +58,7 @@ spec:
             - "/bin/csi-rclone-plugin"
             - "--nodeid=$(NODE_ID)"
             - "--endpoint=$(CSI_ENDPOINT)"
+            - "--v=1"
           env:
             - name: NODE_ID
               valueFrom:
@@ -69,7 +70,7 @@ spec:
           lifecycle:
             postStart:
               exec:
-                command: ["/bin/sh", "-c", "mount -t fuse.rclone | while read -r mount; do umount $(echo $mount | awk '{print $3}') ; done"]
+                command: ["/bin/sh", "-c", "mount -t fuse.rclone | while read -r mount; do umount $(echo $mount | awk '{print $3}') || true ; done"]
           volumeMounts:
             - name: plugin-dir
               mountPath: /plugin

@@ -1,4 +1,4 @@
-{{- if and ( eq .Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "19" ) }}
+{{- if and ( eq .Capabilities.KubeVersion.Major "1") ( eq $.Capabilities.KubeVersion.Minor "19" ) }}
 
 apiVersion: v1
 kind: ServiceAccount

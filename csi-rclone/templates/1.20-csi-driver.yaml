@@ -1,4 +1,4 @@
-{{- if and ( eq .Capabilities.KubeVersion.Major "1") ( eq $.Capabilities.KubeVersion.Minor "19" ) }}
+{{- if and ( eq .Capabilities.KubeVersion.Major "1") ( ge $.Capabilities.KubeVersion.Minor "20" ) }}
 # This should be deregistered once the controller stops
 apiVersion: storage.k8s.io/v1
 kind: CSIDriver
@@ -6,5 +6,5 @@ metadata:
   name: csi-rclone
 spec:
   attachRequired: true
-  podInfoOnMount: false
+  podInfoOnMount: true
 {{- end }}
