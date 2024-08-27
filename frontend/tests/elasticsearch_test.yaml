@@ -1,7 +1,7 @@
 suite: frontend elasticsearch
 templates:
-  - services-deployment.yaml
   - configmap.yaml
+  - services-deployment.yaml
 capabilities:
   apiVersions:
     - pxc.percona.com/v1

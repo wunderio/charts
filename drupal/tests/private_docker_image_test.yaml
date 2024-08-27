@@ -1,9 +1,10 @@
 suite: private docker image
 templates:
-  - drupal-deployment.yaml
-  - drupal-cron.yaml
-  - post-release.yaml
   - drupal-configmap.yaml
+  - drupal-cron.yaml
+  - drupal-deployment.yaml
+  - drupal-secret.yaml
+  - post-release.yaml
 capabilities:
   apiVersions:
     - pxc.percona.com/v1

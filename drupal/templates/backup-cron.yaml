@@ -61,8 +61,7 @@ spec:
             - containerPort: 3306
               name: mariadb
             resources:
-              requests:
-                {{- .Values.backup.resources | toYaml | nindent 14 }}
+              {{- .Values.backup.resources | toYaml | nindent 14 }}
           restartPolicy: Never
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}

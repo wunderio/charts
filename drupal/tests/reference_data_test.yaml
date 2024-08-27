@@ -1,10 +1,11 @@
 suite: reference data
 templates:
+  - drupal-configmap.yaml
+  - drupal-deployment.yaml
+  - drupal-secret.yaml
+  - drupal-volumes.yaml
   - post-release.yaml
   - reference-data-cron.yaml
-  - drupal-deployment.yaml
-  - drupal-volumes.yaml
-  - drupal-configmap.yaml
 capabilities:
   apiVersions:
     - pxc.percona.com/v1
@@ -38,7 +39,7 @@ tests:
           readOnly: true
 
   - it: is not mounted on the main deployment
-    template: post-release.yaml    
+    template: post-release.yaml
     asserts:
     - template: drupal-deployment.yaml
       notContains:
@@ -53,7 +54,7 @@ tests:
         content:
           name: "reference-data-volume"
           mountPath: "/app/reference-data"
-            
+
   - it: takes reference data information
     template: post-release.yaml
     set:
@@ -130,7 +131,7 @@ tests:
         content:
           name: "reference-data-volume"
           persistentVolumeClaim:
-            claimName: foo-reference-data  
+            claimName: foo-reference-data
     - notContains:
         path: spec.template.spec.containers[0].volumeMounts
         content:

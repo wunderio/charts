@@ -1,11 +1,11 @@
 # Create minikube test deployments on different kubernetes versions
-name: Silta chart tests 
+name: Silta chart tests
 
 on:
   # Run for pull requests, but there's an additional draft filter later on
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
-  
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Available minikube kubernetes version list: 
+        # Available minikube kubernetes version list:
         # "minikube config defaults kubernetes-version"
         # and https://kubernetes.io/releases/patch-releases/
         kubernetes-version: ["v1.22.17", "v1.23.17", "v1.24.17", "v1.25.16", "1.26.11", "1.27.8", "1.28.4", "latest"]
@@ -56,7 +56,7 @@ jobs:
             && helm repo add codecentric https://codecentric.github.io/helm-charts \
             && helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx \
             && helm repo add nginx-stable https://helm.nginx.com/stable \
-            && helm plugin install https://github.com/quintush/helm-unittest --version 0.2.4 \
+            && helm plugin install https://github.com/helm-unittest/helm-unittest --version 0.5.1 \
             && helm repo update
 
       - name: Download and start minikube
@@ -69,9 +69,9 @@ jobs:
             --kubernetes-version "${{ matrix.kubernetes-version }}" \
             --insecure-registry "${CLUSTER_DOCKER_REGISTRY}" \
             --cni auto \
-            --wait all 
+            --wait all
       # Could use "medyagh/setup-minikube" but it does not have a way to pass "--insecure-registry" flag
-      # https://github.com/medyagh/setup-minikube/pull/33  
+      # https://github.com/medyagh/setup-minikube/pull/33
       # - name: Start minikube 1.21.14
       #   with:
       #     # "stable" for the latest stable build, or "latest" for the latest development build
@@ -168,7 +168,7 @@ jobs:
           curl --resolve ${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} https://${CLUSTER_DOMAIN} -ILk --fail
           curl --resolve ${CLUSTER_DOMAIN}:80:${MINIKUBE_IP} --resolve ${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} http://${CLUSTER_DOMAIN} -IL --fail
 
-      - name: Build Drupal chart images, deploy and test 
+      - name: Build Drupal chart images, deploy and test
         run: |
 
           MINIKUBE_IP=$(minikube ip)
@@ -215,7 +215,7 @@ jobs:
           helm dependency build "./drupal"
 
           # Chart unit tests
-          helm unittest ./drupal --helm3
+          helm unittest ./drupal
 
           # Dry-run drupal chart with test values
           helm install --dry-run --generate-name ./drupal --values drupal/test.values.yaml
@@ -249,7 +249,7 @@ jobs:
               --retry 5 --retry-delay 5 \
               --fail 
 
-      - name: Build Frontend chart images, deploy and test 
+      - name: Build Frontend chart images, deploy and test
         run: |
 
           MINIKUBE_IP=$(minikube ip)
@@ -270,7 +270,7 @@ jobs:
           helm dependency build ./frontend
 
           # Chart unit tests
-          helm unittest ./frontend --helm3
+          helm unittest ./frontend
 
           # Dry-run drupal chart with test values
           helm install --dry-run --generate-name ./frontend --values frontend/test.values.yaml
@@ -319,7 +319,7 @@ jobs:
               --retry 5 --retry-delay 5 \
               --fail
 
-      - name: Build Simple chart images, deploy and test 
+      - name: Build Simple chart images, deploy and test
         run: |
 
           MINIKUBE_IP=$(minikube ip)
@@ -336,7 +336,7 @@ jobs:
           helm dependency build ./simple
 
           # Chart unit tests
-          helm unittest ./simple --helm3
+          helm unittest ./simple
 
           # Dry-run drupal chart with test values
           helm install --dry-run --generate-name ./simple --values simple/test.values.yaml

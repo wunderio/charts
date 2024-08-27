@@ -119,6 +119,19 @@ tests:
           limits:
             cpu: 234m
             memory: 2G
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu
+          value: 123m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.memory
+          value: 1G
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.cpu
+          value: 234m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.memory
+          value: 2G
 
   - it: uses default resource requests and limits overriden by cronJobDefaults resources
     template: drupal-cron.yaml

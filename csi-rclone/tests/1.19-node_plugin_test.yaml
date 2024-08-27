@@ -1,6 +1,6 @@
 suite: CSI Node Plugin
 templates:
-  - 1.13-csi-nodeplugin-rclone.yaml
+  - 1.19-csi-nodeplugin-rbac.yaml
   - 1.19-csi-nodeplugin-rclone.yaml
 tests:
   - it: is a daemon (1.19)

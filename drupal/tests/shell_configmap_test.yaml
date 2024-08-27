@@ -1,12 +1,14 @@
 suite: shell configmap
 templates:
+  - drupal-configmap.yaml
+  - drupal-secret.yaml
   - shell-configmap.yaml
   - shell-deployment.yaml
 capabilities:
   apiVersions:
     - pxc.percona.com/v1
 tests:
-  
+
   - it: Secret ConfigMap is created
     template: shell-configmap.yaml
     set:
@@ -17,7 +19,7 @@ tests:
       - equal:
           path: metadata.labels.app
           value: drupal
-  
+
   - it: Authorized keys addition is reflected into shell configmap
     template: shell-configmap.yaml
     set:
@@ -26,25 +28,25 @@ tests:
         - foo
         - bar
     asserts:
-      - template: shell-configmap.yaml 
+      - template: shell-configmap.yaml
         equal:
           path: data.authorizedKeys
           value: |-
             foo
             bar
-  
+
   - it: No extra authorized keys are present in template
     template: shell-configmap.yaml
     set:
       shell.enabled: true
       shell.authorizedKeys: []
     asserts:
-      - template: shell-configmap.yaml 
+      - template: shell-configmap.yaml
         equal:
           path: data.authorizedKeys
           value: ""
 
-  - it: Adds keyserver environment variables when shell is enabled 
+  - it: Adds keyserver environment variables when shell is enabled
     template: shell-deployment.yaml
     set:
       shell.enabled: true
@@ -58,14 +60,14 @@ tests:
             value: foo.bar
       - contains:
           path: spec.template.spec.containers[0].env
-          content: 
+          content:
             name: GITAUTH_USERNAME
             valueFrom:
               secretKeyRef:
                 key: keyserver.username
                 name: RELEASE-NAME-secrets-shell
 
-  - it: Keyserver environment variables not present when shell is disabled 
+  - it: Keyserver environment variables not present when shell is disabled
     template: shell-deployment.yaml
     set:
       shell.enabled: true

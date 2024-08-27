@@ -46,7 +46,7 @@ spec:
       enableServiceLinks: false
       containers:
       - name: {{ .Release.Name }}-jumpserver
-        image: wunderio/sshd-gitauth:v0.2
+        image: wunderio/sshd-gitauth:v1.0
         imagePullPolicy: Always
         ports:
           - containerPort: 22
