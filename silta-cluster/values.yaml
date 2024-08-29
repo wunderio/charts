@@ -514,3 +514,9 @@ docker-registry:
     htpasswd: |
       broken:auth
 
+daemonset:
+  enabled: true
+  # Required by elasticsearch
+  # https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-virtual-memory.html#k8s_using_a_daemonset_to_set_virtual_memory
+  maxMapCountSetter:
+    enabled: true
