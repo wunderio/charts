@@ -18,7 +18,7 @@ dependencies:
   repository: file://../forked/minio/minio-6.0.5
   version: 6.0.5
 - name: csi-rclone
-  repository: file://../csi-rclone
+  repository: https://storage.googleapis.com/charts.wdr.io
   version: 1.0.0
 - name: cert-manager
   repository: https://charts.jetstack.io/
@@ -38,5 +38,5 @@ dependencies:
 - name: docker-registry
   repository: https://helm.twun.io
   version: 2.1.0
-digest: sha256:c7ff69f37389d474c7449b4458c727c634e7529ce9fda4aed60c13fa9643b798
-generated: "2024-08-27T13:59:48.177657684+03:00"
+digest: sha256:4b1c653905617945db382d2b950ba0b860f1c90dd12261bb5e1840c46f77e27f
+generated: "2024-09-03T09:52:29.859928636+03:00"
