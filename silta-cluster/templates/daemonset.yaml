@@ -1,0 +1,32 @@
+{{- if .Values.daemonset.enabled }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Release.Name }}-ds
+spec:
+  selector:
+    matchLabels:
+      name: {{ .Release.Name }}-ds
+  template:
+    metadata:
+      labels:
+        name: {{ .Release.Name }}-ds
+    spec:
+      initContainers:
+        {{- if .Values.daemonset.maxMapCountSetter.enabled }}
+        - name: max-map-count-setter
+          image: docker.io/bash:5
+          resources:
+            limits:
+              cpu: 100m
+              memory: 32Mi
+          securityContext:
+            privileged: true
+            runAsUser: 0
+          command: ['/usr/local/bin/bash', '-e', '-c', 'echo 262144 > /proc/sys/vm/max_map_count']
+        {{- end }}
+      containers:
+        - name: sleep
+          image: docker.io/bash:5
+          command: ['sleep', 'infinity']
+{{- end }}

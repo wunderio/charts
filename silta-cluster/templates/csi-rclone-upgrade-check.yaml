@@ -1,0 +1,7 @@
+{{- $rclone := index .Values "csi-rclone" }}
+{{- if $rclone.enabled }}
+{{- $imgversion := semver $rclone.version }}
+{{- if semverCompare "<3.0.0" ( printf "%d.%d.%d" $imgversion.Major $imgversion.Minor $imgversion.Patch ) }}
+{{- fail (printf "csi-rclone image (csi-rclone.version) upgrade required. Current image: %s, parsed version: %s, required minimum version: %s" $rclone.version (printf "%d.%d.%d" $imgversion.Major $imgversion.Minor $imgversion.Patch) "3.0.0" ) }}
+{{- end }}
+{{- end }}

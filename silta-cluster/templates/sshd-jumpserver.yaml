@@ -75,7 +75,7 @@ spec:
       volumes:
       - name: shell-keys
         persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-shell-keys
+          claimName: {{ .Release.Name }}-shell-key
       - name: sshd-jumphost-configmap
         configMap:
           name: {{ .Release.Name }}-sshd-jumphost
@@ -83,9 +83,12 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-shell-keys
+  name: {{ .Release.Name }}-shell-key
   labels:
     name: {{ .Release.Name }}-jumpserver
+  annotations:
+    storage.silta/storage-path: jumpserver
+    csi-rclone/umask: "077"
 spec:
   {{- if .Values.gitAuth.persistence.storageClassName }}
   storageClassName: {{ .Values.gitAuth.persistence.storageClassName }}
@@ -95,37 +98,4 @@ spec:
   resources:
     requests:
       storage: {{ .Values.gitAuth.persistence.size }}
-  {{- if .Values.gitAuth.persistence.storageClassName }}
-  {{- if eq .Values.gitAuth.persistence.storageClassName "silta-shared" }}
-  selector:
-    matchLabels:
-      name: {{ $.Release.Name }}-shell-keys-pv
-  {{- end }}
-  {{- end }}
-{{- end }}
-# silta-shared volume definition if its storage is selected
-{{- if .Values.gitAuth.persistence.storageClassName }}
-{{- if eq .Values.gitAuth.persistence.storageClassName "silta-shared" }}
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: {{ $.Release.Name }}-shell-keys-pv
-  labels:
-    name: {{ $.Release.Name }}-shell-keys-pv
-spec:
-  accessModes:
-    - {{ .Values.gitAuth.persistence.accessMode }}
-  capacity:
-    storage: {{ .Values.gitAuth.persistence.size }}
-  storageClassName: {{ .Values.gitAuth.persistence.storageClassName }}
-  {{- if .Values.gitAuth.persistence.csiDriverName }}
-  csi:
-    driver: {{ .Values.gitAuth.persistence.csiDriverName }}
-    volumeHandle: {{ $.Release.Name }}-shell-keys-pv
-    volumeAttributes:
-      remotePathSuffix: /{{ $.Release.Namespace }}/jumpserver
-      umask: "077"
-  {{- end }}
-{{- end }}
 {{- end }}

@@ -2,8 +2,10 @@ apiVersion: v2
 appVersion: "1.0"
 description: Setup a silta kubernetes cluster.
 name: silta-cluster
-version: 1.7.0
-# kubeVersion: '>=1.20.0-0'
+version: 1.8.0
+# csi-rclone external provisioner requires kubernetes 1.20+
+# https://github.com/kubernetes-csi/external-provisioner?tab=readme-ov-file#compatibility
+kubeVersion: '>=1.20.0-0'
 dependencies:
 - name: ingress-nginx
   # check kubernetes version requirements here: https://github.com/kubernetes/ingress-nginx
@@ -35,8 +37,9 @@ dependencies:
   repository: file://../forked/minio/minio-6.0.5
   condition: minio.enabled
 - name: csi-rclone
-  version: 0.3.x
+  version: 1.0.x
   repository: https://storage.googleapis.com/charts.wdr.io
+  # repository: file://../csi-rclone
   condition: csi-rclone.enabled
 - name: cert-manager
   version: 0.10.x
