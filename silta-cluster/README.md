@@ -69,6 +69,12 @@ helm install kyverno kyverno/kyverno --namespace kyverno --create-namespace
 
 2. Install required policies using kubectl or install [kyverno-policies helm chart](https://github.com/kyverno/kyverno/tree/main/charts/kyverno-policies). Policy examples can be found at [official documentation](https://kyverno.io/policies/) and in [docs/kyverno-policies](docs/kyverno-policies) directory.
 
+Note: if You need to apply PSA labels to existing namespaces (once), run this:
+```
+kubectl apply -f docs/docs/kyverno-add-psa-labels-existing-ns.yaml
+kubectl delete -f docs/docs/kyverno-add-psa-labels-existing-ns.yaml
+```
+
 ### ingress-nginx load balancer on GKE private cluster
 
 When using GKE private cluster, enabling `ingress-nginx` (and `nginx-traefik`) will require additional steps. See [gcs vendor page](https://github.com/wunderio/silta/blob/master/docs/vendor-gcs.md#ingress-nginx-load-balancer-on-gke-private-cluster) in silta documentation for instructions.
