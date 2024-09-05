@@ -64,16 +64,11 @@ Kyverno is a policy engine designed for Kubernetes. It allows cluster administra
 1. Install Kyverno using helm chart:
 ```
 helm repo add kyverno https://kyverno.github.io/kyverno/
-helm install kyverno kyverno/kyverno --namespace kyverno --create-namespace
+helm install kyverno kyverno/kyverno --namespace kyverno --create-namespace --set features.logging.verbosity=1
 ```
 
 2. Install required policies using kubectl or install [kyverno-policies helm chart](https://github.com/kyverno/kyverno/tree/main/charts/kyverno-policies). Policy examples can be found at [official documentation](https://kyverno.io/policies/) and in [docs/kyverno-policies](docs/kyverno-policies) directory.
-
-Note: if You need to apply PSA labels to existing namespaces (once), run this:
-```
-kubectl apply -f docs/docs/kyverno-add-psa-labels-existing-ns.yaml
-kubectl delete -f docs/docs/kyverno-add-psa-labels-existing-ns.yaml
-```
+See [kyverno-policies README](docs/kyverno-policies/README.md) for more information.
 
 ### ingress-nginx load balancer on GKE private cluster
 

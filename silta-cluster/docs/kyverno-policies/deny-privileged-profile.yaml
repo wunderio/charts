@@ -50,10 +50,6 @@ spec:
       any:
       - clusterRoles:
         - cluster-admin
-      - resources:
-          namespaces:
-          - kube-system
-          - silta-cluster
     validate:
       message: Only cluster-admins may create Namespaces that allow setting the privileged level.
       deny: {}

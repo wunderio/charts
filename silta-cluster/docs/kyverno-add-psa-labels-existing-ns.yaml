@@ -37,12 +37,6 @@ spec:
       - resources:
           kinds:
           - Namespace
-    exclude:
-      any:
-      - resources:
-          namespaces:
-          - kube-system
-          - silta-cluster
     mutate:
       targets:
         - apiVersion: v1

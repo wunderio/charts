@@ -37,6 +37,8 @@ spec:
             namespaces:
             - kube-system
             - silta-cluster
+            - kubecost
+            - sumologic
       validate:
         message: >-
           Privileged mode is disallowed. The fields spec.containers[*].securityContext.privileged,
