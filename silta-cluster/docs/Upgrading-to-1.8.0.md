@@ -8,6 +8,7 @@ csi-rclone (v3.0.0) implements PersistentVolume provisioner and requires changes
 
 ```bash
 kubectl delete storageclass silta-shared
+kubectl delete csidriver csi-rclone
 ```
 
 Existing PersistentVolume definitions and PersistentVolumeClaims with selector will keep working with the updated driver.
