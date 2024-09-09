@@ -57,6 +57,18 @@ helm repo add eks https://aws.github.io/eks-charts
 kubectl apply -k github.com/aws/eks-charts/tree/master/stable/aws-calico/crds
 helm install --name aws-calico --namespace kube-system eks/aws-calico
 ```
+### Kyverno policy agent (optional)
+
+Kyverno is a policy engine designed for Kubernetes. It allows cluster administrators to enforce policies on resources in a Kubernetes cluster. 
+
+1. Install Kyverno using helm chart:
+```
+helm repo add kyverno https://kyverno.github.io/kyverno/
+helm install kyverno kyverno/kyverno --namespace kyverno --create-namespace --set features.logging.verbosity=1
+```
+
+2. Install required policies using kubectl or install [kyverno-policies helm chart](https://github.com/kyverno/kyverno/tree/main/charts/kyverno-policies). Policy examples can be found at [official documentation](https://kyverno.io/policies/) and in [docs/kyverno-policies](docs/kyverno-policies) directory.
+See [kyverno-policies README](docs/kyverno-policies/README.md) for more information.
 
 ### ingress-nginx load balancer on GKE private cluster
 
