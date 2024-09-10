@@ -10,7 +10,7 @@ capabilities:
   apiVersions:
     - pxc.percona.com/v1
 tests:
-  - it: By default no reference data PVC or CronJob is created, but the reference volume is mounted for the post-release job
+  - it: By default no reference data PVC or CronJob is created, but the reference volume is mounted for the post-release job (without provisioner)
     template: post-release.yaml
     set:
       referenceData:
@@ -37,6 +37,66 @@ tests:
           name: "reference-data-volume"
           mountPath: "/app/reference-data"
           readOnly: true
+
+  - it: By default no reference data PVC or CronJob is created, but the reference volume is mounted for the post-release job (with provisioner)
+    template: post-release.yaml
+    capabilities:
+      apiVersions:
+        - silta.wdr.io/v1
+    set:
+      referenceData:
+        referenceEnvironment: 'FOO'
+    asserts:
+    # Only public files PVC is defined.
+    - hasDocuments:
+        count: 1
+      template: drupal-volumes.yaml
+    - hasDocuments:
+        count: 0
+      template: reference-data-cron.yaml
+
+    # Reference data volume is mounted in post-release job
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: "reference-data-volume"
+          persistentVolumeClaim:
+            claimName: foo-reference-data
+    - contains:
+        path: spec.template.spec.containers[0].volumeMounts
+        content:
+          name: "reference-data-volume"
+          mountPath: "/app/reference-data"
+          readOnly: true
+  
+  - it: Uses new reference data PVC when found via lookup
+    template: post-release.yaml
+    capabilities:
+      apiVersions:
+        - silta.wdr.io/v1
+    kubernetesProvider:
+      scheme:
+        "v1/PersistentVolumeClaim":
+          gvr:
+            version:  "v1"
+            resource: "persistentvolumeclaims"
+          namespaced: true
+      objects:
+        - kind: PersistentVolumeClaim
+          apiVersion: v1
+          metadata:
+            name: foo-reference
+            namespace: NAMESPACE
+    set:
+      referenceData:
+        referenceEnvironment: 'FOO'
+    asserts:
+    - contains:
+        path: spec.template.spec.volumes
+        content:
+          name: "reference-data-volume"
+          persistentVolumeClaim:
+            claimName: foo-reference
 
   - it: is not mounted on the main deployment
     template: post-release.yaml
@@ -166,6 +226,9 @@ tests:
 
   - it: does not skip mounting on the reference environments
     template: post-release.yaml
+    capabilities:
+      apiVersions:
+        - silta.wdr.io/v1
     set:
       environmentName: 'FOO'
       referenceData:
@@ -174,13 +237,13 @@ tests:
     asserts:
     - template: drupal-volumes.yaml
       hasDocuments:
-        count: 4
+        count: 2
     - contains:
         path: spec.template.spec.volumes
         content:
           name: "reference-data-volume"
           persistentVolumeClaim:
-            claimName: foo-reference-data
+            claimName: foo-reference
     - contains:
         path: spec.template.spec.containers[0].volumeMounts
         content:

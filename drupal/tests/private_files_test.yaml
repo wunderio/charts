@@ -10,7 +10,7 @@ capabilities:
   apiVersions:
     - pxc.percona.com/v1
 tests:
-  - it: private files should be disabled by default
+  - it: private files should be disabled by default (without provisioner)
     template: drupal-deployment.yaml
     asserts:
       # No private files volume is mounted.
@@ -25,7 +25,47 @@ tests:
           count: 2
         template: drupal-volumes.yaml
 
-  - it: private files should work when enabled
+  - it: private files should be disabled by default (silta-shared storageclass, with provisioner)
+    template: drupal-deployment.yaml
+    capabilities:
+      apiVersions:
+        - silta.wdr.io/v1
+    set:
+      mounts.private-files.storageClassName: silta-shared
+    asserts:
+      # No private files volume is mounted.
+      - notContains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-private-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-private-files2
+      # Only one volume is defined.
+      - hasDocuments:
+          count: 1
+        template: drupal-volumes.yaml
+
+  - it: private files should be disabled by default (non-silta-shared storageclass, with provisioner)
+    template: drupal-deployment.yaml
+    capabilities:
+      apiVersions:
+        - silta.wdr.io/v1
+    set:
+      mounts.private-files.storageClassName: foo
+    asserts:
+      # No private files volume is mounted.
+      - notContains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-private-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-private-files
+      # Only one volume is defined.
+      - hasDocuments:
+          count: 1
+        template: drupal-volumes.yaml
+
+  - it: private files should work when enabled (without provisioner)
     template: drupal-deployment.yaml
     set:
       mounts:
@@ -55,6 +95,39 @@ tests:
         hasDocuments:
           count: 4
 
+  - it: private files should work when enabled (with provisioner)
+    template: drupal-deployment.yaml
+    capabilities:
+      apiVersions:
+        - silta.wdr.io/v1
+    set:
+      mounts:
+        private-files:
+          enabled: true
+          storage: 123Gi
+          storageClassName: silta-shared
+          mountPath: /foo/bar/private
+    asserts:
+      # A private files volume is mounted
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: "drupal-private-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-private-files2
+
+      # The environment variable is set
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PRIVATE_FILES_PATH
+            value: '/foo/bar/private'
+
+      # There are two volumes defined.
+      - template: drupal-volumes.yaml
+        hasDocuments:
+          count: 2
+
       # Private files are available for cron jobs.
       - template: drupal-cron.yaml
         contains:
@@ -62,7 +135,7 @@ tests:
           content:
             name: "drupal-private-files"
             persistentVolumeClaim:
-              claimName: RELEASE-NAME-private-files
+              claimName: RELEASE-NAME-private-files2
 
       # Private files are available for in the post-install hooks.
       - template: post-release.yaml
@@ -71,17 +144,23 @@ tests:
           content:
             name: "drupal-private-files"
             persistentVolumeClaim:
-              claimName: RELEASE-NAME-private-files
+              claimName: RELEASE-NAME-private-files2
 
       - template: drupal-volumes.yaml
-        documentIndex: 3
+        documentIndex: 1
         equal:
           path: spec.storageClassName
           value: silta-shared
       - template: drupal-volumes.yaml
+        documentIndex: 0
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-private-files2
+      - template: drupal-volumes.yaml
         # Note that object attributes are iterated alphabetically, so "private-files" comes before "public-files"
-        documentIndex: 1
+        documentIndex: 0
         equal:
           path: spec.resources.requests.storage
           value: 123Gi
+
 

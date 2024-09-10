@@ -83,14 +83,22 @@ spec:
       {{- include "drupal.volumes" . | nindent 6 }}
       - name: ssh-keys
         persistentVolumeClaim:
+          {{- if and ( eq $.Values.shell.mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+          claimName: {{ .Release.Name }}-ssh-keys2
+          {{- else }}
           claimName: {{ .Release.Name }}-ssh-keys
+          {{- end }}
       - name: shell-configmap
         configMap:
           name: {{ .Release.Name }}-shell
       {{- if .Values.backup.enabled }}
       - name: {{ .Release.Name }}-backup
         persistentVolumeClaim:
+          {{- if and ( eq $.Values.backup.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+          claimName: {{ .Release.Name }}-backup2
+          {{- else }}
           claimName: {{ .Release.Name }}-backup
+          {{- end }}
       {{- end }}
       {{- include "drupal.imagePullSecrets" . | nindent 6 }}
 {{- end }}

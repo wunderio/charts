@@ -1,4 +1,6 @@
 {{- if .Values.backup.enabled }}
+{{- if eq .Values.backup.storageClassName "silta-shared" }}
+{{- if eq ( include "silta-cluster.rclone.has-provisioner" . ) "false" }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -20,10 +22,16 @@ spec:
       remotePathSuffix: /{{ .Release.Namespace }}/backup/{{ .Values.environmentName }}
   {{- end }}
 ---
+{{- end }}
+{{- end }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  {{- if and ( eq $.Values.backup.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+  name: {{ .Release.Name }}-backup2
+  {{- else }}
   name: {{ .Release.Name }}-backup
+  {{- end }}
   labels:
     name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
     {{- include "frontend.release_labels" $ | nindent 4 }}
@@ -37,8 +45,10 @@ spec:
     requests:
       storage: {{ .Values.backup.storage }}
 {{- if eq .Values.backup.storageClassName "silta-shared" }}
+{{- if eq ( include "silta-cluster.rclone.has-provisioner" . ) "false" }}
   selector:
     matchLabels:
       name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
+{{- end }}
 {{- end }}
 {{- end }}
