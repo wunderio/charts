@@ -1,6 +1,7 @@
 {{- if .Values.shell.enabled }}
 {{- $releaseNameTrimmed := substr 0 (int (sub 54 (len "ssh-keys"))) $.Release.Name }}
 {{- if eq .Values.shell.mount.storageClassName "silta-shared" }}
+{{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "false" }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -24,15 +25,21 @@ spec:
   {{- end }}
 ---
 {{- end }}
+{{- end }}
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  {{- if and ( eq $.Values.shell.mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+  name: {{ .Release.Name }}-ssh-keys2
+  {{- else }}
   name: {{ .Release.Name }}-ssh-keys
+  {{- end }}
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
   annotations:
     storage.silta/storage-path: {{ .Values.environmentName | default .Release.Name }}/ssh-keys    
+    csi-rclone/umask: "077"
 spec:
   accessModes:
     - ReadWriteMany
@@ -41,8 +48,10 @@ spec:
     requests:
       storage: {{ .Values.shell.mount.storage }}
 {{- if eq .Values.shell.mount.storageClassName "silta-shared" }}
+{{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "false" }}
   selector:
     matchLabels:
       name: {{ $releaseNameTrimmed }}-{{ .Release.Namespace | sha256sum | trunc 7 }}-ssh-keys
+{{- end }}
 {{- end }}
 {{- end }}

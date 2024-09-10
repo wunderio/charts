@@ -470,6 +470,36 @@
         }
       }
     },
+    "silta-hub": { 
+      "type": "object",
+      "properties": {
+        "sync": { 
+          "type": "object",
+          "properties": {
+            "resources": {
+              "type": "object",
+              "properties": {
+                "requests": {
+                  "type": "object",
+                  "properties": {
+                    "cpu": { "type": ["integer", "string"] },
+                    "memory": { "type": "string" }
+                  }
+                },
+                "limits": {
+                  "type": "object",
+                  "properties": {
+                    "cpu": { "type": ["integer", "string"] },
+                    "memory": { "type": "string" }
+                  }
+                }
+              }
+            },
+            "storage": { "type": "string" }
+          }
+        }
+      }
+    },
     "gdprDump": {
       "type": "object",
       "additionalProperties": {

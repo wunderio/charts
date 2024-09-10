@@ -47,6 +47,21 @@ spec:
         {{- if or (eq .Values.referenceData.referenceEnvironment .Values.environmentName) (not .Values.referenceData.skipMount) }}
         - name: reference-data-volume
           persistentVolumeClaim:
+            {{- if 
+              and 
+                ( and 
+                  (eq $.Values.shell.mount.storageClassName "silta-shared" ) 
+                  ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" )
+                ) 
+                (
+                  or
+                    (eq .Values.referenceData.referenceEnvironment .Values.environmentName) 
+                    (lookup "v1" "PersistentVolumeClaim" .Release.Namespace (printf "%s-reference" (include "drupal.referenceEnvironment" $ )))
+                ) 
+            }}
+            claimName: {{ include "drupal.referenceEnvironment" . }}-reference
+            {{- else }}
             claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
+            {{- end }}
         {{- end -}}
         {{- end }}

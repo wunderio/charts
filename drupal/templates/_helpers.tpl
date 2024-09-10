@@ -68,7 +68,11 @@ ports:
     name: {{ $mount.configMapName }}
 {{- else }}
   persistentVolumeClaim:
+    {{- if and ( eq $mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+    claimName: {{ $.Release.Name }}-{{ $index }}2
+    {{- else }}
     claimName: {{ $.Release.Name }}-{{ $index }}
+    {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
@@ -357,6 +361,36 @@ done
 -f {{ $.Values.webRoot }}/sites/default/files/_installing
 {{- end -}}
 
+{{- define "drupal.data-push-command" }}
+{{ include "drupal.extract-reference-data" . }}
+{{- end }}
+
+{{- define "drupal.data-pull-command" }}
+set -e 
+  
+{{ include "drupal.import-reference-files" . }}
+
+{{ include "drupal.wait-for-db-command" . }}
+{{ include "drupal.create-db" . }}
+touch {{ .Values.webRoot }}/sites/default/files/_installing
+{{ include "drupal.import-reference-db" . }}
+
+{{ if .Values.elasticsearch.enabled }}
+  {{ include "drupal.wait-for-elasticsearch-command" . }}
+{{ end }}
+
+{{ .Values.php.postinstall.command }}
+
+rm {{ .Values.webRoot }}/sites/default/files/_installing
+
+{{ .Values.php.postupgrade.command }}
+{{- if .Values.php.postupgrade.afterCommand }}
+  {{ .Values.php.postupgrade.afterCommand }}
+{{- end }}
+
+# Wait for background imports to complete.
+wait
+{{- end }}
 
 {{- define "drupal.post-release-command" -}}
   set -e
@@ -464,12 +498,12 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
     {{ range $folderIndex, $folderPattern := $.Values.referenceData.ignoreFolders -}}
     --exclude="{{ $folderPattern }}" \
     {{ end -}}
-    --delete \
+    --delete --delete-excluded \
     /app/reference-data/{{ $index }}
   {{ end -}}
   {{- end }}
 else
-  echo "Drupal is not installed, skipping reference database dump."
+  echo "Drupal bootstrap unsuccessful, skipping reference database dump."
 fi
 {{- end }}
 
@@ -687,3 +721,9 @@ autoscaling/v2beta1
 {{ fail "Cannot use domain prefixes together with domain masking"}}
 {{- end -}}
 {{- end -}}
+
+{{- define "silta-cluster.rclone.has-provisioner" }}
+{{- if ( $.Capabilities.APIVersions.Has "silta.wdr.io/v1" ) }}true
+{{- else }}false
+{{- end }}
+{{- end }}

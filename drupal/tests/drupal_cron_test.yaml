@@ -64,8 +64,38 @@ tests:
             name: foo
             value: bar
 
-  - it: has public files mounted
+  - it: has public files mounted (without provisioner)
     template: drupal-cron.yaml
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.volumes
+          content:
+            name: "drupal-public-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-public-files
+
+  - it: has public files mounted (silta-shared storageclass, with provisioner)
+    template: drupal-cron.yaml
+    capabilities:
+      apiVersions:
+        - silta.wdr.io/v1
+    set:
+      mounts.public-files.storageClassName: silta-shared
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.volumes
+          content:
+            name: "drupal-public-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-public-files2
+
+  - it: has public files mounted (non-silta-shared storageclass, with provisioner)
+    template: drupal-cron.yaml
+    capabilities:
+      apiVersions:
+        - silta.wdr.io/v1
+    set:
+      mounts.public-files.storageClassName: foo
     asserts:
       - contains:
           path: spec.jobTemplate.spec.template.spec.volumes
