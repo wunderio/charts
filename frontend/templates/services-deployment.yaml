@@ -98,7 +98,11 @@ spec:
             name: {{ $mount.configMapName }}
         {{- else }}
           persistentVolumeClaim:
+            {{- if and ( eq $mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+            claimName: {{ $.Release.Name }}-{{ $mountName }}2
+            {{- else }}
             claimName: {{ $.Release.Name }}-{{ $mountName }}
+            {{- end }}
         {{- end }}
         {{- end }}
         {{- end }}
@@ -106,7 +110,11 @@ spec:
         {{ if $.Values.shell.enabled -}}
         - name: shell-keys
           persistentVolumeClaim:
+            {{- if and ( eq $.Values.shell.mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+            claimName: {{ $.Release.Name }}-shell-keys2
+            {{- else }}
             claimName: {{ $.Release.Name }}-shell-keys
+            {{- end }}
         {{- end }}
       {{ if $service.nodeSelector -}}
       nodeSelector:
@@ -236,7 +244,11 @@ spec:
             name: {{ $mount.configMapName }}
         {{- else }}
           persistentVolumeClaim:
+            {{- if and ( eq $mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+            claimName: {{ $.Release.Name }}-{{ $mountName }}2
+            {{- else }}
             claimName: {{ $.Release.Name }}-{{ $mountName }}
+            {{- end }}
         {{- end }}
         {{- end }}
         {{- end }}
@@ -244,7 +256,11 @@ spec:
         {{ if $.Values.shell.enabled -}}
         - name: shell-keys
           persistentVolumeClaim:
+            {{- if and ( eq $.Values.shell.mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+            claimName: {{ $.Release.Name }}-shell-keys2
+            {{- else }}
             claimName: {{ $.Release.Name }}-shell-keys
+            {{- end }}
         {{- end }}
 {{- end }}
 

@@ -232,3 +232,9 @@ autoscaling/v2
 autoscaling/v2beta1
 {{- end }}
 {{- end }}
+
+{{- define "silta-cluster.rclone.has-provisioner" }}
+{{- if ( $.Capabilities.APIVersions.Has "silta.wdr.io/v1" ) }}true
+{{- else }}false
+{{- end }}
+{{- end }}

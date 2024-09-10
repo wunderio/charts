@@ -59,7 +59,15 @@ spec:
             command: ["/bin/bash", "-c"]
             args:
               - |
+                {{- $mounts_enabled := false }}
+                {{- range $index, $mount := $.Values.mounts }}
+                {{- if eq $mount.enabled true }}
+                {{- $mounts_enabled = true }}
+                {{- end }}
+                {{- end }}
+                {{- if eq $mounts_enabled true }}
                 {{- include "frontend.backup.copy-mounts" . | nindent 16 }}
+                {{- end }}
 
                 # Delete old backups
                 echo "Removing backups older than {{ .Values.backup.retention }} days"
@@ -136,12 +144,20 @@ spec:
             {{- if eq $mount.enabled true }}
             - name: frontend-{{ $mountName }}
               persistentVolumeClaim:
+                {{- if and ( eq $mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+                claimName: {{ $.Release.Name }}-{{ $mountName }}2
+                {{- else }}
                 claimName: {{ $.Release.Name }}-{{ $mountName }}
+                {{- end }}
             {{- end }}
             {{- end }}
             {{- end }}
             {{- end }}
             - name: {{ .Release.Name }}-backup
               persistentVolumeClaim:
+                {{- if and ( eq $.Values.backup.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+                claimName: {{ .Release.Name }}-backup2
+                {{- else }}
                 claimName: {{ .Release.Name }}-backup
+                {{- end }}
 {{- end }}
