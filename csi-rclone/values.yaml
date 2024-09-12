@@ -9,7 +9,7 @@ storageClass:
   pathPattern: ""
   
 # rclone CSI plugin image release version. https://cloud.docker.com/u/wunderio/repository/docker/wunderio/csi-rclone
-version: v3.0.0
+version: v3.0.1
 
 # use default parameters. You might want set this to false when using as subchart.
 defaultParams: true
