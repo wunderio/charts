@@ -29,4 +29,9 @@ spec:
         - name: sleep
           image: docker.io/bash:5
           command: ['sleep', 'infinity']
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
 {{- end }}
