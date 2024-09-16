@@ -1,0 +1,68 @@
+{{- $hub_values := ( index .Values "silta-hub" ) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-hub
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+data:
+  syncStorageSize: {{ $hub_values.sync.storage | quote }}
+  {{- if $hub_values.sync.resources }}
+  syncResources: {{ $hub_values.sync.resources | toYaml }}
+  {{- end }}
+  syncPushJob: |
+    metadata:
+      name: "{{ .Release.Name }}-data-push"
+      labels:
+        {{- include "drupal.release_labels" . | nindent 8 }}
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            {{- include "drupal.release_labels" . | nindent 12 }}
+        spec:
+          restartPolicy: Never
+          enableServiceLinks: false
+          containers:
+          - name: post-release
+            {{- include "drupal.php-container" . | nindent 12 }}
+            command: ["/bin/bash", "-c"]
+            args:
+            - |
+                {{- include "drupal.data-push-command" . | nindent 16 }}
+            volumeMounts:
+              {{- include "drupal.volumeMounts" . | nindent 14 }}
+            resources:
+              {{- .Values.php.postinstall.resources | toYaml | nindent 14 }}
+          {{- include "drupal.imagePullSecrets" . | nindent 10 }}
+          volumes:
+            {{- include "drupal.volumes" . | nindent 12 }}
+  syncPullJob: |
+    metadata:
+      name: "{{ .Release.Name }}-data-pull"
+      labels:
+        {{- include "drupal.release_labels" . | nindent 8 }}
+    spec:
+      backoffLimit: 0
+      template:
+        metadata:
+          labels:
+            {{- include "drupal.release_labels" . | nindent 12 }}
+        spec:
+          restartPolicy: Never
+          enableServiceLinks: false
+          containers:
+          - name: post-release
+            {{- include "drupal.php-container" . | nindent 12 }}
+            command: ["/bin/bash", "-c"]
+            args:
+            - |
+                {{- include "drupal.data-pull-command" . | nindent 16 }}
+            volumeMounts:
+              {{- include "drupal.volumeMounts" . | nindent 14 }}
+            resources:
+              {{- .Values.php.postinstall.resources | toYaml | nindent 14 }}
+          {{- include "drupal.imagePullSecrets" . | nindent 10 }}
+          volumes:
+            {{- include "drupal.volumes" . | nindent 12 }}
