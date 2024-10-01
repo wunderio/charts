@@ -54,7 +54,7 @@ jobs:
               helm lint $CHART
               helm unittest $CHART
               if [ -f "$CHART/test.values.yaml" ]; then
-                helm install --dry-run --generate-name --values "$CHART/test.values.yaml" $CHART
+                helm template --generate-name --values "$CHART/test.values.yaml" $CHART
               fi
               helm package $CHART --destination /tmp/charts
             done

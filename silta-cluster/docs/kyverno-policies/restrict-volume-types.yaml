@@ -37,6 +37,7 @@ spec:
             namespaces:
             - kube-system
             - silta-cluster
+            - sumologic
       preconditions:
         all:
         - key: "{{ request.operation || 'BACKGROUND' }}"
