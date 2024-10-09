@@ -11,4 +11,5 @@ kubectl delete storageclass silta-shared
 kubectl delete csidriver csi-rclone
 ```
 
-Existing PersistentVolume definitions and PersistentVolumeClaims with selector will keep working with the updated driver.
+Existing PersistentVolume definitions and PersistentVolumeClaims with selector will keep working with the updated driver.  
+Restart pods if mounts does not work.
