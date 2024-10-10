@@ -1,7 +1,8 @@
 suite: drupal memcached
 templates:
-  - drupal-deployment.yaml
   - drupal-configmap.yaml
+  - drupal-deployment.yaml
+  - drupal-secret.yaml
 capabilities:
   apiVersions:
     - pxc.percona.com/v1

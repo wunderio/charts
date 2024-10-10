@@ -8,6 +8,8 @@ Service account for setting up resources into kube-system namespace.
 
 csi-rclone chart version greater than 0.3.0 requires csi-rclone:1.3.0+ images with tini. 1.2.x images will break deployment so value overrides need to be adjusted accordingly!  
 
+External provisioner requires kubernetes [1.20](https://github.com/kubernetes-csi/external-provisioner?tab=readme-ov-file#compatibility)+.
+
 ## Usage
 
 1. Set up storage backend. You can use [Minio](https://min.io/), Amazon S3 compatible cloud storage service.

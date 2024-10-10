@@ -1,5 +1,8 @@
 suite: shell deployment
 templates:
+  - drupal-configmap.yaml
+  - drupal-secret.yaml
+  - shell-configmap.yaml
   - shell-deployment.yaml
 capabilities:
   apiVersions:
@@ -59,7 +62,7 @@ tests:
           path: spec.template.spec.containers[0].volumeMounts
           content:
             mountPath: /backups
-            name: RELEASE-NAME-backups
+            name: RELEASE-NAME-backup
             readOnly: true
 
   - it: does not mount backups volume when backups are disabled
@@ -72,6 +75,6 @@ tests:
           path: spec.template.spec.containers[0].volumeMounts
           content:
             mountPath: /backups
-            name: RELEASE-NAME-backups
+            name: RELEASE-NAME-backup
             readOnly: true
 

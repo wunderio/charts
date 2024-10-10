@@ -3,9 +3,13 @@ storageClass:
 
   # storageClass name that will be deployed to cluster.
   name: "rclone"
-
+  
+  # pathPattern is used in PersistentVolume creation process to set the relative subpath in the remote storage.
+  # pathPattern: "${.PVC.namespace}/${.PVC.annotations.csi-rclone/storage-path}"
+  pathPattern: ""
+  
 # rclone CSI plugin image release version. https://cloud.docker.com/u/wunderio/repository/docker/wunderio/csi-rclone
-version: v1.3.0
+version: v3.0.1
 
 # use default parameters. You might want set this to false when using as subchart.
 defaultParams: true
@@ -33,11 +37,17 @@ nodePlugin:
     resources: {}
   # Some Kubernetes distributions use different kubelet base path (e.g. /var/snap/microk8s/common/var/lib/kubelet in Microk8s).
   kubeletBasePath: "/var/lib/kubelet"
+  serviceAccount:
+    annotations: {}
 
 controller:
+  provisioner:
+    resources: {}
   attacher:
     resources: {}
   registrar:
     resources: {}
   rclone:
     resources: {}
+  serviceAccount:
+    annotations: {}

@@ -1,8 +1,10 @@
 suite: Site deployment
 templates:
+  - configmap.yaml
   - deployment.yaml
 tests:
   - it: is a deployment with default values
+    template: deployment.yaml
     asserts:
       - isKind:
           of: Deployment
@@ -14,6 +16,7 @@ tests:
           value: simple
 
   - it: uses the right docker images
+    template: deployment.yaml
     set:
       nginx.image: 'nginx-12345'
     asserts:
@@ -22,6 +25,7 @@ tests:
           value: 'nginx-12345'
 
   - it: sets the replica count correctly
+    template: deployment.yaml
     set:
       replicas: 3
     asserts:
@@ -30,6 +34,7 @@ tests:
           value: 3
 
   - it: takes resource requests and limits
+    template: deployment.yaml
     set:
       nginx.resources:
         requests:

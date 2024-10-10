@@ -1,5 +1,6 @@
 suite: HorizontalPodAutoscaler
 templates:
+  - configmap.yaml
   - nginx.yaml
 tests:
   - it: HPA resource is present when autoscaler is enabled

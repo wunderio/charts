@@ -23,6 +23,35 @@ tests:
           path: spec.jobTemplate.spec.template.spec.containers[0].image
           value: 'drupal-12345'
 
+  - it: can set timezone
+    template: drupal-cron.yaml
+    set:
+      timezone: 'Foo/Bar'
+    capabilities:
+      majorVersion: 1
+      minorVersion: 25
+    asserts:
+      - equal:
+          path: spec.timeZone
+          value: 'Foo/Bar'
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: TZ
+            value: Foo/Bar
+
+  # notExists is not supported in the current version of the test framework
+  # - it: timezone is not set for api versions that do not support it
+  #   template: drupal-cron.yaml
+  #   capabilities:
+  #     majorVersion: 1
+  #     minorVersion: 24
+  #   set:
+  #     timezone: 'Foo/Bar'
+  #   asserts:
+  #     - notExists:
+  #         path: spec.timeZone
+
   - it: sets environment variables correctly
     template: drupal-cron.yaml
     set:
@@ -35,8 +64,38 @@ tests:
             name: foo
             value: bar
 
-  - it: has public files mounted
+  - it: has public files mounted (without provisioner)
     template: drupal-cron.yaml
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.volumes
+          content:
+            name: "drupal-public-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-public-files
+
+  - it: has public files mounted (silta-shared storageclass, with provisioner)
+    template: drupal-cron.yaml
+    capabilities:
+      apiVersions:
+        - silta.wdr.io/v1
+    set:
+      mounts.public-files.storageClassName: silta-shared
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.volumes
+          content:
+            name: "drupal-public-files"
+            persistentVolumeClaim:
+              claimName: RELEASE-NAME-public-files2
+
+  - it: has public files mounted (non-silta-shared storageclass, with provisioner)
+    template: drupal-cron.yaml
+    capabilities:
+      apiVersions:
+        - silta.wdr.io/v1
+    set:
+      mounts.public-files.storageClassName: foo
     asserts:
       - contains:
           path: spec.jobTemplate.spec.template.spec.volumes
@@ -103,6 +162,43 @@ tests:
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.memory
           value: 2G
+
+  - it: uses default resource requests and limits overriden by cronJobDefaults resources
+    template: drupal-cron.yaml
+    set:
+      php:
+        # Unset cron-specific resources.
+        cron:
+          drupal:
+            resources: null
+        resources:
+          requests:
+            cpu: 111m
+            memory: 1G
+          limits:
+            cpu: 222m
+            memory: 2G
+        cronJobDefaults:
+          resources:
+            requests:
+              cpu: 333m
+              memory: 3G
+            limits:
+              cpu: 444m
+              memory: 4G
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.cpu
+          value: 333m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.memory
+          value: 3G
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.cpu
+          value: 444m
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.memory
+          value: 4G
 
   - it: takes custom resource requests and limits
     template: drupal-cron.yaml

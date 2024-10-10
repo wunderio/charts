@@ -64,16 +64,16 @@ ingress:
     redirect-https: true
     extraAnnotations:
       traefik.ingress.kubernetes.io/rate-limit: |
-        extractorfunc: request.host
+        extractorfunc: client.ip
         rateset:
           default:
             period: 5s
             average: 150
             burst: 200
-      nginx.ingress.kubernetes.io/limit-rps: "32"
+      nginx.ingress.kubernetes.io/limit-rps: "60"
       nginx.ingress.kubernetes.io/limit-rpm: "300"
-      nginx.ingress.kubernetes.io/limit-burst-multiplier: "3"
-      nginx.ingress.kubernetes.io/limit-connections: "20"
+      nginx.ingress.kubernetes.io/limit-burst-multiplier: "5"
+      nginx.ingress.kubernetes.io/limit-connections: "100"
   gce:
     type: gce
     # The name of the reserved static IP address.
@@ -87,6 +87,11 @@ ingress:
 cluster:
   type: gke
   vpcNative: false
+
+# Timezone to be used by the services that support it.
+# List of timezones: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List (use the TZ identifier column)
+# The default timezone for most container images is UTC.
+timezone: ""
 
 # backendConfig customizations for main service
 backendConfig:
@@ -104,7 +109,10 @@ singleSubdomain: false
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
-  image: 'wunderio/silta-nginx:1.17-v1'
+  image: 'wunderio/silta-nginx:1.26-v1'
+
+  # Requires "X-Proxy-Auth" header from upstream when value is non-empty string.
+  x_proxy_auth: ""
 
   replicas: 1
 
@@ -256,6 +264,12 @@ services: {}
   #   nodeSelector:
   #     cloud.google.com/gke-nodepool: static-ip
 
+  #  nginx:
+  #    denyDotFiles: true
+  #    locationExtraConfig: |
+  #      # Extra nginx configuration snippet for this service location block.
+
+
 # Configure the dynamically mounted volumes
 mounts: {}
 #  files:
@@ -312,6 +326,9 @@ backup:
 # Note that only keys used here can be overridden.
 serviceDefaults:
   port: 3000
+  nginx:
+    # Deny access to .dotfiles by default.
+    denyDotFiles: true
   resources:
     requests:
       cpu: 2m
@@ -378,6 +395,52 @@ mariadb:
               - static-ip
   enableServiceLinks: false
 
+varnish:
+  enabled: false
+  resources:
+    requests:
+      cpu: 25m
+      memory: 32Mi
+  image: wunderio/silta-varnish
+  imageTag: 7-v1
+  imagePullPolicy: IfNotPresent
+  # https://varnish-cache.org/docs/7.4/reference/varnishd.html#storage-backend
+  storageBackend: 'file,/var/lib/varnish/varnish_storage.bin,512M'
+  # https://varnish-cache.org/docs/7.4/reference/varnishd.html#list-of-parameters
+  extraParams: ""
+  # Custom caching code for vcl_recv subroutine.
+  vcl_recv: |
+    # Deny special pages to bots
+    if (req.url ~ "^/(?:user|admin|cart|checkout|logout|abuse|flag|.*\?rate=)" && req.http.user-agent ~ "(?:crawl|goog|yahoo|spider|bot|Yandex|bing|tracker|click|parser|ltx71|urllib)") {
+      return (synth( 403, "Forbidden"));
+    }
+
+    # Do not cache anything
+    return (pass);
+
+  # Custom caching code for vcl_backend_response subroutine.
+  vcl_backend_response: |
+
+  # Custom html code for 50x pages and backend failures.
+  status_500_html: ""
+  # https://varnish-cache.org/docs/7.4/reference/vcl-backend.html
+  backend_config: |
+    .max_connections = 300;
+    .probe = {
+      .request =
+          "HEAD / HTTP/1.1"
+          "User-Agent: Varnish"
+          "Connection: close"
+          "Host: localhost";
+      .interval  = 5s;
+      .timeout   = 5s;
+      .window    = 5;
+      .threshold = 3;
+    }
+    .first_byte_timeout     = 300s;
+    .connect_timeout        = 10s;
+    .between_bytes_timeout  = 10s;
+
 elasticsearch:
   enabled: false
 
@@ -423,23 +486,30 @@ elasticsearch:
           - static-ip
 
 # These settings are not optimized. To see which overrides are available see:
-# https://github.com/bitnami/charts/blob/master/bitnami/mongodb/values.yaml
+# https://github.com/bitnami/charts/blob/43306df9f67a6c38743cac362676317aa7a8318e/bitnami/mongodb/values.yaml
 mongodb:
   enabled: false
   image:
-    tag: 5.0.3
-
+    tag: "6.0"
+  initdbScripts:
+    setFeatureCompatibilityVersion.js: |
+      db.adminCommand({ setFeatureCompatibilityVersion: "6.0" });
+  auth:
+    enabled: false
+  updateStrategy:
+    type: Recreate
+  enableServiceLinks: false
   # Use a low default to prevent unnecessary storage use.
   persistence:
     size: 1Gi
 
-# # Posgresql overrides
-# # see: https://github.com/bitnami/charts/blob/c3dc56f3679650f1012e497b8a5e71d94dac163e/bitnami/postgresql/values.yaml
-# postgresql:
-#   enabled: false
-#   # Use a low default to prevent unnecessary storage use.
-#   persistence:
-#     size: 1Gi
+# Posgresql overrides
+# see: https://github.com/bitnami/charts/blob/c3dc56f3679650f1012e497b8a5e71d94dac163e/bitnami/postgresql/values.yaml
+postgresql:
+  enabled: false
+  # Use a low default to prevent unnecessary storage use.
+  persistence:
+    size: 1Gi
 
 rabbitmq:
   enabled: false
@@ -461,14 +531,14 @@ signalsciences:
   accesskeyid: ""
   secretaccesskey: ""
   image: signalsciences/sigsci-agent
-  imageTag: 4.40.0
+  imageTag: latest
   # sidecar container resources
   resources:
     requests:
       cpu: 20m
       memory: 40Mi
     limits:
-      cpu: 40m
+      cpu: 200m
       memory: 300Mi
 
 # Mailhog service overrides
@@ -484,3 +554,25 @@ mailhog:
     requests:
       cpu: 1m
       memory: 10M
+
+# Redis
+# https://github.com/bitnami/charts/blob/master/bitnami/redis/values.yaml
+redis:
+  enabled: false
+  architecture: standalone
+  auth:
+    # mandatory value
+    password: ""
+  replica:
+    # replicaCount: 1
+    autoscaling:
+      enabled: false
+  master:
+    resources:
+      limits:
+        cpu: 250m
+        memory: 512Mi
+      requests:
+        cpu: 50m
+        memory: 256Mi
+

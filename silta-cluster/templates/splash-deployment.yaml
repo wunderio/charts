@@ -28,7 +28,8 @@ spec:
     spec:
       enableServiceLinks: false
       containers:
-      - image: "wunderio/silta-splash:v0.1"
+      - image: "wunderio/silta-splash:v1"
+        imagePullPolicy: IfNotPresent
         name: nginx
         resources:
           {{- .Values.splash.resources | toYaml | nindent 10 }}

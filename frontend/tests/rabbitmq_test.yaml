@@ -1,7 +1,8 @@
 suite: RabbitMQ
 templates:
-  - services-deployment.yaml
+  - configmap.yaml
   - services-cron.yaml
+  - services-deployment.yaml
 tests:
   - it: gets exposed when enabled
     template: services-deployment.yaml

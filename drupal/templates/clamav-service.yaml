@@ -1,0 +1,23 @@
+{{- if .Values.clamav.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-clamav
+  annotations:
+    {{- if (index .Values "silta-release").downscaler.enabled }}
+    auto-downscale/down: "false"
+    {{- end }}
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+    service: clamav
+spec:
+  type: ClusterIP
+  ports:
+  - name: web
+    protocol: TCP
+    port: 3310
+    targetPort: 3310
+  selector:
+    {{- include "drupal.release_selector_labels" . | nindent 4 }}
+    service: clamav
+{{- end }}

@@ -173,3 +173,27 @@ tests:
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].resources.requests.memory
           value: 2Mi
+
+  - it: can set timezone
+    template: services-cron.yaml
+    set:
+      timezone: 'Foo/Bar'
+      services.foo:
+        image: 'bar'
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+    capabilities:
+      majorVersion: 1
+      minorVersion: 25
+    asserts:
+      - equal:
+          path: spec.timeZone
+          value: 'Foo/Bar'
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: TZ
+            value: Foo/Bar
+        

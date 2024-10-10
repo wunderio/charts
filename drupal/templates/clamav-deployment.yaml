@@ -1,0 +1,71 @@
+{{- if .Values.clamav.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-clamav
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+    service: clamav
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "drupal.release_selector_labels" . | nindent 6 }}
+      service: clamav
+  template:
+    metadata:
+      labels:
+        {{- include "drupal.release_labels" . | nindent 8 }}
+        service: clamav
+      annotations:
+        # We use a checksum to redeploy the pods when the configMap changes.
+        configMap-checksum: {{ include (print $.Template.BasePath "/clamav-configmap.yaml") . | sha256sum }}
+    spec:
+      enableServiceLinks: false
+      containers:
+      - name: clamd
+        image: {{ .Values.clamav.image }}:{{ .Values.clamav.imageTag }}
+        env:
+        - name: UPDATE
+          value: "false"
+        livenessProbe:
+          tcpSocket:
+            port: 3310
+          initialDelaySeconds: 20
+          timeoutSeconds: 2
+        readinessProbe:
+          tcpSocket:
+            port: 3310
+          initialDelaySeconds: 20
+          timeoutSeconds: 2
+        ports:
+        - containerPort: 3310
+          name: clamd
+          protocol: TCP
+        resources:
+          {{ .Values.clamav.resources | toYaml | nindent 10 }}
+        volumeMounts:
+        - name: avdata
+          mountPath: /var/lib/clamav  
+      - name: freshclam
+        image: {{ .Values.clamav.image }}:{{ .Values.clamav.imageTag }}
+        env:
+        - name: UPDATE_ONLY
+          value: "true"
+        resources:
+          {{ .Values.clamav.resources | toYaml | nindent 10 }}
+        volumeMounts:
+        - name: freshclam-config
+          mountPath: /etc/clamav/freshclam.conf
+          subPath: freshclam.conf
+          readOnly: true
+        - name: avdata
+          mountPath: /var/lib/clamav
+      volumes:
+      - name: freshclam-config
+        configMap:
+          name: {{ .Release.Name }}-clamav
+      - name: avdata
+        source:
+          emptyDir: {}
+{{- end }}

@@ -1,7 +1,8 @@
 suite: drupal deployment
 templates:
-  - drupal-deployment.yaml
   - drupal-configmap.yaml
+  - drupal-deployment.yaml
+  - drupal-secret.yaml
 capabilities:
   apiVersions:
     - pxc.percona.com/v1
@@ -145,12 +146,12 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: boolean_on
-            value: "true"
+            value: "on"
       - contains:
           path: spec.template.spec.containers[0].env
           content:
             name: boolean_off
-            value: "false"
+            value: "off"
       - contains:
           path: spec.template.spec.containers[0].env
           content:
@@ -332,3 +333,18 @@ tests:
               secretKeyRef:
                 key: control_key
                 name: RELEASE-NAME-secrets-varnish
+  - it: can set timezone for php and nginx containers
+    template: drupal-deployment.yaml
+    set:
+      timezone: 'Foo/Bar'
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: TZ
+            value: Foo/Bar
+      - contains:
+          path: spec.template.spec.containers[1].env
+          content:
+            name: TZ
+            value: Foo/Bar

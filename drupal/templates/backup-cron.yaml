@@ -8,7 +8,13 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
     cronjob-type: backup
+    cronjob: "true"
 spec:
+  {{- if .Values.timezone }}
+  {{- if eq ( include "drupal.cron.timezone-support" . ) "true" }}
+  timeZone: {{ .Values.timezone | quote }}
+  {{- end }}
+  {{- end }}
   schedule: {{ .Values.backup.schedule | replace "~" (randNumeric 1) | quote }}
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 3600
@@ -25,6 +31,10 @@ spec:
         metadata:
           annotations:
             nrmitchi.com/sidecars: mariadb
+          labels:
+            {{- include "drupal.release_labels" . | nindent 12 }}
+            cronjob-type: backup
+            cronjob: "true"
         spec:
           enableServiceLinks: false
           containers:
@@ -32,7 +42,7 @@ spec:
             {{- include "drupal.php-container" . | nindent 12 }}
             volumeMounts:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
-              - name: {{ .Release.Name }}-backups
+              - name: {{ .Release.Name }}-backup
                 mountPath: /backups
             command: ["/bin/bash", "-c"]
             args:
@@ -51,14 +61,17 @@ spec:
             - containerPort: 3306
               name: mariadb
             resources:
-              requests:
-                {{- .Values.backup.resources | toYaml | nindent 14 }}
+              {{- .Values.backup.resources | toYaml | nindent 14 }}
           restartPolicy: Never
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}
-            - name: {{ .Release.Name }}-backups
+            - name: {{ .Release.Name }}-backup
               persistentVolumeClaim:
-                claimName: {{ .Release.Name }}-backups
+                {{- if and ( eq $.Values.backup.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+                claimName: {{ .Release.Name }}-backup2
+                {{- else }}
+                claimName: {{ .Release.Name }}-backup
+                {{- end }}
           {{- include "drupal.imagePullSecrets" . | nindent 10 }}
 {{- end }}
 

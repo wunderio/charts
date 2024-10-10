@@ -1,6 +1,8 @@
 suite: HorizontalPodAutoscaler
 templates:
+  - drupal-configmap.yaml
   - drupal-deployment.yaml
+  - drupal-secret.yaml
 tests:
   - it: HPA resource is present when autoscaler is enabled
     template: drupal-deployment.yaml

@@ -1,0 +1,50 @@
+{{- if .Values.clamav.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-clamav
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+data:
+  freshclam.conf: |
+    # https://docs.clamav.net/manual/Usage/Configuration.html#freshclamconf
+    {{- if .Values.clamav.freshclamExtraConfig }}
+    {{ .Values.clamav.freshclamExtraConfig | nindent 4 }}
+    {{- end }}
+    PidFile /tmp/freshclam.pid
+    DatabaseOwner clamav
+    DatabaseMirror database.clamav.net
+    Checks 2
+    ScriptedUpdates yes
+    NotifyClamd /etc/clamav/clamd.conf
+    UpdateLogFile /var/log/clamav/freshclam.log
+    # DatabaseDirectory /var/lib/clamav
+    # LogFileMaxSize 1M
+    # LogTime no
+    # LogVerbose no
+    # LogSyslog no
+    # LogFacility LOG_LOCAL6
+    # LogRotate no
+    # DNSDatabaseInfo current.cvd.clamav.net
+    # MaxAttempts 3
+    # CompressLocalDatabase no
+    # DatabaseCustomURL http://myserver.example.com/mysigs.ndb
+    # PrivateMirror mirror1.example.com
+    # HTTPProxyServer https://proxy.example.com
+    # HTTPProxyPort 1234
+    # HTTPProxyUsername myusername
+    # HTTPProxyPassword mypass
+    # HTTPUserAgent SomeUserAgentIdString
+    # LocalIPAddress aaa.bbb.ccc.ddd
+    # OnUpdateExecute command
+    # OnErrorExecute command
+    # OnOutdatedExecute command
+    # Foreground no
+    # Debug no
+    # ConnectTimeout 30
+    # ReceiveTimeout 60
+    # TestDatabases yes
+    # Bytecode yes
+    # ExtraDatabase dbname1
+    # ExcludeDatabase dbname1
+{{- end }}

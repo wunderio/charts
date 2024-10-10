@@ -1,5 +1,9 @@
 suite: drupal php env
 templates:
+  - drupal-configmap.yaml
+  - drupal-deployment.yaml
+  - drupal-secret.yaml
+  - shell-configmap.yaml
   - shell-deployment.yaml
 capabilities:
   apiVersions:

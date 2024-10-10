@@ -59,6 +59,10 @@ spec:
           value: "{{ .Release.Name }}"
         - name: PROJECT_NAME
           value: "{{ .Values.projectName | default .Release.Namespace }}"
+        {{- if .Values.timezone }}
+        - name: TZ
+          value: {{ .Values.timezone | quote }}
+        {{- end }}
         ports:
         - containerPort: 8080
           name: drupal

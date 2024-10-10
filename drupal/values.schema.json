@@ -106,6 +106,7 @@
         "vpcNative": { "type": "boolean" }
       }
     },
+    "timezone": { "type": "string" },
     "nginx": {
       "type": "object",
       "additionalProperties": false,
@@ -158,6 +159,7 @@
           }
         },
         "real_ip_header": { "type": "string" },
+        "x_proxy_auth": { "type": "string" },
         "resources": {
           "type": "object",
           "additionalProperties": false,
@@ -240,15 +242,47 @@
             }
           }
         },
+        "cronJobDefaults": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "properties": {
+            "resources": {
+              "type": ["object", "null"],
+              "additionalProperties": false,
+              "properties": {
+                "requests": {
+                  "type": "object",
+                  "properties": {
+                    "cpu": { "type": ["integer", "string"] },
+                    "memory": { "type": "string" }
+                  }
+                },
+                "limits": {
+                  "type": "object",
+                  "properties": {
+                    "cpu": { "type": ["integer", "string"] },
+                    "memory": { "type": "string" }
+                  }
+                }
+              }
+            },
+            "nodeSelector": {
+              "type": "object",
+              "additionalProperties": { "type": "string" }
+            }
+          }
+        },
         "cron": {
           "type": "object",
           "additionalProperties": {
-            "type": "object",
+            "type": ["object", "null"],
             "additionalProperties": false,
             "properties": {
               "schedule": { "type": "string" },
               "command": { "type": "string" },
+              "backoffLimit": { "type": "integer" },
               "nodeSelector": { "type": ["object", "null"] },
+              "php_ini": { "type": "string" },
               "resources": {
                 "type": "object",
                 "additionalProperties": false,
@@ -320,6 +354,7 @@
             "upload_max_filesize": { "type": "string" },
             "post_max_size": { "type": "string" },
             "memory_limit": { "type": "string" },
+            "max_execution_time": { "type": "integer" },
             "extraConfig": { "type": "string" }
           }
         },
@@ -431,6 +466,36 @@
                 "memory": { "type": "string" }
               }
             }
+          }
+        }
+      }
+    },
+    "silta-hub": { 
+      "type": "object",
+      "properties": {
+        "sync": { 
+          "type": "object",
+          "properties": {
+            "resources": {
+              "type": "object",
+              "properties": {
+                "requests": {
+                  "type": "object",
+                  "properties": {
+                    "cpu": { "type": ["integer", "string"] },
+                    "memory": { "type": "string" }
+                  }
+                },
+                "limits": {
+                  "type": "object",
+                  "properties": {
+                    "cpu": { "type": ["integer", "string"] },
+                    "memory": { "type": "string" }
+                  }
+                }
+              }
+            },
+            "storage": { "type": "string" }
           }
         }
       }
@@ -618,6 +683,36 @@
                 "storageClassName": { "type": "string" },
                 "csiDriverName": { "type": "string" },
                 "accessModes": { "type": "array" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "clamav": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "image": { "type": "string" },
+        "imageTag": { "type": ["string", "integer"] },
+        "freshclamExtraConfig": { "type": "string" },
+        "resources": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "requests": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": ["integer", "string"] },
+                "memory": { "type": "string" }
+              }
+            },
+            "limits": {
+              "type": "object",
+              "properties": {
+                "cpu": { "type": ["integer", "string"] },
+                "memory": { "type": "string" }
               }
             }
           }

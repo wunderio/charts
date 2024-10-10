@@ -1,11 +1,12 @@
 {{- if .Values.backup.enabled }}
 {{- if eq .Values.backup.storageClassName "silta-shared" }}
+{{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "false" }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backups
+  name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
   labels:
-    name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backups
+    name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
   accessModes:
@@ -16,16 +17,22 @@ spec:
   {{- if .Values.backup.csiDriverName }}
   csi:
     driver: {{ .Values.backup.csiDriverName }}
-    volumeHandle: {{ .Release.Namespace }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backups
+    volumeHandle: {{ .Release.Namespace }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
     volumeAttributes:
       remotePathSuffix: /{{ .Release.Namespace }}/{{ .Values.environmentName }}/backups
+      vfs-cache-mode: "off"
   {{- end }}
 ---
+{{- end }}
 {{- end }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-backups
+  {{- if and ( eq $.Values.backup.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+  name: {{ .Release.Name }}-backup2
+  {{- else }}
+  name: {{ .Release.Name }}-backup
+  {{- end }}
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
   annotations:
@@ -38,8 +45,10 @@ spec:
     requests:
       storage: {{ .Values.backup.storage }}
 {{- if eq .Values.backup.storageClassName "silta-shared" }}
+{{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "false" }}
   selector:
     matchLabels:
-      name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backups
+      name: {{ .Release.Name }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-backup
+{{- end }}
 {{- end }}
 {{- end }}

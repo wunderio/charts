@@ -288,7 +288,12 @@ data:
       # Its purpose is to decide whether or not to serve the request, how to do it, and, if applicable,
       # which backend to use.
       # also used to modify the request
-
+      {{- if ne .Values.nginx.x_proxy_auth "" }}
+      # Block request if proxy header is set but does not match defined value
+      if (req.http.x-proxy-auth != "{{ .Values.nginx.x_proxy_auth }}") {
+        return (synth(403, "Not allowed."));
+      }
+      {{- end }}
       # Fixes "Too many restarts" error
       if (req.restarts > 0) {
         set req.hash_always_miss = true;

@@ -1,13 +1,16 @@
 dependencies:
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
-  version: 4.8.3
+  version: 4.10.4
 - name: nginx-ingress
   repository: https://helm.nginx.com/stable
   version: 0.17.1
 - name: traefik
   repository: file://../legacy_traefik
   version: 1.87.7
+- name: ingress-nginx
+  repository: https://kubernetes.github.io/ingress-nginx
+  version: 4.10.4
 - name: pxc-operator
   repository: https://percona.github.io/percona-helm-charts/
   version: 1.12.2
@@ -16,7 +19,7 @@ dependencies:
   version: 6.0.5
 - name: csi-rclone
   repository: https://storage.googleapis.com/charts.wdr.io
-  version: 0.3.1
+  version: 1.0.0
 - name: cert-manager
   repository: https://charts.jetstack.io/
   version: v0.10.1
@@ -25,7 +28,7 @@ dependencies:
   version: 1.0.0
 - name: instana-agent
   repository: https://agents.instana.io/helm
-  version: 1.2.66
+  version: 1.2.73
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
   version: 4.0.18
@@ -35,5 +38,5 @@ dependencies:
 - name: docker-registry
   repository: https://helm.twun.io
   version: 2.1.0
-digest: sha256:df6f7b163fe7389617d938a7f80da42bd46ca249820e5e32313ff7abedfa8b21
-generated: "2023-11-30T11:31:16.305257237+02:00"
+digest: sha256:4b1c653905617945db382d2b950ba0b860f1c90dd12261bb5e1840c46f77e27f
+generated: "2024-09-03T09:52:29.859928636+03:00"

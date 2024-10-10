@@ -6,7 +6,14 @@ metadata:
   name: {{ .Release.Name }}-refdata
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
+    cronjob: "true"
+    cronjob-type: reference-data
 spec:
+  {{- if .Values.timezone }}
+  {{- if eq ( include "drupal.cron.timezone-support" . ) "true" }}
+  timeZone: {{ .Values.timezone | quote }}
+  {{- end }}
+  {{- end }}
   schedule: {{ .Values.referenceData.schedule | replace "~" (randNumeric 1) | quote }}
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 3600
@@ -15,6 +22,11 @@ spec:
   jobTemplate:
     spec:
       template:
+        metadata:
+          labels:
+            {{- include "drupal.release_labels" . | nindent 12 }}
+            cronjob: "true"
+            cronjob-type: reference-data
         spec:
           enableServiceLinks: false
           containers:
@@ -36,8 +48,11 @@ spec:
             {{- include "drupal.volumes" . | nindent 12 }}
             - name: reference-data-volume
               persistentVolumeClaim:
+                {{- if and ( eq $.Values.referenceData.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+                claimName: {{ include "drupal.referenceEnvironment" . }}-reference
+                {{- else }}
                 claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
-
+                {{- end }}
           {{- include "drupal.imagePullSecrets" . | nindent 10 }}
 {{- end }}
 {{- end }}

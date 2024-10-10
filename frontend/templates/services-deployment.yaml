@@ -4,7 +4,7 @@ kind: Deployment
 metadata:
   name: {{ $.Release.Name }}-{{ $index }}
   labels:
-    {{ include "frontend.release_labels" $ | indent 4 }}
+    {{- include "frontend.release_labels" $ | nindent 4 }}
     silta-frontend: service
 spec:
   {{- if or (not $service.autoscaling) (not (($service.autoscaling).enabled)) }}
@@ -14,12 +14,12 @@ spec:
     {{ default $.Values.serviceDefaults.strategy $service.strategy | toYaml }}
   selector:
     matchLabels:
-      {{ include "frontend.release_labels" $ | indent 6 }}
+      {{- include "frontend.release_selector_labels" $ | nindent 6 }}
       deployment: frontend-{{ $index }}
   template:
     metadata:
       labels:
-        {{ include "frontend.release_labels" $ | indent 8 }}
+        {{- include "frontend.release_labels" $ | nindent 8 }}
         deployment: frontend-{{ $index }}
         silta-frontend: service
         {{ if $.Values.shell.enabled -}}
@@ -50,6 +50,10 @@ spec:
           - name: shell-keys
             mountPath: /etc/ssh/keys
           {{- end }}
+        {{- if $service.lifecycle }}
+        lifecycle:
+        {{- toYaml $service.lifecycle | nindent 10 }}
+        {{- end }}
         livenessProbe:
         {{- if $service.livenessProbe }}
         {{- toYaml $service.livenessProbe | nindent 10 }}
@@ -94,7 +98,11 @@ spec:
             name: {{ $mount.configMapName }}
         {{- else }}
           persistentVolumeClaim:
+            {{- if and ( eq $mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+            claimName: {{ $.Release.Name }}-{{ $mountName }}2
+            {{- else }}
             claimName: {{ $.Release.Name }}-{{ $mountName }}
+            {{- end }}
         {{- end }}
         {{- end }}
         {{- end }}
@@ -102,7 +110,11 @@ spec:
         {{ if $.Values.shell.enabled -}}
         - name: shell-keys
           persistentVolumeClaim:
+            {{- if and ( eq $.Values.shell.mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+            claimName: {{ $.Release.Name }}-shell-keys2
+            {{- else }}
             claimName: {{ $.Release.Name }}-shell-keys
+            {{- end }}
         {{- end }}
       {{ if $service.nodeSelector -}}
       nodeSelector:
@@ -163,7 +175,7 @@ kind: Job
 metadata:
   name: "{{ $.Release.Name }}-{{ $index }}-post-release"
   labels:
-    {{ include "frontend.release_labels" $ | indent 4 }}
+    {{- include "frontend.release_labels" $ | nindent 4 }}
   annotations:
     # This is what defines this resource as a hook. Without this line, the
     # job is considered part of the release.
@@ -176,7 +188,7 @@ spec:
   template:
     metadata:
       labels:
-        {{ include "frontend.release_labels" $ | indent 8 }}
+        {{- include "frontend.release_labels" $ | nindent 8 }}
     spec:
       restartPolicy: Never
       enableServiceLinks: false
@@ -232,7 +244,11 @@ spec:
             name: {{ $mount.configMapName }}
         {{- else }}
           persistentVolumeClaim:
+            {{- if and ( eq $mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+            claimName: {{ $.Release.Name }}-{{ $mountName }}2
+            {{- else }}
             claimName: {{ $.Release.Name }}-{{ $mountName }}
+            {{- end }}
         {{- end }}
         {{- end }}
         {{- end }}
@@ -240,7 +256,11 @@ spec:
         {{ if $.Values.shell.enabled -}}
         - name: shell-keys
           persistentVolumeClaim:
+            {{- if and ( eq $.Values.shell.mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+            claimName: {{ $.Release.Name }}-shell-keys2
+            {{- else }}
             claimName: {{ $.Release.Name }}-shell-keys
+            {{- end }}
         {{- end }}
 {{- end }}
 

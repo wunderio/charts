@@ -1,7 +1,7 @@
 suite: CSI Node Plugin
 templates:
+  - 1.13-csi-nodeplugin-rbac.yaml
   - 1.13-csi-nodeplugin-rclone.yaml
-  - 1.19-csi-nodeplugin-rclone.yaml
 tests:
   - it: is a daemon (1.13)
     template: 1.13-csi-nodeplugin-rclone.yaml
@@ -34,3 +34,20 @@ tests:
       - equal:
           path: spec.template.spec.containers[1].resources.requests.cpu
           value: 456m
+
+  - it: can set service account annotations (1.13)
+    template: 1.13-csi-nodeplugin-rbac.yaml
+    documentIndex: 0
+    capabilities:
+      majorVersion: 1
+      minorVersion: 18
+    set:
+      nodePlugin:
+        serviceAccount:
+          annotations:
+            hello: world
+    asserts:
+      - equal:
+          path: metadata.annotations
+          value:
+            hello: world

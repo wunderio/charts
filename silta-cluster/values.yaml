@@ -48,6 +48,7 @@ ingress-nginx:
       use-geoip: false
       use-gzip: false
       gzip-level: 1
+      proxy-buffer-size: 8k
       # ModSecurity https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#enable-modsecurity
       # Off by default, enable using ingress annotations
       enable-modsecurity: false
@@ -170,6 +171,104 @@ ssl:
   # ca: ""
   # key: ""
   # crt: ""
+
+# Community ingress-nginx chart
+# https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
+# https://github.com/kubernetes/ingress-nginx/blob/e4a66fd2f625de3bcc7aaa793b31f529a0662009/charts/ingress-nginx/values.yaml
+# This is a duplicate of the ingress-nginx chart, but with a different name, meant to immitate traefik ingress class and replace it.
+nginx-traefik:
+  enabled: false
+  controller:
+    # see autoscaling section below
+    replicaCount: 1
+    service:
+      # loadBalancerIP: 1.2.3.4
+      externalTrafficPolicy: Local
+    ingressClass: traefik
+    ingressClassResource:
+      default: true
+      name: traefik
+    watchIngressWithoutClass: false
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 10
+      targetCPUUtilizationPercentage: 80
+      targetMemoryUtilizationPercentage: 80
+    # https://github.com/kubernetes/ingress-nginx/issues/6928
+    minReadySeconds: 10
+    # https://github.com/kubernetes/ingress-nginx/issues/6928
+    extraArgs:
+      shutdown-grace-period: 30
+    config:
+      # Optional CDN configuration
+      use-proxy-protocol: false
+      use-forwarded-headers: true
+      compute-full-forwarded-for: true
+      # forwarded-for-header: "X-Forwarded-For"
+      # proxy-real-ip-cidr: "1.1.1.1/32, 2.2.2.2/32"
+      # Logging configuration
+      disable-access-log: false
+      disable-http-access-log: false
+      disable-stream-access-log: false
+      upstream-keepalive-requests: 16378
+      upstream-keepalive-connections: 4096
+      keep-alive-requests: 16378
+      use-geoip: false
+      use-gzip: false
+      gzip-level: 1
+      proxy-buffer-size: 8k
+      # default is too low (1m)
+      proxy-body-size: 0
+      # Extends client timeouts
+      client-header-timeout: 120
+      client-body-timeout: 120
+      proxy-read-timeout: 120
+      # Tackles https://github.com/kubernetes/ingress-nginx/issues/8488
+      lua-shared-dicts: "certificate_data: 100"
+      # Tackles https://github.com/kubernetes/ingress-nginx/issues/5030
+      variables-hash-bucket-size: "256"
+      variables-hash-max-size: "2048"
+      # Different error codes to distinguish rate limit states
+      limit-req-status-code: 420
+      limit-conn-status-code:  529
+      global-rate-limit-status-code: 429
+      # ModSecurity https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#enable-modsecurity
+      # Off by default, enable using ingress annotations
+      enable-modsecurity: false
+      enable-owasp-modsecurity-crs: false
+      # Required minimum configuration since SecRuleEngine is set to "DetectionOnly" by default
+      # modsecurity-snippet: |
+      #   SecRuleEngine On
+      #   SecRequestBodyAccess On
+    # Admission webhook is broken in GKE private clusters and requires additional configuration
+    # so we disable it by default. Enable when possible.
+    # Reference: https://github.com/kubernetes/ingress-nginx/issues/5401
+    admissionWebhooks:
+      enabled: false
+    priorityClassName: "high-priority"
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+      limits:
+        cpu: 1
+        memory: 1Gi
+    metrics:
+      enabled: false
+      service:
+        annotations:
+          prometheus.io/scrape: "true"
+          prometheus.io/port: "10254"
+  # Splash page
+  defaultBackend:
+    enabled: true
+    name: defaultbackend
+    image:
+      registry: wunderio
+      image: silta-splash
+      tag: "v1"
+      readOnlyRootFilesystem: false
   
 # https://github.com/wunderio/charts/blob/master/csi-rclone/values.yaml
 csi-rclone:
@@ -181,6 +280,7 @@ csi-rclone:
   defaultParams: false
   storageClass:
     name: "silta-shared"
+    pathPattern: "${.PVC.namespace}/${.PVC.annotations.storage.silta/storage-path}"
   # params:
   #   remote: "s3"
   #   remotePath: "projectname"
@@ -279,8 +379,8 @@ silta-downscaler:
   # How long should releases with matching names be kept. The last matching rule takes effect.
   releaseMinAge:
     "^production": 10y
-    "^(master|main|stage|staging)": 4w
-    "^(dev|develop|development)": 2w 
+    "^(master|main|stage|staging)": 8w
+    "^(dev|develop|development)": 4w 
     "^dependabot": 1h
   resources:
     requests:
@@ -317,7 +417,7 @@ silta-shared-nfs:
     server: silta-cluster-nfs-server.silta-cluster.svc.cluster.local
     path: /
   storageClass:
-    name: silta-nfs-shared
+    name: silta-shared-nfs
     # Set volume bindinng mode - Immediate or WaitForFirstConsumer
     volumeBindingMode: WaitForFirstConsumer
     pathPattern: "${.PVC.namespace}/${.PVC.annotations.storage.silta/storage-path}"
@@ -336,7 +436,35 @@ nfs-server:
     limits:
       cpu: 100m
       memory: 512M
-  persistence:
+  persistence:    
+    rclone:
+      enabled: false
+      image: rclone/rclone:1.63
+      # bucket
+      remotePath: ""
+      # rclone config file content (except [remote] header)
+      # https://rclone.org/docs/#config-config-file
+      backend_config: |
+        # type = google cloud storage
+        # project_number = test-project-123
+        # service_account_credentials = { escaped json, convert newlines to \n }
+        # location = region
+        # links = true
+        # gcs_directory_markers = true
+        # bucket_policy_only = true
+      # rclone mount commmand flags
+      # https://rclone.org/commands/rclone_mount/
+      params:
+        cache-chunk-clean-interval: 15m
+        dir-cache-time: 5s
+        vfs-cache-mode: writes
+        cache-info-age: 72h
+        allow-non-empty: true
+        allow-other: true
+      resources:
+        requests:
+          cpu: 10m
+          memory: 128M
     data:
       size: 10Gi
       # storageClassName: standard
@@ -386,3 +514,9 @@ docker-registry:
     htpasswd: |
       broken:auth
 
+daemonset:
+  enabled: true
+  # Required by elasticsearch
+  # https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-virtual-memory.html#k8s_using_a_daemonset_to_set_virtual_memory
+  maxMapCountSetter:
+    enabled: true

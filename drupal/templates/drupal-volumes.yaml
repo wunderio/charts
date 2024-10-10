@@ -4,6 +4,7 @@
 {{- if eq $mount.enabled true }}
 {{- if and (not (hasKey $mount "configMapName")) (not (hasKey $mount "secretName")) -}}
 {{- if eq $mount.storageClassName "silta-shared" }}
+{{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "false" }}
 # Mount-enabled: {{ $mount.enabled  }}
 apiVersion: v1
 kind: PersistentVolume
@@ -27,10 +28,15 @@ spec:
   {{- end }}
 ---
 {{- end }}
+{{- end }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  {{- if and ( eq $mount.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+  name: {{ $.Release.Name }}-{{ $index }}2
+  {{- else }}
   name: {{ $.Release.Name }}-{{ $index }}
+  {{- end }}
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
   annotations:
@@ -43,9 +49,11 @@ spec:
     requests:
       storage: {{ $mount.storage }}
 {{- if eq $mount.storageClassName "silta-shared" }}
+{{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "false" }}
   selector:
     matchLabels:
       name: {{ $releaseNameTrimmed }}-{{ $.Release.Namespace | sha256sum | trunc 7 }}-{{ $index }}
+{{- end }}
 {{- end }}
 ---
 {{- end -}}
@@ -55,6 +63,7 @@ spec:
 {{- if .Values.referenceData.enabled }}
 {{- if eq .Values.referenceData.referenceEnvironment .Values.environmentName }}
 {{- if eq .Values.referenceData.storageClassName "silta-shared" }}
+{{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "false" }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -77,10 +86,15 @@ spec:
   {{- end }}
 ---
 {{- end }}
+{{- end }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
+  {{- if and ( eq $.Values.referenceData.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
+  name: {{ include "drupal.referenceEnvironment" . }}-reference
+  {{- else }}
   name: {{ include "drupal.referenceEnvironment" . }}-reference-data
+  {{- end }}
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
   annotations:
@@ -93,9 +107,11 @@ spec:
     requests:
       storage: {{ .Values.referenceData.storage }}
 {{- if eq .Values.referenceData.storageClassName "silta-shared" }}
+{{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "false" }}
   selector:
     matchLabels:
       name: {{ .Release.Name }}-{{ .Release.Namespace | sha256sum | trunc 7 }}-reference-data
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
