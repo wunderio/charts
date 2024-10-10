@@ -450,6 +450,8 @@ referenceData:
     - languages
     - php
 
+  elasticsearch: true
+
   # Files larger than this will not be included in reference data.
   maxFileSize: '5M'
 
@@ -535,8 +537,10 @@ backup:
   # These tables will have their content ignored from the backups.
   ignoreTableContent: '(cache|cache_.*)'
 
-  #  Do not backup files
-  #skipFiles: true
+  # Do not backup files
+  skipFiles: false
+
+  elasticsearch: true
 
   # Resources for the backup cron job.
   resources:

@@ -448,6 +448,7 @@
         "storageClassName": { "type": "string" },
         "csiDriverName": { "type": "string" },
         "skipMount": { "type": "boolean" },
+        "elasticsearch": { "type": "boolean" },
         "resources": {
           "type": "object",
           "additionalProperties": false,
@@ -518,6 +519,7 @@
         "csiDriverName": { "type": "string" },
         "ignoreTableContent": { "type": "string" },
         "skipFiles": { "type": "boolean" },
+        "elasticsearch": { "type": "boolean" },
         "resources": {
           "type": "object",
           "additionalProperties": false,
