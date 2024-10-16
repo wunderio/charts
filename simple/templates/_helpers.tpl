@@ -67,3 +67,15 @@ autoscaling/v2
 autoscaling/v2beta1
 {{- end }}
 {{- end }}
+
+{{- define "simple.imagePullSecrets" }}
+{{- if or .Values.imagePullSecrets .Values.imagePullSecret }}
+imagePullSecrets:
+{{- if .Values.imagePullSecrets }}
+{{ .Values.imagePullSecrets | toYaml }}
+{{- end }}
+{{- if .Values.imagePullSecret }}
+- name: {{ .Release.Name }}-registry
+{{- end }}
+{{- end }}
+{{- end }}
