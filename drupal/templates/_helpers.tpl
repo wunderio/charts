@@ -83,9 +83,14 @@ ports:
 {{- end }}
 
 {{- define "drupal.imagePullSecrets" }}
-{{- if .Values.imagePullSecrets }}
+{{- if or .Values.imagePullSecrets .Values.imagePullSecret }}
 imagePullSecrets:
+{{- if .Values.imagePullSecrets }}
 {{ .Values.imagePullSecrets | toYaml }}
+{{- end }}
+{{- if .Values.imagePullSecret }}
+- name: {{ .Release.Name }}-registry
+{{- end }}
 {{- end }}
 {{- end }}
 
