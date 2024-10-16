@@ -1,0 +1,61 @@
+suite: Backup Cron Jobs
+templates:
+  - _helpers.tpl
+  - backup-cron.yaml
+tests:
+  - it: can set timezone
+    template: backup-cron.yaml
+    set:
+      timezone: 'Foo/Bar'
+      services.foo:
+        image: 'bar'
+        backup:
+          command: echo "Hello world"
+      backup:
+        enabled: true
+    capabilities:
+      majorVersion: 1
+      minorVersion: 25
+    asserts:
+      - equal:
+          path: spec.timeZone
+          value: 'Foo/Bar'
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: TZ
+            value: Foo/Bar
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[1].env
+          content:
+            name: TZ
+            value: Foo/Bar
+        
+  - it: adds imagePullSecrets
+    template: backup-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+      backup:
+        enabled: true
+      imagePullSecrets:
+        - name: foo
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.imagePullSecrets
+          value: 
+            - name: foo
+
+  - it: adds custom imagePullSecret
+    template: backup-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+      backup:
+        enabled: true
+      imagePullSecret: 'foo'
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.imagePullSecrets
+          value: 
+            - name: RELEASE-NAME-registry

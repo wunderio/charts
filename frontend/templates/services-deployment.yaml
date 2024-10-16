@@ -168,6 +168,7 @@ spec:
                   values:
                   - frontend-{{ $index }}
       {{- end }}
+      {{- include "frontend.imagePullSecrets" $ | nindent 6 }}
 {{- if or $service.postupgrade $service.postinstall }}
 ---
 apiVersion: batch/v1
@@ -262,6 +263,7 @@ spec:
             claimName: {{ $.Release.Name }}-shell-keys
             {{- end }}
         {{- end }}
+      {{- include "frontend.imagePullSecrets" $ | nindent 6 }}
 {{- end }}
 
 {{- if $service.autoscaling }}

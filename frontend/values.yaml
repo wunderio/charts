@@ -17,6 +17,13 @@ projectName: ""
 # This name is mainly used to create nice subdomains for each environment.
 environmentName: ""
 
+# Configure image pull secrets for the containers. This is not needed on GKE.
+# See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+imagePullSecrets: []
+
+# Custom imagePullSecret for the containers. Base64 encoded. This will create a secret and append it to the imagePullSecrets. 
+imagePullSecret: ""
+
 # The app label added to our Kubernetes resources.
 app: frontend
 
