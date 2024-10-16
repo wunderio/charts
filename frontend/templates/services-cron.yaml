@@ -99,6 +99,7 @@ spec:
             {{- end }}
             {{- end }}
             {{- end }}
+          {{- include "frontend.imagePullSecrets" $ | nindent 10 }}
           restartPolicy: OnFailure
           {{- if or $job.nodeSelector $service.nodeSelector ($.Values.cronJobDefaults).nodeSelector }}
           nodeSelector:

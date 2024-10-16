@@ -238,3 +238,15 @@ autoscaling/v2beta1
 {{- else }}false
 {{- end }}
 {{- end }}
+
+{{- define "frontend.imagePullSecrets" }}
+{{- if or .Values.imagePullSecrets .Values.imagePullSecret }}
+imagePullSecrets:
+{{- if .Values.imagePullSecrets }}
+{{ .Values.imagePullSecrets | toYaml }}
+{{- end }}
+{{- if .Values.imagePullSecret }}
+- name: {{ .Release.Name }}-registry
+{{- end }}
+{{- end }}
+{{- end }}

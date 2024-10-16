@@ -57,6 +57,13 @@ spec:
               - mountPath: /backups
                 name: shared-data
             command: ["/bin/bash", "-c"]
+            {{- if .Values.timezone }}
+            {{- if eq ( include "frontend.cron.timezone-support" . ) "true" }}
+            env:
+              - name: TZ
+                value: {{ .Values.timezone }}
+            {{- end }}
+            {{- end }}
             args:
               - |
                 {{- $mounts_enabled := false }}
@@ -160,4 +167,5 @@ spec:
                 {{- else }}
                 claimName: {{ .Release.Name }}-backup
                 {{- end }}
+          {{- include "frontend.imagePullSecrets" $ | nindent 10 }}
 {{- end }}

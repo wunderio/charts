@@ -71,7 +71,7 @@ spec:
             exec:
               command: ["/bin/sleep", "5"]
         resources:
-{{ .Values.nginx.resources | toYaml | indent 10 }}
+          {{- .Values.nginx.resources | toYaml | nindent 10 }}
 
       {{- if .Values.signalsciences.enabled }}
       # Signal Services container
@@ -131,6 +131,7 @@ spec:
         - name: sigsci-tmp
           emptyDir: { }
         {{- end }}
+      {{- include "simple.imagePullSecrets" . | nindent 6 }}
 ---
 {{- if .Values.autoscaling.enabled }}
 apiVersion: {{ include "simple.autoscaling.api-version" . | trim }}

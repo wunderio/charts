@@ -197,3 +197,35 @@ tests:
             name: TZ
             value: Foo/Bar
         
+  - it: adds imagePullSecrets
+    template: services-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+      imagePullSecrets:
+        - name: foo
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.imagePullSecrets
+          value: 
+            - name: foo
+
+  - it: adds custom imagePullSecret
+    template: services-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+      imagePullSecret: 'foo'
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.imagePullSecrets
+          value: 
+            - name: RELEASE-NAME-registry

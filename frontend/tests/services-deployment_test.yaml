@@ -2,6 +2,7 @@ suite: Site deployment
 templates:
   - services-deployment.yaml
   - configmap.yaml
+  - image-secrets.yaml
 tests:
   - it: is a deployment with default values
     template: services-deployment.yaml
@@ -266,3 +267,61 @@ tests:
       - equal:
           path: spec.strategy.foo
           value: BAR
+
+  - it: adds imagePullSecrets
+    template: services-deployment.yaml
+    set:
+      services:
+        foo:
+          image: 'bar'
+      imagePullSecrets:
+        - name: foo
+    asserts:
+      - equal:
+          path: spec.template.spec.imagePullSecrets
+          value: 
+            - name: foo
+
+  - it: adds custom imagePullSecret
+    template: services-deployment.yaml
+    set:
+      services:
+        foo:
+          image: 'bar'
+      imagePullSecret: 'foo'
+    asserts:
+      - equal:
+          path: spec.template.spec.imagePullSecrets
+          value: 
+            - name: RELEASE-NAME-registry
+
+  - it: imagePullSecrets and custom imagePullSecret merged
+    template: services-deployment.yaml
+    set:
+      services:
+        foo:
+          image: 'bar'
+      imagePullSecret: 'foo'
+      imagePullSecrets: 
+        - name: bar1
+        - name: bar2
+    asserts:
+      - equal:
+          path: spec.template.spec.imagePullSecrets
+          value:
+            - name: bar1
+            - name: bar2
+            - name: RELEASE-NAME-registry
+
+  - it: Creates a docker secret when imagePullSecret is set
+    template: image-secrets.yaml
+    set:
+      imagePullSecret: 'foo'
+    asserts:
+      - isKind:
+          of: Secret
+      - equal:
+          path: data
+          value:
+            .dockerconfigjson: foo
+
