@@ -10,6 +10,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
     cronjob: "true"
+    cronjob-name: {{ $index | quote }}
 spec:
   {{- if $.Values.timezone }}
   {{- if eq ( include "drupal.cron.timezone-support" $ ) "true" }}
@@ -30,6 +31,7 @@ spec:
           labels:
             {{- include "drupal.release_labels" $ | nindent 12 }}
             cronjob: "true"
+            cronjob-name: {{ $index | quote }}
         spec:
           enableServiceLinks: false
           containers:
