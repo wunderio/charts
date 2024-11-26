@@ -24,7 +24,7 @@ environmentName: ""
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 
-# Custom imagePullSecret for the containers. Base64 encoded. This will create a secret and append it to the imagePullSecrets. 
+# Custom imagePullSecret for the containers. Base64 encoded. This will create a secret and append it to the imagePullSecrets.
 imagePullSecret: ""
 
 # The app label added to our Kubernetes resources.
@@ -540,6 +540,9 @@ backup:
 
   #  Do not backup files
   #skipFiles: true
+
+  # Set a nodeSelector specifically for backup jobs.
+  nodeSelector: {}
 
   # Resources for the backup cron job.
   resources:
