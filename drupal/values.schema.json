@@ -471,10 +471,10 @@
         }
       }
     },
-    "silta-hub": { 
+    "silta-hub": {
       "type": "object",
       "properties": {
-        "sync": { 
+        "sync": {
           "type": "object",
           "properties": {
             "resources": {
@@ -519,6 +519,7 @@
         "csiDriverName": { "type": "string" },
         "ignoreTableContent": { "type": "string" },
         "skipFiles": { "type": "boolean" },
+        "nodeSelector": { "type": "object" },
         "resources": {
           "type": "object",
           "additionalProperties": false,
