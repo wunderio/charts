@@ -39,6 +39,7 @@ spec:
             - silta-cluster
             - kubecost
             - sumologic
+            - logging
       validate:
         message: >-
           Privileged mode is disallowed. The fields spec.containers[*].securityContext.privileged,
