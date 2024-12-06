@@ -38,6 +38,7 @@ spec:
             - kube-system
             - silta-cluster
             - sumologic
+            - logging
       preconditions:
         all:
         - key: "{{ request.operation || 'BACKGROUND' }}"
