@@ -35,8 +35,8 @@ helm install \
   cert-manager jetstack/cert-manager \
   --namespace cert-manager \
   --create-namespace \
-  --version v1.8.0 \
-  --set installCRDs=true \
+  --version v1.16.2 \
+  --set crds.enabled=true \
   --set global.logLevel=1
 ```
 
@@ -157,6 +157,7 @@ helm upgrade --install --wait silta-cluster silta-cluster \
 ```
 
 ## Upgrade path for older versions:
+ - Upgrading silta-cluster chart to 1.9.0 ([docs/Upgrading-to-1.9.0.md](docs/Upgrading-to-1.9.0.md))
 
  - Upgrading silta-cluster chart to 1.8.0 ([docs/Upgrading-to-1.8.0.md](docs/Upgrading-to-1.8.0.md))
 

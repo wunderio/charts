@@ -150,8 +150,8 @@ jobs:
             cert-manager jetstack/cert-manager \
             --namespace cert-manager \
             --create-namespace \
-            --version v1.8.0 \
-            --set installCRDs=true \
+            --version v1.16.2 \
+            --set crds.enabled=true \
             --set global.logLevel=1 \
             --wait
 
