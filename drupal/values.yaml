@@ -355,6 +355,7 @@ php:
 
   # Set whether Drupal errors are displayed.
   # This is a useful override for development environments.
+  # Set to "hide" for Production environment.
   errorLevel: "verbose"
 
   # PHP settings
@@ -366,6 +367,8 @@ php:
     # Custom php settings block. May override parameters previously defined.
     # Note: include correct php ini section, i.e. "[PHP]" or "[Date]".
     extraConfig: |
+    # Uncomment next line to disable error verbosity for PHP completely
+    #  display_errors = off
 
   # Define the location of the Drupal config files relative to the composer root.
   # This variable is exposed as $DRUPAL_CONFIG_PATH in the container.
