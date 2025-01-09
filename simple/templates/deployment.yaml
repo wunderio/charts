@@ -69,7 +69,7 @@ spec:
         lifecycle:
           preStop:
             exec:
-              command: ["/bin/sleep", "5"]
+              command: ["/bin/sleep", "15"]
         resources:
           {{- .Values.nginx.resources | toYaml | nindent 10 }}
 
