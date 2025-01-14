@@ -6,7 +6,7 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 data:
-  {{- if .Values.clamav.extraConfig }}
+  {{- if .Values.clamav.clamdExtraConfig }}
   clamd.conf: |
     # https://docs.clamav.net/manual/Usage/Configuration.html#clamdconf
     {{ .Values.clamav.extraConfig | nindent 6 }}

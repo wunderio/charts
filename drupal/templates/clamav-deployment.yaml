@@ -45,7 +45,7 @@ spec:
         resources:
           {{ .Values.clamav.resources | toYaml | nindent 10 }}
         volumeMounts:
-        {{- if .Values.clamav.extraConfig }}
+        {{- if .Values.clamav.clamdExtraConfig }}
         - name: clamav-config
           mountPath: /etc/clamav/clamd.conf
           subPath: clamd.conf
@@ -61,7 +61,7 @@ spec:
         resources:
           {{ .Values.clamav.resources | toYaml | nindent 10 }}
         volumeMounts:
-        {{- if .Values.clamav.extraConfig }}
+        {{- if .Values.clamav.clamdExtraConfig }}
           - name: clamav-config
             mountPath: /etc/clamav/clamd.conf
             subPath: clamd.conf
