@@ -63,14 +63,14 @@ spec:
           mountPath: /etc/clamav/clamd.conf
           subPath: clamd.conf
           readOnly: true
-        - name: freshclam-config
+        - name: clamav-config
           mountPath: /etc/clamav/freshclam.conf
           subPath: freshclam.conf
           readOnly: true
         - name: avdata
           mountPath: /var/lib/clamav
       volumes:
-      - name: freshclam-config
+      - name: clamav-config
         configMap:
           name: {{ .Release.Name }}-clamav
       - name: avdata
