@@ -45,8 +45,12 @@ spec:
         resources:
           {{ .Values.clamav.resources | toYaml | nindent 10 }}
         volumeMounts:
+        - name: clamav-config
+          mountPath: /etc/clamav/clamd.conf
+          subPath: clamd.conf
+          readOnly: true
         - name: avdata
-          mountPath: /var/lib/clamav  
+          mountPath: /var/lib/clamav
       - name: freshclam
         image: {{ .Values.clamav.image }}:{{ .Values.clamav.imageTag }}
         env:
@@ -55,14 +59,18 @@ spec:
         resources:
           {{ .Values.clamav.resources | toYaml | nindent 10 }}
         volumeMounts:
-        - name: freshclam-config
+        - name: clamav-config
+          mountPath: /etc/clamav/clamd.conf
+          subPath: clamd.conf
+          readOnly: true
+        - name: clamav-config
           mountPath: /etc/clamav/freshclam.conf
           subPath: freshclam.conf
           readOnly: true
         - name: avdata
           mountPath: /var/lib/clamav
       volumes:
-      - name: freshclam-config
+      - name: clamav-config
         configMap:
           name: {{ .Release.Name }}-clamav
       - name: avdata

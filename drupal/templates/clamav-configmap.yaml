@@ -6,6 +6,136 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 data:
+  clamd.conf: |
+    {{- if .Values.clamav.clamdExtraConfig }}
+    # https://docs.clamav.net/manual/Usage/Configuration.html#clamdconf
+    {{ .Values.clamav.clamdExtraConfig | nindent 4 }}
+    {{- end }}
+    # These are set for docker container and should not be changed
+    LogFile /var/log/clamav/clamd.log
+    LogTime yes
+    LocalSocket /tmp/clamd.sock
+    TCPSocket 3310
+    User clamav
+    # Default configuration
+    # LogFileMaxSize 1M
+    # LogClean no
+    # LogSyslog yes
+    # LogFacility LOG_LOCAL6
+    # LogVerbose no
+    # PreludeEnable no
+    # PreludeAnalyzerName ClamAV
+    # ExtendedDetectionInfo no
+    # PidFile /run/clamav/clamd.pid (disabled by default)
+    # TemporaryDirectory /tmp
+    # DatabaseDirectory /var/lib/clamav (hardcoded by default)
+    # OfficialDatabaseOnly no
+    # FailIfCvdOlderThan -1
+    # LocalSocketGroup virusgroup (disabled by default)
+    # LocalSocketMode 660 (disabled by default)
+    # FixStaleSocket yes
+    # TCPAddr 0.0.0.0 (default: no)
+    # MaxConnectionQueueLength 200
+    # StreamMaxLength 100M
+    # StreamMinPort 1024
+    # StreamMaxPort 2048
+    # MaxThreads 10
+    # ReadTimeout 120
+    # CommandReadTimeout 30
+    # SendBufTimeout 500
+    # MaxQueue 100
+    # IdleTimeout 30
+    # ExcludePath ^/proc/ (default scan all)
+    # MaxDirectoryRecursion 15
+    # FollowDirectorySymlinks no
+    # FollowFileSymlinks no
+    # CrossFilesystems yes
+    # SelfCheck 600
+    # ConcurrentDatabaseReload yes
+    # VirusEvent /opt/send_virus_alert_sms.sh (default no)
+    # ExitOnOOM yes
+    # Foreground no
+    # Debug no
+    # LeaveTemporaryFiles no
+    # GenerateMetadataJson no
+    # AllowAllMatchScan yes
+    # DetectPUA no
+    # ExcludePUA NetTool (load all categories if DetectPUA is enabled)
+    # ExcludePUA PWTool
+    # IncludePUA Spy (load all categories if DetectPUA is enabled)
+    # ForceToDisk no
+    # DisableCache no
+    # CacheSize 65536 (default ?)
+    # HeuristicAlerts yes
+    # HeuristicScanPrecedence no
+    # AlertBrokenExecutable no
+    # AlertBrokenMedia no
+    # AlertEncrypted no
+    # AlertEncryptedArchive no
+    # AlertEncryptedDoc no
+    # AlertOLE2Macros no
+    # AlertPhishingSSLMismatch no
+    # AlertPhishingCloak no
+    # AlertPartitionIntersection no
+    # ScanPE yes
+    # DisableCertCheck no
+    # ScanELF yes
+    # ScanOLE2 yes
+    # ScanPDF yes
+    # ScanSWF yes
+    # ScanXMLDOCS yes
+    # ScanHWP3 yes
+    # ScaOneNote yes
+    # ScanImage yes
+    # ScanImageFuzzyHash yes
+    # ScanMail yes
+    # ScanPartialMessages no
+    # PhishingSignatures yes
+    # PhishingScanURLs yes
+    # StructuredDataDetection no
+    # StructuredMinCreditCardCount 3
+    # StructuredCCOnly no
+    # StructuredMinSSNCount 3
+    # StructuredSSNFormatNormal yes
+    # StructuredSSNFormatStripped no
+    # ScanHTML yes
+    # ScanArchive yes
+    # MaxScanTime 120000
+    # MaxScanSize 400M
+    # MaxFileSize 100M
+    # MaxRecursion 17
+    # MaxFiles 10000
+    # MaxEmbeddedPE 40M
+    # MaxHTMLNormalize 40M
+    # MaxHTMLNoTags 8M
+    # MaxScriptNormalize 20M
+    # MaxZipTypeRcg 1M
+    # MaxPartitions 50
+    # MaxIconsPE 100
+    # MaxRecHWP3 16
+    # PCREMatchLimit 10000
+    # PCRERecMatchLimit 2000
+    # PCREMaxFileSize 100M
+    # AlertExceedsMax no
+    # OnAccessMaxFileSize 5M
+    # OnAccessMaxThreads 5
+    # OnAccessPrevention yes
+    # OnAccessCurlTimeout 5000
+    # OnAccessDisableDDD no
+    # OnAccessIncludePath ^/home (default disabled)
+    # OnAccessExcludePath ^/proc (default disabled)
+    # OnAccessPrevention no
+    # OnAccessDenyOnError no
+    # OnAccessExtraScanning no
+    # OnAccessMountPath /mnt (default disabled)
+    # OnAccessExcludeRootUID no
+    # OnAccessExcludeUID -1 (default disabled)
+    # OnAccessExcludeUname clamav (default disabled)
+    # OnAccessRetryAttempts 0
+    # Bytecode yes
+    # BytecodeSecurity TrustSigned
+    # BytecodeUnsigned no
+    # BytecodeTimeout 10000
   freshclam.conf: |
     # https://docs.clamav.net/manual/Usage/Configuration.html#freshclamconf
     {{- if .Values.clamav.freshclamExtraConfig }}

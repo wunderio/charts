@@ -785,6 +785,9 @@ clamav:
   # Available image tags: https://hub.docker.com/r/clamav/clamav/
   image: clamav/clamav
   imageTag: stable
+  # See https://docs.clamav.net/manual/Usage/Configuration.html#clamdconf
+  clamdExtraConfig: ""
+  # See https://docs.clamav.net/manual/Usage/Configuration.html#freshclamconf
   freshclamExtraConfig: ""
   resources:
     requests:

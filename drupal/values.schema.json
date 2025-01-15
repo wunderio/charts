@@ -698,6 +698,7 @@
         "enabled": { "type": "boolean" },
         "image": { "type": "string" },
         "imageTag": { "type": ["string", "integer"] },
+        "clamdExtraConfig": { "type": "string" },
         "freshclamExtraConfig": { "type": "string" },
         "resources": {
           "type": "object",
