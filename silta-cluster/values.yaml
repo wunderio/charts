@@ -124,6 +124,7 @@ nginx-ingress:
 
 # Traefik 1.7 chart
 # https://github.com/wunderio/charts/blob/master/legacy_traefik/values.yaml
+# Note: Do not use this for new clusters, this is a default LB due to legacy setups. Use ingress-nginx instead.
 traefik:
   enabled: true
   externalTrafficPolicy: Local
