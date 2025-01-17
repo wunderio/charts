@@ -183,7 +183,7 @@ spec:
                   if [ -f "${MARIADB_ROOT_PASSWORD_FILE:-}" ]; then
                       password_aux=$(cat $MARIADB_ROOT_PASSWORD_FILE)
                   fi
-                  mysql-admin status -uroot -p$password_aux
+                  /usr/bin/mariadb-admin status -uroot -p$password_aux
             initialDelaySeconds: {{ .Values.master.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.master.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.master.livenessProbe.timeoutSeconds }}
@@ -201,7 +201,7 @@ spec:
                   if [ -f "${MARIADB_ROOT_PASSWORD_FILE:-}" ]; then
                       password_aux=$(cat $MARIADB_ROOT_PASSWORD_FILE)
                   fi
-                  mysql-admin status -uroot -p$password_aux
+                  /usr/bin/mariadb-admin status -uroot -p$password_aux
             initialDelaySeconds: {{ .Values.master.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.master.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.master.readinessProbe.timeoutSeconds }}
