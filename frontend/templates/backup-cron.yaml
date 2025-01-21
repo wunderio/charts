@@ -140,6 +140,7 @@ spec:
           {{- end }}
           {{- end }}
           restartPolicy: Never
+          serviceAccountName: {{ include "frontend.serviceAccountName" . }}
           volumes:
             - name: shared-data
               emptyDir:
@@ -167,5 +168,4 @@ spec:
                 {{- else }}
                 claimName: {{ .Release.Name }}-backup
                 {{- end }}
-          {{- include "frontend.imagePullSecrets" $ | nindent 10 }}
 {{- end }}

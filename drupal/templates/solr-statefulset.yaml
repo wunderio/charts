@@ -79,7 +79,7 @@ spec:
       volumes:
       - name: {{ .Release.Name }}-core-dir
         emptyDir: {}
-      
+      serviceAccountName: {{ include "drupal.serviceAccountName" . }}
   volumeClaimTemplates:
   - metadata:
       name: {{ .Release.Name }}-solr-data

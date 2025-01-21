@@ -331,7 +331,7 @@ imagePullSecrets:
 {{- define "drupal.wait-for-db-command" }}
 TIME_WAITING=0
 echo "Waiting for database.";
-until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} --silent; do
+until mysqladmin status --connect-timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} --silent; do
   echo -n "."
   sleep 5
   TIME_WAITING=$((TIME_WAITING+5))
@@ -655,7 +655,7 @@ fi
   TIME_WAITING=0
   echo "Waiting for database.";
 
-  until mysqladmin status --connect_timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --protocol=tcp --silent; do
+  until mysqladmin status --connect-timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --protocol=tcp --silent; do
     echo -n "."
     sleep 1s
     TIME_WAITING=$((TIME_WAITING+1))
@@ -730,5 +730,13 @@ autoscaling/v2beta1
 {{- define "silta-cluster.rclone.has-provisioner" }}
 {{- if ( $.Capabilities.APIVersions.Has "silta.wdr.io/v1" ) }}true
 {{- else }}false
+{{- end }}
+{{- end }}
+
+{{- define "drupal.serviceAccountName" }}
+{{- if .Values.serviceAccount.name }}
+{{- .Values.serviceAccount.name }}
+{{- else }}
+{{- .Release.Name }}-sa
 {{- end }}
 {{- end }}

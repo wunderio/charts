@@ -1,47 +1,21 @@
 suite: private docker image
 templates:
-  - drupal-configmap.yaml
-  - drupal-cron.yaml
-  - drupal-deployment.yaml
-  - drupal-secret.yaml
-  - post-release.yaml
-capabilities:
-  apiVersions:
-    - pxc.percona.com/v1
+  - serviceaccount.yaml
+
 tests:
   - it: has no image pull secret by default
-    template: drupal-deployment.yaml
+    template: serviceaccount.yaml
     asserts:
       - isNull:
           path: spec.template.spec.imagePullSecrets
-      - template: drupal-cron.yaml
-        isNull:
-          path: spec.jobTemplate.spec.template.spec.imagePullSecrets
-      - template: post-release.yaml
-        isNull:
-          path: spec.template.spec.imagePullSecrets
 
   - it: sets the image pull secret
-    template: drupal-deployment.yaml
+    template: serviceaccount.yaml
     set:
       imagePullSecrets:
         - name: gcr
     asserts:
      - contains:
-         path: spec.template.spec.imagePullSecrets
+         path: imagePullSecrets
          content:
            name: gcr
-
-     - template: drupal-cron.yaml
-       contains:
-         path: spec.jobTemplate.spec.template.spec.imagePullSecrets
-         content:
-           name: gcr
-
-     - template: post-release.yaml
-       contains:
-         path: spec.template.spec.imagePullSecrets
-         content:
-           name: gcr
-
-

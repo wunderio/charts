@@ -40,7 +40,7 @@ spec:
           {{- end }}
         resources:
           {{- .Values.php.postinstall.resources | toYaml | nindent 10 }}
-      {{- include "drupal.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "drupal.serviceAccountName" . }}
       volumes:
         {{- include "drupal.volumes" . | nindent 8 }}
         {{- if .Values.referenceData.enabled -}}

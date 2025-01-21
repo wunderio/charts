@@ -19,6 +19,12 @@ imagePullSecrets: []
 # Custom imagePullSecret for the containers. Base64 encoded. This will create a secret and append it to the imagePullSecrets. 
 imagePullSecret: ""
 
+serviceAccount:
+  # Default value: [Release.Name]-sa
+  name: ""
+  # Mount service account token to the containers.
+  automountServiceAccountToken: false
+
 # The app label added to our Kubernetes resources.
 app: simple
 

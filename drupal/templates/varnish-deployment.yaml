@@ -74,4 +74,5 @@ spec:
       - name: varnish-secret
         secret:
           secretName: {{ .Release.Name }}-secrets-varnish
+      serviceAccountName: {{ include "drupal.serviceAccountName" . }}
 {{- end }}

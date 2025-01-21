@@ -22,7 +22,7 @@ jobs:
         # Available minikube kubernetes version list:
         # "minikube config defaults kubernetes-version"
         # and https://kubernetes.io/releases/patch-releases/
-        kubernetes-version: ["v1.22.17", "v1.23.17", "v1.24.17", "v1.25.16", "v1.26.15", "v1.27.13", "v1.28.9", "v1.29.4", "v1.30.0", "latest"]
+        kubernetes-version: ["v1.22.17", "v1.23.17", "v1.24.17", "v1.25.16", "v1.26.15", "v1.27.16", "v1.28.13", "v1.29.8", "v1.30.4", "v1.31.0", "latest"]
     env:
       CLUSTER_DOMAIN: minikube.local.wdr.io
       K8S_PROJECT_REPO_DIR: k8s-project-repositories
@@ -41,7 +41,7 @@ jobs:
       - name: Helm and repository setup
         run: |
           # Install Helm 3
-          HELM_VERSION=v3.14.0
+          HELM_VERSION=v3.16.3
           curl -o /tmp/helm.tar.gz https://get.helm.sh/helm-${HELM_VERSION}-linux-amd64.tar.gz \
             && tar -zxvf /tmp/helm.tar.gz -C /tmp \
             && mv /tmp/linux-amd64/helm ~/.local/bin/helm \
@@ -150,8 +150,8 @@ jobs:
             cert-manager jetstack/cert-manager \
             --namespace cert-manager \
             --create-namespace \
-            --version v1.8.0 \
-            --set installCRDs=true \
+            --version v1.16.2 \
+            --set crds.enabled=true \
             --set global.logLevel=1 \
             --wait
 

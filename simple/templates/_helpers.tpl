@@ -79,3 +79,11 @@ imagePullSecrets:
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{- define "simple.serviceAccountName" }}
+{{- if .Values.serviceAccount.name }}
+{{- .Values.serviceAccount.name }}
+{{- else }}
+{{- .Release.Name }}-sa
+{{- end }}
+{{- end }}

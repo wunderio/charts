@@ -159,7 +159,7 @@ spec:
           volumes:
             {{- include "drupal.volumes" $ | nindent 12 }}
 
-          {{- include "drupal.imagePullSecrets" $ | nindent 10 }}
+          serviceAccountName: {{ include "drupal.serviceAccountName" $ }}
 ---
 {{- end }}
 {{- end }}

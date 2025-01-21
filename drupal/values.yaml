@@ -27,6 +27,12 @@ imagePullSecrets: []
 # Custom imagePullSecret for the containers. Base64 encoded. This will create a secret and append it to the imagePullSecrets.
 imagePullSecret: ""
 
+serviceAccount:
+  # Default value: [Release.Name]-sa
+  name: ""
+  # Mount service account token to the containers.
+  automountServiceAccountToken: false
+
 # The app label added to our Kubernetes resources.
 app: drupal
 
@@ -593,6 +599,8 @@ mariadb:
               operator: NotIn
               values:
               - static-ip
+  serviceAccount:
+    create: true
   enableServiceLinks: false
 
 varnish:
@@ -657,6 +665,10 @@ elasticsearch:
   # Disable service links that cause a slow startup.
   enableServiceLinks: false
 
+  rbac:
+    create: true
+    automountToken: false
+
   # This value should be slightly less than 50% of the requested memory.
   esJavaOpts: -Xmx220m -Xms220m
   xpack:
@@ -687,6 +699,9 @@ elasticsearch:
 memcached:
   enabled: false
   replicaCount: 1
+  serviceAccount:
+    create: true
+  automountServiceAccountToken: false
   resources:
     requests:
       cpu: 10m
@@ -700,7 +715,7 @@ memcached:
     # MaxItemSize
     - -I 4M
 
-# https://github.com/bitnami/charts/blob/master/bitnami/redis/values.yaml
+# https://github.com/bitnami/charts/blob/d4dba2b393167d79b8c8f65b46c48b70ee3a9662/bitnami/redis/values.yaml
 redis:
   enabled: false
   architecture: standalone
@@ -719,6 +734,8 @@ redis:
       requests:
         cpu: 50m
         memory: 256Mi
+  serviceAccount:
+    automountServiceAccountToken: false
 
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
