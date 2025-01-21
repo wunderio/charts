@@ -563,7 +563,7 @@ mariadb:
   enabled: true
   image:
     # https://hub.docker.com/r/bitnami/mariadb/tags
-    tag: 10.6-debian-12
+    tag: 11.4-debian-12
   replication:
     enabled: false
   db:
