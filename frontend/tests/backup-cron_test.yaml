@@ -30,32 +30,3 @@ tests:
           content:
             name: TZ
             value: Foo/Bar
-        
-  - it: adds imagePullSecrets
-    template: backup-cron.yaml
-    set:
-      services.foo:
-        image: 'bar'
-      backup:
-        enabled: true
-      imagePullSecrets:
-        - name: foo
-    asserts:
-      - equal:
-          path: spec.jobTemplate.spec.template.spec.imagePullSecrets
-          value: 
-            - name: foo
-
-  - it: adds custom imagePullSecret
-    template: backup-cron.yaml
-    set:
-      services.foo:
-        image: 'bar'
-      backup:
-        enabled: true
-      imagePullSecret: 'foo'
-    asserts:
-      - equal:
-          path: spec.jobTemplate.spec.template.spec.imagePullSecrets
-          value: 
-            - name: RELEASE-NAME-registry

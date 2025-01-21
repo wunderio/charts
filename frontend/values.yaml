@@ -3,6 +3,8 @@
 silta-release:
   downscaler:
     enabled: true
+    # value examples: 10y, 4w, 1h Defaults to values used in silta-downscaler chart.
+    releaseMinAge: ''
 
 # Main domain of the cluster.
 # Subdomains of this domain will be created automatically for each environment.
@@ -23,6 +25,12 @@ imagePullSecrets: []
 
 # Custom imagePullSecret for the containers. Base64 encoded. This will create a secret and append it to the imagePullSecrets. 
 imagePullSecret: ""
+
+serviceAccount:
+  # Default value: [Release.Name]-sa
+  name: ""
+  # Mount service account token to the containers.
+  automountServiceAccountToken: false
 
 # The app label added to our Kubernetes resources.
 app: frontend
@@ -345,6 +353,11 @@ serviceDefaults:
   # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
   strategy:
     type: RollingUpdate
+  terminationGracePeriodSeconds: 30
+  lifecycle:
+    preStop:
+      exec:
+        command: ['/bin/sleep', '15']
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -354,6 +367,8 @@ serviceDefaults:
       resource:
         name: cpu
         targetAverageUtilization: 80
+  # nodeSelector:
+  #   cloud.google.com/gke-nodepool: static-ip
 
 # Provide defaults for all cron jobs. This will override serviceDefaults when defined.
 cronJobDefaults:
@@ -400,6 +415,8 @@ mariadb:
               operator: NotIn
               values:
               - static-ip
+  serviceAccount:
+    create: true
   enableServiceLinks: false
 
 varnish:
@@ -466,6 +483,13 @@ elasticsearch:
     - name: xpack.security.enabled
       value: "false"
 
+  # Disable service links that cause a slow startup.
+  enableServiceLinks: false
+
+  rbac:
+    create: true
+    automountToken: false
+
   # This value should be slightly less than 50% of the requested memory.
   esJavaOpts: -Xmx220m -Xms220m
   xpack:
@@ -517,7 +541,11 @@ postgresql:
   # Use a low default to prevent unnecessary storage use.
   persistence:
     size: 1Gi
+  serviceAccount:
+    create: true
+    automountServiceAccountToken: false
 
+# https://github.com/wunderio/charts/blob/master/rabbitmq/values.yaml
 rabbitmq:
   enabled: false
 
@@ -582,4 +610,6 @@ redis:
       requests:
         cpu: 50m
         memory: 256Mi
+  serviceAccount:
+    automountServiceAccountToken: false
 

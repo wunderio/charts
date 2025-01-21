@@ -181,13 +181,34 @@ tests:
           path: spec.template.spec.containers[0].resources.limits.memory
           value: 4G
 
-  - it: can set nodeSelectors
+  - it: can set nodeSelector via serviceDefaults
+    template: services-deployment.yaml
+    set:
+      services.foo:
+        image: 'bar'
+      serviceDefaults.nodeSelector:
+        foo: bar
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            foo: bar
+      - contains:
+          path: spec.template.spec.tolerations
+          content:
+            key: foo
+            operator: Equal
+            value: bar
+
+  - it: can override nodeSelector in service
     template: services-deployment.yaml
     set:
       services.foo:
         image: 'bar'
         nodeSelector:
           bar: baz
+      serviceDefaults.nodeSelector:
+        foo: bar
     asserts:
       - equal:
           path: spec.template.spec.nodeSelector
@@ -268,60 +289,96 @@ tests:
           path: spec.strategy.foo
           value: BAR
 
-  - it: adds imagePullSecrets
+  - it: can set terminationGracePeriodSeconds
     template: services-deployment.yaml
     set:
-      services:
-        foo:
-          image: 'bar'
-      imagePullSecrets:
-        - name: foo
+      services.foo:
+        image: 'bar'
+        terminationGracePeriodSeconds: 123
     asserts:
       - equal:
-          path: spec.template.spec.imagePullSecrets
-          value: 
-            - name: foo
+          path: spec.template.spec.terminationGracePeriodSeconds
+          value: 123
 
-  - it: adds custom imagePullSecret
+  - it: Uses serviceDefaults lifecycle hook
     template: services-deployment.yaml
     set:
       services:
-        foo:
+        service1:
+          image: 'foo'
+        service2:
           image: 'bar'
-      imagePullSecret: 'foo'
+      serviceDefaults:
+        lifecycle:
+          postStart: 
+            exec:
+              command: ['/bin/echo', 'foo']
+          preStop: 
+            exec:
+              command: ['/bin/echo', 'bar']
     asserts:
-      - equal:
-          path: spec.template.spec.imagePullSecrets
-          value: 
-            - name: RELEASE-NAME-registry
-
-  - it: imagePullSecrets and custom imagePullSecret merged
-    template: services-deployment.yaml
-    set:
-      services:
-        foo:
-          image: 'bar'
-      imagePullSecret: 'foo'
-      imagePullSecrets: 
-        - name: bar1
-        - name: bar2
-    asserts:
-      - equal:
-          path: spec.template.spec.imagePullSecrets
+      - documentIndex: 0
+        equal:
+          path: spec.template.spec.containers[0].lifecycle
           value:
-            - name: bar1
-            - name: bar2
-            - name: RELEASE-NAME-registry
-
-  - it: Creates a docker secret when imagePullSecret is set
-    template: image-secrets.yaml
-    set:
-      imagePullSecret: 'foo'
-    asserts:
-      - isKind:
-          of: Secret
-      - equal:
-          path: data
+            postStart:
+              exec:
+                command: ['/bin/echo', 'foo']
+            preStop:
+              exec:
+                command: ['/bin/echo', 'bar']
+      - documentIndex: 1
+        equal:
+          path: spec.template.spec.containers[0].lifecycle
           value:
-            .dockerconfigjson: foo
+            postStart:
+              exec:
+                command: ['/bin/echo', 'foo']
+            preStop:
+              exec:
+                command: ['/bin/echo', 'bar']
 
+  - it: Allows override of lifecycle hook
+    template: services-deployment.yaml
+    set:
+      services:
+        service1:
+          image: 'foo'
+        service2:
+          image: 'bar'
+          lifecycle:
+            postStart: 
+              exec:
+                command: ['/bin/echo', 'baz']
+            preStop: 
+              exec:
+                command: ['/bin/echo', 'qux']
+      serviceDefaults:
+        lifecycle:
+          postStart: 
+            exec:
+              command: ['/bin/echo', 'foo']
+          preStop: 
+            exec:
+              command: ['/bin/echo', 'bar']
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: spec.template.spec.containers[0].lifecycle
+          value:
+            postStart:
+              exec:
+                command: ['/bin/echo', 'foo']
+            preStop:
+              exec:
+                command: ['/bin/echo', 'bar']
+      - documentIndex: 1
+        equal:
+          path: spec.template.spec.containers[0].lifecycle
+          value:
+            postStart:
+              exec:
+                command: ['/bin/echo', 'baz']
+            preStop:
+              exec:
+                command: ['/bin/echo', 'qux']

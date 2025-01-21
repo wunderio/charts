@@ -84,6 +84,7 @@ spec:
               {{- $.Values.serviceDefaults.resources | toYaml | nindent 14 }}
               {{- end }}
               {{- end }}
+          serviceAccountName: {{ include "frontend.serviceAccountName" $ }}
           volumes:
             {{- if $service.mounts }}
             {{- range $index, $mountName := $service.mounts -}}
@@ -99,7 +100,6 @@ spec:
             {{- end }}
             {{- end }}
             {{- end }}
-          {{- include "frontend.imagePullSecrets" $ | nindent 10 }}
           restartPolicy: OnFailure
           {{- if or $job.nodeSelector $service.nodeSelector ($.Values.cronJobDefaults).nodeSelector }}
           nodeSelector:
