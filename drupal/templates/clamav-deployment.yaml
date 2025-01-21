@@ -76,4 +76,5 @@ spec:
       - name: avdata
         source:
           emptyDir: {}
+      serviceAccountName: {{ include "drupal.serviceAccountName" . }}
 {{- end }}
