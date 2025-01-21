@@ -23,7 +23,7 @@ spec:
     {{ else }}
     - namespaceSelector:
         matchLabels:
-          name: {{ .Release.Namespace }}
+          kubernetes.io/metadata.name: {{ .Release.Namespace }}
     {{ end }}
 ---
 apiVersion: networking.k8s.io/v1
@@ -49,6 +49,6 @@ spec:
     {{ else }}
     - namespaceSelector:
         matchLabels:
-          name: {{ .Release.Namespace }}
+          kubernetes.io/metadata.name: {{ .Release.Namespace }}
     {{ end }}
 {{ end }}

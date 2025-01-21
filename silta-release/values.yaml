@@ -15,7 +15,7 @@ branchName: ""
 #    from:
 #      - namespaceSelector:
 #          matchLabels:
-#            name: other-namespace
+#            kubernetes.io/metadata.name: other-namespace
 ingressAccess: {}
 
 # Add information regarding an HTTP proxy.
