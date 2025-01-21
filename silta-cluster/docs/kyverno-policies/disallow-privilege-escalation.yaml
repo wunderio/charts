@@ -1,0 +1,62 @@
+# Name: 
+#   Validate Pod Security Context
+# Description:
+#     Disallow Privilege Escalation
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: validate-pod-policy
+  annotations:
+    policies.kyverno.io/title: Disallow Privilege Escalation
+    policies.kyverno.io/category: Pod Security Standards (Restricted)
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    kyverno.io/kyverno-version: 1.6.0
+    kyverno.io/kubernetes-version: "1.22-1.23"
+    policies.kyverno.io/description: >-
+      Privilege escalation is disallowed. The fields
+      spec.containers[*].securityContext.allowPrivilegeEscalation,
+      spec.initContainers[*].securityContext.allowPrivilegeEscalation,
+      and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation
+      can't be set to `true`.
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+  - name: containers-user-privileges-validation
+    match:
+      any:
+      - resources:
+          kinds:
+            - Pod
+    exclude:
+      any:
+      - resources:
+          namespaces:
+          - kube-system
+          - silta-cluster
+          - kubecost
+          - sumologic
+          - logging
+    validate:
+      message: >-
+        Privilege escalation is disallowed. The fields
+        spec.containers[*].securityContext.allowPrivilegeEscalation,
+        spec.initContainers[*].securityContext.allowPrivilegeEscalation,
+        and spec.ephemeralContainers[*].securityContext.allowPrivilegeEscalation
+        can't be set to `true`.
+      foreach:
+        - list: request.object.spec.[ephemeralContainers, initContainers, containers][]
+          deny:
+            conditions:
+              any:
+              - key: "{{ element.securityContext.privileged || '' }}"
+                operator: Equals
+                value: true
+                message: >-
+                  non-privileged-containers may not set securityContext.privileged to true
+              - key: "{{ element.securityContext.allowPrivilegeEscalation || '' }}"
+                operator: Equals
+                value: true
+                message: >-
+                  non-privileged-containers may not set securityContext.allowPrivilegeEscalation to true
