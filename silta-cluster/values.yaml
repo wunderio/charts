@@ -408,7 +408,7 @@ nfs-subdir-external-provisioner:
     onDelete: delete
   image:
     repository: docker.io/wunderio/nfs-subdir-external-provisioner
-    tag: v4.0
+    tag: v5.0
 
 # Uses nfs-subdir-external-provisioner. 
 # see: https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/blob/master/charts/nfs-subdir-external-provisioner/values.yaml
@@ -423,6 +423,9 @@ silta-shared-nfs:
     volumeBindingMode: WaitForFirstConsumer
     pathPattern: "${.PVC.namespace}/${.PVC.annotations.storage.silta/storage-path}"
     onDelete: delete
+  image:
+    repository: docker.io/wunderio/nfs-subdir-external-provisioner
+    tag: v5.0
 
 nfs-server:
   enabled: false
