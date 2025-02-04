@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nfs-server
+  namespace: {{ .Release.Namespace }}
+spec:
+  serviceName: nfs-server
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nfs-server
+  template:
+    metadata:
+      labels:
+        app: nfs-server
+    spec:
+      enableServiceLinks: false
+      containers:
+      - name: nfs-server
+        image: '{{ .Values.image }}:{{ .Values.imageTag }}'
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        ports:
+        - name: nfs
+          containerPort: 2049
+        - name: mountd
+          containerPort: 20048
+        - name: rpcbind
+          containerPort: 111
+        securityContext:
+          privileged: true
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: 111
+        readinessProbe:
+          initialDelaySeconds: 10
+          periodSeconds: 20
+          tcpSocket:
+            port: 111
+        resources:
+          {{- .Values.resources | toYaml | nindent 10 }}
+        volumeMounts:
+        {{- if .Values.persistence.rclone.enabled }}
+        - name: exports
+          mountPath: /exports
+          mountPropagation: Bidirectional
+        {{- else }}
+        - name: nfs-server-data
+          mountPath: /exports
+        {{- end }}
+      {{- if .Values.persistence.rclone.enabled }}
+      - name: rclone
+        image: {{ .Values.persistence.rclone.image }}
+        imagePullPolicy: {{ .Values.persistence.rclone.imagePullPolicy }}
+        command: [
+          "/usr/local/bin/rclone", 
+          "mount", 
+          "backend:{{ .Values.persistence.rclone.remotePath }}", 
+          "/exports", 
+          "--allow-non-empty", 
+          "--allow-other",
+          {{- range $key, $value := .Values.persistence.rclone.params }}
+          "--{{ $key }}={{ $value }}",
+          {{- end }}
+        ]
+        securityContext:
+          # Required by fuse mount
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        resources:
+          {{- .Values.persistence.rclone.resources | toYaml | nindent 10 }}
+        volumeMounts:
+          - name: rclone-config
+            mountPath: /config/rclone/rclone.conf
+            subPath: rclone.conf
+          - name: exports
+            mountPath: /exports
+            mountPropagation: Bidirectional
+      {{- end }}
+      {{- if .Values.persistence.rclone.enabled }}
+      volumes:
+      - name: rclone-config
+        configMap:
+          name: nfs-server-rclone-config
+      - name: exports
+        emptyDir: {}
+      {{- end }}
+
+  {{- if not .Values.persistence.rclone.enabled }}
+  volumeClaimTemplates:
+  - metadata:
+      name: nfs-server-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      {{- if .Values.persistence.data.storageClassName }}
+      storageClassName: {{ .Values.persistence.data.storageClassName }}
+      {{- end }}
+      {{- if .Values.persistence.data.csiDriverName }}
+      csiDriverName: {{ .Values.persistence.data.csiDriverName }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.persistence.data.size }}
+      accessModes: {{ .Values.persistence.data.accessModes }}
+  {{- end }}

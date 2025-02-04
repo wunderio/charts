@@ -1,0 +1,11 @@
+{{- if .Values.persistence.rclone.enabled }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nfs-server-rclone-config
+  namespace: {{ .Release.Namespace }}
+data:
+  rclone.conf: |
+    [backend]
+    {{- .Values.persistence.rclone.backend_config | nindent 4 }}
+{{- end }}
