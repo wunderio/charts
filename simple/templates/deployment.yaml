@@ -101,7 +101,7 @@ spec:
         resources:
           {{- .Values.signalsciences.resources | toYaml | nindent 10 }}
       {{- end }}
-
+      serviceAccountName: {{ include "simple.serviceAccountName" . }}
       volumes:
         - name: nginx-conf
           configMap:
@@ -131,7 +131,6 @@ spec:
         - name: sigsci-tmp
           emptyDir: { }
         {{- end }}
-      {{- include "simple.imagePullSecrets" . | nindent 6 }}
 ---
 {{- if .Values.autoscaling.enabled }}
 apiVersion: {{ include "simple.autoscaling.api-version" . | trim }}

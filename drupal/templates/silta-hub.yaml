@@ -35,7 +35,7 @@ data:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
             resources:
               {{- .Values.php.postinstall.resources | toYaml | nindent 14 }}
-          {{- include "drupal.imagePullSecrets" . | nindent 10 }}
+          serviceAccountName: {{ include "drupal.serviceAccountName" . }}
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}
   syncPullJob: |
@@ -63,6 +63,6 @@ data:
               {{- include "drupal.volumeMounts" . | nindent 14 }}
             resources:
               {{- .Values.php.postinstall.resources | toYaml | nindent 14 }}
-          {{- include "drupal.imagePullSecrets" . | nindent 10 }}
+          serviceAccountName: {{ .Release.Name }}-sa
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}

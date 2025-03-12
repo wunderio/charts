@@ -100,7 +100,7 @@ spec:
         resources:
             {{- .Values.signalsciences.resources | toYaml | nindent 10 }}
         {{- end }}
-
+      serviceAccountName: {{ include "frontend.serviceAccountName" . }}
       volumes:
         - name: nginx-conf
           configMap:

@@ -8,6 +8,14 @@
     "branchName": { "type": "string" },
     "imagePullSecrets": { "type": "array" },
     "imagePullSecret": { "type": "string" },
+    "serviceAccount": { 
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "automountServiceAccountToken": { "type": "boolean" }
+      }
+    },
     "app": { "type": "string" },
     "silta-release": { "type": "object" },
     "replicas": { "type": "integer" },

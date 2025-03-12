@@ -166,7 +166,7 @@ spec:
         - name: sigsci-tmp
           emptyDir: {}
         {{- end }}
-      {{- include "drupal.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "drupal.serviceAccountName" . }}
       nodeSelector:
         {{- .Values.php.nodeSelector | toYaml | nindent 8 }}
       tolerations:
