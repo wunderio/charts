@@ -525,10 +525,25 @@ if [[ -f /app/reference-data/db.tar.gz || -f /app/reference-data/db.sql.gz ]]; t
     echo "Importing reference database dump from db.tar.gz"
     mkdir "${tmp_ref_data}"
     tar -xzf "${app_ref_data}/db.tar.gz" -C "${tmp_ref_data}/"
-    find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c \
-      'echo "Importing {}" && \
-      (echo "SET foreign_key_checks=0; SET unique_checks=0;" && cat {}) | \
-      mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}"'
+    import_sql_file() {
+      local file="$1"
+      echo "Importing ${file}"
+      (echo "SET foreign_key_checks=0; SET unique_checks=0;" && cat "$file") | mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}"
+    }
+    export -f import_sql_file
+
+    echo "==> Importing LARGE SQL files (>1GB) serially..."
+    find "${tmp_ref_data}/" -type f -name "*.sql" -size +1024M | while read -r file; do
+      import_sql_file "$file"
+    done
+
+    echo "==> Importing MEDIUM SQL files (100MB–1GB) in parallel (3 at a time)..."
+    find "${tmp_ref_data}/" -type f -name "*.sql" -size -1024M -size +100M | xargs -P3 -n1 -I{} bash -c 'import_sql_file "$@"' _ {}
+
+    echo "==> Importing SMALL SQL files (<100MB) in parallel (10 at a time)..."
+    find "${tmp_ref_data}/" -type f -name "*.sql" -size -100M | xargs -P10 -n1 -I{} bash -c 'import_sql_file "$@"' _ {}
+
+    echo "==> All imports complete!"
   # Backwards compatibility for old way of importing.
   elif [[ -f "${app_ref_data}/db.sql.gz" ]]; then
     echo "Importing reference database dump from db.sql.gz"
