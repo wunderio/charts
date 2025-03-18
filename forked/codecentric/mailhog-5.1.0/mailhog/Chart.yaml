@@ -1,0 +1,20 @@
+apiVersion: v2
+appVersion: v1.0.1
+description: An e-mail testing tool for developers
+home: http://iankent.uk/project/mailhog/
+icon: https://raw.githubusercontent.com/mailhog/MailHog-UI/master/assets/images/hog.png
+keywords:
+- mailhog
+- mail
+- smtp
+- email
+- e-mail
+- testing
+maintainers:
+- email: unguiculus@gmail.com
+  name: unguiculus
+name: mailhog
+sources:
+- https://github.com/mailhog/MailHog
+type: application
+version: 5.1.0
