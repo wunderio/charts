@@ -480,6 +480,21 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   # Remove all non .sql files
   find . -type f ! -name '*.sql' -delete
 
+  # Add START TRANSACTION; before first INSERT statement in each SQL file to optimize data import.
+  for file in "$INPUT_DIR"/*.sql; do
+    tmp_file="$(mktemp)"
+    transaction_inserted=0
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      if [[ "$transaction_inserted" -eq 0 && "$line" == INSERT* ]]; then
+        printf "START TRANSACTION;\n" >> "$tmp_file"
+        transaction_inserted=1
+      fi
+      printf "%s\n" "$line" >> "$tmp_file"
+    done < "$file"
+    mv "$tmp_file" "$file"
+  done
+
   cd "${previous_wd}"
 
   # Compress the sql files into a single file and copy it into the backup folder.
