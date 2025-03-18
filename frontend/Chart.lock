@@ -3,7 +3,7 @@ dependencies:
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 7.10.4
 - name: mailhog
-  repository: https://codecentric.github.io/helm-charts
+  repository: https://storage.googleapis.com/charts.wdr.io
   version: 5.1.0
 - name: elasticsearch
   repository: file://../elasticsearch
@@ -23,5 +23,5 @@ dependencies:
 - name: redis
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 19.1.5
-digest: sha256:17f6538177ebf6ba9e5688e9f5cc9b36598746144336ffc44bbd4a3ecc062c25
-generated: "2025-01-21T14:04:37.839887+02:00"
+digest: sha256:b5bdf0a7bd385f79ea727101d2fa5b02859e027fc2f1408d0e711d604132d476
+generated: "2025-03-18T10:38:55.608016594+02:00"
