@@ -12,7 +12,7 @@ dependencies:
   repository: https://charts.bitnami.com/bitnami
   version: 16.13.2
 - name: mailhog
-  repository: https://codecentric.github.io/helm-charts
+  repository: https://storage.googleapis.com/charts.wdr.io
   version: 5.1.0
 - name: elasticsearch
   repository: file://../elasticsearch
@@ -20,5 +20,5 @@ dependencies:
 - name: silta-release
   repository: file://../silta-release
   version: 1.0.1
-digest: sha256:b7f96b2faca0716d5dd2b8d4a21f053cea6c0fdd8c7391f463e9c677c7c00196
-generated: "2025-01-21T14:03:49.041107+02:00"
+digest: sha256:9941fba8da73d8d7c9024c8c53dda085f0fba6ae50ef63d884dfe994d08a7641
+generated: "2025-03-18T10:31:05.247476421+02:00"

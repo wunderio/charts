@@ -40,6 +40,9 @@ spec:
             - kubecost
             - sumologic
             - logging
+            - lagoon
+            - csi-driver-nfs
+            - csi-rclone
       validate:
         message: >-
           Privileged mode is disallowed. The fields spec.containers[*].securityContext.privileged,
