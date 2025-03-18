@@ -535,10 +535,10 @@ if [[ -f /app/reference-data/db.tar.gz || -f /app/reference-data/db.sql.gz ]]; t
 
   # New way of importing.
   if [[ -f "${app_ref_data}/db.tar.gz" ]]; then
-  echo "Importing reference database dump from db.tar.gz"
-  mkdir "${tmp_ref_data}"
-  tar -xzf "${app_ref_data}/db.tar.gz" -C "${tmp_ref_data}/"
-  find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
+    echo "Importing reference database dump from db.tar.gz"
+    mkdir "${tmp_ref_data}"
+    tar -xzf "${app_ref_data}/db.tar.gz" -C "${tmp_ref_data}/"
+    find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
 
   # Backwards compatibility for old way of importing.
   elif [[ -f "${app_ref_data}/db.sql.gz" ]]; then
