@@ -38,6 +38,10 @@ spec:
           - kubecost
           - sumologic
           - logging
+          - csi-driver-nfs
+          - elasticsearch
+          - lagoon
+          - csi-rclone
     validate:
       message: >-
         Privilege escalation is disallowed. The fields
