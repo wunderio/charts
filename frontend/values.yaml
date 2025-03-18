@@ -580,6 +580,7 @@ signalsciences:
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
 mailhog:
   enabled: false
+  enableServiceLinks: false
   image:
     # Set image repository to "mailhog/mailhog" to reenable logging.
     repository: wunderio/silta-mailhog

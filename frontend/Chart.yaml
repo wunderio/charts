@@ -8,7 +8,7 @@ dependencies:
   condition: mariadb.enabled
 - name: mailhog
   version: 5.1.x
-  repository: https://codecentric.github.io/helm-charts
+  repository: https://storage.googleapis.com/charts.wdr.io
   condition: mailhog.enabled
 - name: elasticsearch
   version: 8.5.x
