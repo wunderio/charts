@@ -507,6 +507,7 @@ gdprDump:
             key: 'processed_data.mail'
         name:
           converter: 'faker'
+          unique: true
           parameters:
             formatter: 'name'
         pass:
