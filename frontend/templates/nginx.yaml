@@ -114,6 +114,10 @@ spec:
               - key: nginx_signalsciences_conf
                 path: nginx_signalsciences_conf
               {{- end }}
+              {{- if .Values.nginx.extraConfig }}
+              - key: extraConfig
+                path: extraConfig
+              {{- end }}
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
           secret:
