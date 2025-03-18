@@ -50,6 +50,9 @@ spec:
             - kubecost
             - sumologic
             - logging
+            - csi-driver-nfs
+            - elasticsearch
+            - csi-rclone
       preconditions:
         all:
         - key: "{{ request.operation || 'BACKGROUND' }}"
