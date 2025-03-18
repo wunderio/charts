@@ -472,19 +472,11 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   mv last-00 "${last_table}"
   # Rename the extracted footer to "footer"
   mv last-01 footer
-  # Prepend header and append footer to all table files, save them as <table_name>.sql
   for file in table-*; do
-    table_name=$(grep 'Table structure for table' ${file} | cut -d$'\x60' -f2)
-    cat header "${file}" footer > "${table_name}.sql"
-  done
-  # Remove all non .sql files
-  find . -type f ! -name '*.sql' -delete
-
-  # Add START TRANSACTION; before first INSERT statement in each SQL file to optimize data import.
-  for file in "$INPUT_DIR"/*.sql; do
+    # Prepend 'START TRANSACTION; before first 'INSERT' statement to improve import speed.
+    # Create temporary file for this.
     tmp_file="$(mktemp)"
     transaction_inserted=0
-
     while IFS= read -r line || [[ -n "$line" ]]; do
       if [[ "$transaction_inserted" -eq 0 && "$line" == INSERT* ]]; then
         printf "START TRANSACTION;\n" >> "$tmp_file"
@@ -493,7 +485,13 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
       printf "%s\n" "$line" >> "$tmp_file"
     done < "$file"
     mv "$tmp_file" "$file"
+
+    # Prepend header and append footer to all table files, save them as <table_name>.sql
+    table_name=$(grep 'Table structure for table' ${file} | cut -d$'\x60' -f2)
+    cat header "${file}" footer > "${table_name}.sql"
   done
+  # Remove all non .sql files
+  find . -type f ! -name '*.sql' -delete
 
   cd "${previous_wd}"
 
