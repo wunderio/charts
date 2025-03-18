@@ -480,6 +480,21 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
   # Remove all non .sql files
   find . -type f ! -name '*.sql' -delete
 
+  # Add START TRANSACTION; before first INSERT statement in each SQL file to optimize data import.
+  for file in "$INPUT_DIR"/*.sql; do
+    tmp_file="$(mktemp)"
+    transaction_inserted=0
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      if [[ "$transaction_inserted" -eq 0 && "$line" == INSERT* ]]; then
+        printf "START TRANSACTION;\n" >> "$tmp_file"
+        transaction_inserted=1
+      fi
+      printf "%s\n" "$line" >> "$tmp_file"
+    done < "$file"
+    mv "$tmp_file" "$file"
+  done
+
   cd "${previous_wd}"
 
   # Compress the sql files into a single file and copy it into the backup folder.
@@ -522,28 +537,11 @@ if [[ -f /app/reference-data/db.tar.gz || -f /app/reference-data/db.sql.gz ]]; t
 
   # New way of importing.
   if [[ -f "${app_ref_data}/db.tar.gz" ]]; then
-    echo "Importing reference database dump from db.tar.gz"
-    mkdir "${tmp_ref_data}"
-    tar -xzf "${app_ref_data}/db.tar.gz" -C "${tmp_ref_data}/"
-    import_sql_file() {
-      local file="$1"
-      echo "Importing ${file}"
-      (echo "SET foreign_key_checks=0; SET unique_checks=0;" && cat "$file") | mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}"
-    }
-    export -f import_sql_file
+  echo "Importing reference database dump from db.tar.gz"
+  mkdir "${tmp_ref_data}"
+  tar -xzf "${app_ref_data}/db.tar.gz" -C "${tmp_ref_data}/"
+  find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
 
-    echo "==> Importing LARGE SQL files (>1GB) serially..."
-    find "${tmp_ref_data}/" -type f -name "*.sql" -size +1024M | while read -r file; do
-      import_sql_file "$file"
-    done
-
-    echo "==> Importing MEDIUM SQL files (100MB–1GB) in parallel (3 at a time)..."
-    find "${tmp_ref_data}/" -type f -name "*.sql" -size -1024M -size +100M | xargs -P3 -n1 -I{} bash -c 'import_sql_file "$@"' _ {}
-
-    echo "==> Importing SMALL SQL files (<100MB) in parallel (10 at a time)..."
-    find "${tmp_ref_data}/" -type f -name "*.sql" -size -100M | xargs -P10 -n1 -I{} bash -c 'import_sql_file "$@"' _ {}
-
-    echo "==> All imports complete!"
   # Backwards compatibility for old way of importing.
   elif [[ -f "${app_ref_data}/db.sql.gz" ]]; then
     echo "Importing reference database dump from db.sql.gz"
