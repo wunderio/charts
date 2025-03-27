@@ -397,9 +397,9 @@ data:
       }
       {{- end }}
 
-      {{- if .Values.mailhog.enabled }}
-      // No varnish for mailhog
-      if (req.url ~ "^/mailhog$") {
+      {{- if .Values.mailpit.enabled }}
+      // No varnish for mailpit
+      if (req.url ~ "^/mailpit$") {
         return (pass);
       }
       {{- end }}
