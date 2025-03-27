@@ -233,10 +233,15 @@ imagePullSecrets:
 - name: ELASTICSEARCH_HOST
   value: {{ .Release.Name }}-es
 {{- end }}
-{{- if or .Values.mailhog.enabled .Values.smtp.enabled }}
+{{- if or .Values.mailhog.enabled .Values.mailpit.enabled .Values.smtp.enabled }}
 {{- if .Values.mailhog.enabled }}
 {{- if contains "mailhog" .Release.Name -}}
 {{- fail "Do not use 'mailhog' in release name or deployment will fail" -}}
+{{- end }}
+{{- end }}
+{{- if .Values.mailpit.enabled }}
+{{- if contains "mailpit" .Release.Name -}}
+{{- fail "Do not use 'mailpit' in release name or deployment will fail" -}}
 {{- end }}
 {{- end }}
 {{ include "smtp.env" . }}
