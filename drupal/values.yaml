@@ -741,6 +741,13 @@ redis:
 # Mailpit service overrides
 mailpit:
   enabled: false
+  resources:
+    requests:
+      cpu: 1m
+      memory: 10M
+    limits:
+      cpu: 50m
+      memory: 100M
 
 
 # Mailhog service overrides
