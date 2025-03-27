@@ -96,8 +96,8 @@ imagePullSecrets:
 
 {{- define "smtp.env" }}
 - name: SMTP_ADDRESS
-  {{- if .Values.mailhog.enabled }}
-  value: "{{ .Release.Name }}-mailhog:1025"
+  {{- if .Values.mailpit.enabled }}
+  value: "{{ .Release.Name }}-mailpit-smtp:25"
   {{ else }}
   value: {{ .Values.smtp.address | quote }}
   {{- end }}
@@ -114,8 +114,8 @@ imagePullSecrets:
       key: password
 # Duplicate SMTP env variables for ssmtp bundled with amazee php image
 - name: SSMTP_MAILHUB
-  {{- if .Values.mailhog.enabled }}
-  value: "{{ .Release.Name }}-mailhog:1025"
+  {{- if .Values.mailpit.enabled }}
+  value: "{{ .Release.Name }}-mailpit-smtp:25"
   {{ else }}
   value: {{ .Values.smtp.address | quote }}
   {{- end }}
