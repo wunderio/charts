@@ -395,8 +395,8 @@ data:
       }
       {{- end }}
 
-      {{- if .Values.mailhog.enabled }}
-      location /mailhog {
+      {{- if .Values.mailpit.enabled }}
+      location /mailpit {
 
         # Auth / whitelist always enabled
         satisfy any;
@@ -412,11 +412,11 @@ data:
         auth_basic_user_file /etc/nginx/.htaccess;
         {{- end}}
 
-        rewrite ^/mailhog$ /mailhog/ permanent;
+        rewrite ^/mailpit /mailpit/ permanent;
 
-        # Proxy to mailhog container
-        rewrite /mailhog(.*) $1 break;
-        proxy_pass http://{{ .Release.Name }}-mailhog:8025/;
+        # Proxy to mailpit container
+        rewrite /mailpit(.*) $1 break;
+        proxy_pass http://{{ .Release.Name }}-mailpit-http:80/;
 
         # Websock connection
         chunked_transfer_encoding on;
