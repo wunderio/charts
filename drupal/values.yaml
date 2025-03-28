@@ -753,6 +753,9 @@ mailpit:
     limits:
       cpu: 50m
       memory: 100M
+  mailpit:
+    # This is for easier proxying from Drupal's nginx
+    webroot: /mailpit
 
 
 # Mailhog service overrides
