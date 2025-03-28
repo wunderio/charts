@@ -741,6 +741,11 @@ redis:
 # Mailpit service overrides
 mailpit:
   enabled: false
+  extraEnvVars:
+    - name: MP_SMTP_AUTH_ACCEPT_ANY
+      value: "true"
+    - name: MP_SMTP_AUTH_ALLOW_INSECURE
+      value: "true"
   resources:
     requests:
       cpu: 1m
