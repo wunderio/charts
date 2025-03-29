@@ -399,7 +399,7 @@ data:
 
       {{- if .Values.mailpit.enabled }}
       // No varnish for mailpit
-      if (req.url ~ "^/mailpit$") {
+      if (req.url ~ "^/mailpit(/|$)") {
         return (pass);
       }
       {{- end }}
