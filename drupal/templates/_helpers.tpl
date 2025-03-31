@@ -371,8 +371,8 @@ done
 {{- end }}
 
 {{- define "drupal.data-pull-command" }}
-set -e 
-  
+set -e
+
 {{ include "drupal.import-reference-files" . }}
 
 {{ include "drupal.wait-for-db-command" . }}
@@ -570,6 +570,10 @@ fi
 {{- define "drupal.backup-command.dump-database" -}}
   set -e
 
+  # Add initial delay to allow mariadb to fully initialize
+  echo "Waiting 30 seconds for database to fully initialize..."
+  sleep 30
+
   # Generate the id of the backup.
   BACKUP_ID=`date +%Y-%m-%d-%H-%M-%S`
   BACKUP_LOCATION="/backups/$BACKUP_ID"
@@ -585,8 +589,8 @@ fi
 
   # Take a database dump.
   echo "Starting database backup."
-  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
-  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
+  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
+  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
   echo "Database backup complete."
 {{- end }}
 
@@ -667,7 +671,7 @@ fi
   done
 
   echo "Importing database dump for validation"
-  mysql -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp < /tmp/db.sql
+  mysql -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp --max_allowed_packet=1G < /tmp/db.sql
   drush status --fields=bootstrap
 
 {{- end }}
