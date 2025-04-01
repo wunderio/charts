@@ -98,6 +98,8 @@ imagePullSecrets:
 - name: SMTP_ADDRESS
   {{- if .Values.mailpit.enabled }}
   value: "{{ .Release.Name }}-mailpit-smtp:25"
+  {{ else if .Values.mailhog.enabled }}
+  value: "{{ .Release.Name }}-mailhog:1025"
   {{ else }}
   value: {{ .Values.smtp.address | quote }}
   {{- end }}
@@ -116,6 +118,8 @@ imagePullSecrets:
 - name: SSMTP_MAILHUB
   {{- if .Values.mailpit.enabled }}
   value: "{{ .Release.Name }}-mailpit-smtp:25"
+  {{ else if .Values.mailhog.enabled }}
+  value: "{{ .Release.Name }}-mailhog:1025"
   {{ else }}
   value: {{ .Values.smtp.address | quote }}
   {{- end }}
