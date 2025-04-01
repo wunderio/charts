@@ -430,6 +430,11 @@ data:
       {{- end}}
 
       {{- if .Values.mailpit.enabled }}
+      # Redirect the legacy mailhog service to mailpit.
+      location /mailhog {
+        return 301 /mailpit/;
+      }
+
       location /mailpit/ {
 
         # Auth / whitelist always enabled
