@@ -29,7 +29,7 @@ shell:
 elasticsearch:
   enabled: true
 
-mailhog:
+mailpit:
   enabled: true
 
 mongodb:
