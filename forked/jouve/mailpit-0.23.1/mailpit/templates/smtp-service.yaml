@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "common.names.fullname" . }}-smtp
+  namespace: {{ include "common.names.namespace" . | quote }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
+  {{- with include "common.tplvalues.merge" ( dict "values" (list .Values.service.smtp.annotations .Values.commonAnnotations) "context" . ) | fromYaml }}
+  annotations: {{- . | toYaml | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.smtp.type }}
+  {{- if or (eq .Values.service.smtp.type "LoadBalancer") (eq .Values.service.smtp.type "NodePort") }}
+  externalTrafficPolicy: {{ .Values.service.smtp.externalTrafficPolicy | quote }}
+  {{- end }}
+  {{- if and (eq .Values.service.smtp.type "LoadBalancer") (not (empty .Values.service.smtp.loadBalancerSourceRanges)) }}
+  loadBalancerSourceRanges: {{ .Values.service.smtp.loadBalancerSourceRanges }}
+  {{- end }}
+  {{- if and (eq .Values.service.smtp.type "LoadBalancer") (not (empty .Values.service.smtp.loadBalancerIP)) }}
+  loadBalancerIP: {{ .Values.service.smtp.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: smtp
+      port: {{ .Values.service.smtp.port }}
+      {{- if and (eq .Values.service.smtp.type "NodePort" "LoadBalancer") (gt (.Values.service.smtp.nodePort | int) 0) }}
+      nodePort: {{ .Values.service.smtp.nodePort }}
+      {{- end }}
+      targetPort: smtp
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" (list .Values.podLabels .Values.commonLabels) "context" . ) | fromYaml }}
+  selector: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 4 }}

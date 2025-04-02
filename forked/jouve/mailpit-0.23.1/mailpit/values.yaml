@@ -1,0 +1,363 @@
+## @section Global parameters
+## Global Docker image parameters
+## Please, note that this will override the image parameters, including dependencies, configured to use the global value
+## Current available global Docker image parameters: imageRegistry, imagePullSecrets and storageClass
+##
+
+## @param global.imageRegistry Global Docker image registry
+## @param global.imagePullSecrets Global Docker registry secret names as an array
+## @param global.storageClass Global StorageClass for Persistent Volume(s)
+##
+global:
+  imageRegistry: ""
+  ## E.g.
+  ## imagePullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  imagePullSecrets: []
+  storageClass: ""
+
+
+## @section Common
+##
+
+## Bitnami image
+## ref: https://hub.docker.com/r/bitnami/image/tags/
+## @param image.registry image registry
+## @param image.repository image repository
+## @param image.tag image tag (immutable tags are recommended)
+## @param image.digest image digest in the way sha256:aa.... Please note this parameter, if set, will override the tag image tag (immutable tags are recommended)
+## @param image.pullPolicy image pull policy
+## @param image.pullSecrets image pull secrets
+## @param image.debug Enable image debug mode
+##
+image:
+  registry: docker.io
+  repository: axllent/mailpit
+  tag: v1.23.1
+  digest: ""
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+  ## Optionally specify an array of imagePullSecrets.
+  ## Secrets must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ## e.g:
+  ## pullSecrets:
+  ##   - myRegistryKeySecretName
+  ##
+  pullSecrets: []
+  ## Enable debug mode
+  ##
+  debug: false
+
+## @param commonLabels [object] Labels to add to all deployed objects
+##
+commonLabels:
+  app.kubernetes.io/version: "{{ .Values.image.tag }}"
+
+## @param podLabels [object] Extra labels for pods
+## ref: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/
+##
+podLabels:
+  helm.sh/chart: "{{ .Chart.Name }}"
+
+## @param updateStrategy.type statefulset strategy type
+## ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+##
+updateStrategy:
+  ## StrategyType
+  ## Can be set to RollingUpdate or OnDelete
+  ##
+  type: RollingUpdate
+
+## @param podSecurityContext [object] SecurityContext for pods
+## ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+##
+podSecurityContext:
+  enabled: true
+  fsGroup: 1001
+
+## @param containerSecurityContext [object] SecurityContext for pods
+## ref: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+##
+containerSecurityContext:
+  enabled: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  runAsUser: 1001
+  runAsGroup: 1001
+  runAsNonRoot: true
+  readOnlyRootFilesystem: true
+  seccompProfile:
+    type: RuntimeDefault
+
+## @param replicaCount Number of replicas to deploy
+##
+replicaCount: 1
+
+## @param revisionHistoryLimit The number of old history to retain to allow rollback
+##
+revisionHistoryLimit: 10
+
+## resource requests and limits
+## ref: http://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+## @param resourcesPreset Set container resources according to one common preset (allowed values: none, nano, small, medium, large, xlarge, 2xlarge). This is ignored if resources is set (resources is recommended for production).
+## More information: https://github.com/bitnami/charts/blob/main/bitnami/common/templates/_resources.tpl#L15
+##
+resourcesPreset: "nano"
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+## @param resources [object] The resources for the containers
+##
+resources: {}
+
+## @param affinity Pod affinity
+## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity
+##
+affinity: {}
+
+## @param args Override default container args (useful when using custom images)
+##
+args: []
+
+## @param extraEnvVars Array with extra environment variables to add to nodes
+## e.g:
+## extraEnvVars:
+##   - name: FOO
+##     value: "bar"
+##
+extraEnvVars: []
+
+## @param extraEnvVarsSecret Name of existing Secret containing extra env vars for containers
+##
+extraEnvVarsSecret: ""
+
+## @param livenessProbe [object] Enables the livenessProbe for mailpit
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 2
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 5
+  successThreshold: 1
+
+## @param readinessProbe [object]  Enables the readinessProbe for mailpit
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 2
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 5
+  successThreshold: 1
+
+## @param nodeSelector Node labels for pod assignment
+## Ref: https://kubernetes.io/docs/user-guide/node-selection/
+nodeSelector: {}
+
+## @param tolerations expects input structure as per specification https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.11/#toleration-v1-core
+## for example:
+##   tolerations:
+##   - key: foo.bar.com/role
+##     operator: Equal
+##     value: master
+##     effect: NoSchedule
+tolerations: []
+
+# https://github.com/axllent/mailpit/wiki/Basic-authentication
+# https://github.com/axllent/mailpit/wiki/HTTPS
+mailpit:
+  ## @param mailpit.webroot Set the webroot for web UI & API
+  webroot: /
+  ui:
+    ## @param mailpit.ui.authFile.enabled Adding basic authentication to web UI
+    ## @param mailpit.ui.authFile.htpasswd htpasswd content
+    ## @param mailpit.ui.authFile.existingSecret Secret containing htpasswd content
+    authFile:
+      enabled: false
+      htpasswd: ""
+      existingSecret: {}
+    ## @param mailpit.ui.tls.enabled Enable tls for web UI
+    ## @param mailpit.ui.tls.secretName tls secret for web UI
+    tls:
+      enabled: false
+      secretName: ""
+  smtp:
+    ## @param mailpit.smtp.authFile.enabled Adding SMTP authentication
+    ## @param mailpit.smtp.authFile.htpasswd htpasswd content
+    ## @param mailpit.smtp.authFile.existingSecret Secret containing htpasswd content
+    authFile:
+      enabled: false
+      htpasswd: ""
+      existingSecret: {}
+    ## @param mailpit.smtp.tls.enabled Enable tls for SMTP
+    ## @param mailpit.smtp.tls.secretName tls secret for SMTP
+    tls:
+      enabled: false
+      secretName: ""
+  relay:
+    ## @param mailpit.relay.enabled enable SMTP Relay configuration
+    ## @param mailpit.relay.config Mailpit SMTP relay configuration
+    ## @param mailpit.relay.relayAll Relay all messages to relay
+    enabled: false
+    config: {}
+    relayAll: false
+
+## @section Traffic Exposure Parameters
+##
+
+## service parameters
+##
+service:
+  http:
+    ## @param service.http.type service type
+    ##
+    type: ClusterIP
+    ## @param service.http.port port for http
+    ##
+    port: 80
+    ## @param service.http.nodePort nodeport bind for HTTP service
+    ##
+    nodePort: 0
+    ## @param service.http.loadBalancerIP %%MAIN_CONTAINER_NAME%% service Load Balancer IP
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
+    ##
+    loadBalancerIP: ""
+    ## @param service.http.loadBalancerSourceRanges %%MAIN_CONTAINER_NAME%% service Load Balancer sources
+    ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+    ## e.g:
+    ## loadBalancerSourceRanges:
+    ##   - 10.10.10.0/24
+    ##
+    loadBalancerSourceRanges: []
+    ## @param service.http.externalTrafficPolicy %%MAIN_CONTAINER_NAME%% service external traffic policy
+    ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ##
+    externalTrafficPolicy: Cluster
+  smtp:
+    ## @param service.smtp.type service type
+    ##
+    type: ClusterIP
+    ## @param service.smtp.port port for SMTP
+    ##
+    port: 25
+    ## @param service.smtp.nodePort nodeport bind for STMP service
+    ##
+    nodePort: 0
+    ## @param service.smtp.loadBalancerIP %%MAIN_CONTAINER_NAME%% service Load Balancer IP
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#type-loadbalancer
+    ##
+    loadBalancerIP: ""
+    ## @param service.smtp.loadBalancerSourceRanges %%MAIN_CONTAINER_NAME%% service Load Balancer sources
+    ## ref: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+    ## e.g:
+    ## loadBalancerSourceRanges:
+    ##   - 10.10.10.0/24
+    ##
+    loadBalancerSourceRanges: []
+    ## @param service.smtp.externalTrafficPolicy %%MAIN_CONTAINER_NAME%% service external traffic policy
+    ## ref http://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
+    ##
+    externalTrafficPolicy: Cluster
+
+## ingress parameters
+## ref: http://kubernetes.io/docs/user-guide/ingress/
+##
+ingress:
+  ## @param ingress.enabled Enable ingress record generation for %%MAIN_CONTAINER_NAME%%
+  ##
+  enabled: false
+  ## @param ingress.annotations Additional annotations for the Ingress resource. To enable certificate autogeneration, place here your cert-manager annotations.
+  ## Use this parameter to set the required annotations for cert-manager, see
+  ## ref: https://cert-manager.io/docs/usage/ingress/#supported-annotations
+  ## e.g:
+  ## annotations:
+  ##   kubernetes.io/ingress.class: nginx
+  ##   cert-manager.io/cluster-issuer: cluster-issuer-name
+  ##
+  annotations: {}
+  ## @param ingress.ingressClassName IngressClass that will be be used to implement the Ingress (Kubernetes 1.18+)
+  ## This is supported in Kubernetes 1.18+ and required if you have more than one IngressClass marked as the default for your cluster .
+  ## ref: https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/
+  ##
+  ingressClassName: ""
+  ## @param ingress.hostname Default host for the ingress record
+  ##
+  hostname: hostname.local
+  ## @param ingress.path Default path for the ingress record
+  ## NOTE: You may need to set this to '/*' in order to use this with ALB ingress controllers
+  ##
+  path: /
+  ## @param ingress.pathType Ingress path type
+  ##
+  pathType: ImplementationSpecific
+  ## @param ingress.extraHosts The list of additional hostnames to be covered with this ingress record.
+  ## Most likely the hostname above will be enough, but in the event more hosts are needed, this is an array
+  ## extraHosts:
+  ## - name: nginx.local
+  ##   path: /
+  ##
+  extraHosts: []
+  ## @param ingress.tls Enable TLS configuration for the host defined at `ingress.hostname` parameter
+  ## TLS certificates will be retrieved from a TLS secret
+  ## You can:
+  ##   - Rely on cert-manager to create it by setting the corresponding annotations
+  ##
+  tls: false
+  ## @param ingress.extraTls The tls configuration for additional hostnames to be covered with this ingress record.
+  ## see: https://kubernetes.io/docs/concepts/services-networking/ingress/#tls
+  ## extraTls:
+  ## - hosts:
+  ##     - nginx.local
+  ##   secretName: nginx.local-tls
+  ##
+  extraTls: []
+
+## @section Persistence Parameters
+##
+
+## Enable persistence using Persistent Volume Claims
+## ref: https://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  ## @param persistence.enabled Enable persistence using Persistent Volume Claims
+  ##
+  enabled: false
+  ## @param persistence.storageClass Storage class of backing PVC
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  storageClass: ""
+  ## @param persistence.annotations Persistent Volume Claim annotations
+  ##
+  annotations: {}
+  ## @param persistence.labels Persistent Volume Claim labels
+  ##
+  labels: {}
+  ## @param persistence.accessModes Persistent Volume Access Modes
+  ##
+  accessModes:
+    - ReadWriteOnce
+  ## @param persistence.size Size of data volume
+  ##
+  size: 8Gi
+  ## @param persistence.existingClaim The name of an existing PVC to use for persistence
+  ##
+  existingClaim: ""
+  ## @param persistence.selector Selector to match an existing Persistent Volume for WordPress data PVC
+  ## If set, the PVC can't have a PV dynamically provisioned for it
+  ## E.g.
+  ## selector:
+  ##   matchLabels:
+  ##     app: my-app
+  ##
+  selector: {}
+  ## @param persistence.dataSource Custom PVC data source
+  ##
+  dataSource: {}
