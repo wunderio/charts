@@ -591,6 +591,9 @@ mailhog:
       cpu: 1m
       memory: 10M
 
+mailpit:
+  enabled: false
+
 # Redis
 # https://github.com/bitnami/charts/blob/master/bitnami/redis/values.yaml
 redis:

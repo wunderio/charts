@@ -5,6 +5,9 @@ dependencies:
 - name: mailhog
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 5.1.0
+- name: mailpit
+  repository: https://jouve.github.io/charts/
+  version: 0.23.1
 - name: elasticsearch
   repository: file://../elasticsearch
   version: 8.5.1
@@ -23,5 +26,5 @@ dependencies:
 - name: redis
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 19.1.5
-digest: sha256:b5bdf0a7bd385f79ea727101d2fa5b02859e027fc2f1408d0e711d604132d476
-generated: "2025-03-18T10:38:55.608016594+02:00"
+digest: sha256:98141819adde164325215c348bfa871d7cbfdacbcbc3effd53bfe0b051c2f698
+generated: "2025-04-02T15:21:37.735374+03:00"

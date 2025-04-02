@@ -582,6 +582,12 @@
         "enabled": { "type": "boolean" }
       }
     },
+    "mailpit": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
     "mailhog": {
       "type": "object",
       "properties": {
