@@ -597,7 +597,6 @@ mailpit:
     webroot: /mailpit
 
 # Important! This service is deprecated and will be removed from future releases. Please use "mailpit" instead.
-
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
 mailhog:
