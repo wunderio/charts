@@ -16,12 +16,12 @@ dependencies:
   version: 5.1.0
 - name: mailpit
   repository: https://jouve.github.io/charts/
-  version: 0.23.1
+  version: 0.24.0
 - name: elasticsearch
   repository: file://../elasticsearch
   version: 8.5.1
 - name: silta-release
   repository: file://../silta-release
   version: 1.0.1
-digest: sha256:38e74b72e50d324a82d8adf1e1f75203074fa997b72c8df03892ceb36424bc40
-generated: "2025-04-01T17:31:34.709323+03:00"
+digest: sha256:e3ea21b74deadb01861e37b2296391e1f0a25f62dc6b3da226d28cb95245342d
+generated: "2025-04-08T22:42:49.491746+03:00"
