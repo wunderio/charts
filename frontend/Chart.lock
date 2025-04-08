@@ -7,7 +7,7 @@ dependencies:
   version: 5.1.0
 - name: mailpit
   repository: https://jouve.github.io/charts/
-  version: 0.23.1
+  version: 0.24.0
 - name: elasticsearch
   repository: file://../elasticsearch
   version: 8.5.1
@@ -26,5 +26,5 @@ dependencies:
 - name: redis
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 19.1.5
-digest: sha256:98141819adde164325215c348bfa871d7cbfdacbcbc3effd53bfe0b051c2f698
-generated: "2025-04-02T15:21:37.735374+03:00"
+digest: sha256:6d8a9d224e4f05d80001444956b411ec09e584c90894d897ebf0f4d7d275d7f9
+generated: "2025-04-08T22:49:11.202227+03:00"

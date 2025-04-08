@@ -595,6 +595,7 @@ mailpit:
   mailpit:
     # This is for easier proxying from Drupal's nginx
     webroot: /mailpit
+  enableServiceLinks: false
 
 # Important! This service is deprecated and will be removed from future releases. Please use "mailpit" instead.
 # Mailhog service overrides
