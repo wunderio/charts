@@ -31,6 +31,10 @@ spec:
           containers:
           - name: {{ $jobName }}-cron
             image: {{ $service.image | quote }}
+            {{- if $service.securityContext }}
+            securityContext:
+              {{- toYaml $service.securityContext | nindent 14 }}
+            {{- end }}
             volumeMounts:
               {{- if $service.mounts }}
               {{- range $index, $mountName := $service.mounts -}}

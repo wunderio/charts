@@ -33,6 +33,10 @@ spec:
       containers:
       - name: {{ $index }}
         image: {{ $service.image | quote }}
+        {{- if $service.securityContext }}
+        securityContext:
+          {{- toYaml $service.securityContext | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: {{ default $.Values.serviceDefaults.port $service.port }}
           name: {{ $index }}
