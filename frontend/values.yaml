@@ -229,15 +229,7 @@ services: {}
   #     - files
   #
   #   # Security context settings for this service
-  #   securityContext:
-  #     # Prevent privilege escalation
-  #     allowPrivilegeEscalation: false
-  #     # Specify user ID
-  #     runAsUser: 1000
-  #     # Specify group ID
-  #     runAsGroup: 1000
-  #     # Specify filesystem group ID for volume access
-  #     fsGroup: 1000
+  #   securityContext: { }
 
   #   # Enable autoscaling using HorizontalPodAutoscaler
   #   # see: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
