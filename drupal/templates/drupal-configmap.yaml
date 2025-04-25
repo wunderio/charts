@@ -597,7 +597,6 @@ data:
           access_log off;
         }
 
-        ## Deny bots on never cached uri without 403 response.
         location ~* ^/(?:user|admin|cart|checkout|logout|abuse|flag) {
           if ( $http_user_agent ~* (?:crawl|goog|yahoo|spider|bot|yandex|bing|tracker|click|parser) ) {
             return 403;
