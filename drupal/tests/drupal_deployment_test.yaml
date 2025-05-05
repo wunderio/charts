@@ -182,7 +182,7 @@ tests:
   - it: sets smtp environment variables correctly
     template: drupal-deployment.yaml
     set:
-      mailhog:
+      mailpit:
         enabled: false
       smtp:
         enabled: true
@@ -199,10 +199,10 @@ tests:
           content:
             name: SMTP_USERNAME
             value: foo
-  - it: sets mailhog smtp environment variables correctly
+  - it: sets mailpit smtp environment variables correctly
     template: drupal-deployment.yaml
     set:
-      mailhog:
+      mailpit:
         enabled: true
       smtp:
         enabled: true
@@ -211,11 +211,11 @@ tests:
           path: spec.template.spec.containers[0].env
           content:
             name: SMTP_ADDRESS
-            value: RELEASE-NAME-mailhog:1025
+            value: RELEASE-NAME-mailpit-smtp:25
   - it: sets ssmtp environment variables correctly
     template: drupal-deployment.yaml
     set:
-      mailhog:
+      mailpit:
         enabled: false
       smtp:
         enabled: true

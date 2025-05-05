@@ -10,6 +10,10 @@ dependencies:
   version: 5.1.x
   repository: https://storage.googleapis.com/charts.wdr.io
   condition: mailhog.enabled
+- name: mailpit
+  version: 0.24.x
+  repository: https://jouve.github.io/charts/
+  condition: mailpit.enabled
 - name: elasticsearch
   version: 8.5.x
   # repository: https://helm.elastic.co

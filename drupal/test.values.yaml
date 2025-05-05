@@ -28,7 +28,7 @@ redis:
 elasticsearch:
   enabled: true
 
-mailhog:
+mailpit:
   enabled: true
 
 backup:

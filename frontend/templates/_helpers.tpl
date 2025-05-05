@@ -182,6 +182,13 @@ rsync -az /values_mounts/ /backups/current/
 - name: MAILHOG_ADDRESS
   value: "{{ .Release.Name }}-mailhog:1025"
 {{- end }}
+{{- if .Values.mailpit.enabled }}
+{{- if contains "mailpit" .Release.Name -}}
+{{- fail "Do not use 'mailpit' in release name or deployment will fail" -}}
+{{- end }}
+- name: MAILPIT_ADDRESS
+  value: "{{ .Release.Name }}-mailpit-smtp:25"
+{{- end }}
 {{- if .Values.varnish.enabled }}
 - name: VARNISH_ADMIN_HOST
   value: {{ .Release.Name }}-varnish

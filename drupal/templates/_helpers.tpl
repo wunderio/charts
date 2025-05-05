@@ -96,7 +96,9 @@ imagePullSecrets:
 
 {{- define "smtp.env" }}
 - name: SMTP_ADDRESS
-  {{- if .Values.mailhog.enabled }}
+  {{- if .Values.mailpit.enabled }}
+  value: "{{ .Release.Name }}-mailpit-smtp:25"
+  {{ else if .Values.mailhog.enabled }}
   value: "{{ .Release.Name }}-mailhog:1025"
   {{ else }}
   value: {{ .Values.smtp.address | quote }}
@@ -114,7 +116,9 @@ imagePullSecrets:
       key: password
 # Duplicate SMTP env variables for ssmtp bundled with amazee php image
 - name: SSMTP_MAILHUB
-  {{- if .Values.mailhog.enabled }}
+  {{- if .Values.mailpit.enabled }}
+  value: "{{ .Release.Name }}-mailpit-smtp:25"
+  {{ else if .Values.mailhog.enabled }}
   value: "{{ .Release.Name }}-mailhog:1025"
   {{ else }}
   value: {{ .Values.smtp.address | quote }}
@@ -233,10 +237,15 @@ imagePullSecrets:
 - name: ELASTICSEARCH_HOST
   value: {{ .Release.Name }}-es
 {{- end }}
-{{- if or .Values.mailhog.enabled .Values.smtp.enabled }}
+{{- if or .Values.mailhog.enabled .Values.mailpit.enabled .Values.smtp.enabled }}
 {{- if .Values.mailhog.enabled }}
 {{- if contains "mailhog" .Release.Name -}}
 {{- fail "Do not use 'mailhog' in release name or deployment will fail" -}}
+{{- end }}
+{{- end }}
+{{- if .Values.mailpit.enabled }}
+{{- if contains "mailpit" .Release.Name -}}
+{{- fail "Do not use 'mailpit' in release name or deployment will fail" -}}
 {{- end }}
 {{- end }}
 {{ include "smtp.env" . }}
