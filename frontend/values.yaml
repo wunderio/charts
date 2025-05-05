@@ -23,7 +23,7 @@ environmentName: ""
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 
-# Custom imagePullSecret for the containers. Base64 encoded. This will create a secret and append it to the imagePullSecrets. 
+# Custom imagePullSecret for the containers. Base64 encoded. This will create a secret and append it to the imagePullSecrets.
 imagePullSecret: ""
 
 serviceAccount:
@@ -227,6 +227,9 @@ services: {}
   #   # Use storage mountpoints (defined in the mounts section) for this service.
   #   mounts:
   #     - files
+  #
+  #   # Security context settings for this service
+  #   securityContext: { }
 
   #   # Enable autoscaling using HorizontalPodAutoscaler
   #   # see: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
