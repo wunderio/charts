@@ -448,6 +448,12 @@ referenceData:
   # When to automatically update the reference data.
   schedule: '~ 3 * * *'
 
+  # Whether to copy the database, only used programmatically.
+  copyDatabase: true
+
+  # Whether to copy files, only used programmatically.
+  copyFiles: true
+
   # Update the reference data after deployments on the reference environment.
   updateAfterDeployment: true
 

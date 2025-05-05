@@ -450,6 +450,8 @@
         "enabled": { "type": "boolean" },
         "referenceEnvironment": { "type": "string" },
         "schedule": { "type": "string" },
+        "copyDatabase": { "type": "boolean" },
+        "copyFiles": { "type": "boolean" },
         "updateAfterDeployment": { "type": "boolean" },
         "ignoreFolders": { "type": "array" },
         "maxFileSize": { "type": "string" },
