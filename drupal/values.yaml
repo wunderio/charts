@@ -448,6 +448,12 @@ referenceData:
   # When to automatically update the reference data.
   schedule: '~ 3 * * *'
 
+  # Whether to copy the database, only used programmatically.
+  copyDatabase: true
+
+  # Whether to copy files, only used programmatically.
+  copyFiles: true
+
   # Update the reference data after deployments on the reference environment.
   updateAfterDeployment: true
 
@@ -738,6 +744,28 @@ redis:
   serviceAccount:
     automountServiceAccountToken: false
 
+# Mailpit service overrides
+# see: https://github.com/jouve/charts/blob/main/charts/mailpit/values.yaml
+mailpit:
+  enabled: false
+  extraEnvVars:
+    - name: MP_SMTP_AUTH_ACCEPT_ANY
+      value: "true"
+    - name: MP_SMTP_AUTH_ALLOW_INSECURE
+      value: "true"
+  resources:
+    requests:
+      cpu: 1m
+      memory: 10M
+    limits:
+      cpu: 50m
+      memory: 100M
+  mailpit:
+    # This is for easier proxying from Drupal's nginx
+    webroot: /mailpit
+  enableServiceLinks: false
+
+# Important! This service is deprecated and will be removed from future releases. Please use "mailpit" instead.
 # Mailhog service overrides
 # see: https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml
 mailhog:
