@@ -26,6 +26,16 @@ Mailhog available at:
   {{- end }}
 {{- end }}
 
+{{- if .Values.mailpit.enabled }}
+
+Mailpit available at:
+
+  http://{{- template "drupal.domain" . }}/mailpit
+  {{- range $index, $domain := .Values.exposeDomains }}
+  http://{{ $domain.hostname }}/mailpit
+  {{- end }}
+{{- end }}
+
 {{- if .Values.nginx.basicauth.enabled }}
 
 Basic access authentication credentials:

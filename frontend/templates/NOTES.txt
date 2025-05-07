@@ -29,6 +29,16 @@ Mailhog available at:
   {{- end }}
 {{- end }}
 
+{{- if .Values.mailpit.enabled }}
+
+Mailpit available at:
+
+  http://{{- template "frontend.domain" . }}/mailpit
+  {{- range $index, $domain := .Values.exposeDomains }}
+  http://{{ $domain.hostname }}/mailpit
+  {{- end }}
+{{- end }}
+
 {{ if $.Values.shell.enabled }}
 SSH connection (limited access through VPN):
   {{ range $index, $service := .Values.services }}

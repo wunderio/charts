@@ -450,6 +450,8 @@
         "enabled": { "type": "boolean" },
         "referenceEnvironment": { "type": "string" },
         "schedule": { "type": "string" },
+        "copyDatabase": { "type": "boolean" },
+        "copyFiles": { "type": "boolean" },
         "updateAfterDeployment": { "type": "boolean" },
         "ignoreFolders": { "type": "array" },
         "maxFileSize": { "type": "string" },
@@ -621,6 +623,12 @@
     "redis": {
       "type": "object",
       "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "mailpit": {
+      "type": "object",
       "properties": {
         "enabled": { "type": "boolean" }
       }

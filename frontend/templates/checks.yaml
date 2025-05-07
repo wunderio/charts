@@ -1,7 +1,13 @@
+{{- if and .Values.mailhog.enabled .Values.mailpit.enabled }}
+{{- fail "Mailhog and mailpit can't be enabled at the same time as those are overlapping services. Use mailpit only as mailhog is deprecated." -}}
+{{- end }}
 {{- if index (index .Values "silta-release") "branchName" }}
 {{- if eq (index (index .Values "silta-release") "branchName") "production" }}
 {{- if .Values.mailhog.enabled }}
 {{- fail "Mailhog should not be enabled in production" -}}
+{{- end }}
+{{- if .Values.mailpit.enabled }}
+{{- fail "Mailpit should not be enabled in production" -}}
 {{- end }}
 {{- end }}
 {{- end }}
