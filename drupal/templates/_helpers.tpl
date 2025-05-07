@@ -535,7 +535,7 @@ else
 fi
 {{- end }}
 
-{{- define "drupal.import-reference-db" -}}
+{{- define  "drupal.import-reference-db" -}}
 if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
   if [[ -f /app/reference-data/db.tar.gz || -f /app/reference-data/db.sql.gz ]]; then
     echo "Dropping old database"
@@ -549,7 +549,20 @@ if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
       echo "Importing reference database dump from db.tar.gz"
       mkdir "${tmp_ref_data}"
       tar -xzf "${app_ref_data}/db.tar.gz" -C "${tmp_ref_data}/"
-      find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
+
+      echo "Importing SQL files sequentially..."
+      find "${tmp_ref_data}/" -type f -name "*.sql" | sort | while IFS= read -r sql_file; do
+        echo "Importing ${sql_file}"
+        if ! mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < "${sql_file}"; then
+          echo "ERROR: Failed to import ${sql_file}. Aborting."
+          # You might want to output the failing SQL command or part of the file for debugging
+          head -n 50 "${sql_file}" # for example
+          exit 1
+        fi
+      done
+
+      echo "All SQL files imported successfully."
+      #find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
 
     # Backwards compatibility for old way of importing.
     elif [[ -f "${app_ref_data}/db.sql.gz" ]]; then
