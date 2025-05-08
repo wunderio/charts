@@ -381,8 +381,12 @@ until curl --silent --connect-timeout 2 "{{ .Values.elasticsearch.protocol }}://
 done
 {{- end }}
 
+{{- define "drupal.installing-file" -}}
+  {{ .Values.webRoot }}/sites/default/files/_installing
+{{- end }}
+
 {{- define "drupal.installation-in-progress-test" -}}
--f {{ $.Values.webRoot }}/sites/default/files/_installing
+-f {{ include "drupal.installing-file" . }}
 {{- end -}}
 
 {{- define "drupal.data-push-command" }}
@@ -392,11 +396,17 @@ done
 {{- define "drupal.data-pull-command" }}
 set -e
 
+INSTALLING_FILE="{{ include "drupal.installing-file" . }}"
+
+# Attempt to remove the _installing file at the very beginning, ignoring errors if it doesn't exist.
+# This cleans up state from a potential previous failed install run.
+rm -f "$INSTALLING_FILE"
+
 {{ include "drupal.import-reference-files" . }}
 
 {{ include "drupal.wait-for-db-command" . }}
 {{ include "drupal.create-db" . }}
-touch {{ .Values.webRoot }}/sites/default/files/_installing
+touch "$INSTALLING_FILE"
 {{ include "drupal.import-reference-db" . }}
 
 {{ if .Values.elasticsearch.enabled }}
@@ -405,7 +415,7 @@ touch {{ .Values.webRoot }}/sites/default/files/_installing
 
 {{ .Values.php.postinstall.command }}
 
-rm {{ .Values.webRoot }}/sites/default/files/_installing
+rm -f "$INSTALLING_FILE"
 
 {{ .Values.php.postupgrade.command }}
 {{- if .Values.php.postupgrade.afterCommand }}
@@ -419,6 +429,12 @@ wait
 {{- define "drupal.post-release-command" -}}
   set -e
 
+  INSTALLING_FILE="{{ include "drupal.installing-file" . }}"
+
+  # Attempt to remove the _installing file at the very beginning, ignoring errors if it doesn't exist.
+  # This cleans up state from a potential previous failed install run.
+  rm -f "$INSTALLING_FILE"
+
   {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
     {{ include "drupal.import-reference-files" . }}
   {{- end }}
@@ -427,7 +443,7 @@ wait
   {{ include "drupal.create-db" . }}
 
   {{ if .Release.IsInstall }}
-    touch {{ .Values.webRoot }}/sites/default/files/_installing
+    touch "$INSTALLING_FILE"
     {{- if .Values.referenceData.enabled }}
       {{ include "drupal.import-reference-db" . }}
     {{- end }}
@@ -439,7 +455,7 @@ wait
 
   {{ if .Release.IsInstall }}
     {{ .Values.php.postinstall.command }}
-    rm {{ .Values.webRoot }}/sites/default/files/_installing
+    rm -f "$INSTALLING_FILE"
   {{ end }}
   {{ .Values.php.postupgrade.command }}
   {{- if .Values.php.postupgrade.afterCommand }}
