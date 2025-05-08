@@ -543,6 +543,7 @@ if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
 
     app_ref_data=/app/reference-data
     tmp_ref_data=/tmp/reference-data
+    import_method={{ .Values.referenceData.databaseImportMethod }}
 
     # New way of importing.
     if [[ -f "${app_ref_data}/db.tar.gz" ]]; then
@@ -550,19 +551,35 @@ if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
       mkdir "${tmp_ref_data}"
       tar -xzf "${app_ref_data}/db.tar.gz" -C "${tmp_ref_data}/"
 
-      echo "Importing SQL files sequentially..."
-      find "${tmp_ref_data}/" -type f -name "*.sql" | sort | while IFS= read -r sql_file; do
-        echo "Importing ${sql_file}"
-        if ! mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < "${sql_file}"; then
-          echo "ERROR: Failed to import ${sql_file}. Aborting."
-          # You might want to output the failing SQL command or part of the file for debugging
-          head -n 50 "${sql_file}" # for example
+      if [[ "$import_method" == "parallel" ]]; then
+        echo "Importing SQL files in parallel. This setting can be changed in silta.yml using the referenceData.databaseImportMethod key."
+        find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
+        pipeline_exit_code=$? # Capture exit code of the pipeline (most likely influenced by xargs)
+
+        # Check if xargs reported an error (any non-zero exit status)
+        if [ "$pipeline_exit_code" -ne 0 ]; then
+          echo "ERROR: One or more parallel imports failed. Check the logs above for specific mysql errors."
           exit 1
         fi
-      done
 
-      echo "All SQL files imported successfully."
-      #find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
+        echo "Parallel import command finished."
+
+      elif [[ "$import_method" == "sequential" ]]; then
+        echo "Importing SQL files in sequentially. This setting can be changed in silta.yml using the referenceData.databaseImportMethod key."
+        find "${tmp_ref_data}/" -type f -name "*.sql" | sort | while IFS= read -r sql_file; do
+          echo "Importing ${sql_file}"
+          if ! mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < "${sql_file}"; then
+            echo "ERROR: Failed to import ${sql_file}. Check the logs above for specific mysql errors."
+            exit 1
+          fi
+        done
+
+        echo "All SQL files imported successfully."
+
+      else
+        echo "Incompatible import method. Please use either 'parallel' or 'sequential' in referenceData.databaseImportMethod."
+        exit 1
+      fi
 
     # Backwards compatibility for old way of importing.
     elif [[ -f "${app_ref_data}/db.sql.gz" ]]; then

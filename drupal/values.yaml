@@ -448,6 +448,9 @@ referenceData:
   # When to automatically update the reference data.
   schedule: '~ 3 * * *'
 
+  # The method used to import the database. Can be either 'parallel' or 'sequential'.
+  databaseImportMethod: 'parallel'
+
   # Whether to copy the database, only used programmatically.
   copyDatabase: true
 
