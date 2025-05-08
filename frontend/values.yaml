@@ -228,8 +228,10 @@ services: {}
   #   mounts:
   #     - files
   #
-  #   # Security context settings for this service
-  #   securityContext: {}
+  #   # Pod level security context settings for this service
+  #   podSecurityContext: {}
+  #   # Container level security context settings
+  #   containerSecurityContext: {}
 
   #   # Enable autoscaling using HorizontalPodAutoscaler
   #   # see: https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale-walkthrough/
