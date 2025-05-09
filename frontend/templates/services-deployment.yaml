@@ -29,13 +29,17 @@ spec:
         # We use a checksum to redeploy the pods when the configMap changes.
         configMap-checksum: {{ include (print $.Template.BasePath "/configmap.yaml") $ | sha256sum }}
     spec:
+      {{- if $service.podSecurityContext }}
+      securityContext:
+        {{- toYaml $service.podSecurityContext | nindent 8 }}
+      {{- end }}
       enableServiceLinks: false
       containers:
       - name: {{ $index }}
         image: {{ $service.image | quote }}
-        {{- if $service.securityContext }}
+        {{- if $service.containerSecurityContext }}
         securityContext:
-          {{- toYaml $service.securityContext | nindent 10 }}
+          {{- toYaml $service.containerSecurityContext | nindent 10 }}
         {{- end }}
         ports:
         - containerPort: {{ default $.Values.serviceDefaults.port $service.port }}
