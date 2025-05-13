@@ -448,6 +448,10 @@ referenceData:
   # When to automatically update the reference data.
   schedule: '~ 3 * * *'
 
+  # The method used to import the database tables. Can be either 'parallel' or 'sequential'.
+  # Parallel is faster but might in some cases be unstable. In that case, use sequential instead.
+  databaseImportMethod: 'parallel'
+
   # Whether to copy the database, only used programmatically.
   copyDatabase: true
 
