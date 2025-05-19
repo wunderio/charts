@@ -2,9 +2,6 @@ dependencies:
 - name: mariadb
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 7.10.4
-- name: mailhog
-  repository: https://storage.googleapis.com/charts.wdr.io
-  version: 5.1.0
 - name: mailpit
   repository: https://jouve.github.io/charts/
   version: 0.24.0
@@ -26,5 +23,5 @@ dependencies:
 - name: redis
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 19.1.5
-digest: sha256:6d8a9d224e4f05d80001444956b411ec09e584c90894d897ebf0f4d7d275d7f9
-generated: "2025-04-08T22:49:11.202227+03:00"
+digest: sha256:0b781b6165e8f06c146449246d449e79256ef51cf1ec2f2f5666ba81a90410e0
+generated: "2025-05-19T16:01:33.429518+03:00"
