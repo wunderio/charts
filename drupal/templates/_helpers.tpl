@@ -98,8 +98,6 @@ imagePullSecrets:
 - name: SMTP_ADDRESS
   {{- if .Values.mailpit.enabled }}
   value: "{{ .Release.Name }}-mailpit-smtp:25"
-  {{ else if .Values.mailhog.enabled }}
-  value: "{{ .Release.Name }}-mailhog:1025"
   {{ else }}
   value: {{ .Values.smtp.address | quote }}
   {{- end }}
@@ -118,8 +116,6 @@ imagePullSecrets:
 - name: SSMTP_MAILHUB
   {{- if .Values.mailpit.enabled }}
   value: "{{ .Release.Name }}-mailpit-smtp:25"
-  {{ else if .Values.mailhog.enabled }}
-  value: "{{ .Release.Name }}-mailhog:1025"
   {{ else }}
   value: {{ .Values.smtp.address | quote }}
   {{- end }}
@@ -244,12 +240,7 @@ imagePullSecrets:
 - name: ELASTICSEARCH_HOST
   value: {{ .Release.Name }}-es
 {{- end }}
-{{- if or .Values.mailhog.enabled .Values.mailpit.enabled .Values.smtp.enabled }}
-{{- if .Values.mailhog.enabled }}
-{{- if contains "mailhog" .Release.Name -}}
-{{- fail "Do not use 'mailhog' in release name or deployment will fail" -}}
-{{- end }}
-{{- end }}
+{{- if or .Values.mailpit.enabled .Values.smtp.enabled }}
 {{- if .Values.mailpit.enabled }}
 {{- if contains "mailpit" .Release.Name -}}
 {{- fail "Do not use 'mailpit' in release name or deployment will fail" -}}
