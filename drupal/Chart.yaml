@@ -18,10 +18,6 @@ dependencies:
   version: 16.13.x
   repository: https://charts.bitnami.com/bitnami
   condition: redis.enabled
-- name: mailhog
-  version: 5.1.x
-  repository: https://storage.googleapis.com/charts.wdr.io
-  condition: mailhog.enabled
 - name: mailpit
   version: 0.24.x
   repository: https://jouve.github.io/charts/
