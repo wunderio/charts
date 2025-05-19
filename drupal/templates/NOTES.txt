@@ -16,16 +16,6 @@ Your site is available at:
   {{- end }}
   {{- end }}
 
-{{- if .Values.mailhog.enabled }}
-  
-Mailhog available at:
-
-  http://{{- template "drupal.domain" . }}/mailhog
-  {{- range $index, $domain := .Values.exposeDomains }}
-  http://{{ $domain.hostname }}/mailhog
-  {{- end }}
-{{- end }}
-
 {{- if .Values.mailpit.enabled }}
 
 Mailpit available at:

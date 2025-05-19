@@ -634,21 +634,6 @@
         "enabled": { "type": "boolean" }
       }
     },
-    "mailhog": {
-      "type": "object",
-      "properties": {
-        "enabled": { "type": "boolean" },
-        "image": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "repository": { "type": "string" },
-            "tag": { "type": "string" },
-            "pullPolicy": { "type": "string" }
-          }
-        }
-      }
-    },
     "smtp": {
       "type": "object",
       "properties": {
