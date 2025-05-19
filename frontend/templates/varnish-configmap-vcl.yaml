@@ -131,13 +131,6 @@ data:
         set req.hash_always_miss = true;
       }
 
-      {{- if .Values.mailhog.enabled }}
-      # No varnish for mailhog
-      if (req.url ~ "^/mailhog$") {
-        return (pass);
-      }
-      {{- end }}
-
       {{- if .Values.mailpit.enabled }}
       // No varnish for mailpit
       if (req.url ~ "^/mailpit(/|$)") {
