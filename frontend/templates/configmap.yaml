@@ -44,6 +44,7 @@ data:
       {{- end }}
 
       real_ip_header              {{ .Values.nginx.real_ip_header }};
+      real_ip_recursive           on;
 
       include                     /etc/nginx/mime.types;
       default_type                application/octet-stream;

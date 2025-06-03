@@ -27,6 +27,8 @@ Mailhog available at:
   {{- range $index, $domain := .Values.exposeDomains }}
   http://{{ $domain.hostname }}/mailhog
   {{- end }}
+  ⚠️ **DEPRECATED** mailhog is deprecated and will be removed in the future, use mailpit instead
+  See: https://wunderio.github.io/silta/docs/silta-examples#sending-e-mail
 {{- end }}
 
 {{- if .Values.mailpit.enabled }}
