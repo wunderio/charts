@@ -53,9 +53,9 @@ SSH connection (limited access through VPN):
   ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }}
 
 Downloading data from server
-  
-  Downloading database: 
-  ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-dump" > my_database_dump.sql
+
+  Downloading database:
+  ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-dump" > {{ .Release.Namespace }}-{{ .Release.Name }}.sql
 
   {{ range $index, $mount := .Values.mounts -}}
   {{ if eq $mount.enabled true -}}
@@ -68,9 +68,9 @@ Downloading data from server
   rsync -chavzP -e "ssh -A -J {{ include "drupal.jumphost" . }}" {{ include "drupal.shellHost" . }}:/app/remote-filename ./
 
 Importing data into server (use this with caution!)
-  
+
   Importing database:
-  ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-cli" < my_database_dump.sql
+  ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-cli" < {{ .Release.Namespace }}-{{ .Release.Name }}.sql
 
   {{ range $index, $mount := .Values.mounts -}}
   {{ if eq $mount.enabled true -}}
