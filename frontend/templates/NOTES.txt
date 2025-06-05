@@ -49,9 +49,16 @@ SSH connection (limited access through VPN):
 
   {{ range $index, $service := .Values.services -}}
   {{- if $service.mounts }}
-  {{- range $indexMount, $service.mounts -}}
-  Importing files to service '{{ $index }}', folder '{{ (index $.Values.mounts $indexMount).mountPath }}':
-rsync -azv -e 'ssh -A -J {{ include "frontend.jumphost" $ }}' local_folder/ www-admin@{{ template "frontend.environment.hostname" $ }}-shell-{{ $index }}.{{ $.Release.Namespace }}:{{ (index $.Values.mounts $indexMount).mountPath }}
+File mounts:
+  {{- range $indexMount, $service.mounts }}
+  {{ $folder := (index $.Values.mounts $indexMount).mountPath }}
+  service '{{ $index }}', folder '{{ $folder }}'
+  Download:
+  {{- /*  Ensure that the mount path is suffixed with a slash when printed. */}}
+  {{- $mountPath := ternary $folder (printf "%s/" $folder) (hasSuffix "/" $folder) }}
+    rsync -azv -e 'ssh -A -J {{ include "frontend.jumphost" $ }}' www-admin@{{ template "frontend.environment.hostname" $ }}-shell-{{ $index }}.{{ $.Release.Namespace }}:{{ $mountPath }} {{ $.Release.Namespace }}-mounts/{{ $indexMount }}
+  Upload:
+    rsync -azv -e 'ssh -A -J {{ include "frontend.jumphost" $ }}' {{ $.Release.Namespace }}-mounts/{{ $indexMount }}/ www-admin@{{ template "frontend.environment.hostname" $ }}-shell-{{ $index }}.{{ $.Release.Namespace }}:{{ (index $.Values.mounts $indexMount).mountPath }}
   {{ end -}}
   {{ end -}}
   {{ end -}}
