@@ -59,8 +59,10 @@ Downloading data from server
 
   {{ range $index, $mount := .Values.mounts -}}
   {{ if eq $mount.enabled true -}}
+  {{/*  Ensure that the printed path is suffixed with a slash.*/}}
+  {{- $mountPath := ternary $mount.mountPath (printf "%s/" $mount.mountPath) (hasSuffix "/" $mount.mountPath) -}}
   Downloading files from {{ $index }}:
-  rsync -azv -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }} {{ $.Release.Namespace }}-mounts/{{ $index }}
+  rsync -azv -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' {{ include "drupal.shellHost" $ }}:{{ $mountPath }} {{ $.Release.Namespace }}-mounts/{{ $index }}
   {{ end }}
   {{ end -}}
 
@@ -74,8 +76,10 @@ Importing data into server (use this with caution!)
 
   {{ range $index, $mount := .Values.mounts -}}
   {{ if eq $mount.enabled true -}}
+  {{/*  Ensure that the printed path is suffixed with a slash.*/}}
+  {{- $mountPath := ternary $mount.mountPath (printf "%s/" $mount.mountPath) (hasSuffix "/" $mount.mountPath) -}}
   Uploading files to {{ $index }}:
-  rsync -azv --temp-dir=/tmp/ -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' {{ $.Release.Namespace }}-mounts/{{ $index }} {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }}
+  rsync -azv --temp-dir=/tmp/ -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' {{ $.Release.Namespace }}-mounts/{{ $index }} {{ include "drupal.shellHost" $ }}:{{ $mountPath }}
   {{ end }}
   {{ end -}}
   {{- end -}}
