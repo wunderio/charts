@@ -60,7 +60,7 @@ Downloading data from server
   {{ range $index, $mount := .Values.mounts -}}
   {{ if eq $mount.enabled true -}}
   Downloading files from {{ $index }}:
-  rsync -azv -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }} local_folder/ 
+  rsync -azv -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }} {{ $.Release.Namespace }}-mounts/{{ $index }}
   {{ end }}
   {{ end -}}
 
@@ -75,7 +75,7 @@ Importing data into server (use this with caution!)
   {{ range $index, $mount := .Values.mounts -}}
   {{ if eq $mount.enabled true -}}
   Uploading files to {{ $index }}:
-  rsync -azv --temp-dir=/tmp/ -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' local_folder/ {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }}
+  rsync -azv --temp-dir=/tmp/ -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' {{ $.Release.Namespace }}-mounts/{{ $index }} {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }}
   {{ end }}
   {{ end -}}
   {{- end -}}
