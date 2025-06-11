@@ -59,7 +59,7 @@ Downloading data from server
 
   {{ range $index, $mount := .Values.mounts -}}
   {{ if eq $mount.enabled true -}}
-  {{/*  Ensure that the mount path is suffixed with a slash when printed. */}}
+  {{/*  Ensure that the mount path is suffixed with a slash to download contents of the mount not the folder itself. */}}
   {{- $mountPath := ternary $mount.mountPath (printf "%s/" $mount.mountPath) (hasSuffix "/" $mount.mountPath) -}}
   Downloading files from {{ $index }}:
   rsync -azv -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' {{ include "drupal.shellHost" $ }}:{{ $mountPath }} {{ $.Release.Namespace }}-mounts/{{ $index }}
