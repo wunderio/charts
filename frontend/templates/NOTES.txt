@@ -51,9 +51,9 @@ SSH connection (limited access through VPN):
 File mounts ('{{ $index }}' service):
   {{- range $indexMount, $service.mounts }}
   {{ $folder := (index $.Values.mounts $indexMount).mountPath }}
-  Mount: '{{ $indexMount }}'
+  Mount name: '{{ $indexMount }}'
   Download:
-  {{- /*  Ensure that the mount path is suffixed with a slash when printed. */}}
+  {{- /*  Ensure that the mount path is suffixed with a slash to download contents of the mount not the folder itself. */}}
   {{- $mountPath := ternary $folder (printf "%s/" $folder) (hasSuffix "/" $folder) }}
     rsync -azv -e 'ssh -A -J {{ include "frontend.jumphost" $ }}' www-admin@{{ template "frontend.environment.hostname" $ }}-shell-{{ $index }}.{{ $.Release.Namespace }}:{{ $mountPath }} {{ $.Release.Namespace }}-mounts/{{ $indexMount }}
   Upload:
