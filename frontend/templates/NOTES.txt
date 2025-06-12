@@ -1,6 +1,5 @@
 {{ $protocol := .Values.ingress.default.tls | ternary "https" "http" -}}
 Deployed {{ .Release.Name }} successfully, your site is available here:
-
   {{ range $index, $service := .Values.services -}}
   {{- if $service.exposedRoute }}
   {{ $protocol }}://{{- template "frontend.domain" $ }}{{ $service.exposedRoute }}
@@ -49,10 +48,10 @@ SSH connection (limited access through VPN):
 
   {{ range $index, $service := .Values.services -}}
   {{- if $service.mounts }}
-File mounts:
+File mounts ('{{ $index }}' service):
   {{- range $indexMount, $service.mounts }}
   {{ $folder := (index $.Values.mounts $indexMount).mountPath }}
-  service '{{ $index }}', folder '{{ $folder }}'
+  Mount: '{{ $indexMount }}'
   Download:
   {{- /*  Ensure that the mount path is suffixed with a slash when printed. */}}
   {{- $mountPath := ternary $folder (printf "%s/" $folder) (hasSuffix "/" $folder) }}
