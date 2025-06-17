@@ -382,7 +382,7 @@ done
 {{- end }}
 
 {{- define "drupal.installing-file" -}}
-  {{ .Values.webRoot }}/sites/default/files/_installing
+{{ .Values.webRoot }}/sites/default/files/_installing
 {{- end }}
 
 {{- define "drupal.installation-in-progress-test" -}}
@@ -398,9 +398,7 @@ set -e
 
 INSTALLING_FILE="{{ include "drupal.installing-file" . }}"
 
-# Attempt to remove the _installing file at the very beginning, ignoring errors if it doesn't exist.
-# This cleans up state from a potential previous failed install run.
-rm -f "$INSTALLING_FILE"
+rm -f "$INSTALLING_FILE" || true
 
 {{ include "drupal.import-reference-files" . }}
 
@@ -415,7 +413,7 @@ touch "$INSTALLING_FILE"
 
 {{ .Values.php.postinstall.command }}
 
-rm -f "$INSTALLING_FILE"
+rm -f "$INSTALLING_FILE" || true
 
 {{ .Values.php.postupgrade.command }}
 {{- if .Values.php.postupgrade.afterCommand }}
@@ -431,8 +429,6 @@ wait
 
   INSTALLING_FILE="{{ include "drupal.installing-file" . }}"
 
-  # Attempt to remove the _installing file at the very beginning, ignoring errors if it doesn't exist.
-  # This cleans up state from a potential previous failed install run.
   rm -f "$INSTALLING_FILE" || true
 
   {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
@@ -455,7 +451,7 @@ wait
 
   {{ if .Release.IsInstall }}
     {{ .Values.php.postinstall.command }}
-    rm -f "$INSTALLING_FILE"
+    rm -f "$INSTALLING_FILE" || true
   {{ end }}
   {{ .Values.php.postupgrade.command }}
   {{- if .Values.php.postupgrade.afterCommand }}
