@@ -3,6 +3,7 @@ templates:
   - drupal-configmap.yaml
   - drupal-secret.yaml
   - shell-configmap.yaml
+  - shell-secret.yaml
   - shell-deployment.yaml
 capabilities:
   apiVersions:

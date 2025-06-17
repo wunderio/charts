@@ -24,6 +24,7 @@ spec:
         # Recreate pods when the configMap or secret changes.
         drupal-cm-checksum: {{ include (print $.Template.BasePath "/drupal-configmap.yaml") . | sha256sum }}
         shell-cm-checksum: {{ include (print $.Template.BasePath "/shell-configmap.yaml") . | sha256sum }}
+        shell-sec-checksum: {{ include (print $.Template.BasePath "/shell-secret.yaml") . | sha256sum }}
         drupal-sec-checksum: {{ include (print $.Template.BasePath "/drupal-secret.yaml") . | sha256sum }}
     spec:
       enableServiceLinks: false
