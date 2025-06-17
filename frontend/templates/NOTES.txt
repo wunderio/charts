@@ -19,7 +19,7 @@ Deployed {{ .Release.Name }} successfully, your site is available here:
   {{- end }}
 
 {{- if .Values.mailhog.enabled }}
-  
+
 Mailhog available at:
 
   http://{{- template "frontend.domain" . }}/mailhog
@@ -50,7 +50,7 @@ SSH connection (limited access through VPN):
   {{- if $service.mounts }}
 File mounts ('{{ $index }}' service):
   {{- range $indexMount, $service.mounts }}
-  {{ $folder := (index $.Values.mounts $indexMount).mountPath }}
+  {{- $folder := (index $.Values.mounts $indexMount).mountPath }}
   Mount name: '{{ $indexMount }}'
   Download:
   {{- /*  Ensure that the mount path is suffixed with a slash to download contents of the mount not the folder itself. */}}
