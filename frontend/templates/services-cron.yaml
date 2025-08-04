@@ -28,12 +28,24 @@ spec:
             cronjob: "true"
         spec:
           enableServiceLinks: false
+          {{- if or (hasKey $job "podSecurityContext") (hasKey $service "podSecurityContext") }}
+          securityContext:
+            {{- if hasKey $job "podSecurityContext" }}
+            {{- toYaml $job.podSecurityContext | nindent 12 }}
+            {{- else if hasKey $service "podSecurityContext" }}
+            {{- toYaml $service.podSecurityContext | nindent 12 }}
+            {{- end }}
+          {{- end }}
           containers:
           - name: {{ $jobName }}-cron
             image: {{ $service.image | quote }}
-            {{- if $service.securityContext }}
+            {{- if or (hasKey $job "containerSecurityContext") (hasKey $service "containerSecurityContext") }}
             securityContext:
-              {{- toYaml $service.securityContext | nindent 14 }}
+              {{- if hasKey $job "containerSecurityContext" }}
+              {{- toYaml $job.containerSecurityContext | nindent 14 }}
+              {{- else if hasKey $service "containerSecurityContext" }}
+              {{- toYaml $service.containerSecurityContext | nindent 14 }}
+              {{- end }}
             {{- end }}
             volumeMounts:
               {{- if $service.mounts }}
@@ -105,26 +117,49 @@ spec:
             {{- end }}
             {{- end }}
           restartPolicy: OnFailure
-          {{- if or $job.nodeSelector $service.nodeSelector ($.Values.cronJobDefaults).nodeSelector }}
+          {{- if or $job.nodeSelector $service.nodeSelector ($.Values.cronJobDefaults).nodeSelector ($.Values.serviceDefaults).nodeSelector }}      
           nodeSelector:
             {{- if $job.nodeSelector }}
             {{- $job.nodeSelector | toYaml | nindent 12 }}
-            {{- else }}
-            {{- if ($.Values.cronJobDefaults).nodeSelector }}
+            {{- else if ($.Values.cronJobDefaults).nodeSelector }}
             {{- $.Values.cronJobDefaults.nodeSelector | toYaml | nindent 12 }}
-            {{- else }}
+            {{- else if $service.nodeSelector }}
             {{- $service.nodeSelector | toYaml | nindent 12 }}
+            {{- else if ($.Values.serviceDefaults).nodeSelector }}
+            {{- $.Values.serviceDefaults.nodeSelector | toYaml | nindent 12 }}
             {{- end }}
-            {{- end }}
+          {{- end }}
+          {{- if or $job.nodeSelector $service.nodeSelector ($.Values.cronJobDefaults).nodeSelector ($.Values.serviceDefaults).nodeSelector $job.tolerations $service.tolerations ($.Values.cronJobDefaults).tolerations ($.Values.serviceDefaults).tolerations }}
           tolerations:
             {{- if $job.nodeSelector }}
             {{- include "frontend.tolerations" $job.nodeSelector | nindent 12 }}
-            {{- else }}
-            {{- if ($.Values.cronJobDefaults).nodeSelector }}
+            {{- else if ($.Values.cronJobDefaults).nodeSelector }}
             {{- include "frontend.tolerations" $.Values.cronJobDefaults.nodeSelector | nindent 12 }}
-            {{- else }}
+            {{- else if $service.nodeSelector }}
             {{- include "frontend.tolerations" $service.nodeSelector | nindent 12 }}
+            {{- else if ($.Values.serviceDefaults).nodeSelector }}
+            {{- include "frontend.tolerations" $.Values.serviceDefaults.nodeSelector | nindent 12 }}
             {{- end }}
+            {{- if $job.tolerations }}
+            {{- $job.tolerations | toYaml | nindent 12 }}
+            {{- else if ($.Values.cronJobDefaults).tolerations }}
+            {{- $.Values.cronJobDefaults.tolerations | toYaml | nindent 12 }}
+            {{- else if $service.tolerations }}
+            {{- $service.tolerations | toYaml | nindent 12 }}
+            {{- else if ($.Values.serviceDefaults).tolerations }}
+            {{- $.Values.serviceDefaults.tolerations | toYaml | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- if or $job.affinity $service.affinity ($.Values.cronJobDefaults).affinity ($.Values.serviceDefaults).affinity }}
+          affinity:
+            {{- if $job.affinity }}
+            {{-  tpl ($job.affinity | toYaml ) (dict "Values" $.Values "Release" $.Release "serviceLabel" (printf "frontend-%s" $serviceName)) | nindent 12 }}
+            {{- else if ($.Values.cronJobDefaults).affinity }}
+            {{-  tpl ($.Values.cronJobDefaults.affinity | toYaml ) (dict "Values" $.Values "Release" $.Release "serviceLabel" (printf "frontend-%s" $serviceName)) | nindent 12 }}
+            {{- else if $service.affinity }}
+            {{-  tpl ($service.affinity | toYaml ) (dict "Values" $.Values "Release" $.Release "serviceLabel" (printf "frontend-%s" $serviceName)) | nindent 12 }}
+            {{- else if ($.Values.serviceDefaults).affinity }}
+            {{-  tpl ($.Values.serviceDefaults.affinity | toYaml ) (dict "Values" $.Values "Release" $.Release "serviceLabel" (printf "frontend-%s" $serviceName)) | nindent 12 }}
             {{- end }}
           {{- end }}
 ---

@@ -1,8 +1,8 @@
-{{- range $index, $service := .Values.services }}
+{{- range $serviceName, $service := .Values.services }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ $.Release.Name }}-{{ $index }}
+  name: {{ $.Release.Name }}-{{ $serviceName }}
   labels:
     {{- include "frontend.release_labels" $ | nindent 4 }}
     silta-frontend: service
@@ -15,12 +15,12 @@ spec:
   selector:
     matchLabels:
       {{- include "frontend.release_selector_labels" $ | nindent 6 }}
-      deployment: frontend-{{ $index }}
+      deployment: frontend-{{ $serviceName }}
   template:
     metadata:
       labels:
         {{- include "frontend.release_labels" $ | nindent 8 }}
-        deployment: frontend-{{ $index }}
+        deployment: frontend-{{ $serviceName }}
         silta-frontend: service
         {{- if $.Values.shell.enabled }}
         silta-ingress: allow
@@ -35,7 +35,7 @@ spec:
       {{- end }}
       enableServiceLinks: false
       containers:
-      - name: {{ $index }}
+      - name: {{ $serviceName }}
         image: {{ $service.image | quote }}
         {{- if $service.containerSecurityContext }}
         securityContext:
@@ -43,7 +43,7 @@ spec:
         {{- end }}
         ports:
         - containerPort: {{ default $.Values.serviceDefaults.port $service.port }}
-          name: {{ $index }}
+          name: {{ $serviceName }}
         volumeMounts:
           {{- if $service.mounts }}
           {{- range $index, $mountName := $service.mounts }}
@@ -131,62 +131,31 @@ spec:
       {{- $nodeSelector := default $.Values.serviceDefaults.nodeSelector $service.nodeSelector }}
       {{- if $nodeSelector }}
       nodeSelector:
-        {{ $nodeSelector | toYaml | nindent 8 }}
+        {{- $nodeSelector | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if or $nodeSelector $service.tolerations $.Values.serviceDefaults.tolerations  }}
       tolerations:
-        {{ include "frontend.tolerations" $nodeSelector | nindent 8 }}
+        {{- include "frontend.tolerations" $nodeSelector | nindent 8 }}
+        {{- if $service.tolerations }}
+        {{- toYaml $service.tolerations | nindent 8 }}
+        {{- else if $.Values.serviceDefaults.tolerations }}
+        {{- toYaml $.Values.serviceDefaults.tolerations | nindent 8 }}
+        {{- end }}
+      {{- end }}
+      {{- if or $service.affinity $.Values.serviceDefaults.affinity }}
       affinity:
-        podAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          # Preferrably keep pods on the same node as the database.
-          - weight: 1
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: release
-                  operator: In
-                  values:
-                  - "{{ $.Release.Name }}"
-                - key: mariadb
-                  operator: In
-                  values:
-                  - mariadb
-              topologyKey: kubernetes.io/hostname
-          # Preferrably keep pods in the same zone as the database.
-          - weight: 1
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: release
-                  operator: In
-                  values:
-                  - "{{ $.Release.Name }}"
-                - key: mariadb
-                  operator: In
-                  values:
-                  - mariadb
-              topologyKey: topology.kubernetes.io/zone
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 10
-            podAffinityTerm:
-              topologyKey: kubernetes.io/hostname
-              labelSelector:
-                matchExpressions:
-                - key: release
-                  operator: In
-                  values:
-                  - "{{ $.Release.Name }}"
-                - key: deployment
-                  operator: In
-                  values:
-                  - frontend-{{ $index }}
+        {{- if $service.affinity }}
+        {{- tpl ( $service.affinity | toYaml ) (dict "Values" $.Values "Release" $.Release "serviceLabel" (printf "frontend-%s" $serviceName)) | nindent 8 }}
+        {{- else if $.Values.serviceDefaults.affinity }}
+        {{- tpl ( $.Values.serviceDefaults.affinity | toYaml ) (dict "Values" $.Values "Release" $.Release "serviceLabel" (printf "frontend-%s" $serviceName)) | nindent 8 }}
+        {{- end }}
       {{- end }}
 {{- if or $service.postupgrade $service.postinstall }}
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: "{{ $.Release.Name }}-{{ $index }}-post-release"
+  name: "{{ $.Release.Name }}-{{ $serviceName }}-post-release"
   labels:
     {{- include "frontend.release_labels" $ | nindent 4 }}
   annotations:
@@ -206,7 +175,7 @@ spec:
       restartPolicy: Never
       enableServiceLinks: false
       containers:
-      - name: {{ $index }}
+      - name: {{ $serviceName }}
         image: {{ $service.image | quote }}
         command: ["/bin/bash", "-c"]
         args:
@@ -221,7 +190,7 @@ spec:
             {{- end }}
         volumeMounts:
           {{ if $service.mounts }}
-          {{- range $index, $mountName := $service.mounts }}
+          {{- range $serviceName, $mountName := $service.mounts }}
           {{ $mount := (index $.Values.mounts $mountName) }}
           {{- if eq $mount.enabled true }}
           - name: frontend-{{ $mountName }}
@@ -245,7 +214,7 @@ spec:
         {{- end }}
       volumes:
         {{ if $service.mounts }}
-        {{- range $index, $mountName := $service.mounts }}
+        {{- range $serviceName, $mountName := $service.mounts }}
         {{- $mount := (index $.Values.mounts $mountName) }}
         {{- if eq $mount.enabled true }}
         - name: frontend-{{ $mountName }}
@@ -283,14 +252,14 @@ spec:
 apiVersion: {{ include "frontend.autoscaling.api-version" $ | trim }}
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ $.Release.Name }}-{{ $index }}
+  name: {{ $.Release.Name }}-{{ $serviceName }}
   labels:
     {{- include "frontend.release_labels" $ | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ $.Release.Name }}-{{ $index }}
+    name: {{ $.Release.Name }}-{{ $serviceName }}
   minReplicas: {{ default $.Values.serviceDefaults.autoscaling.minReplicas $service.autoscaling.minReplicas }}
   maxReplicas: {{ default $.Values.serviceDefaults.autoscaling.maxReplicas $service.autoscaling.maxReplicas }}
   metrics:
