@@ -113,6 +113,7 @@ spec:
                 # Use the exit code of the actual cron command.
                 exit "$exit_code"
 
+            {{- if or $job.resources ($.Values.php.cronJobDefaults).resources $.Values.php.resources }}
             resources:
               {{- if $job.resources }}
               {{- if ($.Values.php.cronJobDefaults).resources }}
@@ -127,7 +128,9 @@ spec:
               {{- $.Values.php.resources | toYaml | nindent 14 }}
               {{- end }}
               {{- end }}
+            {{- end }}
           restartPolicy: Never
+          {{- if or $job.nodeSelector ($.Values.php.cronJobDefaults).nodeSelector $.Values.php.nodeSelector }}
           nodeSelector:
             {{- if $job.nodeSelector }}
             {{- if ($.Values.php.cronJobDefaults).nodeSelector }}
@@ -142,6 +145,8 @@ spec:
             {{- $.Values.php.nodeSelector | toYaml | nindent 12 }}
             {{- end }}
             {{- end }}
+          {{- end }}
+          {{- if or $job.tolerations ($.Values.php.cronJobDefaults).tolerations $.Values.php.tolerations $job.nodeSelector ($.Values.php.cronJobDefaults).nodeSelector $.Values.php.nodeSelector }}
           tolerations:
             {{- if $job.nodeSelector }}
             {{- if ($.Values.php.cronJobDefaults).nodeSelector }}
@@ -156,6 +161,24 @@ spec:
             {{- include "drupal.tolerations" $.Values.php.nodeSelector | nindent 12 }}
             {{- end }}
             {{- end }}
+            {{- if $job.tolerations }}
+            {{- $job.tolerations | toYaml | nindent 12 }}
+            {{- else if ($.Values.php.cronJobDefaults).tolerations }}
+            {{- $.Values.php.cronJobDefaults.tolerations | toYaml | nindent 12 }}
+            {{- else if $.Values.php.tolerations }}
+            {{- $.Values.php.tolerations | toYaml | nindent 12 }}
+            {{- end }}
+          {{- end }}
+          {{- if or $job.affinity ($.Values.php.cronJobDefaults).affinity $.Values.php.affinity }}
+          affinity:
+            {{- if $job.affinity }}
+            {{- tpl ($job.affinity | toYaml ) $ | nindent 12 }}
+            {{- else if ($.Values.php.cronJobDefaults).affinity }}
+            {{- tpl ($.Values.php.cronJobDefaults.affinity | toYaml ) $ | nindent 12 }}
+            {{- else if $.Values.php.affinity }}
+            {{- tpl ($.Values.php.affinity | toYaml ) $ | nindent 12 }}
+            {{- end }}
+          {{- end }}
           volumes:
             {{- include "drupal.volumes" $ | nindent 12 }}
 
