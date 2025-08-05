@@ -271,6 +271,8 @@ services: {}
   #      parallelism: 1
   #      nodeSelector:
   #        cloud.google.com/gke-nodepool: static-ip
+  #      tolerations: []
+  #      affinity: {}
   #      # Optionally override service resource requests
   #      resources:
   #        requests:
@@ -283,6 +285,8 @@ services: {}
 
   #   nodeSelector:
   #     cloud.google.com/gke-nodepool: static-ip
+  #   tolerations: []
+  #   affinity: {}
 
   #  nginx:
   #    denyDotFiles: true
@@ -374,7 +378,53 @@ serviceDefaults:
         targetAverageUtilization: 80
   # nodeSelector:
   #   cloud.google.com/gke-nodepool: static-ip
-
+  # tolerations: []
+  affinity:
+    podAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      # Preferrably keep pods on the same node as the database.
+      - weight: 1
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: release
+              operator: In
+              values:
+              - "{{ $.Release.Name }}"
+            - key: mariadb
+              operator: In
+              values:
+              - mariadb
+          topologyKey: kubernetes.io/hostname
+      # Preferrably keep pods in the same zone as the database.
+      - weight: 1
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: release
+              operator: In
+              values:
+              - "{{ $.Release.Name }}"
+            - key: mariadb
+              operator: In
+              values:
+              - mariadb
+          topologyKey: topology.kubernetes.io/zone
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 10
+        podAffinityTerm:
+          topologyKey: kubernetes.io/hostname
+          labelSelector:
+            matchExpressions:
+            - key: release
+              operator: In
+              values:
+              - "{{ $.Release.Name }}"
+            - key: deployment
+              operator: In
+              values:
+              - "{{ $.serviceLabel }}"
 # Provide defaults for all cron jobs. This will override serviceDefaults when defined.
 cronJobDefaults:
   # resources:
@@ -385,6 +435,8 @@ cronJobDefaults:
   #     memory: 122Mi
   # nodeSelector:
   #   cloud.google.com/gke-nodepool: static-ip
+  # tolerations: []
+  # affinity: {}
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.

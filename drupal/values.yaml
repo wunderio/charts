@@ -291,17 +291,16 @@ php:
           drush cron;
         fi
 
-    # Add custom php.ini file overrides for the cronjob.
-    # Use the same syntax as in php.ini file
-    # Example:
-    # php_ini: |
-        # [PHP]
-        # memory_limit=128M
+      # Add custom php.ini file overrides for the cronjob.
+      # Use the same syntax as in php.ini file
+      # Example:
+      # php_ini: |
+          # [PHP]
+          # memory_limit=128M
 
-    # php_ini: |
-
-      # Set a nodeSelector specifically for cron jobs.
       nodeSelector: {}
+      tolerations: []
+      affinity: {}
 
       # Specify a how many attempts should be made before considering a cron job as failed.
       backoffLimit: 1
@@ -384,6 +383,53 @@ php:
   # Set a restriction on where the php pod are provisioned.
   # This can be used for example to get a static IP for egress traffic.
   nodeSelector: {}
+  tolerations: []
+  affinity:
+    podAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      # Preferrably keep pods on the same node as the database.
+      - weight: 1
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: release
+              operator: In
+              values:
+              - "{{ .Release.Name }}"
+            - key: mariadb
+              operator: In
+              values:
+              - mariadb
+          topologyKey: kubernetes.io/hostname
+      # Preferrably keep pods in the same zone as the database.
+      - weight: 1
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: release
+              operator: In
+              values:
+              - "{{ .Release.Name }}"
+            - key: mariadb
+              operator: In
+              values:
+              - mariadb
+          topologyKey: topology.kubernetes.io/zone
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 10
+        podAffinityTerm:
+          topologyKey: kubernetes.io/hostname
+          labelSelector:
+            matchExpressions:
+            - key: release
+              operator: In
+              values:
+              - "{{ .Release.Name }}"
+            - key: deployment
+              operator: In
+              values:
+              - drupal
 
 # Configuration for everything that runs in shell container.
 shell:
@@ -421,6 +467,8 @@ shell:
   # Set a restriction on where the shell pod are provisioned.
   # This can be used for example to get a static IP for egress traffic.
   nodeSelector: {}
+  tolerations: []
+  affinity: {}
 
 # Configure the dynamically mounted volumes
 mounts:
@@ -558,8 +606,9 @@ backup:
   #  Do not backup files
   #skipFiles: true
 
-  # Set a nodeSelector specifically for backup jobs.
   nodeSelector: {}
+  tolerations: []
+  affinity: {}
 
   # Resources for the backup cron job.
   resources:
@@ -928,7 +977,8 @@ logging:
 
 # Obfuscate parts of the full domain name.
 # Available values for maskSubdomains are:
-# - releaseName (scrambles release name subdomain, e.g., xxx.project.silta.tld)
-# - projectName (scrambles project name subdomain, e.g., release.yyy.silta.tld)
-# - both (obfuscates both, e.g., zzz.silta.tld)
-# maskSubdomains: both
+# - none (no obfuscation, e.g., branch.project.<clusterDomain>)
+# - releaseName (scrambles release name subdomain, e.g., xxx.project.<clusterDomain>)
+# - projectName (scrambles project name subdomain, e.g., release.yyy.<clusterDomain>)
+# - both (obfuscates both, e.g., zzz.<clusterDomain>)
+maskSubdomains: none

@@ -287,6 +287,10 @@
                 "schedule": { "type": "string" },
                 "parallelism": { "type": "integer" },
                 "nodeSelector": { "type": "object" },
+                "tolerations": { "type": "array" },
+                "affinity": { "type": "object" },
+                "podSecurityContext": { "type": "object" },
+                "containerSecurityContext": { "type": "object" },
                 "resources": {
                   "type": "object",
                   "additionalProperties": false,
@@ -321,6 +325,8 @@
             "type": "object",
             "additionalProperties": { "type": "string" }
           },
+          "tolerations": { "type": ["array", "null"] },
+          "affinity": { "type": ["object", "null"] },
           "containerSecurityContext": {
             "type": "object",
             "additionalProperties": false,
@@ -501,6 +507,12 @@
         "nodeSelector": {
           "type": "object",
           "additionalProperties": { "type": "string" }
+        },
+        "tolerations": { 
+          "type": ["array", "null"] 
+        },
+        "affinity": {
+          "type": ["object", "null"]
         }
       }
     },
@@ -531,7 +543,9 @@
         "nodeSelector": {
           "type": "object",
           "additionalProperties": { "type": "string" }
-        }
+        },
+        "tolerations": { "type": ["array", "null"] },
+        "affinity": { "type": ["object", "null"] }
       }
     },
     "shell": {

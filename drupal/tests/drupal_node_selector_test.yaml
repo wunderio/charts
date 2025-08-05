@@ -14,10 +14,8 @@ tests:
   - it: has no node selector by default
     template: drupal-deployment.yaml
     asserts:
-      - equal:
+      - notExists:
           path: spec.template.spec.nodeSelector
-          value: {}
-
   - it: can set a node selector
     template: drupal-deployment.yaml
     set:
@@ -69,9 +67,8 @@ tests:
       php.cron.drupal.nodeSelector:
         foo: bar
     asserts:
-      - equal:
+      - notExists:
           path: spec.template.spec.nodeSelector
-          value: {}
       - template: drupal-cron.yaml
         equal:
           path: spec.jobTemplate.spec.template.spec.nodeSelector.foo
@@ -90,9 +87,8 @@ tests:
       shell.nodeSelector:
         foo: bar
     asserts:
-      - equal:
+      - notExists:
           path: spec.template.spec.nodeSelector
-          value: {}
       - template: shell-deployment.yaml
         equal:
           path: spec.template.spec.nodeSelector.foo
