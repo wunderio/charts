@@ -212,6 +212,7 @@ spec:
           {{ $val | toYaml | indent 4 | trim }}
         {{- end }}
         {{- end }}
+      serviceAccountName: {{ include "frontend.serviceAccountName" $ }}
       volumes:
         {{ if $service.mounts }}
         {{- range $serviceName, $mountName := $service.mounts }}
