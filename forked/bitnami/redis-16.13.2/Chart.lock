@@ -1,0 +1,6 @@
+dependencies:
+- name: common
+  repository: file://../redis-16.13.2-common
+  version: 1.16.0
+digest: sha256:f6f22cf2a116c179c3a31f1a851c991cfceb5d962d777d5687a9e98fa598184f
+generated: "2025-08-11T23:09:03.198929493+03:00"

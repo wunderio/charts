@@ -13,7 +13,8 @@
 ##
 image:
   registry: docker.io
-  repository: bitnami/memcached
+  # repository: bitnami/memcached
+  repository: wunderio/bitnami-memcached
   tag: 1.6.8-debian-10-r0
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -170,7 +171,8 @@ metrics:
   ##
   image:
     registry: docker.io
-    repository: bitnami/memcached-exporter
+    # repository: bitnami/memcached-exporter
+    repository: wunderio/bitnami-memcached-exporter
     tag: 0.7.0-debian-10-r79
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.

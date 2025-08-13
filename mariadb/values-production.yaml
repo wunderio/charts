@@ -18,7 +18,8 @@
 ##
 image:
   registry: docker.io
-  repository: bitnami/mariadb
+  # repository: bitnami/mariadb
+  repository: wunderio/bitnami-mariadb
   tag: 10.3.24-debian-10-r49
   ## Specify a imagePullPolicy
   ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
@@ -57,7 +58,8 @@ volumePermissions:
   enabled: false
   image:
     registry: docker.io
-    repository: bitnami/minideb
+    # repository: bitnami/minideb
+    repository: wunderio/bitnami-minideb
     tag: buster
     pullPolicy: Always
     ## Optionally specify an array of imagePullSecrets.
@@ -523,7 +525,8 @@ metrics:
   enabled: true
   image:
     registry: docker.io
-    repository: bitnami/mysqld-exporter
+    # repository: bitnami/mysqld-exporter
+    repository: wunderio/bitnami-mysqld-exporter
     tag: 0.12.1-debian-10-r235
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.

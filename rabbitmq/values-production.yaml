@@ -13,7 +13,8 @@
 ##
 image:
   registry: docker.io
-  repository: bitnami/rabbitmq
+  # repository: bitnami/rabbitmq
+  repository: wunderio/bitnami-rabbitmq
   tag: 3.8.2-debian-10-r30
 
   ## set to true if you would like to see extra information on logs
@@ -402,7 +403,8 @@ metrics:
   enabled: true
   image:
     registry: docker.io
-    repository: bitnami/rabbitmq-exporter
+    # repository: bitnami/rabbitmq-exporter
+    repository: wunderio/bitnami-rabbitmq-exporter
     tag: 0.29.0-debian-10-r28
     pullPolicy: IfNotPresent
     ## Optionally specify an array of imagePullSecrets.
@@ -541,7 +543,8 @@ volumePermissions:
   enabled: true
   image:
     registry: docker.io
-    repository: bitnami/minideb
+    # repository: bitnami/minideb
+    repository: wunderio/bitnami-minideb
     tag: buster
     pullPolicy: Always
     ## Optionally specify an array of imagePullSecrets.
