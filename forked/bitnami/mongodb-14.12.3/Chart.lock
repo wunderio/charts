@@ -1,0 +1,6 @@
+dependencies:
+- name: common
+  repository: file://../mongodb-14.12.3-common
+  version: 2.17.0
+digest: sha256:e9dd1a63a3f743f4c1f2a21dcfea3a2f9a82313457c2a4985b6129d979404f48
+generated: "2025-08-12T16:43:22.311552203+03:00"
