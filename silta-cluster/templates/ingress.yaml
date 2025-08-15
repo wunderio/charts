@@ -5,7 +5,9 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}
   annotations:
+    {{- if or (eq $ingress.class "gce") (eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1beta1") }}
     kubernetes.io/ingress.class: {{ $ingress.class | quote }}
+    {{- end }}
     {{- if .Values.ssl.enabled }}
     {{- if eq $ingress.class "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
@@ -20,14 +22,14 @@ metadata:
     {{- end }}
     {{- if $redirect_https }}
     ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
-    {{- if eq $ingress.type "traefik" }}
+    {{- if eq $ingress.class "traefik" }}
     nginx.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
     nginx.org/redirect-to-https: {{ $redirect_https | quote }}
     {{- end }}
-    {{- if eq $ingress.type "azure/application-gateway" }}
+    {{- if eq $ingress.class "azure/application-gateway" }}
     appgw.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
     {{- end }}
-    {{- if eq $ingress.type "nginx" }}
+    {{- if eq $ingress.class "nginx" }}
     nginx.ingress.kubernetes.io/ssl-redirect: {{ $redirect_https | quote }}
     nginx.org/redirect-to-https: {{ $redirect_https | quote }}
     {{- end }}
@@ -57,6 +59,9 @@ metadata:
     {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- end }}
 spec:
+  {{- if and (ne $ingress.class "gce" ) (eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1") }}
+  ingressClassName: {{ regexReplaceAll "[^[:alnum:]]" $ingress.class "-" | quote }}
+  {{- end }}
   {{- if .Values.ssl.enabled }}
   tls:
   - secretName: {{ .Release.Name }}-tls
