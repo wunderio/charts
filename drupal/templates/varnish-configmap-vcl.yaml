@@ -304,8 +304,8 @@ data:
         return(pipe);
       }
 
-      # Only allow BAN requests from IP addresses in the 'purge' ACL.
-      if (req.method == "BAN" || req.method == "URIBAN") {
+      # Only allow BAN requests from IP addressees in the 'internal' ACL.
+      if (req.method == "BAN") {
         # Admin port is only exposed to internal network
         if (!client.ip ~ purge) {
           return (synth(403, "Not allowed."));
@@ -319,11 +319,30 @@ data:
         elseif (req.http.Cache-Tags) {
           ban("obj.http.Cache-Tags ~ " + req.http.Cache-Tags);
         }
-        elseif (req.method == "URIBAN") {
-          ban("req.http.host == " + req.http.host + " && req.url == " + req.url);
-        }
         else {
-          return (synth(403, "Cache tags headers not present."));
+          # If there are no cache tags headers in a BAN request,
+          # it is a bad request, so indicate that to the client.
+          return (synth(400, "Cache tags headers not present."));
+        }
+        # Throw a synthetic page so the request won't go to the backend.
+        return (synth(200, "Ban added."));
+      }
+
+      # Only allow URIBAN requests from IP addressees in the 'internal' ACL.
+      if (req.method == "URIBAN") {
+        # Admin port is only exposed to internal network
+        if (!client.ip ~ purge) {
+          return (synth(403, "Not allowed."));
+        }
+
+        # If x-url-invalidate-pattern header is present,
+        # use it to match URLs in stored objects. (ban by regex pattern)
+        if (req.http.x-url-invalidate-pattern) {
+          ban("obj.http.x-url ~ " + req.http.x-url-invalidate-pattern);
+        }
+        # Without pattern, ban by matching host and URL exactly.
+        else {
+          ban("obj.http.host == " + req.http.host + " && obj.http.x-url == " + req.url);
         }
         # Throw a synthetic page so the request won't go to the backend.
         return (synth(200, "Ban added."));
