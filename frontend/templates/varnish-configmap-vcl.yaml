@@ -56,6 +56,45 @@ data:
         return (synth(400));
       }
 
+      # Only allow BAN requests from IP addressees in the 'internal' ACL.
+      if (req.method == "BAN") {
+        # Admin port is only exposed to internal network
+        if (!client.ip ~ internal) {
+          return (synth(403, "Not allowed."));
+        }
+
+        # Logic for the ban, using the cache tags headers.
+        if (req.http.Cache-Tags) {
+          ban("obj.http.Cache-Tags ~ " + req.http.Cache-Tags);
+        }
+        else {
+          # If there are no cache tags headers in a BAN request,
+          # it is a bad request, so indicate that to the client.
+          return (synth(400, "Cache tags headers not present."));
+        }
+        # Throw a synthetic page so the request won't go to the backend.
+        return (synth(200, "Ban added."));
+      }
+
+      # Only allow URIBAN requests from IP addressees in the 'internal' ACL.
+      if (req.method == "URIBAN") {
+        # Admin port is only exposed to internal network
+        if (!client.ip ~ internal) {
+          return (synth(403, "Not allowed."));
+        }
+
+        # If x-url-invalidate-pattern header is present,
+        # use it to match URLs in stored objects. (ban by regex pattern)
+        if (req.http.x-url-invalidate-pattern) {
+          ban("obj.http.x-url ~ " + req.http.x-url-invalidate-pattern);
+        }
+        else {
+          ban("obj.http.host == " + req.http.host + " && obj.http.x-url == " + req.url);
+        }
+        # Throw a synthetic page so the request won't go to the backend.
+        return (synth(200, "Ban added."));
+      }
+
       # Match upstream allowlist to supply headers containing real ip
       if (client.ip ~ upstream_proxy && req.http.X-Envoy-External-Address) {
         set req.http.X-Forwarded-For = req.http.X-Envoy-External-Address;
@@ -98,27 +137,6 @@ data:
       # Do not cache requests with Authorization header
       if (req.http.Authorization) {
         return (pass);
-      }
-
-      # Only allow BAN requests from IP addresses in the 'purge' ACL.
-      if (req.method == "BAN" || req.method == "URIBAN") {
-        # Admin port is only exposed to internal network
-        if (!client.ip ~ internal) {
-          return (synth(403, "Not allowed."));
-        }
-
-        # Logic for the ban, using the cache tags headers.
-        if (req.http.Cache-Tags) {
-          ban("obj.http.Cache-Tags ~ " + req.http.Cache-Tags);
-        }
-        elseif (req.method == "URIBAN") {
-          ban("req.http.host == " + req.http.host + " && req.url == " + req.url);
-        }
-        else {
-          return (synth(403, "Cache tags headers not present."));
-        }
-        # Throw a synthetic page so the request won't go to the backend.
-        return (synth(200, "Ban added."));
       }
 
       # Implementing websocket support (https://www.varnish-cache.org/docs/4.0/users-guide/vcl-example-websockets.html)
