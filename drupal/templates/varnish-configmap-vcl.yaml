@@ -420,8 +420,9 @@ data:
         return (pass);
       }
 
-      if (req.url ~ "\.(png|gif|jpg|tif|tiff|ico|webp|swf|css|js|pdf|doc|xls|ppt|zip)(\?.*)?$") {
-        // Forcing a lookup with static file requests
+      if (req.url ~ "\.(png|gif|jpg|svg|tif|tiff|ico|webp|swf|css|js|pdf|doc|xls|ppt|zip|woff|eot|ttf|bmp|bz2)$") {
+        # Static file request do not vary on cookies
+        unset req.http.Cookie;
         return (hash);
       }
 
@@ -445,12 +446,7 @@ data:
       }
 
       if (req.http.Cookie) {
-        if (req.url ~ "\.(png|gif|jpg|svg|tif|tiff|ico|webp|swf|css|js|pdf|doc|xls|ppt|zip|woff|eot|ttf|bmp|bz2)$") {
-          # Static file request do not vary on cookies
-          unset req.http.Cookie;
-          return (hash);
-        }
-        elseif (req.http.Cookie ~ "(SESS[a-z0-9]+|SSESS[a-z0-9]+)") {
+        if (req.http.Cookie ~ "(SESS[a-z0-9]+|SSESS[a-z0-9]+)") {
           # Authenticated users should not be cached
           return (pass);
         }
