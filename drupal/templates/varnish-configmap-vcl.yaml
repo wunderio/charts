@@ -439,7 +439,7 @@ data:
         return (pass);
       }
 
-      if (req.url ~ "\.(png|gif|jpg|svg|tif|tiff|ico|webp|swf|css|js|pdf|doc|xls|ppt|zip|woff|eot|ttf|bmp|bz2)$") {
+      if (req.url ~ "\.(bmp|bz2|css|doc|eot|gif|ico|jpg|js|pdf|png|ppt|svg|swf|tif|tiff|ttf|webp|woff|xls|zip)$") {
         # Static file request do not vary on cookies
         unset req.http.Cookie;
         return (hash);
