@@ -439,6 +439,20 @@ data:
         return (pass);
       }
 
+      if (req.http.Accept-Encoding) {
+        if (req.url ~ "\.(bz2|eot|gif|gz|ico|jpg|mp3|ogg|pdf|png|svg|swf|tbz|tgz|tif|tiff|ttf|webp|woff|zip)(\?.*)?$") {
+          # No point in compressing these
+          unset req.http.Accept-Encoding;
+        } elsif (req.http.Accept-Encoding ~ "gzip") {
+          set req.http.Accept-Encoding = "gzip";
+        } elsif (req.http.Accept-Encoding ~ "deflate") {
+          set req.http.Accept-Encoding = "deflate";
+        } else {
+          # unknown algorithm
+          unset req.http.Accept-Encoding;
+        }
+      }
+
       if (req.url ~ "\.(bmp|bz2|css|doc|eot|gif|ico|jpg|js|pdf|png|ppt|svg|swf|tif|tiff|ttf|webp|woff|xls|zip)$") {
         # Static file request do not vary on cookies
         unset req.http.Cookie;
@@ -477,20 +491,6 @@ data:
         else {
           # Non-authenticated requests do not vary on cookies
           unset req.http.Cookie;
-        }
-      }
-
-      if (req.http.Accept-Encoding) {
-        if (req.url ~ "\.(jpg|png|gif|svg|tif|tiff|ico|webp|gz|tgz|bz2|tbz|mp3|ogg|swf|zip|pdf|woff|eot|ttf)(\?.*)?$") {
-          # No point in compressing these
-          unset req.http.Accept-Encoding;
-        } elsif (req.http.Accept-Encoding ~ "gzip") {
-            set req.http.Accept-Encoding = "gzip";
-        } elsif (req.http.Accept-Encoding ~ "deflate") {
-            set req.http.Accept-Encoding = "deflate";
-        } else {
-          # unknown algorithm
-          unset req.http.Accept-Encoding;
         }
       }
 
