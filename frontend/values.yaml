@@ -442,11 +442,14 @@ cronJobDefaults:
 
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
-# see: https://github.com/bitnami/charts/blob/master/bitnami/mariadb/values.yaml
+# see: https://github.com/wunderio/charts/blob/master/forked/bitnami/mariadb-7.10.4/values.yaml
 mariadb:
   enabled: false
+  # https://hub.docker.com/r/bitnamilegacy/mariadb/tags
+  # https://hub.docker.com/r/wunderio/bitnami-mariadb/tags
   image:
-    # https://hub.docker.com/r/bitnami/mariadb/tags
+    registry: docker.io
+    repository: wunderio/bitnami-mariadb
     tag: 10.6.15-debian-11-r24
   replication:
     enabled: false
@@ -576,10 +579,14 @@ elasticsearch:
           - static-ip
 
 # These settings are not optimized. To see which overrides are available see:
-# https://github.com/bitnami/charts/blob/43306df9f67a6c38743cac362676317aa7a8318e/bitnami/mongodb/values.yaml
+# https://github.com/wunderio/charts/blob/master/forked/bitnami/mongodb-14.12.3/values.yaml
 mongodb:
   enabled: false
+  # https://hub.docker.com/r/bitnamilegacy/mongodb/tags
+  # https://hub.docker.com/r/wunderio/bitnami-mongodb/tags
   image:
+    registry: docker.io
+    repository: wunderio/bitnami-mongodb
     tag: "6.0"
   initdbScripts:
     setFeatureCompatibilityVersion.js: |
@@ -594,9 +601,15 @@ mongodb:
     size: 1Gi
 
 # Posgresql overrides
-# see: https://github.com/bitnami/charts/blob/c3dc56f3679650f1012e497b8a5e71d94dac163e/bitnami/postgresql/values.yaml
+# see: https://github.com/wunderio/charts/blob/master/forked/bitnami/postgresql-13.2.24/values.yaml
 postgresql:
   enabled: false
+  # https://hub.docker.com/r/bitnamilegacy/postgresql/tags
+  # https://hub.docker.com/r/wunderio/bitnami-postgresql/tags
+  image:
+    registry: docker.io
+    repository: wunderio/bitnami-postgresql
+    tag: 16.1.0-debian-11-r15
   # Use a low default to prevent unnecessary storage use.
   persistence:
     size: 1Gi
@@ -673,9 +686,15 @@ mailhog:
       memory: 10M
 
 # Redis
-# https://github.com/bitnami/charts/blob/master/bitnami/redis/values.yaml
+# https://github.com/wunderio/charts/blob/master/forked/bitnami/redis-19.1.5/values.yaml
 redis:
   enabled: false
+  # https://hub.docker.com/r/bitnamilegacy/redis/tags
+  # https://hub.docker.com/r/wunderio/bitnami-redis/tags  
+  image:
+    registry: docker.io
+    repository: wunderio/bitnami-redis
+    tag: 7.2.4-debian-12-r13
   architecture: standalone
   auth:
     # mandatory value

@@ -624,7 +624,10 @@ backup:
 mariadb:
   enabled: true
   image:
-    # https://hub.docker.com/r/bitnami/mariadb/tags
+    # https://hub.docker.com/r/bitnamilegacy/mariadb/tags
+    # https://hub.docker.com/r/wunderio/bitnami-mariadb/tags
+    registry: docker.io
+    repository: wunderio/bitnami-mariadb
     tag: 10.6-debian-12
   replication:
     enabled: false
@@ -757,9 +760,15 @@ elasticsearch:
           - static-ip
 
 # Memcache service overrides
-# see: https://github.com/bitnami/charts/blob/master/bitnami/memcached/values.yaml
+# see: https://github.com/wunderio/charts/blob/master/forked/bitnami/memcached-4.2.27/values.yaml
 memcached:
   enabled: false
+  # https://hub.docker.com/r/bitnamilegacy/memcached/tags
+  # https://hub.docker.com/r/wunderio/bitnami-memcached/tags
+  image:
+    registry: docker.io
+    repository: wunderio/bitnami-memcached
+    tag: 1.6.8-debian-10-r0
   replicaCount: 1
   serviceAccount:
     create: true
@@ -779,9 +788,15 @@ memcached:
   # Fixes: https://github.com/bitnami/charts/pull/6265
   tolerations: []
 
-# https://github.com/bitnami/charts/blob/d4dba2b393167d79b8c8f65b46c48b70ee3a9662/bitnami/redis/values.yaml
+# see: https://github.com/wunderio/charts/blob/master/forked/bitnami/redis-16.13.2/values.yaml
 redis:
   enabled: false
+  # https://hub.docker.com/r/bitnamilegacy/redis/tags
+  # https://hub.docker.com/r/wunderio/bitnami-redis/tags
+  image:
+    registry: docker.io
+    repository: wunderio/bitnami-redis
+    tag: 6.2.7-debian-11-r11
   architecture: standalone
   auth:
     # mandatory value

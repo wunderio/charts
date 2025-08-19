@@ -26,11 +26,10 @@ dependencies:
   condition: rabbitmq.enabled
 - name: mongodb
   version: 14.12.x
-  repository: oci://registry-1.docker.io/bitnamicharts
+  repository: https://storage.googleapis.com/charts.wdr.io
   condition: mongodb.enabled
 - name: postgresql
   version: 13.2.x
-  # repository: https://charts.bitnami.com/bitnami
   repository: https://storage.googleapis.com/charts.wdr.io
   condition: postgresql.enabled
 - name: silta-release
@@ -38,5 +37,5 @@ dependencies:
   repository: file://../silta-release
 - name: redis
   version: 19.1.5
-  repository: oci://registry-1.docker.io/bitnamicharts
+  repository: https://storage.googleapis.com/charts.wdr.io
   condition: redis.enabled
