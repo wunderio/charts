@@ -16,7 +16,7 @@ environmentName: ""
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 
-# Custom imagePullSecret for the containers. Base64 encoded. This will create a secret and append it to the imagePullSecrets. 
+# Custom imagePullSecret for the containers. Base64 encoded. This will create a secret and append it to the imagePullSecrets.
 imagePullSecret: ""
 
 serviceAccount:
@@ -125,6 +125,8 @@ backendConfig:
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
+  # The nginx version, for example "1.28". This can be set by your CI system using the --set parameter.
+  version: ""
   image: 'you need to pass in a value for nginx.image to your helm chart'
 
   # Requires "X-Proxy-Auth" header from upstream when value is non-empty string.
@@ -191,7 +193,7 @@ signalsciences:
   accesskeyid: ""
   secretaccesskey: ""
   image: signalsciences/sigsci-agent
-  imageTag: 4.40.0
+  imageTag: latest
   # sidecar container resources
   resources:
     requests:
