@@ -22,7 +22,7 @@
 {{- else -}}
 {{- $maxEnvironmentNameLength := int (sub 62 (add (len .Values.clusterDomain) (len $projectName))) }}
 {{- $environmentName := (ge (len $environmentName) $maxEnvironmentNameLength) | ternary (print ($environmentName | trunc (int (sub $maxEnvironmentNameLength 3))) $environmentNameHash) $environmentName -}}
-{{- if not (hasKey $.Values "maskSubdomains") -}}
+{{- if eq $.Values.maskSubdomains "none" -}}
 {{ $environmentName }}{{ include "drupal.domainSeparator" . }}{{ $projectName }}.{{ .Values.clusterDomain }}
 {{- else if eq $.Values.maskSubdomains "both" -}}
 {{- include "masking.prefix-alert" . -}}

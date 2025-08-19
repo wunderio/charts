@@ -382,7 +382,7 @@ done
 {{- end }}
 
 {{- define "drupal.installing-file" -}}
-  {{ .Values.webRoot }}/sites/default/files/_installing
+{{ .Values.webRoot }}/sites/default/files/_installing
 {{- end }}
 
 {{- define "drupal.installation-in-progress-test" -}}
@@ -398,9 +398,7 @@ set -e
 
 INSTALLING_FILE="{{ include "drupal.installing-file" . }}"
 
-# Attempt to remove the _installing file at the very beginning, ignoring errors if it doesn't exist.
-# This cleans up state from a potential previous failed install run.
-rm -f "$INSTALLING_FILE"
+rm -f "$INSTALLING_FILE" || true
 
 {{ include "drupal.import-reference-files" . }}
 
@@ -415,7 +413,7 @@ touch "$INSTALLING_FILE"
 
 {{ .Values.php.postinstall.command }}
 
-rm -f "$INSTALLING_FILE"
+rm -f "$INSTALLING_FILE" || true
 
 {{ .Values.php.postupgrade.command }}
 {{- if .Values.php.postupgrade.afterCommand }}
@@ -431,9 +429,7 @@ wait
 
   INSTALLING_FILE="{{ include "drupal.installing-file" . }}"
 
-  # Attempt to remove the _installing file at the very beginning, ignoring errors if it doesn't exist.
-  # This cleans up state from a potential previous failed install run.
-  rm -f "$INSTALLING_FILE"
+  rm -f "$INSTALLING_FILE" || true
 
   {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
     {{ include "drupal.import-reference-files" . }}
@@ -455,7 +451,7 @@ wait
 
   {{ if .Release.IsInstall }}
     {{ .Values.php.postinstall.command }}
-    rm -f "$INSTALLING_FILE"
+    rm -f "$INSTALLING_FILE" || true
   {{ end }}
   {{ .Values.php.postupgrade.command }}
   {{- if .Values.php.postupgrade.afterCommand }}
@@ -581,7 +577,7 @@ if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
         echo "Parallel import command finished."
 
       elif [[ "$import_method" == "sequential" ]]; then
-        echo "Importing SQL files in sequentially. This setting can be changed in silta.yml using the referenceData.databaseImportMethod key."
+        echo "Importing SQL files sequentially. This setting can be changed in silta.yml using the referenceData.databaseImportMethod key."
         find "${tmp_ref_data}/" -type f -name "*.sql" | sort | while IFS= read -r sql_file; do
           echo "Importing ${sql_file}"
           if ! mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < "${sql_file}"; then
@@ -590,7 +586,7 @@ if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
           fi
         done
 
-        echo "All SQL files imported successfully."
+        echo "Sequential import command finished."
 
       else
         echo "Incompatible import method. Please use either 'parallel' or 'sequential' in referenceData.databaseImportMethod."

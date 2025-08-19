@@ -48,8 +48,10 @@ spec:
           preStop:
             exec:
               command: [ "/bin/sleep", "15" ]
+        {{- if .Values.php.resources }}
         resources:
           {{- .Values.php.resources | toYaml | nindent 10 }}
+        {{- end }}
 
       # Nginx container
       - name: nginx
@@ -120,8 +122,10 @@ spec:
           preStop:
             exec:
               command: ["/bin/sleep", "15"]
+        {{- if .Values.nginx.resources }}
         resources:
           {{- .Values.nginx.resources | toYaml | nindent 10 }}
+        {{- end }}
 
       {{- if .Values.signalsciences.enabled }}
       # Signal Services container
@@ -148,8 +152,10 @@ spec:
           preStop:
             exec:
               command: ["/bin/sleep", "30"]
+        {{- if .Values.signalsciences.resources }}
         resources:
           {{- .Values.signalsciences.resources | toYaml | nindent 10 }}
+        {{- end }}
       {{- end }}
 
       volumes:
@@ -167,56 +173,21 @@ spec:
           emptyDir: {}
         {{- end }}
       serviceAccountName: {{ include "drupal.serviceAccountName" . }}
+      {{- if .Values.php.nodeSelector }}
       nodeSelector:
         {{- .Values.php.nodeSelector | toYaml | nindent 8 }}
+      {{- end }}
+      {{- if or .Values.php.tolerations (include "drupal.tolerations" .Values.php.nodeSelector) }}
       tolerations:
         {{- include "drupal.tolerations" .Values.php.nodeSelector | nindent 8 }}
+        {{- if .Values.php.tolerations }}
+        {{- .Values.php.tolerations | toYaml | nindent 8 }}
+        {{- end }}
+      {{- end }}
+      {{- if .Values.php.affinity }}
       affinity:
-        podAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          # Preferrably keep pods on the same node as the database.
-          - weight: 1
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: release
-                  operator: In
-                  values:
-                  - "{{ .Release.Name }}"
-                - key: mariadb
-                  operator: In
-                  values:
-                  - mariadb
-              topologyKey: kubernetes.io/hostname
-          # Preferrably keep pods in the same zone as the database.
-          - weight: 1
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: release
-                  operator: In
-                  values:
-                  - "{{ .Release.Name }}"
-                - key: mariadb
-                  operator: In
-                  values:
-                  - mariadb
-              topologyKey: topology.kubernetes.io/zone
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 10
-            podAffinityTerm:
-              topologyKey: kubernetes.io/hostname
-              labelSelector:
-                matchExpressions:
-                - key: release
-                  operator: In
-                  values:
-                  - "{{ .Release.Name }}"
-                - key: deployment
-                  operator: In
-                  values:
-                  - drupal
+        {{- tpl ( .Values.php.affinity | toYaml ) . | nindent 8 }} 
+      {{- end }}
 ---
 {{- if .Values.autoscaling.enabled }}
 apiVersion: {{ include "drupal.autoscaling.api-version" . | trim }}

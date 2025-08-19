@@ -1,0 +1,101 @@
+suite: tolerations test
+templates:
+  - drupal-configmap.yaml
+  - drupal-cron.yaml
+  - drupal-deployment.yaml
+  - drupal-secret.yaml
+  - shell-configmap.yaml
+  - shell-secret.yaml
+  - shell-deployment.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
+tests:
+  - it: has no custom tolerations by default
+    template: drupal-deployment.yaml
+    asserts:
+      - notExists:
+          path: spec.template.spec.tolerations
+
+  - it: can set custom tolerations for php pods
+    template: drupal-deployment.yaml
+    set:
+      php.tolerations:
+        - key: "custom-key"
+          operator: "Equal"
+          value: "custom-value"
+          effect: "NoSchedule"
+    asserts:
+      - exists:
+          path: spec.template.spec.tolerations
+      - contains:
+          path: spec.template.spec.tolerations
+          content:
+            key: "custom-key"
+            operator: "Equal"
+            value: "custom-value"
+            effect: "NoSchedule"
+
+  - it: applies custom tolerations to shell deployment
+    template: shell-deployment.yaml
+    set:
+      shell.tolerations:
+        - key: "shell-key"
+          operator: "Equal"
+          value: "shell-value"
+          effect: "NoSchedule"
+    asserts:
+      - contains:
+          path: spec.template.spec.tolerations
+          content:
+            key: "shell-key"
+            operator: "Equal"
+            value: "shell-value"
+            effect: "NoSchedule"
+
+  - it: applies custom tolerations to cron jobs
+    template: drupal-cron.yaml
+    set:
+      php.cron.drupal.tolerations:
+        - key: "cron-key"
+          operator: "Equal"
+          value: "cron-value"
+          effect: "NoSchedule"
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.tolerations
+          content:
+            key: "cron-key"
+            operator: "Equal"
+            value: "cron-value"
+            effect: "NoSchedule"
+
+  - it: can set different tolerations for php and shell
+    template: drupal-deployment.yaml
+    set:
+      php.tolerations:
+        - key: "php-key"
+          operator: "Equal"
+          value: "php-value"
+          effect: "NoSchedule"
+      shell.tolerations:
+        - key: "shell-key"
+          operator: "Equal"
+          value: "shell-value"
+          effect: "NoSchedule"
+    asserts:
+      - contains:
+          path: spec.template.spec.tolerations
+          content:
+            key: "php-key"
+            operator: "Equal"
+            value: "php-value"
+            effect: "NoSchedule"
+      - template: shell-deployment.yaml
+        contains:
+          path: spec.template.spec.tolerations
+          content:
+            key: "shell-key"
+            operator: "Equal"
+            value: "shell-value"
+            effect: "NoSchedule"

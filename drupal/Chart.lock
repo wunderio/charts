@@ -9,7 +9,7 @@ dependencies:
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 4.2.27
 - name: redis
-  repository: https://charts.bitnami.com/bitnami
+  repository: https://storage.googleapis.com/charts.wdr.io
   version: 16.13.2
 - name: mailhog
   repository: https://storage.googleapis.com/charts.wdr.io
@@ -23,5 +23,5 @@ dependencies:
 - name: silta-release
   repository: file://../silta-release
   version: 1.0.1
-digest: sha256:e3ea21b74deadb01861e37b2296391e1f0a25f62dc6b3da226d28cb95245342d
-generated: "2025-04-08T22:42:49.491746+03:00"
+digest: sha256:213c0b37cfaeb7c5416d7390912e735ad4eef9d2c798431034b492f2e2b377c8
+generated: "2025-08-19T09:50:46.780411246+03:00"

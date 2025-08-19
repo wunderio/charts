@@ -47,7 +47,7 @@ tests:
     template: configmap.yaml
     set:
       nginx:
-        security_headers: 
+        security_headers:
           foo: bar
         content_security_policy: "baz"
     asserts:
@@ -95,3 +95,64 @@ tests:
     - matchRegex:
         path: data.nginx_conf
         pattern: 'add_header                  foo bar;'
+
+
+  - it: includes NDK module for nginx < 1.26
+    template: configmap.yaml
+    set:
+      signalsciences:
+        enabled: true
+      nginx:
+        version: "1.25"
+    asserts:
+      - matchRegex:
+          path: data.nginx_signalsciences_conf
+          pattern: 'load_module /etc/nginx/modules/ngx_http_sigsci_module.so;'
+      - matchRegex:
+          path: data.nginx_signalsciences_conf
+          pattern: 'load_module /etc/nginx/modules/ndk_http_module.so;'
+
+  - it: does not include NDK module for nginx >= 1.26
+    template: configmap.yaml
+    set:
+      signalsciences:
+        enabled: true
+      nginx:
+        version: "1.26"
+    asserts:
+      - matchRegex:
+          path: data.nginx_signalsciences_conf
+          pattern: 'load_module /etc/nginx/modules/ngx_http_sigsci_module.so;'
+      - notMatchRegex:
+          path: data.nginx_signalsciences_conf
+          pattern: 'load_module /etc/nginx/modules/ndk_http_module.so;'
+
+  - it: does not include NDK module for nginx 2.x
+    template: configmap.yaml
+    set:
+      signalsciences:
+        enabled: true
+      nginx:
+        version: "2.0"
+    asserts:
+      - matchRegex:
+          path: data.nginx_signalsciences_conf
+          pattern: 'load_module /etc/nginx/modules/ngx_http_sigsci_module.so;'
+      - notMatchRegex:
+          path: data.nginx_signalsciences_conf
+          pattern: 'load_module /etc/nginx/modules/ndk_http_module.so;'
+
+  - it: includes NDK module when nginx version is empty
+    template: configmap.yaml
+    set:
+      signalsciences:
+        enabled: true
+      nginx:
+        version: ""
+    asserts:
+      - matchRegex:
+          path: data.nginx_signalsciences_conf
+          pattern: 'load_module /etc/nginx/modules/ngx_http_sigsci_module.so;'
+      - matchRegex:
+          path: data.nginx_signalsciences_conf
+          pattern: 'load_module /etc/nginx/modules/ndk_http_module.so;'

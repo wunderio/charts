@@ -24,6 +24,7 @@ spec:
         # Recreate pods when the configMap or secret changes.
         drupal-cm-checksum: {{ include (print $.Template.BasePath "/drupal-configmap.yaml") . | sha256sum }}
         shell-cm-checksum: {{ include (print $.Template.BasePath "/shell-configmap.yaml") . | sha256sum }}
+        shell-sec-checksum: {{ include (print $.Template.BasePath "/shell-secret.yaml") . | sha256sum }}
         drupal-sec-checksum: {{ include (print $.Template.BasePath "/drupal-secret.yaml") . | sha256sum }}
     spec:
       enableServiceLinks: false
@@ -65,20 +66,47 @@ spec:
           mountPath: /backups
           readOnly: true
         {{- end }}
+        {{- if or $.Values.shell.resources .Values.php.resources }}
         resources:
           {{- merge .Values.shell.resources .Values.php.resources | toYaml | nindent 10 }}
+        {{- end }}
+      {{- if or .Values.shell.nodeSelector .Values.php.nodeSelector }}
       nodeSelector:
-        {{ if .Values.shell.nodeSelector }}
+        {{- if .Values.shell.nodeSelector }}
         {{- .Values.shell.nodeSelector | toYaml | nindent 8 }}
-        {{ else }}
+        {{- else }}
+        {{- if .Values.php.nodeSelector }}
         {{- .Values.php.nodeSelector | toYaml | nindent 8 }}
         {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- if or .Values.shell.tolerations .Values.php.tolerations .Values.shell.nodeSelector .Values.php.nodeSelector }}
       tolerations:
         {{ if .Values.shell.nodeSelector }}
         {{- include "drupal.tolerations" .Values.shell.nodeSelector | nindent 8 }}
-        {{ else }}
+        {{- else }}
+        {{- if .Values.php.nodeSelector }}
         {{- include "drupal.tolerations" .Values.php.nodeSelector | nindent 8 }}
         {{- end }}
+        {{- end }}
+        {{- if .Values.shell.tolerations }}
+        {{- .Values.shell.tolerations | toYaml | nindent 8 }}
+        {{- else }}
+        {{- if .Values.php.tolerations }}
+        {{- .Values.php.tolerations | toYaml | nindent 8 }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- if or .Values.shell.affinity .Values.php.affinity }}
+      affinity:
+        {{- if .Values.shell.affinity }}
+        {{- tpl ( .Values.shell.affinity | toYaml ) . | nindent 8 }}
+        {{- else }}
+        {{- if .Values.php.affinity }}
+        {{- tpl ( .Values.php.affinity | toYaml ) . | nindent 8 }}
+        {{- end }}
+        {{- end }}
+      {{- end }}
       volumes:
       {{- include "drupal.volumes" . | nindent 6 }}
       - name: ssh-keys

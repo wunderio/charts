@@ -151,6 +151,8 @@ ssl:
 
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
+  # The nginx version, for example "1.28". This can be set by your CI system using the --set parameter.
+  version: ""
   image: 'you need to pass in a value for nginx.image to your helm chart'
 
   # Requires "X-Proxy-Auth" header from upstream when value is non-empty string.
@@ -291,17 +293,16 @@ php:
           drush cron;
         fi
 
-    # Add custom php.ini file overrides for the cronjob.
-    # Use the same syntax as in php.ini file
-    # Example:
-    # php_ini: |
-        # [PHP]
-        # memory_limit=128M
+      # Add custom php.ini file overrides for the cronjob.
+      # Use the same syntax as in php.ini file
+      # Example:
+      # php_ini: |
+          # [PHP]
+          # memory_limit=128M
 
-    # php_ini: |
-
-      # Set a nodeSelector specifically for cron jobs.
       nodeSelector: {}
+      tolerations: []
+      affinity: {}
 
       # Specify a how many attempts should be made before considering a cron job as failed.
       backoffLimit: 1
@@ -384,6 +385,53 @@ php:
   # Set a restriction on where the php pod are provisioned.
   # This can be used for example to get a static IP for egress traffic.
   nodeSelector: {}
+  tolerations: []
+  affinity:
+    podAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      # Preferrably keep pods on the same node as the database.
+      - weight: 1
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: release
+              operator: In
+              values:
+              - "{{ .Release.Name }}"
+            - key: mariadb
+              operator: In
+              values:
+              - mariadb
+          topologyKey: kubernetes.io/hostname
+      # Preferrably keep pods in the same zone as the database.
+      - weight: 1
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: release
+              operator: In
+              values:
+              - "{{ .Release.Name }}"
+            - key: mariadb
+              operator: In
+              values:
+              - mariadb
+          topologyKey: topology.kubernetes.io/zone
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 10
+        podAffinityTerm:
+          topologyKey: kubernetes.io/hostname
+          labelSelector:
+            matchExpressions:
+            - key: release
+              operator: In
+              values:
+              - "{{ .Release.Name }}"
+            - key: deployment
+              operator: In
+              values:
+              - drupal
 
 # Configuration for everything that runs in shell container.
 shell:
@@ -421,6 +469,8 @@ shell:
   # Set a restriction on where the shell pod are provisioned.
   # This can be used for example to get a static IP for egress traffic.
   nodeSelector: {}
+  tolerations: []
+  affinity: {}
 
 # Configure the dynamically mounted volumes
 mounts:
@@ -448,7 +498,8 @@ referenceData:
   # When to automatically update the reference data.
   schedule: '~ 3 * * *'
 
-  # The method used to import the database. Can be either 'parallel' or 'sequential'.
+  # The method used to import the database tables. Can be either 'parallel' or 'sequential'.
+  # Parallel is faster but might in some cases be unstable. In that case, use sequential instead.
   databaseImportMethod: 'parallel'
 
   # Whether to copy the database, only used programmatically.
@@ -557,8 +608,9 @@ backup:
   #  Do not backup files
   #skipFiles: true
 
-  # Set a nodeSelector specifically for backup jobs.
   nodeSelector: {}
+  tolerations: []
+  affinity: {}
 
   # Resources for the backup cron job.
   resources:
@@ -572,7 +624,10 @@ backup:
 mariadb:
   enabled: true
   image:
-    # https://hub.docker.com/r/bitnami/mariadb/tags
+    # https://hub.docker.com/r/bitnamilegacy/mariadb/tags
+    # https://hub.docker.com/r/wunderio/bitnami-mariadb/tags
+    registry: docker.io
+    repository: wunderio/bitnami-mariadb
     tag: 10.6-debian-12
   replication:
     enabled: false
@@ -705,9 +760,15 @@ elasticsearch:
           - static-ip
 
 # Memcache service overrides
-# see: https://github.com/bitnami/charts/blob/master/bitnami/memcached/values.yaml
+# see: https://github.com/wunderio/charts/blob/master/forked/bitnami/memcached-4.2.27/values.yaml
 memcached:
   enabled: false
+  # https://hub.docker.com/r/bitnamilegacy/memcached/tags
+  # https://hub.docker.com/r/wunderio/bitnami-memcached/tags
+  image:
+    registry: docker.io
+    repository: wunderio/bitnami-memcached
+    tag: 1.6.8-debian-10-r0
   replicaCount: 1
   serviceAccount:
     create: true
@@ -724,10 +785,18 @@ memcached:
     - -m 118
     # MaxItemSize
     - -I 4M
+  # Fixes: https://github.com/bitnami/charts/pull/6265
+  tolerations: []
 
-# https://github.com/bitnami/charts/blob/d4dba2b393167d79b8c8f65b46c48b70ee3a9662/bitnami/redis/values.yaml
+# see: https://github.com/wunderio/charts/blob/master/forked/bitnami/redis-16.13.2/values.yaml
 redis:
   enabled: false
+  # https://hub.docker.com/r/bitnamilegacy/redis/tags
+  # https://hub.docker.com/r/wunderio/bitnami-redis/tags
+  image:
+    registry: docker.io
+    repository: wunderio/bitnami-redis
+    tag: 6.2.7-debian-11-r11
   architecture: standalone
   auth:
     # mandatory value
@@ -927,7 +996,8 @@ logging:
 
 # Obfuscate parts of the full domain name.
 # Available values for maskSubdomains are:
-# - releaseName (scrambles release name subdomain, e.g., xxx.project.silta.tld)
-# - projectName (scrambles project name subdomain, e.g., release.yyy.silta.tld)
-# - both (obfuscates both, e.g., zzz.silta.tld)
-# maskSubdomains: both
+# - none (no obfuscation, e.g., branch.project.<clusterDomain>)
+# - releaseName (scrambles release name subdomain, e.g., xxx.project.<clusterDomain>)
+# - projectName (scrambles project name subdomain, e.g., release.yyy.<clusterDomain>)
+# - both (obfuscates both, e.g., zzz.<clusterDomain>)
+maskSubdomains: none

@@ -1,6 +1,5 @@
 {{ $protocol := .Values.ingress.default.tls | ternary "https" "http" -}}
 Deployed {{ .Release.Name }} successfully, your site is available here:
-
   {{ range $index, $service := .Values.services -}}
   {{- if $service.exposedRoute }}
   {{ $protocol }}://{{- template "frontend.domain" $ }}{{ $service.exposedRoute }}
@@ -20,13 +19,15 @@ Deployed {{ .Release.Name }} successfully, your site is available here:
   {{- end }}
 
 {{- if .Values.mailhog.enabled }}
-  
+
 Mailhog available at:
 
   http://{{- template "frontend.domain" . }}/mailhog
   {{- range $index, $domain := .Values.exposeDomains }}
   http://{{ $domain.hostname }}/mailhog
   {{- end }}
+  ⚠️ **DEPRECATED** mailhog is deprecated and will be removed in the future, use mailpit instead
+  See: https://wunderio.github.io/silta/docs/silta-examples#sending-e-mail
 {{- end }}
 
 {{- if .Values.mailpit.enabled }}
@@ -47,9 +48,16 @@ SSH connection (limited access through VPN):
 
   {{ range $index, $service := .Values.services -}}
   {{- if $service.mounts }}
-  {{- range $indexMount, $service.mounts -}}
-  Importing files to service '{{ $index }}', folder '{{ (index $.Values.mounts $indexMount).mountPath }}':
-rsync -azv -e 'ssh -A -J {{ include "frontend.jumphost" $ }}' local_folder/ www-admin@{{ template "frontend.environment.hostname" $ }}-shell-{{ $index }}.{{ $.Release.Namespace }}:{{ (index $.Values.mounts $indexMount).mountPath }}
+File mounts ('{{ $index }}' service):
+  {{- range $indexMount, $service.mounts }}
+  {{- $folder := (index $.Values.mounts $indexMount).mountPath }}
+  Mount name: '{{ $indexMount }}'
+  Download:
+  {{- /*  Ensure that the mount path is suffixed with a slash to download contents of the mount not the folder itself. */}}
+  {{- $mountPath := ternary $folder (printf "%s/" $folder) (hasSuffix "/" $folder) }}
+    rsync -azv -e 'ssh -A -J {{ include "frontend.jumphost" $ }}' www-admin@{{ template "frontend.environment.hostname" $ }}-shell-{{ $index }}.{{ $.Release.Namespace }}:{{ $mountPath }} {{ $.Release.Namespace }}-mounts/{{ $indexMount }}
+  Upload:
+    rsync -azv -e 'ssh -A -J {{ include "frontend.jumphost" $ }}' {{ $.Release.Namespace }}-mounts/{{ $indexMount }}/ www-admin@{{ template "frontend.environment.hostname" $ }}-shell-{{ $index }}.{{ $.Release.Namespace }}:{{ (index $.Values.mounts $indexMount).mountPath }}
   {{ end -}}
   {{ end -}}
   {{ end -}}

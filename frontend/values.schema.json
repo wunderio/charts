@@ -110,6 +110,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "version": { "type": "string" },
         "image": { "type": "string" },
         "replicas": { "type": "integer" },
         "autoscaling": {
@@ -287,6 +288,10 @@
                 "schedule": { "type": "string" },
                 "parallelism": { "type": "integer" },
                 "nodeSelector": { "type": "object" },
+                "tolerations": { "type": "array" },
+                "affinity": { "type": "object" },
+                "podSecurityContext": { "type": "object" },
+                "containerSecurityContext": { "type": "object" },
                 "resources": {
                   "type": "object",
                   "additionalProperties": false,
@@ -321,9 +326,69 @@
             "type": "object",
             "additionalProperties": { "type": "string" }
           },
-          "securityContext": {
+          "tolerations": { "type": ["array", "null"] },
+          "affinity": { "type": ["object", "null"] },
+          "containerSecurityContext": {
             "type": "object",
             "additionalProperties": false,
+            "properties": {
+              "allowPrivilegeEscalation": { "type": "boolean" },
+              "readOnlyRootFilesystem": { "type": "boolean" },
+              "runAsNonRoot": { "type": "boolean" },
+              "runAsUser": { "type": "integer" },
+              "runAsGroup": { "type": "integer" },
+              "fsGroup": { "type": "integer" },
+              "privileged": { "type": "boolean" },
+              "procMount": { "type": "string" },
+              "capabilities": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "add": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "drop": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              },
+              "seccompProfile": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": { "type": "string" },
+                  "localhostProfile": { "type": "string" }
+                }
+              },
+              "seLinuxOptions": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "level": { "type": "string" },
+                  "role": { "type": "string" },
+                  "type": { "type": "string" },
+                  "user": { "type": "string" }
+                }
+              },
+              "sysctls": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": { "type": "string" },
+                    "value": { "type": "string" }
+                  },
+                  "required": ["name", "value"]
+                }
+              }
+            }
+          },
+          "podSecurityContext": {
+            "type": "object",
+            "additionalProperties": true,
             "properties": {
               "allowPrivilegeEscalation": { "type": "boolean" },
               "readOnlyRootFilesystem": { "type": "boolean" },
@@ -443,6 +508,12 @@
         "nodeSelector": {
           "type": "object",
           "additionalProperties": { "type": "string" }
+        },
+        "tolerations": {
+          "type": ["array", "null"]
+        },
+        "affinity": {
+          "type": ["object", "null"]
         }
       }
     },
@@ -473,7 +544,9 @@
         "nodeSelector": {
           "type": "object",
           "additionalProperties": { "type": "string" }
-        }
+        },
+        "tolerations": { "type": ["array", "null"] },
+        "affinity": { "type": ["object", "null"] }
       }
     },
     "shell": {

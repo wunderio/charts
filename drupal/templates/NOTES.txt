@@ -24,6 +24,8 @@ Mailhog available at:
   {{- range $index, $domain := .Values.exposeDomains }}
   http://{{ $domain.hostname }}/mailhog
   {{- end }}
+  ⚠️ **DEPRECATED** mailhog is deprecated and will be removed in the future, use mailpit instead
+  See: https://wunderio.github.io/silta/docs/silta-examples#sending-e-mail
 {{- end }}
 
 {{- if .Values.mailpit.enabled }}
@@ -53,12 +55,14 @@ SSH connection (limited access through VPN):
 Downloading data from server
 
   Downloading database:
-  ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-dump" > my_database_dump.sql
+  ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-dump" > {{ .Release.Namespace }}-{{ .Release.Name }}.sql
 
   {{ range $index, $mount := .Values.mounts -}}
   {{ if eq $mount.enabled true -}}
+  {{/*  Ensure that the mount path is suffixed with a slash to download contents of the mount not the folder itself. */}}
+  {{- $mountPath := ternary $mount.mountPath (printf "%s/" $mount.mountPath) (hasSuffix "/" $mount.mountPath) -}}
   Downloading files from {{ $index }}:
-  rsync -azv -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }} local_folder/
+  rsync -azv -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' {{ include "drupal.shellHost" $ }}:{{ $mountPath }} {{ $.Release.Namespace }}-mounts/{{ $index }}
   {{ end }}
   {{ end -}}
 
@@ -68,12 +72,12 @@ Downloading data from server
 Importing data into server (use this with caution!)
 
   Importing database:
-  ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-cli" < my_database_dump.sql
+  ssh {{ include "drupal.shellHost" . }} -J {{ include "drupal.jumphost" . }} "drush sql-cli" < {{ .Release.Namespace }}-{{ .Release.Name }}.sql
 
   {{ range $index, $mount := .Values.mounts -}}
   {{ if eq $mount.enabled true -}}
   Uploading files to {{ $index }}:
-  rsync -azv --temp-dir=/tmp/ -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' local_folder/ {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }}
+  rsync -azv --temp-dir=/tmp/ -e 'ssh -A -J {{ include "drupal.jumphost" $ }}' {{ $.Release.Namespace }}-mounts/{{ $index }}/ {{ include "drupal.shellHost" $ }}:{{ $mount.mountPath }}
   {{ end }}
   {{ end -}}
   {{- end -}}

@@ -1,0 +1,175 @@
+suite: affinity test
+templates:
+  - drupal-configmap.yaml
+  - drupal-cron.yaml
+  - drupal-deployment.yaml
+  - drupal-secret.yaml
+  - shell-configmap.yaml
+  - shell-secret.yaml
+  - shell-deployment.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
+tests:
+  - it: can set custom pod affinity for php pods
+    template: drupal-deployment.yaml
+    set:
+      php.affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: "custom-node-label"
+                operator: "In"
+                values:
+                - "true"
+    asserts:
+      - exists:
+          path: spec.template.spec.affinity
+      - exists:
+          path: spec.template.spec.affinity.nodeAffinity
+      - exists:
+          path: spec.template.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution
+      - contains:
+          path: spec.template.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions
+          content:
+            key: "custom-node-label"
+            operator: "In"
+            values:
+            - "true"
+
+  - it: applies custom affinity to shell deployment
+    template: shell-deployment.yaml
+    set:
+      shell.affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: "shell-node-label"
+                operator: "In"
+                values:
+                - "true"
+    asserts:
+      - isNotNull:
+          path: spec.template.spec.affinity.nodeAffinity
+      - isNotNull:
+          path: spec.template.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution
+      - contains:
+          path: spec.template.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions
+          content:
+            key: "shell-node-label"
+            operator: "In"
+            values:
+            - "true"
+
+  - it: applies custom affinity to cron jobs
+    template: drupal-cron.yaml
+    set:
+      php.cron.drupal.affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: "cron-node-label"
+                operator: "In"
+                values:
+                - "true"
+    asserts:
+      - isNotNull:
+          path: spec.jobTemplate.spec.template.spec.affinity.nodeAffinity
+      - isNotNull:
+          path: spec.jobTemplate.spec.template.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions
+          content:
+            key: "cron-node-label"
+            operator: "In"
+            values:
+            - "true"
+
+  - it: can set different affinities for php and shell
+    template: drupal-deployment.yaml
+    set:
+      php.affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: "php-node-label"
+                operator: "In"
+                values:
+                - "true"
+      shell.affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: "shell-node-label"
+                operator: "In"
+                values:
+                - "true"
+    asserts:
+      - contains:
+          path: spec.template.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions
+          content:
+            key: "php-node-label"
+            operator: "In"
+            values:
+            - "true"
+      - template: shell-deployment.yaml
+        contains:
+          path: spec.template.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions
+          content:
+            key: "shell-node-label"
+            operator: "In"
+            values:
+            - "true"
+
+  - it: can set pod affinity and pod anti-affinity
+    template: drupal-deployment.yaml
+    set:
+      php.affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: "app"
+                operator: "In"
+                values:
+                - "database"
+            topologyKey: "kubernetes.io/hostname"
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: "app"
+                  operator: "In"
+                  values:
+                  - "frontend"
+              topologyKey: "kubernetes.io/hostname"
+    asserts:
+      - isNotNull:
+          path: spec.template.spec.affinity.podAffinity
+      - isNotNull:
+          path: spec.template.spec.affinity.podAffinity.requiredDuringSchedulingIgnoredDuringExecution
+      - contains:
+          path: spec.template.spec.affinity.podAffinity.requiredDuringSchedulingIgnoredDuringExecution[0].labelSelector.matchExpressions
+          content:
+            key: "app"
+            operator: "In"
+            values:
+            - "database"
+      - isNotNull:
+          path: spec.template.spec.affinity.podAntiAffinity
+      - isNotNull:
+          path: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution
+      - contains:
+          path: spec.template.spec.affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchExpressions
+          content:
+            key: "app"
+            operator: "In"
+            values:
+            - "frontend"

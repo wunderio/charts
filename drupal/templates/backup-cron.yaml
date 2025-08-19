@@ -67,6 +67,13 @@ spec:
             {{- .Values.backup.nodeSelector | toYaml | nindent 12 }}
           tolerations:
             {{- include "drupal.tolerations" .Values.backup.nodeSelector | nindent 12 }}
+            {{- if .Values.backup.tolerations }}
+            {{- .Values.backup.tolerations | toYaml | nindent 12 }}
+            {{- end }}
+          {{- if .Values.backup.affinity }}
+          affinity:
+            {{- tpl ( .Values.backup.affinity | toYaml ) . | nindent 12 }}
+          {{- end }}
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}
             - name: {{ .Release.Name }}-backup
