@@ -19,13 +19,6 @@ helm repo add twuni https://helm.twun.io
 # ingress-nginx (optional)
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 
-# nginx-stable (optional)
-# CRD's need to be installed manually, see below
-helm repo add nginx-ingress https://helm.nginx.com/stable
-```
-
-Note: nginx-ingress requires CRD installation before installing the chart. See https://docs.nginx.com/nginx-ingress-controller/installation/installation-with-helm/#installing-the-crds for instructions.
-
 ### cert-manager (required for ssl/tls)
 
 Here are installation steps from official documentation https://cert-manager.io/docs/installation/helm/ -
@@ -157,6 +150,8 @@ helm upgrade --install --wait silta-cluster silta-cluster \
 ```
 
 ## Upgrade path for older versions:
+ - Upgrading silta-cluster chart to 1.10.0 ([docs/Upgrading-to-1.10.0.md](docs/Upgrading-to-1.10.0.md))
+
  - Upgrading silta-cluster chart to 1.9.0 ([docs/Upgrading-to-1.9.0.md](docs/Upgrading-to-1.9.0.md))
 
  - Upgrading silta-cluster chart to 1.8.0 ([docs/Upgrading-to-1.8.0.md](docs/Upgrading-to-1.8.0.md))
