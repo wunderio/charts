@@ -120,6 +120,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "version": { "type": "string" },
         "image": { "type": "string" },
         "basicauth": {
           "type": "object",

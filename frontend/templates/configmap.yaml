@@ -8,7 +8,14 @@ data:
   {{- if .Values.signalsciences.enabled }}
   nginx_signalsciences_conf: |
     load_module /etc/nginx/modules/ngx_http_sigsci_module.so;
+
+  {{- /* NDK module is required only for nginx versions < 1.26. */}}
+  {{- $versionParts := split "." .Values.nginx.version }}
+  {{- $nginxMajor := $versionParts._0 }}
+  {{- $nginxMinor := $versionParts._1 }}
+  {{- if or (empty $nginxMajor) (and (eq $nginxMajor "1" ) ( lt $nginxMinor "26" )) }}
     load_module /etc/nginx/modules/ndk_http_module.so;
+  {{- end }}
   {{- end }}
 
   nginx_conf: |
@@ -96,7 +103,7 @@ data:
           default  '';
       }
       add_header X-Robots-Tag $x_robots_tag_header always;
-      
+
       map $uri $no_slash_uri {
           ~^/(?<no_slash>.*)$ $no_slash;
       }

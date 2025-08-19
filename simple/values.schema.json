@@ -8,7 +8,7 @@
     "branchName": { "type": "string" },
     "imagePullSecrets": { "type": "array" },
     "imagePullSecret": { "type": "string" },
-    "serviceAccount": { 
+    "serviceAccount": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -114,6 +114,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "version": { "type": "string"},
         "image": { "type": "string"},
         "resources": {
           "type": "object",

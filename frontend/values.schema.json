@@ -110,6 +110,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "version": { "type": "string" },
         "image": { "type": "string" },
         "replicas": { "type": "integer" },
         "autoscaling": {
@@ -508,8 +509,8 @@
           "type": "object",
           "additionalProperties": { "type": "string" }
         },
-        "tolerations": { 
-          "type": ["array", "null"] 
+        "tolerations": {
+          "type": ["array", "null"]
         },
         "affinity": {
           "type": ["object", "null"]

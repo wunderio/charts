@@ -80,48 +80,6 @@ ingress-nginx:
       tag: "v1"
       readOnlyRootFilesystem: false
 
-# Official nginx chart from nginxinc 
-# https://github.com/nginxinc/kubernetes-ingress/blob/057c6d7e4f2361f5d2ddd897e9995bcb48ed7e32/deployments/helm-chart/values.yaml
-nginx-ingress:
-  enabled: false
-  controller:
-    replicaCount: 1
-    service:
-      # loadBalancerIP: 1.2.3.4
-      externalTrafficPolicy: Local
-    ingressClass: nginx
-    setAsDefaultIngress: false
-    appprotect:
-      enable: false
-      # Sets log level for App Protect WAF. Allowed values: fatal, error, warn, info, debug, trace
-      logLevel: info
-    appprotectdos:
-      enable: false
-      debug: false
-    config:
-      entries:
-        # Optional CDN configuration
-        real-ip-header: "X-Forwarded-For"
-        real-ip-recursive: "True"
-        #set-real-ip-from: "1.1.1.1/32, 2.2.2.2/32"
-        # Logging configuration
-        access-log-off: "False"
-        server-tokens: "False"
-    autoscaling:
-      enabled: false
-      minReplicas: 1
-      maxReplicas: 3
-      targetCPUUtilizationPercentage: 80
-      targetMemoryUtilizationPercentage: 80
-    priorityClassName: "high-priority"
-    resources:
-      requests:
-        cpu: "100m"
-        memory: "128Mi"
-      limits:
-        cpu: "200m"
-        memory: "512Mi"
-
 # Traefik 1.7 chart
 # https://github.com/wunderio/charts/blob/master/legacy_traefik/values.yaml
 # Note: Do not use this for new clusters, this is a default LB due to legacy setups. Use ingress-nginx instead.
