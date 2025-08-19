@@ -1,0 +1,6 @@
+dependencies:
+- name: common
+  repository: file://../rabbitmq-16.0.3-common
+  version: 2.31.2
+digest: sha256:f853af0929bfc03bb30c8ae15316e5bccf0f90fa6aa0f488806cbdb3b73259c5
+generated: "2025-08-14T10:26:52.079536812+03:00"
