@@ -183,7 +183,7 @@ data:
         set beresp.http.x-ttl = "10m";
       }
 
-      if (bereq.url ~ "^[^?]*\.(jpg|jpeg|gif|png|svg|ico|webp|css|js|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|flv|swf|html|htm|otf)(\?.*)?$") {
+      if (bereq.url ~ "^[^?]*\.(?:jpg|jpeg|gif|png|svg|ico|webp|css|js|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|flv|swf|html|htm|otf)(?:\?.*)?$") {
         # Strip any cookies before static files are inserted into cache.
         unset beresp.http.set-cookie;
         if(beresp.status == 200){
@@ -199,7 +199,7 @@ data:
       # Large static files are delivered directly to the end-user without
       # waiting for Varnish to fully read the file first.
       # Varnish 4 fully supports Streaming, so use streaming here to avoid locking.
-      if (bereq.url ~ "^[^?]*\.(mp[34]|rar|tar|tgz|gz|pdf|wav|zip|bz2|xz|7z|avi|mov|ogm|mpe?g|mk[av]|webm)(\?.*)?$") {
+      if (bereq.url ~ "^[^?]*\.(?:mp[34]|rar|tar|tgz|gz|pdf|wav|zip|bz2|xz|7z|avi|mov|ogm|mpe?g|mk[av]|webm)(?:\?.*)?$") {
         unset beresp.http.set-cookie;
         set beresp.do_stream = true;  # Check memory usage it'll grow in fetch_chunksize blocks (128k by default) if the backend doesn't send a Content-Length header, so only enable it for big objects
         set beresp.do_gzip = false;   # Don't try to compress it for storage
@@ -425,7 +425,7 @@ data:
 
       {{- if .Values.mailpit.enabled }}
       // No varnish for mailpit
-      if (req.url ~ "^/mailpit(/|$)") {
+      if (req.url ~ "^/mailpit(?:/|$)") {
         return (pass);
       }
       {{- end }}
@@ -440,7 +440,7 @@ data:
       }
 
       if (req.http.Accept-Encoding) {
-        if (req.url ~ "\.(bz2|eot|gif|gz|ico|jpg|mp3|ogg|pdf|png|svg|swf|tbz|tgz|tif|tiff|ttf|webp|woff|zip)(\?.*)?$") {
+        if (req.url ~ "\.(?:bz2|eot|gif|gz|ico|jpg|mp3|ogg|pdf|png|svg|swf|tbz|tgz|tif|tiff|ttf|webp|woff|zip)(\?.*)?$") {
           # No point in compressing these
           unset req.http.Accept-Encoding;
         } elsif (req.http.Accept-Encoding ~ "gzip") {
@@ -453,14 +453,14 @@ data:
         }
       }
 
-      if (req.url ~ "\.(bmp|bz2|css|doc|eot|gif|ico|jpg|js|pdf|png|ppt|svg|swf|tif|tiff|ttf|webp|woff|xls|zip)$") {
+      if (req.url ~ "\.(?:bmp|bz2|css|doc|eot|gif|ico|jpg|js|pdf|png|ppt|svg|swf|tif|tiff|ttf|webp|woff|xls|zip)$") {
         # Static file request do not vary on cookies
         unset req.http.Cookie;
         return (hash);
       }
 
       # Do not allow public access to cron.php , update.php or install.php.
-      if (req.url ~ "^(|/core)/(cron|install|update)\.php$" && !client.ip ~ internal) {
+      if (req.url ~ "^(?:/core)?/(?:cron|install|update)\.php$" && !client.ip ~ internal) {
         # Have Varnish throw the error directly.
         return (synth( 404, "Page not found."));
       }
@@ -502,7 +502,7 @@ data:
       # Large static files are delivered directly to the end-user without
       # waiting for Varnish to fully read the file first.
       # Varnish 4 fully supports Streaming, so set do_stream in vcl_backend_response()
-      if (req.url ~ "^[^?]*\.(mp[34]|rar|tar|tgz|gz|wav|zip|bz2|xz|7z|avi|mov|ogm|mpe?g|mk[av]|webm)(\?.*)?$") {
+      if (req.url ~ "^[^?]*\.(?:mp[34]|rar|tar|tgz|gz|wav|zip|bz2|xz|7z|avi|mov|ogm|mpe?g|mk[av]|webm)(?:\?.*)?$") {
         unset req.http.Cookie;
         return (hash);
       }
