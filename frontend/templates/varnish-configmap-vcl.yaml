@@ -158,13 +158,13 @@ data:
 
       {{- if .Values.mailpit.enabled }}
       // No varnish for mailpit
-      if (req.url ~ "^/mailpit(/|$)") {
+      if (req.url ~ "^/mailpit(?:/|$)") {
         return (pass);
       }
       {{- end }}
 
       if (req.http.Accept-Encoding) {
-        if (req.url ~ "\.(jpg|png|gif|svg|tif|tiff|ico|webp|gz|tgz|bz2|tbz|mp3|ogg|swf|zip|pdf|woff|eot|ttf)(\?.*)?$") {
+        if (req.url ~ "\.(?:jpg|png|gif|svg|tif|tiff|ico|webp|gz|tgz|bz2|tbz|mp3|ogg|swf|zip|pdf|woff|eot|ttf)(?:\?.*)?$") {
           # No point in compressing these
           unset req.http.Accept-Encoding;
         } elsif (req.http.Accept-Encoding ~ "gzip") {
