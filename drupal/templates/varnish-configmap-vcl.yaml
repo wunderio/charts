@@ -479,7 +479,7 @@ data:
       }
 
       if (req.http.Cookie) {
-        if (req.http.Cookie ~ "(SESS[a-z0-9]+|SSESS[a-z0-9]+)") {
+        if (req.http.Cookie ~ "S?SESS[a-z0-9]+=") {
           # Authenticated users should not be cached
           return (pass);
         }
