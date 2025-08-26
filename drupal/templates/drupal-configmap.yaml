@@ -517,11 +517,6 @@ data:
           try_files $uri @drupal;
         }
 
-        location ~* ^.+\.(?:pdf|pptx?)$ {
-          expires 30d;
-          tcp_nodelay off;
-        }
-
         ## Advanced Help module makes each module provided README available.
         location ~* ^/help/[^/]*/README\.txt$ {
           try_files $uri @drupal;
