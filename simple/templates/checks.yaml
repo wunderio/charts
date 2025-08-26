@@ -4,3 +4,12 @@
 {{ if .Values.nginx.basicauth.noauthips }}
 {{- fail "nginx.basicauth.noauthips configuration schema is depreciated migrate configuration to nginx.noauthips" -}}
 {{- end }}
+{{- /* Ingress checks */ -}}
+{{- range $ingress_index, $ingress := $.Values.ingress }}
+{{- if and $ingress.extraAnnotations (hasKey $ingress.extraAnnotations "nginx.ingress.kubernetes.io/limit-connections") }}
+{{- $limit := int (get $ingress.extraAnnotations "nginx.ingress.kubernetes.io/limit-connections") }}
+{{- if gt $limit 65536 }}
+{{- fail "nginx.ingress.kubernetes.io/limit-connections cannot be greater than 65536" }}
+{{- end }}
+{{- end }}
+{{- end }}
