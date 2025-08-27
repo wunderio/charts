@@ -350,7 +350,7 @@ imagePullSecrets:
 {{- define "drupal.wait-for-db-command" }}
 TIME_WAITING=0
 echo "Waiting for database.";
-until mysqladmin status --connect-timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} --silent; do
+until mariadb-admin status --connect-timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} --silent; do
   echo -n "."
   sleep 5
   TIME_WAITING=$((TIME_WAITING+5))
@@ -363,7 +363,7 @@ done
 {{- end }}
 
 {{- define "drupal.create-db" }}
-mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
+mariadb -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
 {{- end }}
 
 {{- define "drupal.wait-for-elasticsearch-command" }}
@@ -490,11 +490,11 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
       /tmp/db.sql \
       '/-- Table structure for table/-1' \
       '{*}'
-    # First file is the mysqldump header, rename it to "header"
+    # First file is the mariadb-dump header, rename it to "header"
     mv table-0000 header
     # Find last table file
     last_table=$(find -type f -name 'table-*' | sort -n | tail -n1)
-    # Split last table file to extract mysqldump footer, which starts with a line including "@OLD_"
+    # Split last table file to extract mariadb-dump footer, which starts with a line including "@OLD_"
     csplit \
       --silent \
       --prefix='last-' \
@@ -565,12 +565,12 @@ if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
 
       if [[ "$import_method" == "parallel" ]]; then
         echo "Importing SQL files in parallel. This setting can be changed in silta.yml using the referenceData.databaseImportMethod key."
-        find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
+        find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mariadb -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
         pipeline_exit_code=$? # Capture exit code of the pipeline (most likely influenced by xargs)
 
         # Check if xargs reported an error (any non-zero exit status)
         if [ "$pipeline_exit_code" -ne 0 ]; then
-          echo "ERROR: One or more parallel imports failed. Check the logs above for specific mysql errors."
+          echo "ERROR: One or more parallel imports failed. Check the logs above for specific mariadb errors."
           exit 1
         fi
 
@@ -580,8 +580,8 @@ if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
         echo "Importing SQL files sequentially. This setting can be changed in silta.yml using the referenceData.databaseImportMethod key."
         find "${tmp_ref_data}/" -type f -name "*.sql" | sort | while IFS= read -r sql_file; do
           echo "Importing ${sql_file}"
-          if ! mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < "${sql_file}"; then
-            echo "ERROR: Failed to import ${sql_file}. Check the logs above for specific mysql errors."
+          if ! mariadb -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < "${sql_file}"; then
+            echo "ERROR: Failed to import ${sql_file}. Check the logs above for specific mariadb errors."
             exit 1
           fi
         done
@@ -658,8 +658,8 @@ fi
 
   # Take a database dump.
   echo "Starting database backup."
-  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
-  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
+  /usr/bin/mariadb-dump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
+  /usr/bin/mariadb-dump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
   echo "Database backup complete."
 {{- end }}
 
@@ -728,7 +728,7 @@ fi
   TIME_WAITING=0
   echo "Waiting for database.";
 
-  until mysqladmin status --connect-timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --protocol=tcp --silent; do
+  until mariadb-admin status --connect-timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --protocol=tcp --silent; do
     echo -n "."
     sleep 1s
     TIME_WAITING=$((TIME_WAITING+1))
@@ -740,7 +740,7 @@ fi
   done
 
   echo "Importing database dump for validation"
-  mysql -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp --max_allowed_packet=1G < /tmp/db.sql
+  mariadb -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp --max_allowed_packet=1G < /tmp/db.sql
   drush status --fields=bootstrap
 
 {{- end }}

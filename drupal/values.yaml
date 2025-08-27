@@ -628,7 +628,7 @@ mariadb:
     # https://hub.docker.com/r/wunderio/bitnami-mariadb/tags
     registry: docker.io
     repository: wunderio/bitnami-mariadb
-    tag: 10.6-debian-12
+    tag: 11.4-debian-12
   replication:
     enabled: false
   db:
