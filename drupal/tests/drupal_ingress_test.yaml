@@ -1,6 +1,7 @@
 suite: drupal ingress
 templates:
   - drupal-ingress.yaml
+  - checks.yaml
 capabilities:
   apiVersions:
     - pxc.percona.com/v1
@@ -402,3 +403,40 @@ tests:
         equal:
           path: spec.rules[0].http.paths[0].path
           value: '/'
+
+  - it: prevents limit connections above 65536 for default ingress
+    template: checks.yaml
+    set:
+      ingress:
+        default:
+          extraAnnotations:
+            'nginx.ingress.kubernetes.io/limit-connections': '65537'
+    asserts:
+      - failedTemplate:
+          errorMessage: "nginx.ingress.kubernetes.io/limit-connections cannot be greater than 65536"
+
+  - it: allows limit connections above 65536 for default ingress
+    template: checks.yaml
+    set:
+      ingress:
+        default:
+          extraAnnotations:
+            'nginx.ingress.kubernetes.io/limit-connections': '65536'
+    asserts:
+      - notFailedTemplate:
+          errorMessage: "nginx.ingress.kubernetes.io/limit-connections cannot be greater than 65536"
+
+  - it: prevents limit connections above 65536 for enabled exposeDomains ingress
+    template: checks.yaml
+    set:
+      exposeDomains:
+        bar:
+          hostname: foo.bar
+          ingress: baz
+      ingress:
+        baz:
+          extraAnnotations:
+            'nginx.ingress.kubernetes.io/limit-connections': '65537'
+    asserts:
+      - failedTemplate:
+          errorMessage: "nginx.ingress.kubernetes.io/limit-connections cannot be greater than 65536"
