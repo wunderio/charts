@@ -50,7 +50,7 @@ spec:
                 {{ include "drupal.backup-command" (merge $params . ) | nindent 16 }}
                 {{ include "mariadb.db-validation" (merge $params . ) | nindent 16 }}
           - name: mariadb
-            image: docker.io/bitnami/mariadb:10.3.24-debian-10-r49
+            image: docker.io/wunderio/bitnami-mariadb:10.3.24-debian-10-r49
             imagePullPolicy: IfNotPresent
             env:
             - name: MARIADB_ROOT_PASSWORD
