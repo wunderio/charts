@@ -453,7 +453,7 @@ data:
         }
       }
 
-      if (req.url ~ "\.(?:bmp|bz2|css|doc|eot|gif|ico|jpg|js|pdf|png|ppt|svg|swf|tif|tiff|ttf|webp|woff|xls|zip)$") {
+      if (req.url ~ "^/sites/.*?/files/.*\.(?:bmp|bz2|css|doc|eot|gif|ico|jpg|js|pdf|png|ppt|svg|swf|tif|tiff|ttf|webp|woff|xls|zip)$") {
         # Static file request do not vary on cookies
         unset req.http.Cookie;
         return (hash);
