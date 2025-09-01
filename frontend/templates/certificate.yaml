@@ -96,6 +96,7 @@ spec:
 {{- end }}
 
 {{- else if eq $context_ssl.issuer "custom" }}
+{{- if not $context_ssl.existingTLSSecret }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -121,6 +122,7 @@ data:
   tls.crt: {{ $context_ssl.crt | b64enc }}
   tls.key: {{ $context_ssl.key | b64enc }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}
 
@@ -177,6 +179,7 @@ spec:
 ---
 
 {{- else if eq $domain.ssl.issuer "custom" }}
+{{- if not $domain.ssl.existingTLSSecret }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -191,6 +194,7 @@ data:
   tls.crt: {{ $domain.ssl.crt | default "" | b64enc }}
   tls.key: {{ $domain.ssl.key | default "" | b64enc }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

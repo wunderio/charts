@@ -33,7 +33,8 @@
               "issuer": { "type": "string" },
               "ca": { "type": "string" },
               "key": { "type": "string" },
-              "crt": { "type": "string" }
+              "crt": { "type": "string" },
+              "existingTLSSecret": { "type": "string" }
             }
           },
           "ingress": { "type": "string" }
@@ -52,7 +53,8 @@
             "issuer": { "type": "string" },
             "ca": { "type": "string" },
             "key": { "type": "string" },
-            "crt": { "type": "string" }
+            "crt": { "type": "string" },
+            "existingTLSSecret": { "type": "string" }
           }
         },
         "ingress": { "type": "string" }
@@ -73,7 +75,8 @@
         "issuer": { "type": "string" },
         "ca": { "type": "string" },
         "key": { "type": "string" },
-        "crt": { "type": "string" }
+        "crt": { "type": "string" },
+        "existingTLSSecret": { "type": "string" }
       }
     },
     "backendConfig": {

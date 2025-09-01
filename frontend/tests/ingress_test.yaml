@@ -323,3 +323,73 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: "nginx.ingress.kubernetes.io/limit-connections cannot be greater than 65536"
+
+  - it: uses default TLS secret when ssl.existingTLSSecret is not defined
+    template: ingress.yaml
+    asserts:
+      - equal:
+          path: spec.tls[0].secretName
+          value: RELEASE-NAME-tls
+
+  - it: uses default TLS secret for exposeDomains when ssl.existingTLSSecret is not defined
+    template: ingress.yaml
+    set:
+      exposeDomains:
+        foo:
+          hostname: foo.bar
+          ssl:
+            enabled: true
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: spec.tls[0].secretName
+          value: RELEASE-NAME-tls
+      - documentIndex: 0
+        equal:
+          path: spec.tls[0].hosts[0]
+          value: release-name.namespace.silta.wdr.io
+      - documentIndex: 1
+        equal:
+          path: spec.tls[0].secretName
+          value: RELEASE-NAME-tls-foo
+      - documentIndex: 1
+        equal:
+          path: spec.tls[0].hosts[0]
+          value: foo.bar
+
+  - it: uses custom TLS secret when ssl.existingTLSSecret is defined
+    template: ingress.yaml
+    set:
+      ssl:
+        existingTLSSecret: my-tls-secret
+    asserts:
+      - equal:
+          path: spec.tls[0].secretName
+          value: my-tls-secret
+
+  - it: uses custom TLS secret for exposeDomains
+    template: ingress.yaml
+    set:
+      exposeDomains:
+        foo:
+          hostname: foo.bar
+          ssl:
+            enabled: true
+            existingTLSSecret: my-foo-tls-secret
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: spec.tls[0].secretName
+          value: RELEASE-NAME-tls
+      - documentIndex: 0
+        equal:
+          path: spec.tls[0].hosts[0]
+          value: release-name.namespace.silta.wdr.io
+      - documentIndex: 1
+        equal:
+          path: spec.tls[0].secretName
+          value: my-foo-tls-secret
+      - documentIndex: 1
+        equal:
+          path: spec.tls[0].hosts[0]
+          value: foo.bar
