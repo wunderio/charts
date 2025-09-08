@@ -34,7 +34,7 @@ jobs:
           mkdir -p ~/.local/bin
 
           # Latest tagged release
-          latest_release_url=$(curl -s https://api.github.com/repos/wunderio/silta-cli/releases/latest | jq -r '.assets[] | .browser_download_url | select(endswith("linux-amd64.tar.gz"))')
+          curl -sL https://silta-cli.wdr.io/releases/latest/silta-latest-linux-amd64.tar.gz | tar xz -C ~/.local/bin
 
           silta version
       - name: Helm and repository setup
