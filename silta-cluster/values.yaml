@@ -11,7 +11,7 @@ ingress:
 
 # Community ingress-nginx chart
 # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
-# https://github.com/kubernetes/ingress-nginx/blob/e4a66fd2f625de3bcc7aaa793b31f529a0662009/charts/ingress-nginx/values.yaml
+# https://github.com/kubernetes/ingress-nginx/blob/106e633655e7e5799ccf28d747b07d78833cd860/charts/ingress-nginx/values.yaml
 ingress-nginx:
   enabled: false
   controller:
@@ -133,7 +133,7 @@ ssl:
 
 # Community ingress-nginx chart
 # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
-# https://github.com/kubernetes/ingress-nginx/blob/e4a66fd2f625de3bcc7aaa793b31f529a0662009/charts/ingress-nginx/values.yaml
+# https://github.com/kubernetes/ingress-nginx/blob/106e633655e7e5799ccf28d747b07d78833cd860/charts/ingress-nginx/values.yaml
 # This is a duplicate of the ingress-nginx chart, but with a different name, meant to immitate traefik ingress class and replace it.
 nginx-traefik:
   enabled: false
@@ -191,7 +191,6 @@ nginx-traefik:
       # Different error codes to distinguish rate limit states
       limit-req-status-code: 420
       limit-conn-status-code:  529
-      global-rate-limit-status-code: 429
       # ModSecurity https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#enable-modsecurity
       # Off by default, enable using ingress annotations
       enable-modsecurity: false
