@@ -125,8 +125,8 @@ singleSubdomain: false
 # These variables are build-specific and should be passed via the --set parameter.
 nginx:
   # The nginx version, for example "1.28".
-  version: "1.26"
-  image: 'wunderio/silta-nginx:1.26-v1'
+  version: "1.28"
+  image: 'wunderio/silta-nginx:1.28-v1'
 
   # Requires "X-Proxy-Auth" header from upstream when value is non-empty string.
   x_proxy_auth: ""
@@ -690,7 +690,7 @@ mailhog:
 redis:
   enabled: false
   # https://hub.docker.com/r/bitnamilegacy/redis/tags
-  # https://hub.docker.com/r/wunderio/bitnami-redis/tags  
+  # https://hub.docker.com/r/wunderio/bitnami-redis/tags
   image:
     registry: docker.io
     repository: wunderio/bitnami-redis
