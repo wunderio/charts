@@ -83,6 +83,10 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: {{ .Release.Name }}-solr-data
+      {{- if or (eq .Values.solr.persistence.data.storageClassName "silta-shared") (eq .Values.solr.persistence.data.storageClassName "nfs-shared") }}
+      annotations:
+        storage.silta/storage-path: {{ .Values.environmentName | default .Release.Name }}/solr-data
+      {{- end }}
     spec:
       accessModes: [ "ReadWriteOnce" ]
       {{- if .Values.solr.persistence.data.storageClassName }}
