@@ -1,0 +1,38 @@
+suite: solr
+templates:
+  - solr-statefulset.yaml
+  - solr-service.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
+tests:
+  - it: storage path annotation is not set by default
+    template: solr-statefulset.yaml
+    set:
+      solr:
+        enabled: true
+    asserts:
+      - notExists:
+          path: spec.volumeClaimTemplates[0].metadata.annotations['storage.silta/storage-path']
+  - it: storage path annotation set if silta-shared storage class used
+    template: solr-statefulset.yaml
+    set:
+      solr:
+        enabled: true
+        persistence:
+          data:
+            storageClassName: silta-shared
+    asserts:
+      - exists:
+          path: spec.volumeClaimTemplates[0].metadata.annotations['storage.silta/storage-path']
+  - it: storage path annotation set if nfs-shared storage class used
+    template: solr-statefulset.yaml
+    set:
+      solr:
+        enabled: true
+        persistence:
+          data:
+            storageClassName: nfs-shared
+    asserts:
+      - exists:
+          path: spec.volumeClaimTemplates[0].metadata.annotations['storage.silta/storage-path']

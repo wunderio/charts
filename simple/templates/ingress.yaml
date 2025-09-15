@@ -85,12 +85,18 @@ spec:
   {{- end }}
   {{- if $ingress.tls }}
   tls:
+  {{- if $.Values.ssl.existingTLSSecret }}
+  - secretName: {{ $.Values.ssl.existingTLSSecret }}
+    hosts:
+      - {{ include "simple.domain" . | quote }}
+  {{- else }}
   - secretName: {{ .Release.Name }}-tls{{- if eq $.Values.ssl.issuer "custom" }}-custom{{- end }}
     hosts: 
-      - {{ template "simple.domain" . }}
+      - {{ include "simple.domain" . | quote }}
+  {{- end }}
   {{- end }}
   rules:
-  - host: {{ template "simple.domain" . }}
+  - host: {{ include "simple.domain" . | quote }}
     http:
       paths:
       - path: /
@@ -221,9 +227,15 @@ spec:
   {{- if eq $domain.ingress $ingress_index }}
   {{- if $domain.ssl }}
   {{- if $domain.ssl.enabled }}
+  {{- if $domain.ssl.existingTLSSecret }}
+  - secretName: {{ $domain.ssl.existingTLSSecret }}
+    hosts:
+      - {{ $domain.hostname | quote }}
+  {{- else }}
   - secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}{{- if eq $domain.ssl.issuer "custom" }}-custom{{- end }}
     hosts:
-      - {{ $domain.hostname }}
+      - {{ $domain.hostname | quote }}
+  {{- end }}
   {{- end }}
   {{- end }}
   {{- end }}
