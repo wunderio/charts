@@ -14,9 +14,15 @@ spec:
   ports:
     - name: ssh
       port: {{ .Values.gitAuth.port }}
+      {{- if eq .Values.gitAuth.mode "bridge" }}
+      targetPort: 9022
+      {{- else }}
       targetPort: 22
+      {{- end }}
+      
   type: "LoadBalancer"
   externalTrafficPolicy: {{ .Values.gitAuth.externalTrafficPolicy }}
+  internalTrafficPolicy: Cluster
 {{- if .Values.gitAuth.loadBalancerIP }}
   loadBalancerIP: {{ .Values.gitAuth.loadBalancerIP }}
 {{- end }}
@@ -26,6 +32,7 @@ spec:
 {{- end }}
   selector:
     name: {{ .Release.Name }}-jumpserver
+
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -49,8 +56,22 @@ spec:
         image: {{ .Values.gitAuth.image }}:{{ .Values.gitAuth.imageTag }}
         imagePullPolicy: Always
         ports:
+          {{- if eq .Values.gitAuth.mode "bridge" }}
+          - containerPort: 9022
+            protocol: TCP
+          {{- else }}
           - containerPort: 22
+          {{- end }}
+          
         env:
+          {{- if eq .Values.gitAuth.mode "bridge" }}
+          - name: HOST_KEY_PATH
+            value: {{ .Values.gitAuth.hostKeyPath | quote }}
+          - name: AUTHORIZED_KEYS_PATH
+            value: /app/authorized_keys
+          - name: PORT
+            value: "9022"
+          {{- end }}
           {{- if .Values.gitAuth.keyserver.enabled }}
           - name: GITAUTH_URL
             value: {{ .Values.gitAuth.keyserver.url | default (printf "https://keys.%s/api/1/git-ssh-keys" .Values.clusterDomain) | quote }}
@@ -64,12 +85,23 @@ spec:
             value: {{ .Values.gitAuth.outsideCollaborators | default true | quote }}
           {{- end }}
         volumeMounts:
+        {{- if eq .Values.gitAuth.mode "bridge" }}
+        - mountPath: /app/keys
+          name: shell-keys
+        - mountPath: /app/authorized_keys
+          name: sshd-jumphost-configmap
+          readOnly: true
+          subPath: authorizedKeys
+        - mountPath: /app/recordings
+          name: recordings
+        {{- else }}
         - name: shell-keys
           mountPath: /etc/ssh/keys
         - name: sshd-jumphost-configmap
           mountPath: /etc/ssh/authorized_keys
           subPath: authorizedKeys
           readOnly: true
+        {{- end }}
         resources:
           {{- .Values.gitAuth.resources | toYaml | nindent 10 }}
       volumes:
@@ -79,7 +111,16 @@ spec:
       - name: sshd-jumphost-configmap
         configMap:
           name: {{ .Release.Name }}-sshd-jumphost
+      {{- if eq .Values.gitAuth.mode "bridge" }}
+      - name: recordings
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-shell-recordings
+      {{- end }}
+      {{- if eq .Values.gitAuth.mode "bridge" }}
+      serviceAccountName: {{ .Release.Name }}-sshbridge
+      {{- end }}
 ---
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -98,4 +139,84 @@ spec:
   resources:
     requests:
       storage: {{ .Values.gitAuth.persistence.size }}
+{{- end }}
+
+{{- if eq .Values.gitAuth.mode "bridge" }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  annotations:
+    storage.silta/storage-path: shell-recordings
+  name: {{ .Release.Name }}-shell-recordings
+spec:
+  accessModes:
+  - {{ .Values.gitAuth.recordings.persistence.accessMode }}
+  resources:
+    requests:
+      storage: {{ .Values.gitAuth.recordings.persistence.size }}
+  storageClassName: {{ .Values.gitAuth.recordings.persistence.storageClassName }}
+---
+
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Release.Name }}-sshbridge
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}-sshbridge
+# allow exec into pods
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods/exec
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+  - watch
+# allow endpoint and endpoinslice list for service endpoint discovery
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - get
+  - list
+  - watch
+---
+
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Release.Name }}-sshbridge
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Release.Name }}-sshbridge
+subjects:
+- kind: ServiceAccount
+  name: {{ .Release.Name }}-sshbridge
+  namespace: {{ .Release.Namespace }}
 {{- end }}
