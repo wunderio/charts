@@ -264,6 +264,8 @@ splash:
 # SSH Jumphost settings
 gitAuth:
   enabled: true
+  image: wunderio/sshd-gitauth
+  imageTag: v1.0
   port: 22
   keyserver:
     enabled: true
@@ -288,6 +290,8 @@ gitAuth:
 # SSH keyserver (keys.[clusterDomain])
 sshKeyServer:
   enabled: true
+  image: wunderio/silta-ssh-keys
+  imageTag: v0.1
   gitauthApiToken: ''
   apiUsername: ''
   apiPassword: ''
@@ -352,6 +356,7 @@ silta-downscaler:
 silta-proxy:
   enabled: false
 
+# https://github.com/instana/helm-charts/blob/main/instana-agent/values.yaml
 instana-agent:
   enabled: false
 
@@ -481,3 +486,5 @@ daemonset:
   # https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-virtual-memory.html#k8s_using_a_daemonset_to_set_virtual_memory
   maxMapCountSetter:
     enabled: true
+    image: docker.io/bash
+    imageTag: "5"

@@ -29,7 +29,7 @@ spec:
       enableServiceLinks: false
       containers:
       - name: {{ .Release.Name }}-ssh-key-server
-        image: wunderio/silta-ssh-keys:v0.1
+        image: {{ .Values.sshKeyServer.image }}:{{ .Values.sshKeyServer.imageTag }}
         ports:
           - containerPort: 80
         imagePullPolicy: Always
