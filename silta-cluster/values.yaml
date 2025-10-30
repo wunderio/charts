@@ -1,7 +1,9 @@
 # Main domain of the cluster.
 clusterDomain: "silta.wdr.io"
 
+# Ingress configuration for built-in domain.
 ingress:
+  enabled: true
   # Options: traefik, gce, azure/application-gateway, etc.
   class: traefik
   redirect-https: true
@@ -31,6 +33,8 @@ ingress-nginx:
       maxReplicas: 10
       targetCPUUtilizationPercentage: 80
       targetMemoryUtilizationPercentage: 80
+    extraArgs:
+      default-ssl-certificate: "silta-cluster/silta-cluster-tls"
     config:
       # Optional CDN configuration
       use-proxy-protocol: false
@@ -70,9 +74,9 @@ ingress-nginx:
       limits:
         cpu: 1
         memory: 1Gi
-  # Splash page
+  # Splash page for nonexistent sites
   defaultBackend:
-    enabled: true
+    enabled: false
     name: defaultbackend
     image:
       registry: wunderio
@@ -158,6 +162,7 @@ nginx-traefik:
     minReadySeconds: 10
     # https://github.com/kubernetes/ingress-nginx/issues/6928
     extraArgs:
+      default-ssl-certificate: "silta-cluster/silta-cluster-tls"
       shutdown-grace-period: 30
     config:
       # Optional CDN configuration
@@ -218,9 +223,9 @@ nginx-traefik:
         annotations:
           prometheus.io/scrape: "true"
           prometheus.io/port: "10254"
-  # Splash page
+  # Splash page for nonexistent sites
   defaultBackend:
-    enabled: true
+    enabled: false
     name: defaultbackend
     image:
       registry: wunderio
@@ -255,6 +260,7 @@ minio:
 
 # Splash page.
 splash:
+  enabled: false
   resources:
     requests:
       cpu: 10m

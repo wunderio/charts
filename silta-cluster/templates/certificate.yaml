@@ -1,5 +1,7 @@
 ---
 {{- if .Values.ssl.enabled }}
+{{- $ingress := .Values.ingress }}
+{{- if or $ingress.enabled .Values.deploymentRemover.enabled .Values.sshKeyServer.enabled (index (index .Values "silta-downscaler") "enabled") (index (index .Values "docker-registry") "enabled") }}
 {{- if has .Values.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
 apiVersion: {{ include "silta-cluster.cert-manager-api-version" . | trim }}
 kind: Certificate
@@ -8,7 +10,9 @@ metadata:
 spec:
   secretName: {{ .Release.Name }}-tls
   dnsNames:
+  {{- if $ingress.enabled }}
   - {{ .Values.clusterDomain }}
+  {{- end }}
   {{- if .Values.deploymentRemover.enabled }}
   - webhooks.{{ .Values.clusterDomain }}
   {{- end }}
@@ -30,7 +34,9 @@ spec:
       - http01:
           ingress: {{ .Release.Name }}
         domains:
+          {{- if $ingress.enabled }}
           - {{ .Values.clusterDomain }}
+          {{- end }}
           {{- if .Values.deploymentRemover.enabled }}
           - webhooks.{{ .Values.clusterDomain }}
           {{- end }}
@@ -56,7 +62,9 @@ spec:
   renewBefore: 150h 
   commonName: {{ .Values.clusterDomain }}
   dnsNames:
+  {{- if $ingress.enabled }}
   - {{ .Values.clusterDomain }}
+  {{- end }}
   {{- if .Values.deploymentRemover.enabled }}
   - webhooks.{{ .Values.clusterDomain }}
   {{- end }}
@@ -83,5 +91,6 @@ data:
   tls.crt: {{ .Values.ssl.crt | b64enc }}
   tls.key: {{ .Values.ssl.key | b64enc }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}
