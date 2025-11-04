@@ -1,6 +1,6 @@
 apiVersion: v2
 appVersion: "1.0"
-description: Setup a silta kubernetes cluster.
+description: Setup a Silta Kubernetes cluster.
 name: silta-cluster
 version: 1.13.0
 # csi-rclone external provisioner requires kubernetes 1.20+
