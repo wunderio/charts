@@ -154,8 +154,6 @@ data:
       ## This value is set to be identical with PHP's post_max_size.
       client_max_body_size        {{ .Values.php.php_ini.post_max_size }};
       client_body_buffer_size     128k;
-      client_header_buffer_size   4k;
-      large_client_header_buffers 8 16K;
       keepalive_timeout           15 10;
       keepalive_requests          100;
       reset_timedout_connection   on;
@@ -209,6 +207,19 @@ data:
         ~^/(?<no_slash>.*)$ $no_slash;
       }
 
+      {{- if .Values.nginx.httpConfig  }}
+      # nginx.httpConfig values
+      {{- range $k, $v := .Values.nginx.httpConfig  }}
+      {{- if not (eq $v "null") }}
+      {{- if (contains "\n" $v) }}
+      {{- printf "%s %s" $k (tpl $v $) | nindent 6 }}
+      {{- else }}
+      {{ $k }} {{ tpl $v $ }};
+      {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
+    
       include conf.d/*.conf;
     }
 

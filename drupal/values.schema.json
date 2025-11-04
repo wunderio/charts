@@ -151,6 +151,7 @@
         "content_security_policy": { "type": "string" },
         "loglevel": { "type": "string" },
         "comp_level": { "type": "integer" },
+        "httpConfig": { "type": "object" },
         "extraConfig": { "type": "string" },
         "locationExtraConfig": { "type": "string" },
         "serverExtraConfig": { "type": "string" },
