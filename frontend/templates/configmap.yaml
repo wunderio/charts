@@ -69,8 +69,6 @@ data:
       client_header_timeout       60s;
       client_max_body_size        32m;
       client_body_buffer_size     16k;
-      client_header_buffer_size   4k;
-      large_client_header_buffers 8 16K;
       keepalive_timeout           75s;
       keepalive_requests          100;
       reset_timedout_connection   off;
@@ -114,6 +112,19 @@ data:
       # Verify if x_proxy_auth value is correct
       map $http_x_proxy_auth $proxy_auth { default 0; '{{ .Values.nginx.x_proxy_auth }}' 1; }
       {{- end}}
+
+      {{- if .Values.nginx.httpConfig  }}
+      # nginx.httpConfig values
+      {{- range $k, $v := .Values.nginx.httpConfig  }}
+      {{- if not (eq $v "null") }}
+      {{- if (contains "\n" $v) }}
+      {{- printf "%s %s" $k (tpl $v $) | nindent 6 }}
+      {{- else }}
+      {{ $k }} {{ tpl $v $ }};
+      {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
 
       include conf.d/*.conf;
     }

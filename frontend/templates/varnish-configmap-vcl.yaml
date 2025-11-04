@@ -135,7 +135,7 @@ data:
       }
 
       # Do not cache requests with Authorization header
-      if (req.http.Authorization) {
+      if (req.http.Authorization || client.ip ~ internal) {
         return (pass);
       }
 

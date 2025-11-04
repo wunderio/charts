@@ -238,8 +238,14 @@ nginx:
   # Extra configuration block in location context.
   locationExtraConfig: |
 
+  # Note: This will be deprecated in the future, use nginx.httpConfig instead.
   # Extra configuration to pass to nginx as a file
   extraConfig: |
+
+  # Configuration for http context.
+  httpConfig:
+    client_header_buffer_size: "4k"
+    large_client_header_buffers: "8 16K"
 
   # Toggle open_files_cache.
   # Naming follows https://nginx.org/en/docs/http/ngx_http_core_module.html#open_file_cache directive
@@ -626,7 +632,7 @@ mariadb:
     # https://hub.docker.com/r/wunderio/bitnami-mariadb/tags
     registry: docker.io
     repository: wunderio/bitnami-mariadb
-    tag: 10.6-debian-12
+    tag: 11.4-debian-12
   replication:
     enabled: false
   db:

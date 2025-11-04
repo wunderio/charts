@@ -169,6 +169,7 @@
         "content_security_policy": { "type": "string" },
         "serverExtraConfig": { "type": "string" },
         "locationExtraConfig": { "type": "string" },
+        "httpConfig": { "type": "object" },
         "extraConfig": { "type": "string" },
         "redirects": {
           "type": "array",

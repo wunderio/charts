@@ -434,7 +434,7 @@ data:
         return (synth( 403, "Forbidden"));
       }
 
-      if (req.http.Authorization) {
+      if (req.http.Authorization || client.ip ~ internal) {
         # Not cacheable by default
         return (pass);
       }
