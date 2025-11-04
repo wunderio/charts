@@ -175,6 +175,7 @@
         "content_security_policy": { "type": "string" },
         "serverExtraConfig": { "type": "string" },
         "locationExtraConfig": { "type": "string" },
+        "httpConfig": { "type": "object" },
         "extraConfig": { "type": "string" },
         "extra_headers": { "type": "object" },
         "extra_conditions": { "type": "string" },

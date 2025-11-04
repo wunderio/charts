@@ -194,8 +194,13 @@ nginx:
   # Extra configuration block in location context.
   locationExtraConfig: |
 
-  # Extra configuration to pass to nginx as a file
+  # Note: This will be deprecated in the future, use nginx.httpConfig instead.
   extraConfig: |
+
+  # Configuration for http context.
+  httpConfig:
+    client_header_buffer_size: "4k"
+    large_client_header_buffers: "8 16K"
 
   # DEPRECATED. Please use serverExtraConfig instead
   extra_headers: {}
@@ -450,7 +455,7 @@ mariadb:
   image:
     registry: docker.io
     repository: wunderio/bitnami-mariadb
-    tag: 10.6.15-debian-11-r24
+    tag: 11.4-debian-12
   replication:
     enabled: false
   db:
