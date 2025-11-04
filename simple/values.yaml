@@ -183,8 +183,13 @@ nginx:
   # Extra configuration block in location context.
   locationExtraConfig: |
 
-  # Extra configuration to pass to nginx as a file
+  # Note: This will be deprecated in the future, use nginx.httpConfig instead.
   extraConfig: |
+
+  # Configuration for http context.
+  httpConfig:
+    client_header_buffer_size: "4k"
+    large_client_header_buffers: "8 16K"
 
 # Fastly Signal Sciences support
 # https://docs.fastly.com/signalsciences/
