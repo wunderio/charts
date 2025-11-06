@@ -14,7 +14,7 @@ helm repo add jetstack https://charts.jetstack.io
 helm repo add wunderio https://storage.googleapis.com/charts.wdr.io
 
 # Docker Registry Helm Chart (optional)
-helm repo add twuni https://helm.twun.io
+helm repo add twuni https://twuni.github.io/docker-registry.helm
 
 # ingress-nginx (optional)
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
