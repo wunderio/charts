@@ -46,7 +46,7 @@ jobs:
             helm repo add instana https://agents.instana.io/helm
             helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
             # docker-registry
-            helm repo add twuni https://helm.twun.io
+            helm repo add twuni https://twuni.github.io/docker-registry.helm
             # ingress-nginx
             helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
             # nginx-ingress
