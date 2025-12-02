@@ -625,10 +625,12 @@ postgresql:
 # https://github.com/wunderio/charts/blob/master/rabbitmq/values.yaml
 rabbitmq:
   enabled: false
-
-  # Use a low default to prevent unnecessary storage use.
   persistence:
     size: 1Gi
+  enableServiceLinks: false
+  networkPolicy:
+    # We create our own network policy for the rabbitmq service.
+    enabled: false
 
 # Add following lines to your node.Dockerfile when enabling instana monitoring
 #   RUN npm install -g @instana/collector
