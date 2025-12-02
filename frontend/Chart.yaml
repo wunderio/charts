@@ -21,8 +21,8 @@ dependencies:
   repository: file://../elasticsearch
   condition: elasticsearch.enabled
 - name: rabbitmq
-  version: 6.17.x
-  repository: https://storage.googleapis.com/charts.wdr.io
+  version: 16.0.x
+  repository: oci://registry-1.docker.io/bitnamicharts
   condition: rabbitmq.enabled
 - name: mongodb
   version: 14.12.x

@@ -12,8 +12,8 @@ dependencies:
   repository: file://../elasticsearch
   version: 8.5.1
 - name: rabbitmq
-  repository: https://storage.googleapis.com/charts.wdr.io
-  version: 6.17.5
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 16.0.3
 - name: mongodb
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 14.12.3
