@@ -8,7 +8,14 @@ data:
   {{- if .Values.signalsciences.enabled }}
   nginx_signalsciences_conf: |
     load_module /etc/nginx/modules/ngx_http_sigsci_module.so;
+
+  {{- /* NDK module is required only for nginx versions < 1.26. */}}
+  {{- $versionParts := split "." .Values.nginx.version }}
+  {{- $nginxMajor := $versionParts._0 }}
+  {{- $nginxMinor := $versionParts._1 }}
+  {{- if or (empty $nginxMajor) (and (eq $nginxMajor "1" ) ( lt $nginxMinor "26" )) }}
     load_module /etc/nginx/modules/ndk_http_module.so;
+  {{- end }}
   {{- end }}
 
   nginx_conf: |
@@ -44,13 +51,14 @@ data:
       {{- end }}
 
       real_ip_header              {{ .Values.nginx.real_ip_header }};
+      real_ip_recursive           on;
 
       include                     /etc/nginx/mime.types;
       default_type                application/octet-stream;
 
       log_format  main            '$remote_addr - $remote_user [$time_local] "$request" '
                                   '$status $body_bytes_sent "$http_referer" '
-                                  '"$http_user_agent" "$http_x_forwarded_for" $host "$http_ja3"';
+                                  '"$http_user_agent" "$http_x_forwarded_for" $host "$http_ja3" "$http_ja4"';
 
 
       access_log                  /proc/self/fd/1 main;
@@ -61,8 +69,6 @@ data:
       client_header_timeout       60s;
       client_max_body_size        32m;
       client_body_buffer_size     16k;
-      client_header_buffer_size   4k;
-      large_client_header_buffers 8 16K;
       keepalive_timeout           75s;
       keepalive_requests          100;
       reset_timedout_connection   off;
@@ -95,7 +101,7 @@ data:
           default  '';
       }
       add_header X-Robots-Tag $x_robots_tag_header always;
-      
+
       map $uri $no_slash_uri {
           ~^/(?<no_slash>.*)$ $no_slash;
       }
@@ -106,6 +112,19 @@ data:
       # Verify if x_proxy_auth value is correct
       map $http_x_proxy_auth $proxy_auth { default 0; '{{ .Values.nginx.x_proxy_auth }}' 1; }
       {{- end}}
+
+      {{- if .Values.nginx.httpConfig  }}
+      # nginx.httpConfig values
+      {{- range $k, $v := .Values.nginx.httpConfig  }}
+      {{- if not (eq $v "null") }}
+      {{- if (contains "\n" $v) }}
+      {{- printf "%s %s" $k (tpl $v $) | nindent 6 }}
+      {{- else }}
+      {{ $k }} {{ tpl $v $ }};
+      {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- end }}
 
       include conf.d/*.conf;
     }
@@ -188,6 +207,43 @@ data:
         rewrite /mailhog(.*) $1 break;
         proxy_pass http://{{ .Release.Name }}-mailhog:8025/;
 
+        # Websock connection
+        chunked_transfer_encoding on;
+        proxy_set_header X-NginX-Proxy true;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_http_version 1.1;
+        proxy_redirect off;
+        proxy_buffering off;
+      }
+      {{- end}}
+
+      {{- if .Values.mailpit.enabled }}
+      # Redirect the legacy mailhog service to mailpit.
+      location /mailhog {
+        return 301 /mailpit/;
+      }
+      location /mailpit/ {
+                # Auth / whitelist always enabled
+        satisfy any;
+        allow 127.0.0.1;
+        {{- range .Values.nginx.noauthips }}
+        allow {{ . }};
+        {{- end }}
+        deny all;
+
+        {{- if gt (len .Values.nginx.noauthips) 1 -}}
+        # Basic auth only offered when at least one extra ip is whitelisted. Prevents using default credentials.
+        auth_basic "Restricted";
+        auth_basic_user_file /etc/nginx/.htaccess;
+        {{- end}}
+
+        # Proxy to mailpit container
+        proxy_pass http://{{ .Release.Name }}-mailpit-http:80/mailpit/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
         # Websock connection
         chunked_transfer_encoding on;
         proxy_set_header X-NginX-Proxy true;

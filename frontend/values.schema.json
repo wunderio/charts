@@ -8,7 +8,7 @@
     "branchName": { "type": "string" },
     "imagePullSecrets": { "type": "array" },
     "imagePullSecret": { "type": "string" },
-    "serviceAccount": { 
+    "serviceAccount": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -33,7 +33,8 @@
               "issuer": { "type": "string" },
               "ca": { "type": "string" },
               "key": { "type": "string" },
-              "crt": { "type": "string" }
+              "crt": { "type": "string" },
+              "existingTLSSecret": { "type": "string" }
             }
           },
           "ingress": { "type": "string" }
@@ -52,7 +53,8 @@
             "issuer": { "type": "string" },
             "ca": { "type": "string" },
             "key": { "type": "string" },
-            "crt": { "type": "string" }
+            "crt": { "type": "string" },
+            "existingTLSSecret": { "type": "string" }
           }
         },
         "ingress": { "type": "string" }
@@ -73,7 +75,8 @@
         "issuer": { "type": "string" },
         "ca": { "type": "string" },
         "key": { "type": "string" },
-        "crt": { "type": "string" }
+        "crt": { "type": "string" },
+        "existingTLSSecret": { "type": "string" }
       }
     },
     "backendConfig": {
@@ -110,6 +113,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "version": { "type": "string" },
         "image": { "type": "string" },
         "replicas": { "type": "integer" },
         "autoscaling": {
@@ -171,6 +175,7 @@
         "content_security_policy": { "type": "string" },
         "serverExtraConfig": { "type": "string" },
         "locationExtraConfig": { "type": "string" },
+        "httpConfig": { "type": "object" },
         "extraConfig": { "type": "string" },
         "extra_headers": { "type": "object" },
         "extra_conditions": { "type": "string" },
@@ -287,6 +292,10 @@
                 "schedule": { "type": "string" },
                 "parallelism": { "type": "integer" },
                 "nodeSelector": { "type": "object" },
+                "tolerations": { "type": "array" },
+                "affinity": { "type": "object" },
+                "podSecurityContext": { "type": "object" },
+                "containerSecurityContext": { "type": "object" },
                 "resources": {
                   "type": "object",
                   "additionalProperties": false,
@@ -320,6 +329,124 @@
           "nodeSelector": {
             "type": "object",
             "additionalProperties": { "type": "string" }
+          },
+          "tolerations": { "type": ["array", "null"] },
+          "affinity": { "type": ["object", "null"] },
+          "containerSecurityContext": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "allowPrivilegeEscalation": { "type": "boolean" },
+              "readOnlyRootFilesystem": { "type": "boolean" },
+              "runAsNonRoot": { "type": "boolean" },
+              "runAsUser": { "type": "integer" },
+              "runAsGroup": { "type": "integer" },
+              "fsGroup": { "type": "integer" },
+              "privileged": { "type": "boolean" },
+              "procMount": { "type": "string" },
+              "capabilities": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "add": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "drop": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              },
+              "seccompProfile": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": { "type": "string" },
+                  "localhostProfile": { "type": "string" }
+                }
+              },
+              "seLinuxOptions": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "level": { "type": "string" },
+                  "role": { "type": "string" },
+                  "type": { "type": "string" },
+                  "user": { "type": "string" }
+                }
+              },
+              "sysctls": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": { "type": "string" },
+                    "value": { "type": "string" }
+                  },
+                  "required": ["name", "value"]
+                }
+              }
+            }
+          },
+          "podSecurityContext": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "allowPrivilegeEscalation": { "type": "boolean" },
+              "readOnlyRootFilesystem": { "type": "boolean" },
+              "runAsNonRoot": { "type": "boolean" },
+              "runAsUser": { "type": "integer" },
+              "runAsGroup": { "type": "integer" },
+              "fsGroup": { "type": "integer" },
+              "privileged": { "type": "boolean" },
+              "procMount": { "type": "string" },
+              "capabilities": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "add": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "drop": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  }
+                }
+              },
+              "seccompProfile": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": { "type": "string" },
+                  "localhostProfile": { "type": "string" }
+                }
+              },
+              "seLinuxOptions": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "level": { "type": "string" },
+                  "role": { "type": "string" },
+                  "type": { "type": "string" },
+                  "user": { "type": "string" }
+                }
+              },
+              "sysctls": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": { "type": "string" },
+                    "value": { "type": "string" }
+                  },
+                  "required": ["name", "value"]
+                }
+              }
+            }
           }
         }
       }
@@ -385,6 +512,12 @@
         "nodeSelector": {
           "type": "object",
           "additionalProperties": { "type": "string" }
+        },
+        "tolerations": {
+          "type": ["array", "null"]
+        },
+        "affinity": {
+          "type": ["object", "null"]
         }
       }
     },
@@ -415,7 +548,9 @@
         "nodeSelector": {
           "type": "object",
           "additionalProperties": { "type": "string" }
-        }
+        },
+        "tolerations": { "type": ["array", "null"] },
+        "affinity": { "type": ["object", "null"] }
       }
     },
     "shell": {
@@ -578,6 +713,12 @@
     "redis": {
       "type": "object",
       "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "mailpit": {
+      "type": "object",
       "properties": {
         "enabled": { "type": "boolean" }
       }

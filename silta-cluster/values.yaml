@@ -1,7 +1,9 @@
 # Main domain of the cluster.
 clusterDomain: "silta.wdr.io"
 
+# Ingress configuration for built-in domain.
 ingress:
+  enabled: true
   # Options: traefik, gce, azure/application-gateway, etc.
   class: traefik
   redirect-https: true
@@ -11,7 +13,7 @@ ingress:
 
 # Community ingress-nginx chart
 # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
-# https://github.com/kubernetes/ingress-nginx/blob/e4a66fd2f625de3bcc7aaa793b31f529a0662009/charts/ingress-nginx/values.yaml
+# https://github.com/kubernetes/ingress-nginx/blob/106e633655e7e5799ccf28d747b07d78833cd860/charts/ingress-nginx/values.yaml
 ingress-nginx:
   enabled: false
   controller:
@@ -31,6 +33,8 @@ ingress-nginx:
       maxReplicas: 10
       targetCPUUtilizationPercentage: 80
       targetMemoryUtilizationPercentage: 80
+    extraArgs:
+      default-ssl-certificate: "silta-cluster/silta-cluster-tls"
     config:
       # Optional CDN configuration
       use-proxy-protocol: false
@@ -70,57 +74,15 @@ ingress-nginx:
       limits:
         cpu: 1
         memory: 1Gi
-  # Splash page
+  # Splash page for nonexistent sites
   defaultBackend:
-    enabled: true
+    enabled: false
     name: defaultbackend
     image:
       registry: wunderio
       image: silta-splash
       tag: "v1"
       readOnlyRootFilesystem: false
-
-# Official nginx chart from nginxinc 
-# https://github.com/nginxinc/kubernetes-ingress/blob/057c6d7e4f2361f5d2ddd897e9995bcb48ed7e32/deployments/helm-chart/values.yaml
-nginx-ingress:
-  enabled: false
-  controller:
-    replicaCount: 1
-    service:
-      # loadBalancerIP: 1.2.3.4
-      externalTrafficPolicy: Local
-    ingressClass: nginx
-    setAsDefaultIngress: false
-    appprotect:
-      enable: false
-      # Sets log level for App Protect WAF. Allowed values: fatal, error, warn, info, debug, trace
-      logLevel: info
-    appprotectdos:
-      enable: false
-      debug: false
-    config:
-      entries:
-        # Optional CDN configuration
-        real-ip-header: "X-Forwarded-For"
-        real-ip-recursive: "True"
-        #set-real-ip-from: "1.1.1.1/32, 2.2.2.2/32"
-        # Logging configuration
-        access-log-off: "False"
-        server-tokens: "False"
-    autoscaling:
-      enabled: false
-      minReplicas: 1
-      maxReplicas: 3
-      targetCPUUtilizationPercentage: 80
-      targetMemoryUtilizationPercentage: 80
-    priorityClassName: "high-priority"
-    resources:
-      requests:
-        cpu: "100m"
-        memory: "128Mi"
-      limits:
-        cpu: "200m"
-        memory: "512Mi"
 
 # Traefik 1.7 chart
 # https://github.com/wunderio/charts/blob/master/legacy_traefik/values.yaml
@@ -175,7 +137,7 @@ ssl:
 
 # Community ingress-nginx chart
 # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
-# https://github.com/kubernetes/ingress-nginx/blob/e4a66fd2f625de3bcc7aaa793b31f529a0662009/charts/ingress-nginx/values.yaml
+# https://github.com/kubernetes/ingress-nginx/blob/106e633655e7e5799ccf28d747b07d78833cd860/charts/ingress-nginx/values.yaml
 # This is a duplicate of the ingress-nginx chart, but with a different name, meant to immitate traefik ingress class and replace it.
 nginx-traefik:
   enabled: false
@@ -200,6 +162,7 @@ nginx-traefik:
     minReadySeconds: 10
     # https://github.com/kubernetes/ingress-nginx/issues/6928
     extraArgs:
+      default-ssl-certificate: "silta-cluster/silta-cluster-tls"
       shutdown-grace-period: 30
     config:
       # Optional CDN configuration
@@ -233,7 +196,6 @@ nginx-traefik:
       # Different error codes to distinguish rate limit states
       limit-req-status-code: 420
       limit-conn-status-code:  529
-      global-rate-limit-status-code: 429
       # ModSecurity https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#enable-modsecurity
       # Off by default, enable using ingress annotations
       enable-modsecurity: false
@@ -261,9 +223,9 @@ nginx-traefik:
         annotations:
           prometheus.io/scrape: "true"
           prometheus.io/port: "10254"
-  # Splash page
+  # Splash page for nonexistent sites
   defaultBackend:
-    enabled: true
+    enabled: false
     name: defaultbackend
     image:
       registry: wunderio
@@ -298,6 +260,7 @@ minio:
 
 # Splash page.
 splash:
+  enabled: false
   resources:
     requests:
       cpu: 10m
@@ -307,6 +270,8 @@ splash:
 # SSH Jumphost settings
 gitAuth:
   enabled: true
+  image: wunderio/sshd-gitauth
+  imageTag: v1.0
   port: 22
   keyserver:
     enabled: true
@@ -331,6 +296,8 @@ gitAuth:
 # SSH keyserver (keys.[clusterDomain])
 sshKeyServer:
   enabled: true
+  image: wunderio/silta-ssh-keys
+  imageTag: v0.1
   gitauthApiToken: ''
   apiUsername: ''
   apiPassword: ''
@@ -395,6 +362,7 @@ silta-downscaler:
 silta-proxy:
   enabled: false
 
+# https://github.com/instana/helm-charts/blob/main/instana-agent/values.yaml
 instana-agent:
   enabled: false
 
@@ -408,7 +376,7 @@ nfs-subdir-external-provisioner:
     onDelete: delete
   image:
     repository: docker.io/wunderio/nfs-subdir-external-provisioner
-    tag: v4.0
+    tag: v5.0
 
 # Uses nfs-subdir-external-provisioner. 
 # see: https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/blob/master/charts/nfs-subdir-external-provisioner/values.yaml
@@ -423,6 +391,9 @@ silta-shared-nfs:
     volumeBindingMode: WaitForFirstConsumer
     pathPattern: "${.PVC.namespace}/${.PVC.annotations.storage.silta/storage-path}"
     onDelete: delete
+  image:
+    repository: docker.io/wunderio/nfs-subdir-external-provisioner
+    tag: v5.0
 
 nfs-server:
   enabled: false
@@ -521,3 +492,5 @@ daemonset:
   # https://www.elastic.co/guide/en/cloud-on-k8s/master/k8s-virtual-memory.html#k8s_using_a_daemonset_to_set_virtual_memory
   maxMapCountSetter:
     enabled: true
+    image: docker.io/bash
+    imageTag: "5"

@@ -1,10 +1,27 @@
 parameters:
   monolog.channel_handlers:
-     # Log to stderr by default.
-     default: ['stream']
+    default:
+      handlers:
+        - name: 'stream'
+          formatter: 'json'
+          processors:
+            - 'message_placeholder'
+            - 'request_uri'
+            - 'referer'
+            - 'current_user'
+            - 'ip'
+            - 'filter_backtrace'
 
 services:
+  # Defines a 'stream' channel handler used above.
+  # Log to stderr by default.
+  # The minimum (also default) logging level is 100 (DEBUG), we set it here explicitly for better visibility.
   monolog.handler.stream:
     class: Monolog\Handler\StreamHandler
-    # The minimum logging level DEBUG = 100
-    arguments: ['php://stderr', 100]
+    arguments: [ 'php://stderr', 100 ]
+  # Override monolog's 'filter_backtrace' processor to remove some redundant data (thus reduce data ingest)
+  # Remove the 'link' from context data as it makes sense only in Drupal's admin UI.
+  monolog.processor.filter_backtrace:
+    class: Drupal\monolog\Logger\Processor\ContextKeyFilterProcessor
+    arguments: [ [ 'backtrace', 'link' ] ]
+    shared: false

@@ -196,3 +196,129 @@ tests:
           content:
             name: TZ
             value: Foo/Bar
+
+  - it: can set podSecurityContext at cron job level
+    template: services-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+            podSecurityContext:
+              fsGroup: 1000
+              runAsUser: 1001
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.securityContext.fsGroup
+          value: 1000
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.securityContext.runAsUser
+          value: 1001
+
+  - it: can set containerSecurityContext at cron job level
+    template: services-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+            containerSecurityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem
+          value: true
+
+  - it: inherits podSecurityContext from service level
+    template: services-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+        podSecurityContext:
+          fsGroup: 2000
+          runAsUser: 2001
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.securityContext.fsGroup
+          value: 2000
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.securityContext.runAsUser
+          value: 2001
+
+  - it: inherits containerSecurityContext from service level
+    template: services-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+        containerSecurityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem
+          value: true
+
+  - it: cronjob level podSecurityContext takes precedence over service level podSecurityContext
+    template: services-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+        podSecurityContext:
+          fsGroup: 2000
+          runAsUser: 2001
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+            podSecurityContext:
+              fsGroup: 3000
+              runAsUser: 3001
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.securityContext.fsGroup
+          value: 3000
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.securityContext.runAsUser
+          value: 3001
+
+  - it: cronjob level containerSecurityContext takes precedence over service level containerSecurityContext
+    template: services-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+        containerSecurityContext:
+          allowPrivilegeEscalation: true
+          readOnlyRootFilesystem: true
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+            containerSecurityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: false
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].securityContext.allowPrivilegeEscalation
+          value: false
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem
+          value: false

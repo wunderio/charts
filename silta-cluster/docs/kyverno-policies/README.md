@@ -9,6 +9,7 @@ kubectl apply -f .
 ## Adding privileged pod security policy for system namespaces
 
 ```bash
+kubectl label namespace silta-cluster pod-security.kubernetes.io/enforce=privileged
 kubectl label namespace kube-system pod-security.kubernetes.io/enforce=privileged
 ```
 

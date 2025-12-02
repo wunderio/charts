@@ -15,7 +15,7 @@ spec:
       initContainers:
         {{- if .Values.daemonset.maxMapCountSetter.enabled }}
         - name: max-map-count-setter
-          image: docker.io/bash:5
+          image: {{ .Values.daemonset.maxMapCountSetter.image }}:{{ .Values.daemonset.maxMapCountSetter.imageTag }}
           resources:
             limits:
               cpu: 100m

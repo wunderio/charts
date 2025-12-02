@@ -183,7 +183,7 @@ data:
         set beresp.http.x-ttl = "10m";
       }
 
-      if (bereq.url ~ "^[^?]*\.(jpg|jpeg|gif|png|svg|ico|webp|css|js|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|flv|swf|html|htm|otf)(\?.*)?$") {
+      if (bereq.url ~ "^[^?]*\.(?:jpg|jpeg|gif|png|svg|ico|webp|css|js|zip|tgz|gz|rar|bz2|pdf|txt|tar|wav|bmp|rtf|flv|swf|html|htm|otf)(?:\?.*)?$") {
         # Strip any cookies before static files are inserted into cache.
         unset beresp.http.set-cookie;
         if(beresp.status == 200){
@@ -199,7 +199,7 @@ data:
       # Large static files are delivered directly to the end-user without
       # waiting for Varnish to fully read the file first.
       # Varnish 4 fully supports Streaming, so use streaming here to avoid locking.
-      if (bereq.url ~ "^[^?]*\.(mp[34]|rar|tar|tgz|gz|pdf|wav|zip|bz2|xz|7z|avi|mov|ogm|mpe?g|mk[av]|webm)(\?.*)?$") {
+      if (bereq.url ~ "^[^?]*\.(?:mp[34]|rar|tar|tgz|gz|pdf|wav|zip|bz2|xz|7z|avi|mov|ogm|mpe?g|mk[av]|webm)(?:\?.*)?$") {
         unset beresp.http.set-cookie;
         set beresp.do_stream = true;  # Check memory usage it'll grow in fetch_chunksize blocks (128k by default) if the backend doesn't send a Content-Length header, so only enable it for big objects
         set beresp.do_gzip = false;   # Don't try to compress it for storage
@@ -304,8 +304,8 @@ data:
         return(pipe);
       }
 
-      # Only allow BAN requests from IP addresses in the 'purge' ACL.
-      if (req.method == "BAN" || req.method == "URIBAN") {
+      # Only allow BAN requests from IP addressees in the 'internal' ACL.
+      if (req.method == "BAN") {
         # Admin port is only exposed to internal network
         if (!client.ip ~ purge) {
           return (synth(403, "Not allowed."));
@@ -319,11 +319,30 @@ data:
         elseif (req.http.Cache-Tags) {
           ban("obj.http.Cache-Tags ~ " + req.http.Cache-Tags);
         }
-        elseif (req.method == "URIBAN") {
-          ban("req.http.host == " + req.http.host + " && req.url == " + req.url);
-        }
         else {
-          return (synth(403, "Cache tags headers not present."));
+          # If there are no cache tags headers in a BAN request,
+          # it is a bad request, so indicate that to the client.
+          return (synth(400, "Cache tags headers not present."));
+        }
+        # Throw a synthetic page so the request won't go to the backend.
+        return (synth(200, "Ban added."));
+      }
+
+      # Only allow URIBAN requests from IP addressees in the 'internal' ACL.
+      if (req.method == "URIBAN") {
+        # Admin port is only exposed to internal network
+        if (!client.ip ~ purge) {
+          return (synth(403, "Not allowed."));
+        }
+
+        # If x-url-invalidate-pattern header is present,
+        # use it to match URLs in stored objects. (ban by regex pattern)
+        if (req.http.x-url-invalidate-pattern) {
+          ban("obj.http.x-url ~ " + req.http.x-url-invalidate-pattern);
+        }
+        # Without pattern, ban by matching host and URL exactly.
+        else {
+          ban("obj.http.host == " + req.http.host + " && obj.http.x-url == " + req.url);
         }
         # Throw a synthetic page so the request won't go to the backend.
         return (synth(200, "Ban added."));
@@ -404,22 +423,44 @@ data:
       }
       {{- end }}
 
+      {{- if .Values.mailpit.enabled }}
+      // No varnish for mailpit
+      if (req.url ~ "^/mailpit(?:/|$)") {
+        return (pass);
+      }
+      {{- end }}
+
       if (req.url ~ "^/(?:user|admin|cart|checkout|logout|abuse|flag|.*\?rate=)" && req.http.user-agent ~ "(?:crawl|goog|yahoo|spider|bot|Yandex|bing|tracker|click|parser|ltx71|urllib)") {
         return (synth( 403, "Forbidden"));
       }
 
-      if (req.http.Authorization) {
+      if (req.http.Authorization || client.ip ~ internal) {
         # Not cacheable by default
         return (pass);
       }
 
-      if (req.url ~ "\.(png|gif|jpg|tif|tiff|ico|webp|swf|css|js|pdf|doc|xls|ppt|zip)(\?.*)?$") {
-        // Forcing a lookup with static file requests
+      if (req.http.Accept-Encoding) {
+        if (req.url ~ "\.(?:bz2|eot|gif|gz|ico|jpg|mp3|ogg|pdf|png|svg|swf|tbz|tgz|tif|tiff|ttf|webp|woff|zip)(\?.*)?$") {
+          # No point in compressing these
+          unset req.http.Accept-Encoding;
+        } elsif (req.http.Accept-Encoding ~ "gzip") {
+          set req.http.Accept-Encoding = "gzip";
+        } elsif (req.http.Accept-Encoding ~ "deflate") {
+          set req.http.Accept-Encoding = "deflate";
+        } else {
+          # unknown algorithm
+          unset req.http.Accept-Encoding;
+        }
+      }
+
+      if (req.url ~ "^/sites/.*?/files/.*\.(?:bmp|bz2|css|doc|eot|gif|ico|jpg|js|pdf|png|ppt|svg|swf|tif|tiff|ttf|webp|woff|xls|zip)$") {
+        # Static file request do not vary on cookies
+        unset req.http.Cookie;
         return (hash);
       }
 
       # Do not allow public access to cron.php , update.php or install.php.
-      if (req.url ~ "^(|/core)/(cron|install|update)\.php$" && !client.ip ~ internal) {
+      if (req.url ~ "^(?:/core)?/(?:cron|install|update)\.php$" && !client.ip ~ internal) {
         # Have Varnish throw the error directly.
         return (synth( 404, "Page not found."));
       }
@@ -438,12 +479,7 @@ data:
       }
 
       if (req.http.Cookie) {
-        if (req.url ~ "\.(png|gif|jpg|svg|tif|tiff|ico|webp|swf|css|js|pdf|doc|xls|ppt|zip|woff|eot|ttf|bmp|bz2)$") {
-          # Static file request do not vary on cookies
-          unset req.http.Cookie;
-          return (hash);
-        }
-        elseif (req.http.Cookie ~ "(SESS[a-z0-9]+|SSESS[a-z0-9]+)") {
+        if (req.http.Cookie ~ "S?SESS[a-z0-9]+=") {
           # Authenticated users should not be cached
           return (pass);
         }
@@ -458,20 +494,6 @@ data:
         }
       }
 
-      if (req.http.Accept-Encoding) {
-        if (req.url ~ "\.(jpg|png|gif|svg|tif|tiff|ico|webp|gz|tgz|bz2|tbz|mp3|ogg|swf|zip|pdf|woff|eot|ttf)(\?.*)?$") {
-          # No point in compressing these
-          unset req.http.Accept-Encoding;
-        } elsif (req.http.Accept-Encoding ~ "gzip") {
-            set req.http.Accept-Encoding = "gzip";
-        } elsif (req.http.Accept-Encoding ~ "deflate") {
-            set req.http.Accept-Encoding = "deflate";
-        } else {
-          # unknown algorithm
-          unset req.http.Accept-Encoding;
-        }
-      }
-
       // Keep multiple cache objects to a minimum
       # -> NOT. We dont Vary cache per these headers.
       #unset req.http.Accept-Language;
@@ -480,7 +502,7 @@ data:
       # Large static files are delivered directly to the end-user without
       # waiting for Varnish to fully read the file first.
       # Varnish 4 fully supports Streaming, so set do_stream in vcl_backend_response()
-      if (req.url ~ "^[^?]*\.(mp[34]|rar|tar|tgz|gz|wav|zip|bz2|xz|7z|avi|mov|ogm|mpe?g|mk[av]|webm)(\?.*)?$") {
+      if (req.url ~ "^[^?]*\.(?:mp[34]|rar|tar|tgz|gz|wav|zip|bz2|xz|7z|avi|mov|ogm|mpe?g|mk[av]|webm)(?:\?.*)?$") {
         unset req.http.Cookie;
         return (hash);
       }

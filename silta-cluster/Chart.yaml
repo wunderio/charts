@@ -1,29 +1,24 @@
 apiVersion: v2
 appVersion: "1.0"
-description: Setup a silta kubernetes cluster.
+description: Setup a Silta Kubernetes cluster.
 name: silta-cluster
-version: 1.9.0
+version: 1.13.1
 # csi-rclone external provisioner requires kubernetes 1.20+
 # https://github.com/kubernetes-csi/external-provisioner?tab=readme-ov-file#compatibility
 kubeVersion: '>=1.20.0-0'
 dependencies:
 - name: ingress-nginx
   # check kubernetes version requirements here: https://github.com/kubernetes/ingress-nginx
-  version: 4.10.x
+  version: 4.13.x
   repository: https://kubernetes.github.io/ingress-nginx
   condition: ingress-nginx.enabled
-- name: nginx-ingress
-  # check kubernetes version requirements here: https://github.com/nginxinc/kubernetes-ingress/tree/057c6d7e4f2361f5d2ddd897e9995bcb48ed7e32#nginx-ingress-controller-releases
-  version: 0.17.x
-  repository: https://helm.nginx.com/stable
-  condition: nginx-ingress.enabled
 - name: traefik
   version: 1.87.x
   repository: file://../legacy_traefik
   condition: traefik.enabled
 - name: ingress-nginx
   # check kubernetes version requirements here: https://github.com/kubernetes/ingress-nginx
-  version: 4.10.x
+  version: 4.13.x
   alias: nginx-traefik
   repository: https://kubernetes.github.io/ingress-nginx
   condition: nginx-traefik.enabled
@@ -63,6 +58,6 @@ dependencies:
   alias: silta-shared-nfs
   condition: silta-shared-nfs.enabled
 - name: docker-registry
-  repository: https://helm.twun.io
+  repository: https://twuni.github.io/docker-registry.helm
   version: 2.1.x
   condition: docker-registry.enabled

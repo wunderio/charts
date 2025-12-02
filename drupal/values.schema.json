@@ -8,7 +8,7 @@
     "branchName": { "type": "string" },
     "imagePullSecrets": { "type": "array" },
     "imagePullSecret": { "type": "string" },
-    "serviceAccount": { 
+    "serviceAccount": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -42,7 +42,8 @@
               "issuer": { "type": "string" },
               "ca": { "type": "string" },
               "key": { "type": "string" },
-              "crt": { "type": "string" }
+              "crt": { "type": "string" },
+              "existingTLSSecret": { "type": "string" }
             }
           },
           "ingress": { "type": "string" }
@@ -61,7 +62,8 @@
             "issuer": { "type": "string" },
             "ca": { "type": "string" },
             "key": { "type": "string" },
-            "crt": { "type": "string" }
+            "crt": { "type": "string" },
+            "existingTLSSecret": { "type": "string" }
           }
         },
         "ingress": { "type": "string" }
@@ -83,7 +85,8 @@
         "issuer": { "type": "string" },
         "ca": { "type": "string" },
         "key": { "type": "string" },
-        "crt": { "type": "string" }
+        "crt": { "type": "string" },
+        "existingTLSSecret": { "type": "string" }
       }
     },
     "backendConfig": {
@@ -120,6 +123,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
+        "version": { "type": "string" },
         "image": { "type": "string" },
         "basicauth": {
           "type": "object",
@@ -147,6 +151,7 @@
         "content_security_policy": { "type": "string" },
         "loglevel": { "type": "string" },
         "comp_level": { "type": "integer" },
+        "httpConfig": { "type": "object" },
         "extraConfig": { "type": "string" },
         "locationExtraConfig": { "type": "string" },
         "serverExtraConfig": { "type": "string" },
@@ -278,6 +283,14 @@
             "nodeSelector": {
               "type": "object",
               "additionalProperties": { "type": "string" }
+            },
+            "tolerations": {
+              "type": ["array", "null"],
+              "additionalProperties": { "type": "string" }
+            },
+            "affinity": {
+              "type": ["object", "null"],
+              "additionalProperties": { "type": "string" }
             }
           }
         },
@@ -291,6 +304,8 @@
               "command": { "type": "string" },
               "backoffLimit": { "type": "integer" },
               "nodeSelector": { "type": ["object", "null"] },
+              "tolerations": { "type": ["array", "null"] },
+              "affinity": { "type": ["object", "null"] },
               "php_ini": { "type": "string" },
               "resources": {
                 "type": "object",
@@ -369,7 +384,9 @@
         },
         "drupalConfigPath": { "type": "string" },
         "drupalCoreVersion": { "type": "string" },
-        "nodeSelector": { "type": "object" }
+        "nodeSelector": { "type": "object" },
+        "tolerations": { "type": ["array", "null"] },
+        "affinity": { "type": ["object", "null"] }
       }
     },
     "shell": {
@@ -426,7 +443,9 @@
             }
           }
         },
-        "nodeSelector": { "type": "object" }
+        "nodeSelector": { "type": "object" },
+        "tolerations": { "type": ["array", "null"] },
+        "affinity": { "type": ["object", "null"] }
       }
     },
     "mounts": {
@@ -450,6 +469,9 @@
         "enabled": { "type": "boolean" },
         "referenceEnvironment": { "type": "string" },
         "schedule": { "type": "string" },
+        "databaseImportMethod": { "type": "string" },
+        "copyDatabase": { "type": "boolean" },
+        "copyFiles": { "type": "boolean" },
         "updateAfterDeployment": { "type": "boolean" },
         "ignoreFolders": { "type": "array" },
         "maxFileSize": { "type": "string" },
@@ -528,6 +550,8 @@
         "ignoreTableContent": { "type": "string" },
         "skipFiles": { "type": "boolean" },
         "nodeSelector": { "type": "object" },
+        "tolerations": { "type": ["array", "null"] },
+        "affinity": { "type": ["object", "null"] },
         "resources": {
           "type": "object",
           "additionalProperties": false,
@@ -621,6 +645,12 @@
     "redis": {
       "type": "object",
       "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "mailpit": {
+      "type": "object",
       "properties": {
         "enabled": { "type": "boolean" }
       }

@@ -3,10 +3,15 @@ version: 2.1
 orbs:
   silta: silta/silta@1
 
+executors:
+  cicd83:
+    docker:
+      - image: wunderio/silta-cicd:circleci-php8.3-node22-composer2-v1
+
 jobs:
 
   build:
-    executor: silta/silta
+    executor: cicd83
     resource_class: small
 
     steps:
@@ -34,13 +39,14 @@ jobs:
             set -o xtrace
 
             helm repo add wunderio https://storage.googleapis.com/charts.wdr.io
+            helm repo add jouve https://jouve.github.io/charts/
             helm repo add codecentric https://codecentric.github.io/helm-charts
             helm repo add jetstack https://charts.jetstack.io
             helm repo add elastic https://helm.elastic.co
             helm repo add instana https://agents.instana.io/helm
             helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
             # docker-registry
-            helm repo add twuni https://helm.twun.io
+            helm repo add twuni https://twuni.github.io/docker-registry.helm
             # ingress-nginx
             helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
             # nginx-ingress
@@ -67,7 +73,7 @@ jobs:
             - /tmp/charts
 
   deploy:
-    executor: silta/silta
+    executor: cicd83
     resource_class: small
 
     steps:

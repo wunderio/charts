@@ -50,7 +50,7 @@ spec:
                 {{ include "drupal.backup-command" (merge $params . ) | nindent 16 }}
                 {{ include "mariadb.db-validation" (merge $params . ) | nindent 16 }}
           - name: mariadb
-            image: docker.io/bitnami/mariadb:10.3.24-debian-10-r49
+            image: {{ printf "%s/%s:%s" $.Values.mariadb.image.registry $.Values.mariadb.image.repository $.Values.mariadb.image.tag }}
             imagePullPolicy: IfNotPresent
             env:
             - name: MARIADB_ROOT_PASSWORD
@@ -67,6 +67,13 @@ spec:
             {{- .Values.backup.nodeSelector | toYaml | nindent 12 }}
           tolerations:
             {{- include "drupal.tolerations" .Values.backup.nodeSelector | nindent 12 }}
+            {{- if .Values.backup.tolerations }}
+            {{- .Values.backup.tolerations | toYaml | nindent 12 }}
+            {{- end }}
+          {{- if .Values.backup.affinity }}
+          affinity:
+            {{- tpl ( .Values.backup.affinity | toYaml ) . | nindent 12 }}
+          {{- end }}
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}
             - name: {{ .Release.Name }}-backup

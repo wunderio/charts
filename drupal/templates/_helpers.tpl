@@ -96,7 +96,9 @@ imagePullSecrets:
 
 {{- define "smtp.env" }}
 - name: SMTP_ADDRESS
-  {{- if .Values.mailhog.enabled }}
+  {{- if .Values.mailpit.enabled }}
+  value: "{{ .Release.Name }}-mailpit-smtp:25"
+  {{ else if .Values.mailhog.enabled }}
   value: "{{ .Release.Name }}-mailhog:1025"
   {{ else }}
   value: {{ .Values.smtp.address | quote }}
@@ -114,7 +116,9 @@ imagePullSecrets:
       key: password
 # Duplicate SMTP env variables for ssmtp bundled with amazee php image
 - name: SSMTP_MAILHUB
-  {{- if .Values.mailhog.enabled }}
+  {{- if .Values.mailpit.enabled }}
+  value: "{{ .Release.Name }}-mailpit-smtp:25"
+  {{ else if .Values.mailhog.enabled }}
   value: "{{ .Release.Name }}-mailhog:1025"
   {{ else }}
   value: {{ .Values.smtp.address | quote }}
@@ -130,6 +134,13 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ .Release.Name }}-secrets-smtp
       key: password
+{{- end }}
+
+{{- define "drupal.ref-data-env" }}
+- name: REF_DATA_COPY_DB
+  value: {{ .Values.referenceData.copyDatabase | quote }}
+- name: REF_DATA_COPY_FILES
+  value: {{ .Values.referenceData.copyFiles | quote }}
 {{- end }}
 
 {{- define "drupal.db-env" }}
@@ -233,14 +244,22 @@ imagePullSecrets:
 - name: ELASTICSEARCH_HOST
   value: {{ .Release.Name }}-es
 {{- end }}
-{{- if or .Values.mailhog.enabled .Values.smtp.enabled }}
+{{- if or .Values.mailhog.enabled .Values.mailpit.enabled .Values.smtp.enabled }}
 {{- if .Values.mailhog.enabled }}
 {{- if contains "mailhog" .Release.Name -}}
 {{- fail "Do not use 'mailhog' in release name or deployment will fail" -}}
 {{- end }}
 {{- end }}
+{{- if .Values.mailpit.enabled }}
+{{- if contains "mailpit" .Release.Name -}}
+{{- fail "Do not use 'mailpit' in release name or deployment will fail" -}}
+{{- end }}
+{{- end }}
 {{ include "smtp.env" . }}
 {{- end}}
+{{- if .Values.referenceData.enabled }}
+  {{ include "drupal.ref-data-env" . }}
+{{- end }}
 {{- if .Values.varnish.enabled }}
 - name: VARNISH_ADMIN_HOST
   value: {{ .Release.Name }}-varnish
@@ -331,7 +350,7 @@ imagePullSecrets:
 {{- define "drupal.wait-for-db-command" }}
 TIME_WAITING=0
 echo "Waiting for database.";
-until mysqladmin status --connect-timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} --silent; do
+until mariadb-admin status --connect-timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} --silent; do
   echo -n "."
   sleep 5
   TIME_WAITING=$((TIME_WAITING+5))
@@ -344,7 +363,7 @@ done
 {{- end }}
 
 {{- define "drupal.create-db" }}
-mysql -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
+mariadb -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
 {{- end }}
 
 {{- define "drupal.wait-for-elasticsearch-command" }}
@@ -362,8 +381,12 @@ until curl --silent --connect-timeout 2 "{{ .Values.elasticsearch.protocol }}://
 done
 {{- end }}
 
+{{- define "drupal.installing-file" -}}
+{{ .Values.webRoot }}/sites/default/files/_installing
+{{- end }}
+
 {{- define "drupal.installation-in-progress-test" -}}
--f {{ $.Values.webRoot }}/sites/default/files/_installing
+-f {{ include "drupal.installing-file" . }}
 {{- end -}}
 
 {{- define "drupal.data-push-command" }}
@@ -371,13 +394,17 @@ done
 {{- end }}
 
 {{- define "drupal.data-pull-command" }}
-set -e 
-  
+set -e
+
+INSTALLING_FILE="{{ include "drupal.installing-file" . }}"
+
+rm -f "$INSTALLING_FILE" || true
+
 {{ include "drupal.import-reference-files" . }}
 
 {{ include "drupal.wait-for-db-command" . }}
 {{ include "drupal.create-db" . }}
-touch {{ .Values.webRoot }}/sites/default/files/_installing
+touch "$INSTALLING_FILE"
 {{ include "drupal.import-reference-db" . }}
 
 {{ if .Values.elasticsearch.enabled }}
@@ -386,7 +413,7 @@ touch {{ .Values.webRoot }}/sites/default/files/_installing
 
 {{ .Values.php.postinstall.command }}
 
-rm {{ .Values.webRoot }}/sites/default/files/_installing
+rm -f "$INSTALLING_FILE" || true
 
 {{ .Values.php.postupgrade.command }}
 {{- if .Values.php.postupgrade.afterCommand }}
@@ -400,6 +427,10 @@ wait
 {{- define "drupal.post-release-command" -}}
   set -e
 
+  INSTALLING_FILE="{{ include "drupal.installing-file" . }}"
+
+  rm -f "$INSTALLING_FILE" || true
+
   {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
     {{ include "drupal.import-reference-files" . }}
   {{- end }}
@@ -408,7 +439,7 @@ wait
   {{ include "drupal.create-db" . }}
 
   {{ if .Release.IsInstall }}
-    touch {{ .Values.webRoot }}/sites/default/files/_installing
+    touch "$INSTALLING_FILE"
     {{- if .Values.referenceData.enabled }}
       {{ include "drupal.import-reference-db" . }}
     {{- end }}
@@ -420,7 +451,7 @@ wait
 
   {{ if .Release.IsInstall }}
     {{ .Values.php.postinstall.command }}
-    rm {{ .Values.webRoot }}/sites/default/files/_installing
+    rm -f "$INSTALLING_FILE" || true
   {{ end }}
   {{ .Values.php.postupgrade.command }}
   {{- if .Values.php.postupgrade.afterCommand }}
@@ -440,112 +471,149 @@ wait
 {{- define "drupal.extract-reference-data" -}}
 set -e
 if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-  echo "Dump reference database."
-  dump_dir=/tmp/reference-data-export/
-  mkdir "${dump_dir}"
+  if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
+    echo "Dump reference database."
+    dump_dir=/tmp/reference-data-export/
+    mkdir "${dump_dir}"
 
-  echo "Dump reference database."
-  gdpr-dump /app/gdpr-dump.yaml > /tmp/db.sql
+    echo "Dump reference database."
+    gdpr-dump /app/gdpr-dump.yaml > /tmp/db.sql
 
-  previous_wd=$(pwd)
-  cd "${dump_dir}" || exit
+    previous_wd=$(pwd)
+    cd "${dump_dir}" || exit
 
-  # Split the dump to one file per table. Use 4 digit suffix so that we don't run into sorting issues when there are over 100 or 1000 tables.
-  csplit \
-    --silent \
-    --prefix='table-' \
-    --suffix-format='%04d' \
-    /tmp/db.sql \
-    '/-- Table structure for table/-1' \
-    '{*}'
-  # First file is the mysqldump header, rename it to "header"
-  mv table-0000 header
-  # Find last table file
-  last_table=$(find -type f -name 'table-*' | sort -n | tail -n1)
-  # Split last table file to extract mysqldump footer, which starts with a line including "@OLD_"
-  csplit \
-    --silent \
-    --prefix='last-' \
-    "${last_table}" \
-    '/@OLD_/'
-  # Replace $last_table with the version of it that has footer extracted from it
-  mv last-00 "${last_table}"
-  # Rename the extracted footer to "footer"
-  mv last-01 footer
-  # Prepend header and append footer to all table files, save them as <table_name>.sql
-  for file in table-*; do
-    table_name=$(grep 'Table structure for table' ${file} | cut -d$'\x60' -f2)
-    cat header "${file}" footer > "${table_name}.sql"
-  done
-  # Remove all non .sql files
-  find . -type f ! -name '*.sql' -delete
+    # Split the dump to one file per table. Use 4 digit suffix so that we don't run into sorting issues when there are over 100 or 1000 tables.
+    csplit \
+      --silent \
+      --prefix='table-' \
+      --suffix-format='%04d' \
+      /tmp/db.sql \
+      '/-- Table structure for table/-1' \
+      '{*}'
+    # First file is the mariadb-dump header, rename it to "header"
+    mv table-0000 header
+    # Find last table file
+    last_table=$(find -type f -name 'table-*' | sort -n | tail -n1)
+    # Split last table file to extract mariadb-dump footer, which starts with a line including "@OLD_"
+    csplit \
+      --silent \
+      --prefix='last-' \
+      "${last_table}" \
+      '/@OLD_/'
+    # Replace $last_table with the version of it that has footer extracted from it
+    mv last-00 "${last_table}"
+    # Rename the extracted footer to "footer"
+    mv last-01 footer
+    # Prepend header and append footer to all table files, save them as <table_name>.sql
+    for file in table-*; do
+      table_name=$(grep 'Table structure for table' ${file} | cut -d$'\x60' -f2)
+      cat header "${file}" footer > "${table_name}.sql"
+    done
+    # Remove all non .sql files
+    find . -type f ! -name '*.sql' -delete
 
-  cd "${previous_wd}"
+    cd "${previous_wd}"
 
-  # Compress the sql files into a single file and copy it into the backup folder.
-  # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
-  tar -cf /tmp/db.tar.gz -I 'gzip -1' -C "${dump_dir}" .
-  cp /tmp/db.tar.gz /app/reference-data/db.tar.gz && echo "Saved db.tar.gz"
+    # Compress the sql files into a single file and copy it into the backup folder.
+    # We don't do this directly on the volume mount to avoid sending the uncompressed dump across the network.
+    tar -cf /tmp/db.tar.gz -I 'gzip -1' -C "${dump_dir}" .
+    cp /tmp/db.tar.gz /app/reference-data/db.tar.gz && echo "Saved db.tar.gz"
 
-  # For backwards compability, we keep this older method of saving reference data. This way it will be easier to roll back if needed.
-  # This will be removed once the new method has successfully been rolled out.
-  gzip -1 /tmp/db.sql
-  cp /tmp/db.sql.gz /app/reference-data/db.sql.gz && echo "Saved db.sql.gz"
+    # For backwards compability, we keep this older method of saving reference data. This way it will be easier to roll back if needed.
+    # This will be removed once the new method has successfully been rolled out.
+    gzip -1 /tmp/db.sql
+    cp /tmp/db.sql.gz /app/reference-data/db.sql.gz && echo "Saved db.sql.gz"
+  fi
 
-  {{ range $index, $mount := .Values.mounts -}}
-  {{- if eq $mount.enabled true -}}
-  # File backup for {{ $index }} volume.
-  echo "Dump reference files for {{ $index }} volume."
+  if [ "${REF_DATA_COPY_FILES:-}" == "true" ]; then
+    {{ range $index, $mount := .Values.mounts -}}
+    {{- if eq $mount.enabled true -}}
+    # File backup for {{ $index }} volume.
+    echo "Dump reference files for {{ $index }} volume."
 
-  # Update reference data files.
-  rsync -rvu "{{ $mount.mountPath }}/" \
-    --max-size="{{ $.Values.referenceData.maxFileSize }}" \
-    {{ range $folderIndex, $folderPattern := $.Values.referenceData.ignoreFolders -}}
-    --exclude="{{ $folderPattern }}" \
+    # Update reference data files.
+    rsync -rvu "{{ $mount.mountPath }}/" \
+      --max-size="{{ $.Values.referenceData.maxFileSize }}" \
+      {{ range $folderIndex, $folderPattern := $.Values.referenceData.ignoreFolders -}}
+      --exclude="{{ $folderPattern }}" \
+      {{ end -}}
+      --delete --delete-excluded \
+      /app/reference-data/{{ $index }}
     {{ end -}}
-    --delete --delete-excluded \
-    /app/reference-data/{{ $index }}
-  {{ end -}}
-  {{- end }}
+    {{- end }}
+  fi
 else
   echo "Drupal bootstrap unsuccessful, skipping reference database dump."
 fi
 {{- end }}
 
-{{- define "drupal.import-reference-db" -}}
-if [[ -f /app/reference-data/db.tar.gz || -f /app/reference-data/db.sql.gz ]]; then
-  echo "Dropping old database"
-  drush sql-drop -y
+{{- define  "drupal.import-reference-db" -}}
+if [ "${REF_DATA_COPY_DB:-}" == "true" ]; then
+  if [[ -f /app/reference-data/db.tar.gz || -f /app/reference-data/db.sql.gz ]]; then
+    echo "Dropping old database"
+    drush sql-drop -y
 
-  app_ref_data=/app/reference-data
-  tmp_ref_data=/tmp/reference-data
+    app_ref_data=/app/reference-data
+    tmp_ref_data=/tmp/reference-data
+    import_method={{ .Values.referenceData.databaseImportMethod }}
 
-  # New way of importing.
-  if [[ -f "${app_ref_data}/db.tar.gz" ]]; then
-    echo "Importing reference database dump from db.tar.gz"
-    mkdir "${tmp_ref_data}"
-    tar -xzf "${app_ref_data}/db.tar.gz" -C "${tmp_ref_data}/"
-    find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mysql -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
+    # New way of importing.
+    if [[ -f "${app_ref_data}/db.tar.gz" ]]; then
+      echo "Importing reference database dump from db.tar.gz"
+      mkdir "${tmp_ref_data}"
+      tar -xzf "${app_ref_data}/db.tar.gz" -C "${tmp_ref_data}/"
 
-  # Backwards compatibility for old way of importing.
-  elif [[ -f "${app_ref_data}/db.sql.gz" ]]; then
-    echo "Importing reference database dump from db.sql.gz"
-    gunzip -c "${app_ref_data}/db.sql.gz" > "${tmp_ref_data}-db.sql"
-    pv -f "${tmp_ref_data}-db.sql" | drush sql-cli
-  fi
+      if [[ "$import_method" == "parallel" ]]; then
+        echo "Importing SQL files in parallel. This setting can be changed in silta.yml using the referenceData.databaseImportMethod key."
+        find "${tmp_ref_data}/" -type f -name "*.sql" | xargs -P10 -I{} sh -c 'echo "Importing {}" && mariadb -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < {}'
+        pipeline_exit_code=$? # Capture exit code of the pipeline (most likely influenced by xargs)
 
-  # Clear caches before doing anything else.
-  if [[ "${DRUPAL_CORE_VERSION}" -eq 7 ]] ; then
-    drush cache-clear all;
+        # Check if xargs reported an error (any non-zero exit status)
+        if [ "$pipeline_exit_code" -ne 0 ]; then
+          echo "ERROR: One or more parallel imports failed. Check the logs above for specific mariadb errors."
+          exit 1
+        fi
+
+        echo "Parallel import command finished."
+
+      elif [[ "$import_method" == "sequential" ]]; then
+        echo "Importing SQL files sequentially. This setting can be changed in silta.yml using the referenceData.databaseImportMethod key."
+        find "${tmp_ref_data}/" -type f -name "*.sql" | sort | while IFS= read -r sql_file; do
+          echo "Importing ${sql_file}"
+          if ! mariadb -A --user="${DB_USER}" --password="${DB_PASS}" --host="${DB_HOST}" "${DB_NAME}" < "${sql_file}"; then
+            echo "ERROR: Failed to import ${sql_file}. Check the logs above for specific mariadb errors."
+            exit 1
+          fi
+        done
+
+        echo "Sequential import command finished."
+
+      else
+        echo "Incompatible import method. Please use either 'parallel' or 'sequential' in referenceData.databaseImportMethod."
+        exit 1
+      fi
+
+    # Backwards compatibility for old way of importing.
+    elif [[ -f "${app_ref_data}/db.sql.gz" ]]; then
+      echo "Importing reference database dump from db.sql.gz"
+      gunzip -c "${app_ref_data}/db.sql.gz" > "${tmp_ref_data}-db.sql"
+      pv -f "${tmp_ref_data}-db.sql" | drush sql-cli
+    fi
+
+    # Clear caches before doing anything else.
+    if [[ "${DRUPAL_CORE_VERSION}" -eq 7 ]] ; then
+      drush cache-clear all;
+    else
+      drush cache-rebuild;
+    fi
   else
-    drush cache-rebuild;
+    printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
   fi
-else
-  printf "\e[33mNo reference data found, please install Drupal or import a database dump. See release information for instructions.\e[0m\n"
 fi
 {{- end }}
 
-{{- define "drupal.import-reference-files" -}}
+{{- define "drupal.import-reference-files" }}
+if [ "${REF_DATA_COPY_FILES:-}" == "true" ]; then
   {{ range $index, $mount := .Values.mounts -}}
   {{- if eq $mount.enabled true -}}
   if [ -d "/app/reference-data/{{ $index }}" ] && [ -n "$(ls /app/reference-data/{{ $index }})" ]; then
@@ -560,6 +628,7 @@ fi
   fi
   {{ end -}}
   {{- end }}
+fi
 {{- end }}
 
 {{- define "drupal.backup-command" -}}
@@ -569,6 +638,10 @@ fi
 
 {{- define "drupal.backup-command.dump-database" -}}
   set -e
+
+  # Add initial delay to allow mariadb to fully initialize
+  echo "Waiting 30 seconds for database to fully initialize..."
+  sleep 30
 
   # Generate the id of the backup.
   BACKUP_ID=`date +%Y-%m-%d-%H-%M-%S`
@@ -585,8 +658,8 @@ fi
 
   # Take a database dump.
   echo "Starting database backup."
-  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
-  /usr/bin/mysqldump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
+  /usr/bin/mariadb-dump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick $IGNORE_TABLES $DB_NAME > /tmp/db.sql
+  /usr/bin/mariadb-dump -u $DB_USER --password=$DB_PASS -h $DB_HOST --skip-lock-tables --single-transaction --max_allowed_packet=1G --quick --force --no-data $DB_NAME $IGNORED_TABLES >> /tmp/db.sql
   echo "Database backup complete."
 {{- end }}
 
@@ -655,7 +728,7 @@ fi
   TIME_WAITING=0
   echo "Waiting for database.";
 
-  until mysqladmin status --connect-timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --protocol=tcp --silent; do
+  until mariadb-admin status --connect-timeout=2 -u $DB_USER -p$DB_PASS -h $DB_HOST --protocol=tcp --silent; do
     echo -n "."
     sleep 1s
     TIME_WAITING=$((TIME_WAITING+1))
@@ -667,7 +740,7 @@ fi
   done
 
   echo "Importing database dump for validation"
-  mysql -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp < /tmp/db.sql
+  mariadb -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp --max_allowed_packet=1G < /tmp/db.sql
   drush status --fields=bootstrap
 
 {{- end }}

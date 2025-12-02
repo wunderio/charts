@@ -56,4 +56,29 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].resources.limits.memory
           value: 2G
-
+  - it: httpConfig can be passed
+    template: configmap.yaml
+    set:
+      nginx.httpConfig:
+        foo: "0"
+        bar: "1"
+        baz: "2"
+    asserts:
+    - matchRegex:
+        path: data.nginx_conf
+        pattern: "foo 0;"
+    - matchRegex:
+        path: data.nginx_conf
+        pattern: "bar 1;"
+    - matchRegex:
+        path: data.nginx_conf
+        pattern: "baz 2;"
+  - it: httpConfig appears in http context
+    template: configmap.yaml
+    set:
+      nginx.httpConfig:
+        foobar: "123"
+    asserts:
+    - matchRegex:
+        path: data.nginx_conf
+        pattern: "http \\{[\\s\\S]*foobar 123;[\\s\\S]*include conf\\.d/\\*\\.conf;"
