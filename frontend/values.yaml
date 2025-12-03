@@ -627,6 +627,10 @@ rabbitmq:
   enabled: false
   persistence:
     size: 1Gi
+  image:
+    registry: docker.io
+    repository: wunderio/bitnami-rabbitmq
+    tag: 4.1.0-debian-12-r1
   enableServiceLinks: false
   networkPolicy:
     # We create our own network policy for the rabbitmq service.
