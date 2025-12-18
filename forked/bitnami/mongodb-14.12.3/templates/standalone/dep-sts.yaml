@@ -233,6 +233,8 @@ spec:
               value: {{ ternary "yes" "no" .Values.disableSystemLog | quote }}
             - name: MONGODB_DISABLE_JAVASCRIPT
               value: {{ ternary "yes" "no" .Values.disableJavascript | quote }}
+            - name: MONGODB_ENABLE_JOURNAL
+              value: {{ ternary "yes" "no" .Values.enableJournal | quote  }}
             - name: MONGODB_PORT_NUMBER
               value: {{ .Values.containerPorts.mongodb | quote }}
             - name: MONGODB_ENABLE_IPV6

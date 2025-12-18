@@ -334,6 +334,10 @@ disableSystemLog: false
 ## ref: https://docs.mongodb.com/manual/core/server-side-javascript/
 ##
 disableJavascript: false
+## @param enableJournal Switch to enable/disable MongoDB(&reg;) Journaling
+## ref: https://docs.mongodb.com/manual/reference/configuration-options/#mongodb-setting-storage.journal.enabled
+##
+enableJournal: true
 ## @param configuration MongoDB(&reg;) configuration file to be used for Primary and Secondary nodes
 ## For documentation of all options, see: http://docs.mongodb.org/manual/reference/configuration-options/
 ## Example:
