@@ -538,6 +538,7 @@ if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
       --exclude="{{ $folderPattern }}" \
       {{ end -}}
       --delete --delete-excluded \
+      --ignore-missing-args \
       /app/reference-data/{{ $index }}
     {{ end -}}
     {{- end }}
@@ -619,11 +620,11 @@ if [ "${REF_DATA_COPY_FILES:-}" == "true" ]; then
   if [ -d "/app/reference-data/{{ $index }}" ] && [ -n "$(ls /app/reference-data/{{ $index }})" ]; then
     echo "Importing {{ $index }} files"
     # skip subfolders
-    rsync -r --delete --temp-dir=/tmp/ --filter "- */" "/app/reference-data/{{ $index }}/" "{{ $mount.mountPath }}" &
+    rsync -r --delete --ignore-missing-args --temp-dir=/tmp/ --filter "- */" "/app/reference-data/{{ $index }}/" "{{ $mount.mountPath }}" &
     # run rsync for each subfolder
     for f in /app/reference-data/{{ $index }}/*/; do
       subfolder="$(realpath -s $f)"
-      rsync -r --delete --temp-dir=/tmp/ "${subfolder}" "{{ $mount.mountPath }}" &
+      rsync -r --delete --ignore-missing-args --temp-dir=/tmp/ "${subfolder}" "{{ $mount.mountPath }}" &
     done
   fi
   {{ end -}}
