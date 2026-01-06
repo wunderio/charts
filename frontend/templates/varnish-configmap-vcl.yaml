@@ -24,6 +24,15 @@ data:
       {{- end }}
     }
 
+    # Define the purge network access.
+    # These are used below to allow cache purging via BAN.
+    acl purge {
+      "127.0.0.1";
+      {{- range .Values.nginx.noauthips }}
+      {{ . | quote }};
+      {{- end }}
+    }
+
     # List of upstream proxies we trust to set X-Forwarded-For correctly.
     acl upstream_proxy {
       {{- if kindIs "string" .Values.nginx.realipfrom }}
@@ -56,10 +65,29 @@ data:
         return (synth(400));
       }
 
+      # Match upstream allowlist to supply headers containing real ip
+      if (client.ip ~ upstream_proxy && req.http.X-Envoy-External-Address) {
+        set req.http.X-Forwarded-For = req.http.X-Envoy-External-Address;
+        set req.http.X-Real-IP = req.http.X-Envoy-External-Address;
+      }
+      elseif (client.ip ~ upstream_proxy && req.http.X-Forwarded-For) {
+        set req.http.X-Real-IP = req.http.X-Forwarded-For;
+      }
+      elseif (client.ip ~ upstream_proxy && req.http.X-Real-IP) {
+        set req.http.X-Forwarded-For = req.http.X-Real-IP;
+      }
+      else {
+        set req.http.X-Forwarded-For = client.ip;
+        set req.http.X-Real-IP = client.ip;
+      }
+      
+      # Use first ip from X-Real-IP as parsed ip
+      set req.http.X-Parsed-IP = regsub(req.http.X-Real-IP, "[, ].*$", "");
+
       # Only allow BAN requests from IP addressees in the 'internal' ACL.
       if (req.method == "BAN") {
         # Admin port is only exposed to internal network
-        if (!client.ip ~ internal) {
+        if (!std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ purge || std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ upstream_proxy ) {
           return (synth(403, "Not allowed."));
         }
 
@@ -79,7 +107,7 @@ data:
       # Only allow URIBAN requests from IP addressees in the 'internal' ACL.
       if (req.method == "URIBAN") {
         # Admin port is only exposed to internal network
-        if (!client.ip ~ internal) {
+        if (!std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ purge || std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ upstream_proxy ) {
           return (synth(403, "Not allowed."));
         }
 
@@ -93,24 +121,6 @@ data:
         }
         # Throw a synthetic page so the request won't go to the backend.
         return (synth(200, "Ban added."));
-      }
-
-      # Match upstream allowlist to supply headers containing real ip
-      if (client.ip ~ upstream_proxy && req.http.X-Envoy-External-Address) {
-        set req.http.X-Forwarded-For = req.http.X-Envoy-External-Address;
-        set req.http.X-Real-IP = req.http.X-Envoy-External-Address;
-      }
-      elseif (client.ip ~ upstream_proxy && req.http.X-Forwarded-For) {
-        set req.http.X-Forwarded-For = req.http.X-Forwarded-For;
-        set req.http.X-Real-IP = req.http.X-Forwarded-For;
-      }
-      elseif (client.ip ~ upstream_proxy && req.http.X-Real-IP) {
-        set req.http.X-Forwarded-For = req.http.X-Real-IP;
-        set req.http.X-Real-IP = req.http.X-Real-IP;
-      }
-      else {
-        set req.http.X-Forwarded-For = client.ip;
-        set req.http.X-Real-IP = client.ip;
       }
 
       # Check request methods
@@ -135,7 +145,7 @@ data:
       }
 
       # Do not cache requests with Authorization header
-      if (req.http.Authorization || client.ip ~ internal) {
+      if (req.http.Authorization || ( std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ internal && std.ip(req.http.X-Parsed-IP, "0.0.0.0") !~ upstream_proxy )) {
         return (pass);
       }
 
