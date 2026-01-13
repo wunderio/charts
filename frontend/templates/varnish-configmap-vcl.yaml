@@ -87,7 +87,7 @@ data:
       # Only allow BAN requests from IP addressees in the 'internal' ACL.
       if (req.method == "BAN") {
         # Admin port is only exposed to internal network
-        if (!std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ purge || std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ upstream_proxy ) {
+        if (!std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ purge) {
           return (synth(403, "Not allowed."));
         }
 
@@ -107,7 +107,7 @@ data:
       # Only allow URIBAN requests from IP addressees in the 'internal' ACL.
       if (req.method == "URIBAN") {
         # Admin port is only exposed to internal network
-        if (!std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ purge || std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ upstream_proxy ) {
+        if (!std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ purge) {
           return (synth(403, "Not allowed."));
         }
 
@@ -145,7 +145,12 @@ data:
       }
 
       # Do not cache requests with Authorization header
-      if (req.http.Authorization || ( std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ internal && std.ip(req.http.X-Parsed-IP, "0.0.0.0") !~ upstream_proxy )) {
+      if (req.http.Authorization) {
+        return (pass);
+      }
+      
+      # Do not cache requests from internal network and upstream proxy ip (passthrough traffic is still cached)
+      if ( std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ internal) {
         return (pass);
       }
 

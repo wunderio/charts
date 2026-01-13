@@ -824,6 +824,8 @@ redis:
 # see: https://github.com/jouve/charts/blob/main/charts/mailpit/values.yaml
 mailpit:
   enabled: false
+  image:
+    tag: v1.28.2
   extraEnvVars:
     - name: MP_SMTP_AUTH_ACCEPT_ANY
       value: "true"
