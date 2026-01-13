@@ -323,10 +323,9 @@ data:
       # Use first ip from X-Real-IP as parsed ip
       set req.http.X-Parsed-IP = regsub(req.http.X-Real-IP, "[, ].*$", "");
 
-      # Only allow BAN requests from IP addressees in the 'internal' ACL.
+      # Allow BAN requests only from IP addressees in the 'purge' ACL.
       if (req.method == "BAN") {
-        # Admin port is only exposed to internal network
-        if (!std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ purge || std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ upstream_proxy ) {
+        if (!std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ purge) {
           return (synth(403, "Not allowed."));
         }
 
@@ -347,10 +346,9 @@ data:
         return (synth(200, "Ban added."));
       }
 
-      # Only allow URIBAN requests from IP addressees in the 'internal' ACL.
+      # Allow URIBAN requests only from IP addressees in the 'purge' ACL.
       if (req.method == "URIBAN") {
-        # Admin port is only exposed to internal network
-        if (!std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ purge || std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ upstream_proxy ) {
+        if (!std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ purge) {
           return (synth(403, "Not allowed."));
         }
 
@@ -435,8 +433,13 @@ data:
         return (synth( 403, "Forbidden"));
       }
 
-      if (req.http.Authorization || ( std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ internal && std.ip(req.http.X-Parsed-IP, "0.0.0.0") !~ upstream_proxy )) {
-        # Not cacheable by default
+      # Do not cache requests with Authorization header
+      if (req.http.Authorization) {
+        return (pass);
+      }
+
+      # Do not cache requests from internal network and upstream proxy ip (passthrough traffic is still cached)
+      if ( std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ internal || std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ upstream_proxy ) {
         return (pass);
       }
 
@@ -461,8 +464,7 @@ data:
       }
 
       # Do not allow public access to cron.php , update.php or install.php.
-      if (req.url ~ "^(?:/core)?/(?:cron|install|update)\.php$" && (!std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ internal || std.ip(req.http.X-Parsed-IP, "0.0.0.0") ~ upstream_proxy)) {
-        # Have Varnish throw the error directly.
+      if (req.url ~ "^(?:/core)?/(?:cron|install|update)\.php$") {
         return (synth( 404, "Page not found."));
       }
 

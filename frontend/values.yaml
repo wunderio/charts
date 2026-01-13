@@ -662,6 +662,8 @@ signalsciences:
 # Mailpit service overrides
 # see: https://github.com/jouve/charts/blob/main/charts/mailpit/values.yaml
 mailpit:
+  image:
+    tag: v1.28.2
   enabled: false
   extraEnvVars:
     - name: MP_SMTP_AUTH_ACCEPT_ANY
