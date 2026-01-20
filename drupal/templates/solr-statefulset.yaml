@@ -43,9 +43,14 @@ spec:
           - {{ . | quote }}
           {{- end }}
         livenessProbe:
-          initialDelaySeconds: 30
-          tcpSocket:
+          httpGet:
+            scheme: HTTP
+            path: {{ .Values.solr.readinessProbeUrl }}
             port: 8983
+          initialDelaySeconds: 60
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 3
         readinessProbe:
           initialDelaySeconds: 30
           periodSeconds: 20
