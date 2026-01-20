@@ -614,7 +614,6 @@ postgresql:
   # https://hub.docker.com/r/wunderio/silta-postgresql/tags
   # https://hub.docker.com/r/wunderio/bitnami-postgresql/tags
   # https://hub.docker.com/r/bitnamilegacy/postgresql/tags
-  # https://hub.docker.com/r/wunderio/bitnami-postgresql/tags
   image:
     registry: docker.io
     repository: wunderio/silta-postgresql
