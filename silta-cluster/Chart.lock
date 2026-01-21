@@ -1,13 +1,13 @@
 dependencies:
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
-  version: 4.13.4
+  version: 4.13.5
 - name: traefik
   repository: file://../legacy_traefik
   version: 1.87.7
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
-  version: 4.13.4
+  version: 4.13.5
 - name: pxc-operator
   repository: https://percona.github.io/percona-helm-charts/
   version: 1.12.2
@@ -29,11 +29,8 @@ dependencies:
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
   version: 4.0.18
-- name: nfs-subdir-external-provisioner
-  repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
-  version: 4.0.18
 - name: docker-registry
   repository: https://twuni.github.io/docker-registry.helm
   version: 2.1.0
-digest: sha256:af541ba31e0516ab8c82a94c5a651dffca67956b790b7781391ba220c1aeb3f0
-generated: "2025-11-06T16:12:05.039910552+02:00"
+digest: sha256:fa94e3a3d44403f63af4b6fff089564ba00bc638f30510a85546fd0bf07a1630
+generated: "2026-01-19T15:13:49.077419682+02:00"
