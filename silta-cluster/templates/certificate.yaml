@@ -50,6 +50,8 @@ spec:
           - registry.{{ .Values.clusterDomain }}
           {{- end }}
 {{- end }}
+  privateKey:
+    rotationPolicy: "Always"
 ---
 {{- else if eq .Values.ssl.issuer "selfsigned" }}
 apiVersion: {{ include "silta-cluster.cert-manager-api-version" . | trim }}
@@ -80,6 +82,8 @@ spec:
   issuerRef:
     name: {{ .Values.ssl.issuer }}
     kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: "Always"
 ---
 {{- else if eq .Values.ssl.issuer "custom" }}
 apiVersion: v1
