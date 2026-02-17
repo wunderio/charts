@@ -26,6 +26,8 @@ spec:
         domains:
           - {{ template "simple.domain" . }}
 {{- end }}
+  privateKey:
+    rotationPolicy: "Always"
 ---
 
 {{- else if eq $context_ssl.issuer "selfsigned" }}
@@ -45,6 +47,8 @@ spec:
   issuerRef:
     name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: "Always"
 ---
 
 {{- else if eq $context_ssl.issuer "custom" }}
@@ -95,6 +99,8 @@ spec:
         domains:
           - {{ $domain.hostname }}
 {{- end }}
+  privateKey:
+    rotationPolicy: "Always"
 ---
 
 {{- else if eq $domain.ssl.issuer "selfsigned" }}
@@ -114,6 +120,8 @@ spec:
   issuerRef:
     name: {{ $domain.ssl.issuer }}
     kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: "Always"
 ---
 
 {{- else if eq $domain.ssl.issuer "custom" }}

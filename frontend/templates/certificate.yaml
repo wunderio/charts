@@ -26,6 +26,8 @@ spec:
         domains:
           - {{ template "frontend.domain" . }}
 {{- end }}
+  privateKey:
+    rotationPolicy: "Always"
 ---
 {{- range $index, $prefix := .Values.domainPrefixes }}
 {{- $params := dict "prefix" $prefix }}
@@ -53,6 +55,8 @@ spec:
         domains:
           - '{{ template "frontend.domain" (merge $params $ ) }}'
 {{- end }}
+  privateKey:
+    rotationPolicy: "Always"
 ---
 {{- end }}
 
@@ -73,6 +77,8 @@ spec:
   issuerRef:
     name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: "Always"
 ---
 {{- range $index, $prefix := .Values.domainPrefixes }}
 {{- $params := dict "prefix" $prefix  -}}
@@ -92,6 +98,8 @@ spec:
   issuerRef:
     name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: "Always"
 ---
 {{- end }}
 
@@ -157,6 +165,8 @@ spec:
         domains:
           - {{ $domain.hostname }}
 {{- end }}
+  privateKey:
+    rotationPolicy: "Always"
 ---
 
 {{- else if eq $domain.ssl.issuer "selfsigned" }}
@@ -176,6 +186,8 @@ spec:
   issuerRef:
     name: {{ $domain.ssl.issuer }}
     kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: "Always"
 ---
 
 {{- else if eq $domain.ssl.issuer "custom" }}
