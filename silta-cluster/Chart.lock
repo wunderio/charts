@@ -5,6 +5,12 @@ dependencies:
 - name: traefik
   repository: file://../legacy_traefik
   version: 1.87.7
+- name: traefik-crds
+  repository: https://traefik.github.io/charts
+  version: 1.14.0
+- name: traefik
+  repository: https://traefik.github.io/charts
+  version: 39.0.4
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
   version: 4.13.7
@@ -32,5 +38,5 @@ dependencies:
 - name: docker-registry
   repository: https://twuni.github.io/docker-registry.helm
   version: 2.1.0
-digest: sha256:a4c111e763a3fd1ead646c7db0bd097d60315b8fc83b99b67539ddd2b9328b41
-generated: "2026-02-05T15:41:13.339620696+02:00"
+digest: sha256:fcb718832e39c18ef72f015f73ee548be4825af1856b4b577a3c8df38140119e
+generated: "2026-03-05T13:56:15.183717269+01:00"

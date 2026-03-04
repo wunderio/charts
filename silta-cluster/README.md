@@ -7,6 +7,9 @@ This helm chart helps setting up resources for https://github.com/wunderio/silta
 ### Set up helm repositories
 
 ```
+# Traefik 3
+helm repo add traefik https://traefik.github.io/charts                         
+
 # Jetstack helm chart repository for cert-manager
 helm repo add jetstack https://charts.jetstack.io
 
@@ -151,6 +154,8 @@ helm upgrade --install --wait silta-cluster silta-cluster \
 ```
 
 ## Upgrade path for older versions:
+ - Upgrading silta-cluster chart to 1.16.0 ([docs/Upgrading-to-1.16.0.md](docs/Upgrading-to-1.16.0.md))
+
  - Upgrading silta-cluster chart to 1.10.0 ([docs/Upgrading-to-1.10.0.md](docs/Upgrading-to-1.10.0.md))
 
  - Upgrading silta-cluster chart to 1.9.0 ([docs/Upgrading-to-1.9.0.md](docs/Upgrading-to-1.9.0.md))

@@ -125,6 +125,81 @@ traefik:
     limits:
       memory: 512M
 
+traefik3crds:
+  enabled: false
+
+# Traefik 3 chart
+# https://github.com/traefik/traefik-helm-chart/blob/20a237feeeb5b541dae0b99bcdea8b94fae210a1/traefik/values.yaml
+# Important: This subchart can't be enabled with "enabled:true", use "traefik3.providers.kubernetesIngress.enabled:true" instead.
+traefik3:
+  service:
+    spec:
+      externalTrafficPolicy: Local
+      # loadBalancerIP: "1.2.3.4"
+      # type: LoadBalancer
+  priorityClassName: "high-priority"
+  deployment:
+    replicas: 1
+  autoscaling:
+    enabled: false
+    minReplicas: 2
+    maxReplicas: 5
+  providers:
+    kubernetesIngress:
+      # Use this instead of the legacy traefik chart
+      enabled: false
+      ingressClass: traefik
+      # false: "404 page not found", true: "no available server"
+      allowEmptyServices: false
+    kubernetesGateway:
+      enabled: false
+  ingressClass:
+    enabled: true
+    isDefaultClass: false
+    name: "traefik"
+  namespaceOverride: silta-cluster
+  ports:
+    websecure:
+      forwardedHeaders:
+        # Trust forwarded headers information (X-Forwarded-*).
+        trustedIPs: []
+        insecure: false
+      proxyProtocol:
+        trustedIPs: []
+        insecure: false
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128M
+    limits:
+      cpu: 1
+      memory: 512M
+  logs:
+    general:
+      # @schema enum:["common", "json", null]; type:[string, null]; default: "common"
+      # format: common
+      # @schema enum:[TRACE,DEBUG,INFO,WARN,ERROR,FATAL,PANIC]; default: "INFO"
+      level: "WARN"
+    access:
+      # access logs
+      enabled: false
+  tlsOptions:
+    default:
+      sniStrict: true
+      # minVersion: VersionTLS12
+      # curvePreferences: ["X25519", "CurveP256", "CurveP384"]
+      # cipherSuites:
+      #   - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+      #   - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+      #   - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+      #   - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+      #   - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+      #   - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+   
+  # metrics:
+  #   # -- Enable metrics for internal resources. Default: false
+  #   addInternals: true
+
 ssl:
   enabled: true
   email: admin@example.com
