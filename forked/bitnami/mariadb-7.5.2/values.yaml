@@ -295,6 +295,9 @@ master:
     character-set-server=UTF8
     collation-server=utf8_general_ci
 
+    innodb_undo_log_truncate=ON
+    innodb_max_undo_log_size=1G
+
     [client]
     port=3306
     socket=/opt/bitnami/mariadb/tmp/mysql.sock
@@ -432,6 +435,9 @@ slave:
     log-error=/opt/bitnami/mariadb/logs/mysqld.log
     character-set-server=UTF8
     collation-server=utf8_general_ci
+
+    innodb_undo_log_truncate=ON
+    innodb_max_undo_log_size=1G
 
     [client]
     port=3306
