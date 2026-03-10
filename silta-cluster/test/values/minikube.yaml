@@ -1,12 +1,16 @@
 traefik:
-  replicas: 1
-  ssl:
-    enabled: true
+  enabled: false
+
+traefik3:
+  deployment:
+    replicas: 1
+  service:
+    spec:
+      # metallb shared ip works only with "Cluster" TP
+      externalTrafficPolicy: Cluster          
   service:
     annotations:
       metallb.universe.tf/allow-shared-ip: "shared"
-  # metallb shared ip works only with "Cluster" TP
-  externalTrafficPolicy: Cluster
 
 ssl:
   enabled: true
