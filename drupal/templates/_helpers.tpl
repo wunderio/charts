@@ -800,6 +800,12 @@ autoscaling/v2beta1
 {{- end }}
 {{- end }}
 
+{{- define "silta-cluster.traefik3.enabled" }}
+{{- if ( $.Capabilities.APIVersions.Has "traefik.io/v1alpha1" ) }}true
+{{- else }}false
+{{- end }}
+{{- end }}
+
 {{- define "drupal.serviceAccountName" }}
 {{- if .Values.serviceAccount.name }}
 {{- .Values.serviceAccount.name }}

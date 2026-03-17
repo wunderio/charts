@@ -71,6 +71,10 @@ metadata:
     {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- end }}
 
+    {{- if eq ( include "silta-cluster.traefik3.enabled" $ ) "true" }}
+    traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $.Release.Name }}-rl@kubernetescrd
+    {{- end }}
+
     {{- if (index .Values "silta-release").downscaler.enabled }}
     auto-downscale/down: "false"
     auto-downscale/last-update: {{ dateInZone "2006-01-02T15:04:05.999Z" (now) "UTC" }}
@@ -206,6 +210,10 @@ metadata:
     
     {{- if $ingress.extraAnnotations }}
     {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
+    {{- end }}
+
+    {{- if eq ( include "silta-cluster.traefik3.enabled" $ ) "true" }}
+    traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $.Release.Name }}-rl@kubernetescrd
     {{- end }}
 
     {{- if (index $.Values "silta-release").downscaler.enabled }}

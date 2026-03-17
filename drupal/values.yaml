@@ -93,6 +93,10 @@ ingress:
     type: traefik
     tls: true
     redirect-https: true
+    # rateLimit:
+    #   average: 32
+    #   burst: 300
+    #   period: 1s
     extraAnnotations:
       traefik.ingress.kubernetes.io/rate-limit: |
         extractorfunc: client.ip

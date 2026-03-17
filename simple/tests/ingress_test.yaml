@@ -2,6 +2,7 @@ suite: Site ingress
 templates:
   - configmap.yaml
   - ingress.yaml
+  - ingress-mw.yaml
   - checks.yaml
 tests:
   - it: is a ingress
@@ -276,6 +277,88 @@ tests:
     - matchRegex:
         path: data.nginx_conf
         pattern: 'set_real_ip_from *2.2.2.2'
+
+  - it: writes ingress rateLimit values to traefik3 middleware resource
+    template: ingress-mw.yaml
+    capabilities:
+      apiVersions:
+        - traefik.io/v1alpha1
+    set:
+      ingress:
+        default:
+          type: traefik
+          rateLimit:
+            average: 12
+            burst: 48
+            period: '2s'
+          extraAnnotations:
+            nginx.ingress.kubernetes.io/limit-rps: '22'
+            nginx.ingress.kubernetes.io/limit-rpm: '88'
+            nginx.ingress.kubernetes.io/limit-burst-multiplier: '100'
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-rl
+      - documentIndex: 0
+        equal:
+          path: spec.rateLimit.average
+          value: 12
+      - documentIndex: 0
+        equal:
+          path: spec.rateLimit.burst
+          value: 48
+      - documentIndex: 0
+        equal:
+          path: spec.rateLimit.period
+          value: 2s
+
+  - it: falls back to nginx rate-limit annotations for traefik3 middleware
+    template: ingress-mw.yaml
+    capabilities:
+      apiVersions:
+        - traefik.io/v1alpha1
+    set:
+      ingress:
+        default:
+          type: traefik
+          extraAnnotations:
+            nginx.ingress.kubernetes.io/limit-rps: '22'
+            nginx.ingress.kubernetes.io/limit-rpm: '88'
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-rl
+      - documentIndex: 0
+        equal:
+          path: spec.rateLimit.average
+          value: 22
+      - documentIndex: 0
+        equal:
+          path: spec.rateLimit.burst
+          value: 88
+      - documentIndex: 0
+        equal:
+          path: spec.rateLimit.period
+          value: 1s
+
+  - it: sets traefik3 middleware annotation in ingress
+    template: ingress.yaml
+    capabilities:
+      apiVersions:
+        - traefik.io/v1alpha1
+    set:
+      ingress:
+        default:
+          type: traefik
+          extraAnnotations:
+            nginx.ingress.kubernetes.io/limit-rps: '22'
+            nginx.ingress.kubernetes.io/limit-rpm: '88'
+    asserts:
+      - equal:
+          path: metadata.annotations['traefik.ingress.kubernetes.io/router.middlewares']
+          value: NAMESPACE-RELEASE-NAME-rl@kubernetescrd
 
   - it: prevents limit connections above 65536 for default ingress
     template: checks.yaml
