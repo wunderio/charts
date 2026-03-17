@@ -2,7 +2,7 @@ apiVersion: v2
 appVersion: "1.0"
 description: Setup a Silta Kubernetes cluster.
 name: silta-cluster
-version: 1.16.0
+version: 1.17.1
 # csi-rclone external provisioner requires kubernetes 1.20+
 # https://github.com/kubernetes-csi/external-provisioner?tab=readme-ov-file#compatibility
 kubeVersion: '>=1.20.0-0'
@@ -12,9 +12,10 @@ dependencies:
   version: 4.13.x
   repository: https://kubernetes.github.io/ingress-nginx
   condition: ingress-nginx.enabled
-- name: traefik
+- name: traefik1
+  alias: traefik
   version: 1.87.x
-  repository: file://../legacy_traefik
+  repository: file://../forked/traefik/traefik-1.87.7
   condition: traefik.enabled
 - name: traefik-crds
   alias: traefik3crds
