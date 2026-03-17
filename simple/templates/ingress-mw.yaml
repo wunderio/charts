@@ -1,0 +1,54 @@
+{{- if eq ( include "silta-cluster.traefik3.enabled" $ ) "true" }}
+{{- $ingress := $.Values.ingress.default }}
+{{- if or (eq $ingress.type "traefik") (eq $ingress.type "nginx") }}
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ $.Release.Name }}-rl
+  labels:
+    {{- include "simple.release_labels" $ | nindent 4 }}
+spec:
+  {{- if or (($ingress.rateLimit).average) (($ingress.rateLimit).burst) (($ingress.rateLimit).period) }}
+  rateLimit:
+    average: {{ $ingress.rateLimit.average }}
+    burst: {{ $ingress.rateLimit.burst }}
+    period: {{ $ingress.rateLimit.period }}
+  {{- else if $ingress.extraAnnotations }}
+  {{- $annotations := $ingress.extraAnnotations }}
+  {{- if hasKey $annotations "nginx.ingress.kubernetes.io/limit-rps" }}
+  rateLimit:
+    average: {{ index $annotations "nginx.ingress.kubernetes.io/limit-rps" }}
+    burst: {{ index $annotations "nginx.ingress.kubernetes.io/limit-rpm" }}
+    period: 1s
+  {{- end }}
+  {{- end }}
+  {{- end }}
+
+{{- range $ingress_index, $ingress := $.Values.ingress }}
+---
+{{- $ingress := mergeOverwrite (deepCopy $.Values.ingress.default) $ingress }}
+{{- if or (eq $ingress.type "traefik") (eq $ingress.type "nginx") }}
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ $.Release.Name }}-rl-{{ $ingress_index }}
+  labels:
+    {{- include "simple.release_labels" $ | nindent 4 }}
+spec:
+  {{- if or (($ingress.rateLimit).average) (($ingress.rateLimit).burst) (($ingress.rateLimit).period) }}
+  rateLimit:
+    average: {{ $ingress.rateLimit.average }}
+    burst: {{ $ingress.rateLimit.burst }}
+    period: {{ $ingress.rateLimit.period }}
+  {{- else if $ingress.extraAnnotations }}
+  {{- $annotations := $ingress.extraAnnotations }}
+  {{- if hasKey $annotations "nginx.ingress.kubernetes.io/limit-rps" }}
+  rateLimit:
+    average: {{ index $annotations "nginx.ingress.kubernetes.io/limit-rps" }}
+    burst: {{ index $annotations "nginx.ingress.kubernetes.io/limit-rpm" }}
+    period: 1s
+  {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

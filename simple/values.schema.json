@@ -94,6 +94,15 @@
           "tls": { "type": "boolean" },
           "redirect-https": { "type": "boolean" },
           "staticIpAddressName": { "type": "string" },
+           "rateLimit": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "average": { "type": "integer" },
+              "burst": { "type": "integer" },
+              "period": { "type": "string" }
+            }
+          },
           "extraAnnotations": {
             "type": "object",
             "additionalProperties": { "type": "string" }
