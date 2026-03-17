@@ -347,7 +347,9 @@ gitAuth:
   enabled: true
   image: wunderio/sshd-gitauth
   imageTag: v1.0
+  mode: openssh
   port: 22
+  hostKeyPath: "/app/keys/ssh_host_ed25519_key,/app/keys/ssh_host_ecdsa_key,/app/keys/ssh_host_rsa_key"
   keyserver:
     enabled: true
     url: ''
@@ -358,6 +360,11 @@ gitAuth:
   outsideCollaborators: true
   allowedIps: []
   replicas: 1
+  recordings:
+    persistence:
+      storageClassName: silta-shared
+      accessMode: ReadWriteMany
+      size: 1G
   persistence:
     # storageClassName: silta-shared
     accessMode: ReadWriteOnce
