@@ -43,6 +43,7 @@ spec:
             - csi-driver-nfs
             - lagoon-logging
             - csi-rclone
+            - monitoring
       preconditions:
         all:
         - key: "{{ request.operation || 'BACKGROUND' }}"
