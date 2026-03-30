@@ -509,3 +509,20 @@ daemonset:
     enabled: true
     image: docker.io/bash
     imageTag: "5"
+
+hub:
+  enabled: false
+  clusterId: ""
+  url: ""
+  accessKey: ""
+  syncSchedule: "0 2 * * *"
+  telemetry: "all" # Telemetry options: "disabled", "silta-cluster", "all"
+  image: "wunderio/silta-hub-agent"
+  imageTag: "1"
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi

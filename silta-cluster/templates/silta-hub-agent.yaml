@@ -1,0 +1,97 @@
+{{- if and .Values.hub.enabled .Values.hub.clusterId }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Release.Name }}-hub-agent
+  namespace: {{ .Release.Namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ .Release.Name }}-hub-agent
+rules:
+  - apiGroups: [""]
+    resources:
+      - namespaces
+      - pods
+      - services
+      - configmaps
+      - secrets
+    verbs:
+      - get
+      - list
+  - apiGroups: ["apps"]
+    resources:
+      - deployments
+      - statefulsets
+      - daemonsets
+      - replicasets
+    verbs:
+      - get
+      - list
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
+      - cronjobs
+    verbs:
+      - get
+      - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ .Release.Name }}-hub-agent
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ .Release.Name }}-hub-agent
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Release.Name }}-hub-agent
+    namespace: {{ .Release.Namespace }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-hub-agent
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ .Release.Name }}-hub-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-hub-agent
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-hub-agent
+    spec:
+      serviceAccountName: {{ .Release.Name }}-hub-agent
+      containers:
+        - name: agent
+          image: {{ .Values.hub.image }}:{{ .Values.hub.imageTag }}
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: SILTA_HUB_URL
+              value: {{ .Values.hub.url }}
+            - name: CLUSTER_ID
+              value: {{ .Values.hub.clusterId }}
+            - name: SILTA_HUB_KEY
+              value: {{ .Values.hub.accessKey }}
+            - name: HUB_SYNC_CRON
+              value: {{ .Values.hub.syncSchedule }}
+            - name: TELEMETRY
+              value: {{ .Values.hub.telemetry }}
+          resources:
+            {{- .Values.hub.resources | toYaml | nindent 12 }}
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+---
+{{- end }}
