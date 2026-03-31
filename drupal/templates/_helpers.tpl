@@ -428,8 +428,9 @@ wait
   set -e
 
   INSTALLING_FILE="{{ include "drupal.installing-file" . }}"
-
   rm -f "$INSTALLING_FILE" || true
+
+  trap 'rm -f "$INSTALLING_FILE" || true' EXIT
 
   {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
     {{ include "drupal.import-reference-files" . }}
@@ -708,6 +709,10 @@ fi
   ls -lh /backups/*
 {{- end }}
 
+{{- define "drupal.cleanup-job" }}
+rm -f "{{ include "drupal.installing-file" . }}" || true
+{{- end }}
+
 {{- define "mariadb.db-validation" -}}
 
   set -e
@@ -737,6 +742,24 @@ fi
   mariadb -u $DB_USER -p$DB_PASS $DB_NAME -h $DB_HOST --protocol=tcp --max_allowed_packet=1G < /tmp/db.sql
   drush status --fields=bootstrap
 
+{{- end }}
+
+{{- define "drupal.pre-release-command" -}}
+  set -e
+
+  {{- include "drupal.wait-for-db-command" . }}
+  
+  {{- if .Values.elasticsearch.enabled }}
+    {{ include "drupal.wait-for-elasticsearch-command" . }}
+  {{ end }}
+
+  {{- if .Values.php.preupgrade.backup }}
+    {{- include "drupal.backup-command" . }}
+  {{- end }}
+
+  {{- if .Values.php.preupgrade.command }}
+    {{- .Values.php.preupgrade.command }}
+  {{- end }}
 {{- end }}
 
 {{- define "cert-manager.api-version" }}

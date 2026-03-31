@@ -366,6 +366,35 @@
             }
           }
         },
+        "preupgrade": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "backup": { "type": "boolean" },
+            "command": { "type": "string" },
+            "nodeSelector": { "type": "object" },
+            "resources": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "requests": {
+                  "type": "object",
+                  "properties": {
+                    "cpu": { "type": ["integer", "string"] },
+                    "memory": { "type": "string" }
+                  }
+                },
+                "limits": {
+                  "type": "object",
+                  "properties": {
+                    "cpu": { "type": ["integer", "string"] },
+                    "memory": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
         "postupgrade": {
           "type": "object",
           "additionalProperties": false,
@@ -582,7 +611,7 @@
           }
         }
       }
-     },
+    },
     "mariadb": {
       "type": "object",
       "properties": {

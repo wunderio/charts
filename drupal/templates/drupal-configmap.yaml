@@ -834,6 +834,10 @@ data:
 
     # Prevent requests during the site installation process.
     if [ {{ include "drupal.installation-in-progress-test" $ }} ]; then
+      PID=$(pgrep -o php-fpm || true)
+      if [ -n "$PID" ]; then
+        echo "Installation in progress, failing health check." > /proc/$PID/fd/2;
+      fi
       exit 1;
     fi
 
