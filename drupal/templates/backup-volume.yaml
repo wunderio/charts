@@ -1,4 +1,4 @@
-{{- if .Values.backup.enabled }}
+{{- if or .Values.backup.enabled ( or (ne .Values.php.preupgrade.command "") .Values.php.preupgrade.backup ) }}
 {{- if eq .Values.backup.storageClassName "silta-shared" }}
 {{- if eq ( include "silta-cluster.rclone.has-provisioner" $ ) "false" }}
 apiVersion: v1

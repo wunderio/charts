@@ -363,6 +363,17 @@ php:
     afterCommand: |
 
 
+  # Executes before the environment is installed. Could be useful for backups before environment is upgraded.
+  preupgrade:
+    backup: false
+    command: ""
+    resources:
+      requests:
+        cpu: 500m
+        memory: 488Mi
+      limits:
+        memory: 488Mi
+
   # Pass additional environment variables to all php containers as key-value pairs.
   env: {}
 

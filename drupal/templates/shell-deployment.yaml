@@ -61,7 +61,7 @@ spec:
           mountPath: /etc/ssh/authorized_keys
           subPath: authorizedKeys
           readOnly: true
-        {{- if .Values.backup.enabled }}
+        {{- if or .Values.backup.enabled ( or (ne .Values.php.preupgrade.command "") .Values.php.preupgrade.backup ) }}
         - name: {{ .Release.Name }}-backup
           mountPath: /backups
           readOnly: true
@@ -119,7 +119,7 @@ spec:
       - name: shell-configmap
         configMap:
           name: {{ .Release.Name }}-shell
-      {{- if .Values.backup.enabled }}
+      {{- if or .Values.backup.enabled ( or (ne .Values.php.preupgrade.command "") .Values.php.preupgrade.backup ) }}
       - name: {{ .Release.Name }}-backup
         persistentVolumeClaim:
           {{- if and ( eq $.Values.backup.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
