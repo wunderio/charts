@@ -379,7 +379,7 @@ gitAuth:
 sshKeyServer:
   enabled: true
   image: wunderio/silta-ssh-keys
-  imageTag: v0.1
+  imageTag: v1.0
   gitauthApiToken: ''
   apiUsername: ''
   apiPassword: ''
