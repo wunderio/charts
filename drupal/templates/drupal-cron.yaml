@@ -25,9 +25,9 @@ spec:
   suspend: false
   jobTemplate:
     spec:
-      # This is a fallback for sidecar termination failure.
-      # Two hours should be enough for any cron actions.
-      activeDeadlineSeconds: 7200
+      {{- if or $job.activeDeadlineSeconds ($.Values.php.cronJobDefaults).activeDeadlineSeconds }}
+      activeDeadlineSeconds: {{ $job.activeDeadlineSeconds | default $.Values.php.cronJobDefaults.activeDeadlineSeconds }}
+      {{- end }}
       backoffLimit: {{ $job.backoffLimit | default 1 }}
       template:
         metadata:
