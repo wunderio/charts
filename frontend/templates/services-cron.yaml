@@ -20,6 +20,9 @@ spec:
   suspend: false
   jobTemplate:
     spec:
+      {{- if or $job.activeDeadlineSeconds ($.Values.cronJobDefaults).activeDeadlineSeconds }}
+      activeDeadlineSeconds: {{ $job.activeDeadlineSeconds | default $.Values.cronJobDefaults.activeDeadlineSeconds }}
+      {{- end }}
       parallelism: {{ default 1 $job.parallelism }}
       template:
         metadata:

@@ -283,6 +283,7 @@ php:
       enabled: true
 
   cronJobDefaults:
+    # activeDeadlineSeconds: 7200
     # resources:
     #   requests:
     #     cpu: 500m
@@ -316,6 +317,10 @@ php:
 
       # Specify a how many attempts should be made before considering a cron job as failed.
       backoffLimit: 1
+
+      # Set activeDeadlineSeconds for this specific cron job.
+      # If not set, the cronJobDefaults value is used. If neither is set, no deadline is applied.
+      # activeDeadlineSeconds: 7200
 
       # Set resources specifically for cron jobs. If not set, they will be
       # inherited from php.resources.
