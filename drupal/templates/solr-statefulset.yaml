@@ -84,6 +84,9 @@ spec:
       volumes:
       - name: {{ .Release.Name }}-core-dir
         emptyDir: {}
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
       serviceAccountName: {{ include "drupal.serviceAccountName" . }}
   volumeClaimTemplates:
   - metadata:

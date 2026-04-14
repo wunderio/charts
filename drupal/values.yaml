@@ -891,7 +891,8 @@ smtp:
 # Solr.
 solr:
   enabled: false
-  # Available image tags: https://hub.docker.com/r/geerlingguy/solr/tags
+  # Official image tags: https://hub.docker.com/_/solr/tags
+  # Versions before 9.x: https://hub.docker.com/r/geerlingguy/solr/tags
   image: wunderio/silta-solr
   imageTag: 8-v1
 
