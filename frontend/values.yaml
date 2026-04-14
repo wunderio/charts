@@ -280,6 +280,7 @@ services: {}
   #      command: echo "hello world"
   #      schedule: "~ 1 * * *"
   #      parallelism: 1
+  #      # activeDeadlineSeconds: 7200
   #      nodeSelector:
   #        cloud.google.com/gke-nodepool: static-ip
   #      tolerations: []
@@ -438,6 +439,7 @@ serviceDefaults:
               - "{{ $.serviceLabel }}"
 # Provide defaults for all cron jobs. This will override serviceDefaults when defined.
 cronJobDefaults:
+  # activeDeadlineSeconds: 7200
   # resources:
   #   requests:
   #     cpu: 100m
