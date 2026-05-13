@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: vmproxy
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: vmproxy
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: vmproxy
+        release: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: vmproxy
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: JWKS_URL
+            value: {{ .Values.proxies.jwksUrl }}
+          - name: METRICS_WRITE_URL
+            value: {{ .Values.proxies.metrics.writeUrl }}
+          - name: METRICS_READ_URL
+            value: {{ .Values.proxies.metrics.readUrl }}
+          - name: DEBUG_METRICS_INSERT
+            value: {{ .Values.proxies.metrics.debugInsert | quote }}
+          - name: DEBUG_METRICS_SELECT
+            value: {{ .Values.proxies.metrics.debugSelect | quote }}
+          - name: LOGS_WRITE_URL
+            value: {{ .Values.proxies.logs.writeUrl }}
+          - name: LOGS_READ_URL
+            value: {{ .Values.proxies.logs.readUrl }}
+          - name: DEBUG_LOGS_INSERT
+            value: {{ .Values.proxies.logs.debugInsert | quote }}
+          - name: DEBUG_LOGS_SELECT 
+            value: {{ .Values.proxies.logs.debugSelect | quote }}
+          - name: TRACES_WRITE_URL
+            value: {{ .Values.proxies.traces.writeUrl }}
+          - name: TRACES_READ_URL
+            value: {{ .Values.proxies.traces.readUrl }}
+          - name: DEBUG_TRACES_INSERT
+            value: {{ .Values.proxies.traces.debugInsert | quote }}
+          - name: DEBUG_TRACES_SELECT
+            value: {{ .Values.proxies.traces.debugSelect | quote }}
+          - name: VM_PROXY_REPLICA
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
