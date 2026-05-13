@@ -1,0 +1,49 @@
+replicaCount: 1
+
+image:
+  repository: vmproxy
+  tag: latest
+  pullPolicy: IfNotPresent
+
+proxies:
+  # JWKS URL for JWT authentication. This should point to the JWKS endpoint of your identity provider (e.g., Keycloak, Auth0).
+  # It is used by vmproxy to validate incoming JWT tokens and extract user information for authentication and authorization purposes.
+  # For example, grafana query proxy checks project permissions based on the "project" claim in the JWT token, which is validated using the JWKS URL.
+  jwksUrl: https://example.com/realms/example/protocol/openid-connect/certs
+  metrics:
+    writeUrl: http://vm-cluster-victoria-metrics-cluster-vminsert:8480/insert/prometheus
+    readUrl: http://vm-cluster-victoria-metrics-cluster-vmselect:8481/select/prometheus
+    debugInsert: "false"
+    debugSelect: "false"
+  logs:
+    writeUrl: http://vl-cluster-victoria-logs-cluster-vlinsert:9481/insert/opentelemetry/v1/logs
+    readUrl: http://vl-cluster-victoria-logs-cluster-vlselect:9471
+    debugInsert: "false"
+    debugSelect: "false"
+  traces:
+    writeUrl: http://vt-cluster-vtinsert:10481/insert/opentelemetry/v1/traces
+    readUrl: http://vt-cluster-vtselect:10471/select
+    debugInsert: "false"
+    debugSelect: "false"
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+  host: vmproxy.local
+  tls: []
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+affinity: {}
+nodeSelector: {}
+tolerations: []
