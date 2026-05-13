@@ -64,5 +64,4 @@ spec:
   - hosts:
     - {{ .Values.ingress.host }}
     secretName: {{ $.Release.Name }}-ingress-tls
-    {{- end }}
 {{- end }}
