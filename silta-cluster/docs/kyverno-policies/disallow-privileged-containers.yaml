@@ -43,6 +43,7 @@ spec:
             - lagoon
             - csi-driver-nfs
             - csi-rclone
+            - monitoring
       validate:
         message: >-
           Privileged mode is disallowed. The fields spec.containers[*].securityContext.privileged,

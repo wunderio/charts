@@ -42,6 +42,7 @@ spec:
           - elasticsearch
           - lagoon
           - csi-rclone
+          - monitoring
     validate:
       message: >-
         Privilege escalation is disallowed. The fields
