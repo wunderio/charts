@@ -131,6 +131,8 @@ httproute:
   gatewayNamespace: traefik
   # Port on the Gateway for HTTPS listeners.
   gatewayPort: 8443
+  # Name of the Gateway listener to attach to (must allow the app's namespace).
+  listenerName: websecure-dev
 
 # Infrastructure related settings.
 cluster:

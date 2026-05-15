@@ -1,44 +1,50 @@
 {{- if .Values.httproute.enabled }}
 {{- $context_ssl := .Values.ssl }}
-# ListenerSet: creates a listener on the shared Gateway for this app's domain.
-# cert-manager watches ListenerSets and auto-creates Certificate CRDs
-# from the cluster-issuer annotation, so no explicit Certificate is needed.
-apiVersion: gateway.networking.k8s.io/v1
-kind: ListenerSet
+{{- $letsencrypt_in_use := false }}
+{{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+{{- $letsencrypt_in_use = true }}
+{{- end }}
+{{- if $letsencrypt_in_use }}
+# Certificate for the primary domain.
+# With HTTPRoute, we use explicit Certificate CRDs since ListenerSet
+# is not yet supported by all Gateway API implementations.
+apiVersion: cert-manager.io/v1
+kind: Certificate
 metadata:
-  name: {{ .Release.Name }}-drupal
-  annotations:
-    {{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-    cert-manager.io/cluster-issuer: {{ $context_ssl.issuer }}
-    {{- end }}
+  name: {{ .Release.Name }}-crt
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
-  parentRef:
-    name: {{ .Values.httproute.gatewayName | default "main" }}
-    namespace: {{ .Values.httproute.gatewayNamespace | default "traefik" }}
-  listeners:
-    - name: {{ .Release.Name }}-https
-      hostname: {{ include "drupal.domain" . | quote }}
-      port: {{ .Values.httproute.gatewayPort | default 8443 }}
-      protocol: HTTPS
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: {{ .Release.Name }}-tls
+  secretName: {{ .Release.Name }}-tls
+  dnsNames:
+    - {{ include "drupal.domain" . | quote }}
+  issuerRef:
+    name: {{ $context_ssl.issuer }}
+    kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: Always
 {{- range $index, $prefix := .Values.domainPrefixes }}
 {{- $params := dict "prefix" $prefix }}
-    - name: {{ $.Release.Name }}-https-p{{ $index }}
-      hostname: '{{ include "drupal.domain" (merge $params $) }}'
-      port: {{ $.Values.httproute.gatewayPort | default 8443 }}
-      protocol: HTTPS
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: {{ $.Release.Name }}-tls-p{{ $index }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-crt-p{{ $index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+spec:
+  secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+  dnsNames:
+    - '{{ include "drupal.domain" (merge $params $) }}'
+  issuerRef:
+    name: {{ $context_ssl.issuer }}
+    kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: Always
 {{- end }}
 ---
-# HTTPRoute: routes traffic from the ListenerSet to the drupal service.
+{{- end }}
+# HTTPRoute: routes traffic from the shared Gateway to the drupal service.
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -47,8 +53,9 @@ metadata:
     {{- include "drupal.release_labels" . | nindent 4 }}
 spec:
   parentRefs:
-    - kind: ListenerSet
-      name: {{ .Release.Name }}-drupal
+    - name: {{ .Values.httproute.gatewayName | default "main" }}
+      namespace: {{ .Values.httproute.gatewayNamespace | default "traefik" }}
+      sectionName: {{ .Values.httproute.listenerName | default "websecure-dev" }}
   hostnames:
     - {{ include "drupal.domain" . | quote }}
     {{- range $index, $prefix := .Values.domainPrefixes }}
@@ -64,38 +71,32 @@ spec:
 {{- /* HTTPRoutes for exposeDomains */ -}}
 {{- range $domain_index, $domain := .Values.exposeDomains }}
 {{- $domain := mergeOverwrite (deepCopy $.Values.exposeDomainsDefaults) $domain }}
+{{- $domain_ssl_le := false }}
+{{- if $domain.ssl }}
+{{- if $domain.ssl.enabled }}
+{{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+{{- $domain_ssl_le = true }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if $domain_ssl_le }}
 ---
-apiVersion: gateway.networking.k8s.io/v1
-kind: ListenerSet
+apiVersion: cert-manager.io/v1
+kind: Certificate
 metadata:
-  name: {{ $.Release.Name }}-drupal-{{ $domain_index }}
-  annotations:
-    {{- if $domain.ssl }}
-    {{- if $domain.ssl.enabled }}
-    {{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-    cert-manager.io/cluster-issuer: {{ $domain.ssl.issuer }}
-    {{- end }}
-    {{- end }}
-    {{- end }}
+  name: {{ $.Release.Name }}-crt-{{ $domain_index }}
   labels:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
-  parentRef:
-    name: {{ $.Values.httproute.gatewayName | default "main" }}
-    namespace: {{ $.Values.httproute.gatewayNamespace | default "traefik" }}
-  listeners:
-    - name: {{ $.Release.Name }}-https-{{ $domain_index }}
-      hostname: {{ $domain.hostname | quote }}
-      port: {{ $.Values.httproute.gatewayPort | default 8443 }}
-      protocol: HTTPS
-      tls:
-        mode: Terminate
-        certificateRefs:
-          {{- if and $domain.ssl $domain.ssl.enabled $domain.ssl.existingTLSSecret }}
-          - name: {{ $domain.ssl.existingTLSSecret }}
-          {{- else }}
-          - name: {{ $.Release.Name }}-tls-{{ $domain_index }}
-          {{- end }}
+  secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}
+  dnsNames:
+    - {{ $domain.hostname | quote }}
+  issuerRef:
+    name: {{ $domain.ssl.issuer }}
+    kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: Always
+{{- end }}
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -105,8 +106,9 @@ metadata:
     {{- include "drupal.release_labels" $ | nindent 4 }}
 spec:
   parentRefs:
-    - kind: ListenerSet
-      name: {{ $.Release.Name }}-drupal-{{ $domain_index }}
+    - name: {{ $.Values.httproute.gatewayName | default "main" }}
+      namespace: {{ $.Values.httproute.gatewayNamespace | default "traefik" }}
+      sectionName: {{ $.Values.httproute.listenerName | default "websecure-dev" }}
   hostnames:
     - {{ $domain.hostname | quote }}
   rules:
