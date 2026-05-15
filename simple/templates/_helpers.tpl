@@ -3,6 +3,19 @@ app: {{ .Values.app | quote }}
 release: {{ .Release.Name }}
 {{- end }}
 
+{{/*
+Resolve an image value that may be either a plain string ("registry/repo:tag")
+or a map with .repository and .tag fields. This enables backward-compatible
+support for ArgoCD Image Updater which writes split repository/tag values.
+*/}}
+{{- define "simple.image" -}}
+{{- if kindIs "map" . -}}
+{{- printf "%s:%s" .repository .tag -}}
+{{- else -}}
+{{- . -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "simple.domainSeparator" -}}
 {{- if .Values.singleSubdomain -}}
 -

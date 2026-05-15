@@ -127,7 +127,7 @@
       "additionalProperties": false,
       "properties": {
         "version": { "type": "string"},
-        "image": { "type": "string"},
+        "image": { "oneOf": [{ "type": "string" }, { "type": "object", "properties": { "repository": { "type": "string" }, "tag": { "type": "string" } }, "required": ["repository", "tag"] }] },
         "resources": {
           "type": "object",
           "additionalProperties": false,

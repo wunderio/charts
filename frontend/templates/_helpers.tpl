@@ -2,6 +2,19 @@
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{/*
+Resolve an image value that may be either a plain string ("registry/repo:tag")
+or a map with .repository and .tag fields. This enables backward-compatible
+support for ArgoCD Image Updater which writes split repository/tag values.
+*/}}
+{{- define "frontend.image" -}}
+{{- if kindIs "map" . -}}
+{{- printf "%s:%s" .repository .tag -}}
+{{- else -}}
+{{- . -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "frontend.release_selector_labels" }}
 app: {{ .Values.app | quote }}
 release: {{ .Release.Name }}

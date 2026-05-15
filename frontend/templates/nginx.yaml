@@ -24,7 +24,7 @@ spec:
       containers:
       # Nginx container
       - name: nginx
-        image: {{ .Values.nginx.image | quote }}
+        image: {{ include "frontend.image" .Values.nginx.image | quote }}
         imagePullPolicy: Always
         ports:
         - containerPort: 8080

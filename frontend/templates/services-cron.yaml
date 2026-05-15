@@ -41,7 +41,7 @@ spec:
           {{- end }}
           containers:
           - name: {{ $jobName }}-cron
-            image: {{ $service.image | quote }}
+            image: {{ include "frontend.image" $service.image | quote }}
             {{- if or (hasKey $job "containerSecurityContext") (hasKey $service "containerSecurityContext") }}
             securityContext:
               {{- if hasKey $job "containerSecurityContext" }}
