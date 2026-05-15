@@ -30,7 +30,7 @@ spec:
       enableServiceLinks: false
       containers:
       - name: shell
-        image: {{ .Values.shell.image | quote }}
+        image: {{ include "drupal.image" .Values.shell.image | quote }}
         env:
         {{- include "drupal.env" . | indent 8 }}
         {{- if .Values.shell.gitAuth.keyserver.enabled }}

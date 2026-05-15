@@ -2,6 +2,19 @@
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{/*
+Resolve an image value that may be either a plain string ("registry/repo:tag")
+or a map with .repository and .tag fields. This enables backward-compatible
+support for ArgoCD Image Updater which writes split repository/tag values.
+*/}}
+{{- define "drupal.image" -}}
+{{- if kindIs "map" . -}}
+{{- printf "%s:%s" .repository .tag -}}
+{{- else -}}
+{{- . -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "drupal.release_selector_labels" -}}
 app: {{ .Values.app | quote }}
 release: {{ .Release.Name }}
@@ -16,7 +29,7 @@ helm.sh/chart: {{ template "drupal.chart" . }}
 {{- end }}
 
 {{- define "drupal.php-container" -}}
-image: {{ .Values.php.image | quote }}
+image: {{ include "drupal.image" .Values.php.image | quote }}
 env: {{ include "drupal.env" . }}
 ports:
   - containerPort: 9000

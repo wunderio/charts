@@ -1,3 +1,4 @@
+{{- if ne ((.Values.ingress).enabled | toString) "false" }}
 {{- $context_ingress := .Values.ingress.default }}
 {{- $context_ssl := .Values.ssl }}
 {{- if $context_ingress.tls }}
@@ -206,6 +207,7 @@ data:
   tls.crt: {{ $domain.ssl.crt | default "" | b64enc }}
   tls.key: {{ $domain.ssl.key | default "" | b64enc }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

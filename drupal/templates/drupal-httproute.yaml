@@ -1,0 +1,118 @@
+{{- if .Values.httproute.enabled }}
+{{- $context_ssl := .Values.ssl }}
+# ListenerSet: creates a listener on the shared Gateway for this app's domain.
+# cert-manager watches ListenerSets and auto-creates Certificate CRDs
+# from the cluster-issuer annotation, so no explicit Certificate is needed.
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: {{ .Release.Name }}-drupal
+  annotations:
+    {{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+    cert-manager.io/cluster-issuer: {{ $context_ssl.issuer }}
+    {{- end }}
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+spec:
+  parentRef:
+    name: {{ .Values.httproute.gatewayName | default "main" }}
+    namespace: {{ .Values.httproute.gatewayNamespace | default "traefik" }}
+  listeners:
+    - name: {{ .Release.Name }}-https
+      hostname: {{ include "drupal.domain" . | quote }}
+      port: {{ .Values.httproute.gatewayPort | default 8443 }}
+      protocol: HTTPS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: {{ .Release.Name }}-tls
+{{- range $index, $prefix := .Values.domainPrefixes }}
+{{- $params := dict "prefix" $prefix }}
+    - name: {{ $.Release.Name }}-https-p{{ $index }}
+      hostname: '{{ include "drupal.domain" (merge $params $) }}'
+      port: {{ $.Values.httproute.gatewayPort | default 8443 }}
+      protocol: HTTPS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: {{ $.Release.Name }}-tls-p{{ $index }}
+{{- end }}
+---
+# HTTPRoute: routes traffic from the ListenerSet to the drupal service.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Name }}-drupal
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+spec:
+  parentRefs:
+    - kind: ListenerSet
+      name: {{ .Release.Name }}-drupal
+  hostnames:
+    - {{ include "drupal.domain" . | quote }}
+    {{- range $index, $prefix := .Values.domainPrefixes }}
+    {{- $params := dict "prefix" $prefix }}
+    - '{{ include "drupal.domain" (merge $params $) }}'
+    {{- end }}
+  rules:
+    - backendRefs:
+        - kind: Service
+          name: {{ include "drupal.servicename" . }}
+          port: 80
+
+{{- /* HTTPRoutes for exposeDomains */ -}}
+{{- range $domain_index, $domain := .Values.exposeDomains }}
+{{- $domain := mergeOverwrite (deepCopy $.Values.exposeDomainsDefaults) $domain }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: {{ $.Release.Name }}-drupal-{{ $domain_index }}
+  annotations:
+    {{- if $domain.ssl }}
+    {{- if $domain.ssl.enabled }}
+    {{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+    cert-manager.io/cluster-issuer: {{ $domain.ssl.issuer }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+spec:
+  parentRef:
+    name: {{ $.Values.httproute.gatewayName | default "main" }}
+    namespace: {{ $.Values.httproute.gatewayNamespace | default "traefik" }}
+  listeners:
+    - name: {{ $.Release.Name }}-https-{{ $domain_index }}
+      hostname: {{ $domain.hostname | quote }}
+      port: {{ $.Values.httproute.gatewayPort | default 8443 }}
+      protocol: HTTPS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          {{- if and $domain.ssl $domain.ssl.enabled $domain.ssl.existingTLSSecret }}
+          - name: {{ $domain.ssl.existingTLSSecret }}
+          {{- else }}
+          - name: {{ $.Release.Name }}-tls-{{ $domain_index }}
+          {{- end }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ $.Release.Name }}-drupal-{{ $domain_index }}
+  labels:
+    {{- include "drupal.release_labels" $ | nindent 4 }}
+spec:
+  parentRefs:
+    - kind: ListenerSet
+      name: {{ $.Release.Name }}-drupal-{{ $domain_index }}
+  hostnames:
+    - {{ $domain.hostname | quote }}
+  rules:
+    - backendRefs:
+        - kind: Service
+          name: {{ include "drupal.servicename" $ }}
+          port: 80
+{{- end }}
+{{- end }}

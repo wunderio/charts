@@ -1,3 +1,4 @@
+{{- if ne ((.Values.ingress).enabled | toString) "false" }}
 {{- $ingress := .Values.ingress.default }}
 {{- $context_ssl := .Values.ssl }}
 {{- $letsencrypt_in_use := false }}
@@ -150,6 +151,7 @@ spec:
 
 # Ingresses for exposeDomains
 {{- range $ingress_index, $ingress := $.Values.ingress }}
+{{- if kindIs "map" $ingress }}
 
 {{- $ingress := mergeOverwrite (deepCopy $.Values.ingress.default) $ingress }}
 
@@ -307,5 +309,7 @@ spec:
   {{- end }}
   {{- end }}
 ---
+{{- end }}
+{{- end }}
 {{- end }}
 {{- end }}

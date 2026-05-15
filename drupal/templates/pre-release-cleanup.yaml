@@ -4,6 +4,12 @@ metadata:
   name: "{{ .Release.Name }}-cleanup"
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
+  annotations:
+    # ArgoCD hook: run before sync, delete on success.
+    # Without these, ttlSecondsAfterFinished=0 causes the Job to self-delete
+    # and ArgoCD enters an endless sync loop trying to recreate it.
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   ttlSecondsAfterFinished: 0
   template:
