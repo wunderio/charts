@@ -1,3 +1,4 @@
+{{- if ne ((.Values.ingress).enabled | toString) "false" }}
 {{- $ingress := .Values.ingress.default }}
 {{- $context_ssl := .Values.ssl }}
 {{- $letsencrypt_in_use := false }}
@@ -303,5 +304,6 @@ spec:
   {{- end }}
   {{- end }}
 ---
+{{- end }}
 {{- end }}
 {{- end }}

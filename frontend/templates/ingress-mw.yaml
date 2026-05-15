@@ -1,3 +1,4 @@
+{{- if ne ((.Values.ingress).enabled | toString) "false" }}
 {{- if eq ( include "silta-cluster.traefik3.enabled" $ ) "true" }}
 {{- $ingress := $.Values.ingress.default }}
 {{- if or (eq $ingress.type "traefik") (eq $ingress.type "nginx") }}
@@ -49,6 +50,7 @@ spec:
     period: 1s
   {{- end }}
   {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

@@ -108,6 +108,20 @@
             "additionalProperties": { "type": "string" }
           }
         }
+      },
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "httproute": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "gatewayName": { "type": "string" },
+        "gatewayNamespace": { "type": "string" },
+        "gatewayPort": { "type": "integer" },
+        "listenerName": { "type": "string" }
       }
     },
     "cluster": {

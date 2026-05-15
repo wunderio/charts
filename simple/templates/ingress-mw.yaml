@@ -1,3 +1,4 @@
+{{- if ne ((.Values.ingress).enabled | toString) "false" }}
 {{- if eq ( include "silta-cluster.traefik3.enabled" $ ) "true" }}
 {{- $ingress := $.Values.ingress.default }}
 {{- if or (eq $ingress.type "traefik") (eq $ingress.type "nginx") }}
@@ -20,9 +21,10 @@ spec:
     average: {{ index $annotations "nginx.ingress.kubernetes.io/limit-rps" }}
     burst: {{ index $annotations "nginx.ingress.kubernetes.io/limit-rpm" }}
     period: 1s
-  {{- end }}
-  {{- end }}
-  {{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
 
 {{- range $ingress_index, $ingress := $.Values.ingress }}
 ---
