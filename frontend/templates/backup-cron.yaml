@@ -19,7 +19,7 @@ spec:
   suspend: false
   jobTemplate:
     spec:
-      activeDeadlineSeconds: 7200
+      activeDeadlineSeconds: 21600
       backoffLimit: 2
       template:
         spec:
