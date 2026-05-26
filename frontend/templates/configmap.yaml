@@ -137,6 +137,11 @@ data:
       https on;
     }
 
+    map $http_x_forwarded_proto $request_scheme {
+      default $http_x_forwarded_proto;
+      ""      $scheme;
+    }
+
     {{- if .Values.nginx.redirects }}
     # Custom redirects with full url matching
     map '$scheme://$host$request_uri' $redirect_uri {
@@ -327,7 +332,7 @@ data:
 
         # Most web apps can be configured to read this header and
         # understand that the current session is actually HTTPS.
-        proxy_set_header        X-Forwarded-Proto $scheme;
+        proxy_set_header        X-Forwarded-Proto $request_scheme;
         proxy_set_header        X-Forwarded-Port  $server_port;
         add_header              Front-End-Https   on;
 
