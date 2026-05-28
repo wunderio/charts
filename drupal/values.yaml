@@ -905,6 +905,14 @@ solr:
     "-m", "256m", 
     "-a", "-Dlog4j2.formatMsgNoLookups=true -XX:+ExitOnOutOfMemoryError -XX:+HeapDumpOnOutOfMemoryError"
   ]
+  # Additive module list rendered as SOLR_MODULES.
+  # Example: ["extraction", "langid", "ltr", "analysis-extras"]
+  modules: []
+  # Additive environment variables for Solr container.
+  # Supports either env list format or a key-value map.
+  extraEnv: null
+  # Additive command arguments appended after commandArgs.
+  extraCommandArgs: []
 
   # Path in php container containing solr conf files (schema, solrconfig, stopwords, etc.).
   # Solr init container will contents of this folder to actual solr container.
