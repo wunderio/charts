@@ -1,0 +1,437 @@
+suite: Site certificate
+templates:
+  - certificate.yaml
+tests:
+
+  # --- Main domain: letsencrypt ---
+
+  - it: letsencrypt emits a v1 Certificate
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+      - documentIndex: 0
+        equal:
+          path: apiVersion
+          value: 'cert-manager.io/v1'
+
+  - it: letsencrypt Certificate has ACME annotations
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: metadata.annotations['cert-manager.io/issue-temporary-certificate']
+          value: 'true'
+      - documentIndex: 0
+        equal:
+          path: metadata.annotations['acme.cert-manager.io/http01-override-ingress-name']
+          value: 'RELEASE-NAME-nginx'
+
+  - it: letsencrypt Certificate has correct issuerRef
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: letsencrypt
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.kind
+          value: ClusterIssuer
+
+  - it: letsencrypt Certificate has no duration or commonName
+    asserts:
+      - documentIndex: 0
+        notExists:
+          path: spec.duration
+      - documentIndex: 0
+        notExists:
+          path: spec.commonName
+
+  - it: letsencrypt Certificate has privateKey rotationPolicy
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: spec.privateKey.rotationPolicy
+          value: Always
+
+  # --- Main domain: letsencrypt-staging ---
+
+  - it: letsencrypt-staging emits a Certificate with ACME annotations
+    set:
+      ssl.issuer: letsencrypt-staging
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: letsencrypt-staging
+      - documentIndex: 0
+        equal:
+          path: metadata.annotations['cert-manager.io/issue-temporary-certificate']
+          value: 'true'
+
+  # --- Main domain: selfsigned ---
+
+  - it: selfsigned emits a Certificate
+    set:
+      ssl.issuer: selfsigned
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: selfsigned
+
+  - it: selfsigned Certificate has duration and renewBefore
+    set:
+      ssl.issuer: selfsigned
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: spec.duration
+          value: 2160h
+      - documentIndex: 0
+        equal:
+          path: spec.renewBefore
+          value: 150h
+
+  - it: selfsigned Certificate has commonName set to the domain
+    set:
+      ssl.issuer: selfsigned
+      environmentName: myenv
+      projectName: myproject
+      clusterDomain: example.com
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: spec.commonName
+          value: myenv.myproject.example.com
+
+  - it: selfsigned Certificate has no ACME annotations
+    set:
+      ssl.issuer: selfsigned
+    asserts:
+      - documentIndex: 0
+        notExists:
+          path: metadata.annotations
+
+  # --- Main domain: custom ---
+
+  - it: custom emits a Secret
+    set:
+      ssl.issuer: custom
+      ssl.ca: dGVzdA==
+      ssl.crt: dGVzdA==
+      ssl.key: dGVzdA==
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Secret
+      - documentIndex: 0
+        equal:
+          path: type
+          value: kubernetes.io/tls
+
+  - it: custom with existingTLSSecret emits no resources
+    set:
+      ssl.issuer: custom
+      ssl.existingTLSSecret: my-existing-secret
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # --- Main domain: arbitrary ClusterIssuer ---
+
+  - it: arbitrary issuer emits a Certificate
+    set:
+      ssl.issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+      - documentIndex: 0
+        equal:
+          path: apiVersion
+          value: 'cert-manager.io/v1'
+
+  - it: arbitrary issuer Certificate has correct issuerRef
+    set:
+      ssl.issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: my-cluster-issuer
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.kind
+          value: ClusterIssuer
+
+  - it: arbitrary issuer Certificate has no ACME annotations
+    set:
+      ssl.issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 0
+        notExists:
+          path: metadata.annotations
+
+  - it: arbitrary issuer Certificate has no duration or commonName
+    set:
+      ssl.issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 0
+        notExists:
+          path: spec.duration
+      - documentIndex: 0
+        notExists:
+          path: spec.commonName
+
+  - it: arbitrary issuer Certificate has privateKey rotationPolicy
+    set:
+      ssl.issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: spec.privateKey.rotationPolicy
+          value: Always
+
+  # --- domainPrefixes ---
+
+  - it: letsencrypt with domainPrefixes emits prefix Certificates with ACME annotations
+    set:
+      domainPrefixes: ['www']
+    asserts:
+      - documentIndex: 1
+        isKind:
+          of: Certificate
+      - documentIndex: 1
+        equal:
+          path: metadata.annotations['cert-manager.io/issue-temporary-certificate']
+          value: 'true'
+      - documentIndex: 1
+        equal:
+          path: spec.issuerRef.name
+          value: letsencrypt
+
+  - it: selfsigned with domainPrefixes emits prefix Certificates with duration
+    set:
+      ssl.issuer: selfsigned
+      domainPrefixes: ['www']
+    asserts:
+      - documentIndex: 1
+        isKind:
+          of: Certificate
+      - documentIndex: 1
+        equal:
+          path: spec.duration
+          value: 2160h
+      - documentIndex: 1
+        notExists:
+          path: metadata.annotations
+
+  - it: arbitrary issuer with domainPrefixes emits plain prefix Certificates
+    set:
+      ssl.issuer: my-cluster-issuer
+      domainPrefixes: ['www']
+    asserts:
+      - documentIndex: 1
+        isKind:
+          of: Certificate
+      - documentIndex: 1
+        equal:
+          path: spec.issuerRef.name
+          value: my-cluster-issuer
+      - documentIndex: 1
+        notExists:
+          path: metadata.annotations
+      - documentIndex: 1
+        notExists:
+          path: spec.duration
+
+  # --- exposeDomains: ssl.enabled: false ---
+
+  - it: exposeDomain with ssl.enabled false emits no certificate for that domain
+    set:
+      exposeDomains:
+        nodomain:
+          hostname: insecure.example.com
+          ssl:
+            enabled: false
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: exposeDomain with ssl.enabled false does not override default true on other domains
+    set:
+      exposeDomains:
+        nodomain:
+          hostname: insecure.example.com
+          ssl:
+            enabled: false
+        secure:
+          hostname: secure.example.com
+    asserts:
+      - hasDocuments:
+          count: 2
+      - documentIndex: 1
+        equal:
+          path: spec.dnsNames[0]
+          value: secure.example.com
+
+  # --- exposeDomains: default issuer (letsencrypt) ---
+
+  - it: exposeDomain with default issuer emits a Certificate with ACME annotations
+    set:
+      exposeDomains:
+        foo:
+          hostname: foo.example.com
+    asserts:
+      - documentIndex: 1
+        isKind:
+          of: Certificate
+      - documentIndex: 1
+        equal:
+          path: metadata.annotations['cert-manager.io/issue-temporary-certificate']
+          value: 'true'
+      - documentIndex: 1
+        equal:
+          path: metadata.annotations['acme.cert-manager.io/http01-override-ingress-name']
+          value: 'RELEASE-NAME-nginx-default'
+      - documentIndex: 1
+        equal:
+          path: spec.dnsNames[0]
+          value: foo.example.com
+      - documentIndex: 1
+        equal:
+          path: spec.issuerRef.name
+          value: letsencrypt
+
+  # --- exposeDomains: selfsigned issuer ---
+
+  - it: exposeDomain with selfsigned issuer emits Certificate with duration and commonName
+    set:
+      exposeDomains:
+        foo:
+          hostname: foo.example.com
+          ssl:
+            issuer: selfsigned
+    asserts:
+      - documentIndex: 1
+        isKind:
+          of: Certificate
+      - documentIndex: 1
+        equal:
+          path: spec.duration
+          value: 2160h
+      - documentIndex: 1
+        equal:
+          path: spec.renewBefore
+          value: 150h
+      - documentIndex: 1
+        equal:
+          path: spec.commonName
+          value: foo.example.com
+      - documentIndex: 1
+        notExists:
+          path: metadata.annotations
+
+  # --- exposeDomains: custom issuer ---
+
+  - it: exposeDomain with custom issuer emits a Secret
+    set:
+      exposeDomains:
+        foo:
+          hostname: foo.example.com
+          ssl:
+            issuer: custom
+            crt: dGVzdA==
+            key: dGVzdA==
+    asserts:
+      - documentIndex: 1
+        isKind:
+          of: Secret
+      - documentIndex: 1
+        equal:
+          path: type
+          value: kubernetes.io/tls
+
+  - it: exposeDomain with custom issuer and existingTLSSecret emits no Secret
+    set:
+      exposeDomains:
+        foo:
+          hostname: foo.example.com
+          ssl:
+            issuer: custom
+            existingTLSSecret: my-tls-secret
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  # --- exposeDomains: arbitrary ClusterIssuer ---
+
+  - it: exposeDomain with arbitrary issuer emits a plain Certificate
+    set:
+      exposeDomains:
+        foo:
+          hostname: foo.example.com
+          ssl:
+            issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 1
+        isKind:
+          of: Certificate
+      - documentIndex: 1
+        equal:
+          path: apiVersion
+          value: 'cert-manager.io/v1'
+      - documentIndex: 1
+        equal:
+          path: spec.issuerRef.name
+          value: my-cluster-issuer
+      - documentIndex: 1
+        equal:
+          path: spec.issuerRef.kind
+          value: ClusterIssuer
+
+  - it: exposeDomain with arbitrary issuer Certificate has no ACME annotations
+    set:
+      exposeDomains:
+        foo:
+          hostname: foo.example.com
+          ssl:
+            issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 1
+        notExists:
+          path: metadata.annotations
+
+  - it: exposeDomain with arbitrary issuer Certificate has no duration or commonName
+    set:
+      exposeDomains:
+        foo:
+          hostname: foo.example.com
+          ssl:
+            issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 1
+        notExists:
+          path: spec.duration
+      - documentIndex: 1
+        notExists:
+          path: spec.commonName
+
+  - it: exposeDomain with arbitrary issuer Certificate has privateKey rotationPolicy
+    set:
+      exposeDomains:
+        foo:
+          hostname: foo.example.com
+          ssl:
+            issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.privateKey.rotationPolicy
+          value: Always

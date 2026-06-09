@@ -1,0 +1,309 @@
+suite: Site certificates
+templates:
+  - certificate.yaml
+tests:
+  # --- Main domain ---
+
+  - it: letsencrypt issuer creates a Certificate with ACME annotations
+    template: certificate.yaml
+    set:
+      ssl:
+        issuer: letsencrypt
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+      - documentIndex: 0
+        equal:
+          path: apiVersion
+          value: cert-manager.io/v1
+      - documentIndex: 0
+        equal:
+          path: metadata.annotations['cert-manager.io/issue-temporary-certificate']
+          value: "true"
+      - documentIndex: 0
+        exists:
+          path: metadata.annotations['acme.cert-manager.io/http01-override-ingress-name']
+      - documentIndex: 0
+        notExists:
+          path: spec.duration
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: letsencrypt
+
+  - it: letsencrypt-staging issuer creates a Certificate with ACME annotations
+    template: certificate.yaml
+    set:
+      ssl:
+        issuer: letsencrypt-staging
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+      - documentIndex: 0
+        equal:
+          path: metadata.annotations['cert-manager.io/issue-temporary-certificate']
+          value: "true"
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: letsencrypt-staging
+
+  - it: selfsigned issuer creates a Certificate with duration fields and no ACME annotations
+    template: certificate.yaml
+    set:
+      ssl:
+        issuer: selfsigned
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+      - documentIndex: 0
+        equal:
+          path: apiVersion
+          value: cert-manager.io/v1
+      - documentIndex: 0
+        equal:
+          path: spec.duration
+          value: 2160h
+      - documentIndex: 0
+        equal:
+          path: spec.renewBefore
+          value: 150h
+      - documentIndex: 0
+        exists:
+          path: spec.commonName
+      - documentIndex: 0
+        notExists:
+          path: metadata.annotations
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: selfsigned
+
+  - it: custom issuer creates a Secret when no existingTLSSecret
+    template: certificate.yaml
+    set:
+      ssl:
+        issuer: custom
+        crt: dGVzdA==
+        key: dGVzdA==
+        ca: dGVzdA==
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Secret
+      - documentIndex: 0
+        equal:
+          path: apiVersion
+          value: v1
+      - documentIndex: 0
+        equal:
+          path: type
+          value: kubernetes.io/tls
+
+  - it: custom issuer with existingTLSSecret emits no resources
+    template: certificate.yaml
+    set:
+      ssl:
+        issuer: custom
+        existingTLSSecret: my-existing-secret
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: arbitrary ClusterIssuer creates a plain Certificate without ACME annotations or duration fields
+    template: certificate.yaml
+    set:
+      ssl:
+        issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+      - documentIndex: 0
+        equal:
+          path: apiVersion
+          value: cert-manager.io/v1
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: my-cluster-issuer
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.kind
+          value: ClusterIssuer
+      - documentIndex: 0
+        notExists:
+          path: metadata.annotations
+      - documentIndex: 0
+        notExists:
+          path: spec.duration
+      - documentIndex: 0
+        notExists:
+          path: spec.commonName
+
+  # --- exposeDomains ---
+
+  - it: exposeDomain with ssl.enabled false creates no certificate
+    template: certificate.yaml
+    set:
+      exposeDomainsDefaults:
+        ingress: default
+        ssl:
+          enabled: true
+          issuer: letsencrypt
+      exposeDomains:
+        foo:
+          hostname: foo.example.com
+          ssl:
+            enabled: false
+    asserts:
+      - hasDocuments:
+          count: 1
+
+  - it: exposeDomain letsencrypt issuer creates a Certificate with ACME annotations
+    template: certificate.yaml
+    set:
+      ingress:
+        default:
+          tls: false
+      exposeDomains:
+        foo:
+          hostname: foo.example.com
+          ssl:
+            enabled: true
+            issuer: letsencrypt
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+      - documentIndex: 0
+        equal:
+          path: apiVersion
+          value: cert-manager.io/v1
+      - documentIndex: 0
+        equal:
+          path: metadata.annotations['cert-manager.io/issue-temporary-certificate']
+          value: "true"
+      - documentIndex: 0
+        exists:
+          path: metadata.annotations['acme.cert-manager.io/http01-override-ingress-name']
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: letsencrypt
+      - documentIndex: 0
+        notExists:
+          path: spec.duration
+
+  - it: exposeDomain selfsigned issuer creates a Certificate with duration fields
+    template: certificate.yaml
+    set:
+      ingress:
+        default:
+          tls: false
+      exposeDomains:
+        foo:
+          hostname: foo.example.com
+          ssl:
+            enabled: true
+            issuer: selfsigned
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+      - documentIndex: 0
+        equal:
+          path: spec.duration
+          value: 2160h
+      - documentIndex: 0
+        equal:
+          path: spec.renewBefore
+          value: 150h
+      - documentIndex: 0
+        equal:
+          path: spec.commonName
+          value: foo.example.com
+      - documentIndex: 0
+        notExists:
+          path: metadata.annotations
+
+  - it: exposeDomain arbitrary ClusterIssuer creates a plain Certificate
+    template: certificate.yaml
+    set:
+      ingress:
+        default:
+          tls: false
+      exposeDomains:
+        foo:
+          hostname: foo.example.com
+          ssl:
+            enabled: true
+            issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+      - documentIndex: 0
+        equal:
+          path: apiVersion
+          value: cert-manager.io/v1
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: my-cluster-issuer
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.kind
+          value: ClusterIssuer
+      - documentIndex: 0
+        notExists:
+          path: metadata.annotations
+      - documentIndex: 0
+        notExists:
+          path: spec.duration
+      - documentIndex: 0
+        notExists:
+          path: spec.commonName
+
+  - it: exposeDomain custom issuer creates a Secret
+    template: certificate.yaml
+    set:
+      ingress:
+        default:
+          tls: false
+      exposeDomains:
+        foo:
+          hostname: foo.example.com
+          ssl:
+            enabled: true
+            issuer: custom
+            crt: dGVzdA==
+            key: dGVzdA==
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Secret
+      - documentIndex: 0
+        equal:
+          path: type
+          value: kubernetes.io/tls
+
+  - it: exposeDomain custom issuer with existingTLSSecret creates no Secret
+    template: certificate.yaml
+    set:
+      ingress:
+        default:
+          tls: false
+      exposeDomains:
+        foo:
+          hostname: foo.example.com
+          ssl:
+            enabled: true
+            issuer: custom
+            existingTLSSecret: my-existing-secret
+    asserts:
+      - hasDocuments:
+          count: 0

@@ -360,6 +360,23 @@ tests:
           path: metadata.annotations['traefik.ingress.kubernetes.io/router.middlewares']
           value: NAMESPACE-RELEASE-NAME-rl@kubernetescrd
 
+  - it: normalizes double dashes in traefik3 middleware resource name
+    template: ingress-mw.yaml
+    capabilities:
+      apiVersions:
+        - traefik.io/v1alpha1
+    release:
+      name: foo--bar
+    set:
+      ingress:
+        default:
+          type: traefik
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: metadata.name
+          value: foo-bar-rl
+
   - it: prevents limit connections above 65536 for default ingress
     template: checks.yaml
     set:

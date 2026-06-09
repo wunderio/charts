@@ -1,0 +1,429 @@
+suite: drupal certificate
+templates:
+  - drupal-certificate.yaml
+  - checks.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
+tests:
+  - it: letsencrypt - creates a Certificate resource
+    template: drupal-certificate.yaml
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+
+  - it: letsencrypt - uses cert-manager.io/v1 apiVersion
+    template: drupal-certificate.yaml
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: apiVersion
+          value: 'cert-manager.io/v1'
+
+  - it: letsencrypt - certificate has correct name
+    template: drupal-certificate.yaml
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: metadata.name
+          value: 'RELEASE-NAME-crt'
+
+  - it: letsencrypt - certificate has ACME temporary certificate annotation
+    template: drupal-certificate.yaml
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: metadata.annotations['cert-manager.io/issue-temporary-certificate']
+          value: 'true'
+
+  - it: letsencrypt - certificate has ACME http01 override ingress annotation
+    template: drupal-certificate.yaml
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: metadata.annotations['acme.cert-manager.io/http01-override-ingress-name']
+          value: 'RELEASE-NAME-drupal'
+
+  - it: letsencrypt - certificate secretName is correct
+    template: drupal-certificate.yaml
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: spec.secretName
+          value: 'RELEASE-NAME-tls'
+
+  - it: letsencrypt - certificate issuerRef is correct
+    template: drupal-certificate.yaml
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: 'letsencrypt'
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.kind
+          value: 'ClusterIssuer'
+
+  - it: letsencrypt - certificate has no duration or renewBefore fields
+    template: drupal-certificate.yaml
+    asserts:
+      - documentIndex: 0
+        notExists:
+          path: spec.duration
+      - documentIndex: 0
+        notExists:
+          path: spec.renewBefore
+
+  - it: letsencrypt-staging - creates Certificate with staging issuerRef
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: letsencrypt-staging
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: 'letsencrypt-staging'
+
+  - it: letsencrypt-staging - certificate has ACME annotations
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: letsencrypt-staging
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: metadata.annotations['cert-manager.io/issue-temporary-certificate']
+          value: 'true'
+      - documentIndex: 0
+        equal:
+          path: metadata.annotations['acme.cert-manager.io/http01-override-ingress-name']
+          value: 'RELEASE-NAME-drupal'
+
+  - it: selfsigned - creates Certificate resource
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: selfsigned
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+
+  - it: selfsigned - certificate has duration and renewBefore fields
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: selfsigned
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: spec.duration
+          value: '2160h'
+      - documentIndex: 0
+        equal:
+          path: spec.renewBefore
+          value: '150h'
+
+  - it: selfsigned - certificate has no ACME annotations
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: selfsigned
+    asserts:
+      - documentIndex: 0
+        notExists:
+          path: metadata.annotations
+
+  - it: selfsigned - certificate issuerRef is correct
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: selfsigned
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: 'selfsigned'
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.kind
+          value: 'ClusterIssuer'
+
+  - it: custom - creates a kubernetes.io/tls Secret
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: custom
+      ssl.ca: myca
+      ssl.crt: mycrt
+      ssl.key: mykey
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Secret
+      - documentIndex: 0
+        equal:
+          path: type
+          value: 'kubernetes.io/tls'
+
+  - it: custom - secret has correct name
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: custom
+      ssl.ca: myca
+      ssl.crt: mycrt
+      ssl.key: mykey
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: metadata.name
+          value: 'RELEASE-NAME-tls-custom'
+
+  - it: custom - existingTLSSecret skips resource creation
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: custom
+      ssl.existingTLSSecret: my-existing-secret
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: generic issuer - creates Certificate resource
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+
+  - it: generic issuer - certificate has correct issuerRef
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.name
+          value: 'my-cluster-issuer'
+      - documentIndex: 0
+        equal:
+          path: spec.issuerRef.kind
+          value: 'ClusterIssuer'
+
+  - it: generic issuer - certificate has no ACME annotations
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 0
+        notExists:
+          path: metadata.annotations
+
+  - it: generic issuer - certificate has no duration or renewBefore fields
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 0
+        notExists:
+          path: spec.duration
+      - documentIndex: 0
+        notExists:
+          path: spec.renewBefore
+
+  - it: tls disabled - no certificate resources are rendered
+    template: drupal-certificate.yaml
+    set:
+      ingress.default.tls: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: domainPrefixes - creates additional Certificate per prefix
+    template: drupal-certificate.yaml
+    set:
+      domainPrefixes: ['en', 'fi']
+    asserts:
+      - hasDocuments:
+          count: 3
+      - documentIndex: 0
+        equal:
+          path: metadata.name
+          value: 'RELEASE-NAME-crt'
+      - documentIndex: 1
+        isKind:
+          of: Certificate
+      - documentIndex: 1
+        equal:
+          path: metadata.name
+          value: 'RELEASE-NAME-crt-p0'
+      - documentIndex: 1
+        equal:
+          path: spec.secretName
+          value: 'RELEASE-NAME-tls-p0'
+
+  - it: domainPrefixes letsencrypt - prefix certificates have ACME annotations
+    template: drupal-certificate.yaml
+    set:
+      domainPrefixes: ['en']
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: metadata.annotations['cert-manager.io/issue-temporary-certificate']
+          value: 'true'
+
+  - it: domainPrefixes selfsigned - prefix certificates have duration fields
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: selfsigned
+      domainPrefixes: ['en']
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.duration
+          value: '2160h'
+      - documentIndex: 1
+        equal:
+          path: spec.renewBefore
+          value: '150h'
+
+  - it: domainPrefixes custom - prefix certificates are Secrets
+    template: drupal-certificate.yaml
+    set:
+      ssl.issuer: custom
+      ssl.ca: myca
+      ssl.crt: mycrt
+      ssl.key: mykey
+      domainPrefixes: ['en']
+    asserts:
+      - documentIndex: 1
+        isKind:
+          of: Secret
+      - documentIndex: 1
+        equal:
+          path: metadata.name
+          value: 'RELEASE-NAME-tls-p0-custom'
+
+  - it: exposeDomains - letsencrypt creates Certificate with ACME annotations
+    template: drupal-certificate.yaml
+    set:
+      exposeDomains:
+        example:
+          hostname: example.com
+    asserts:
+      - documentIndex: 1
+        isKind:
+          of: Certificate
+      - documentIndex: 1
+        equal:
+          path: metadata.name
+          value: 'RELEASE-NAME-crt-example'
+      - documentIndex: 1
+        equal:
+          path: spec.secretName
+          value: 'RELEASE-NAME-tls-example'
+      - documentIndex: 1
+        equal:
+          path: metadata.annotations['cert-manager.io/issue-temporary-certificate']
+          value: 'true'
+
+  - it: exposeDomains - letsencrypt annotation references correct ingress name
+    template: drupal-certificate.yaml
+    set:
+      exposeDomains:
+        example:
+          hostname: example.com
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: metadata.annotations['acme.cert-manager.io/http01-override-ingress-name']
+          value: 'RELEASE-NAME-drupal-default'
+
+  - it: exposeDomains - letsencrypt certificate has correct issuerRef
+    template: drupal-certificate.yaml
+    set:
+      exposeDomains:
+        example:
+          hostname: example.com
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.issuerRef.name
+          value: 'letsencrypt'
+
+  - it: exposeDomains - selfsigned creates Certificate with duration fields
+    template: drupal-certificate.yaml
+    set:
+      exposeDomains:
+        example:
+          hostname: example.com
+          ssl:
+            issuer: selfsigned
+    asserts:
+      - documentIndex: 1
+        isKind:
+          of: Certificate
+      - documentIndex: 1
+        equal:
+          path: spec.duration
+          value: '2160h'
+      - documentIndex: 1
+        equal:
+          path: spec.renewBefore
+          value: '150h'
+      - documentIndex: 1
+        notExists:
+          path: metadata.annotations
+
+  - it: exposeDomains - custom creates a kubernetes.io/tls Secret
+    template: drupal-certificate.yaml
+    set:
+      exposeDomains:
+        example:
+          hostname: example.com
+          ssl:
+            issuer: custom
+            crt: mycrt
+            key: mykey
+    asserts:
+      - documentIndex: 1
+        isKind:
+          of: Secret
+      - documentIndex: 1
+        equal:
+          path: metadata.name
+          value: 'RELEASE-NAME-tls-example-custom'
+      - documentIndex: 1
+        equal:
+          path: type
+          value: 'kubernetes.io/tls'
+
+  - it: exposeDomains - generic issuer creates Certificate without ACME annotations
+    template: drupal-certificate.yaml
+    set:
+      exposeDomains:
+        example:
+          hostname: example.com
+          ssl:
+            issuer: my-cluster-issuer
+    asserts:
+      - documentIndex: 1
+        isKind:
+          of: Certificate
+      - documentIndex: 1
+        equal:
+          path: spec.issuerRef.name
+          value: 'my-cluster-issuer'
+      - documentIndex: 1
+        notExists:
+          path: metadata.annotations
+
+  - it: exposeDomains - ssl disabled in exposeDomainsDefaults prevents certificate creation
+    template: drupal-certificate.yaml
+    set:
+      exposeDomainsDefaults.ssl.enabled: false
+      exposeDomains:
+        example:
+          hostname: example.com
+    asserts:
+      - hasDocuments:
+          count: 1

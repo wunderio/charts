@@ -1,57 +1,7 @@
 {{- $context_ingress := .Values.ingress.default }}
 {{- $context_ssl := .Values.ssl }}
 {{- if $context_ingress.tls }}
-{{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-apiVersion: {{ include "cert-manager.api-version" . | trim }}
-kind: Certificate
-metadata:
-  name: {{ .Release.Name }}-crt
-  annotations:
-    cert-manager.io/issue-temporary-certificate: "true"
-    acme.cert-manager.io/http01-override-ingress-name: "{{ .Release.Name }}-simple"
-  labels:
-    {{- include "simple.release_labels" . | nindent 4 }}
-spec:
-  secretName: {{ .Release.Name }}-tls
-  dnsNames:
-  - {{ template "simple.domain" . }}
-  issuerRef:
-    name: {{ $context_ssl.issuer }}
-    kind: ClusterIssuer
-{{- if eq ( include "cert-manager.api-version" . | trim ) "certmanager.k8s.io/v1alpha1" }}
-  acme:
-    config:
-      - http01:
-          ingress: {{ .Release.Name }}-simple
-        domains:
-          - {{ template "simple.domain" . }}
-{{- end }}
-  privateKey:
-    rotationPolicy: "Always"
----
-
-{{- else if eq $context_ssl.issuer "selfsigned" }}
-apiVersion: {{ include "cert-manager.api-version" . | trim }}
-kind: Certificate
-metadata:
-  name: {{ .Release.Name }}-crt
-  labels:
-    {{- include "simple.release_labels" . | nindent 4 }}
-spec:
-  secretName: {{ .Release.Name }}-tls
-  duration: 2160h
-  renewBefore: 150h 
-  commonName: {{ template "simple.domain" . }}
-  dnsNames:
-  - {{ template "simple.domain" . }}
-  issuerRef:
-    name: {{ $context_ssl.issuer }}
-    kind: ClusterIssuer
-  privateKey:
-    rotationPolicy: "Always"
----
-
-{{- else if eq $context_ssl.issuer "custom" }}
+{{- if eq $context_ssl.issuer "custom" }}
 {{- if not $context_ssl.existingTLSSecret }}
 apiVersion: v1
 kind: Secret
@@ -66,65 +16,43 @@ data:
   tls.key: {{ $context_ssl.key | b64enc }}
 ---
 {{- end }}
-{{- end }}
-
-# Certificates for exposeDomains 
-
-{{- range $index, $domain := .Values.exposeDomains }}
-{{- $domain := merge $domain $.Values.exposeDomainsDefaults }}
-{{- if $domain.ssl }}
-{{- if $domain.ssl.enabled }}
-{{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-apiVersion: {{ include "cert-manager.api-version" $ | trim }}
+{{- else }}
+apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: {{ $.Release.Name }}-crt-{{ $index }}
+  name: {{ .Release.Name }}-crt
+  {{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
   annotations:
     cert-manager.io/issue-temporary-certificate: "true"
-    acme.cert-manager.io/http01-override-ingress-name: "{{ $.Release.Name }}-simple-{{ $domain.ingress }}"
+    acme.cert-manager.io/http01-override-ingress-name: "{{ .Release.Name }}-simple"
+  {{- end }}
   labels:
-    {{- include "simple.release_labels" $ | nindent 4 }}
+    {{- include "simple.release_labels" . | nindent 4 }}
 spec:
-  secretName: {{ $.Release.Name }}-tls-{{ $index }}
-  dnsNames:
-  - {{ $domain.hostname }}
-  issuerRef:
-    name: {{ $domain.ssl.issuer }}
-    kind: ClusterIssuer
-{{- if eq ( include "cert-manager.api-version" $ | trim ) "certmanager.k8s.io/v1alpha1" }}
-  acme:
-    config:
-      - http01:
-          ingress: {{ $.Release.Name }}-simple-{{ $domain.ingress }}
-        domains:
-          - {{ $domain.hostname }}
-{{- end }}
-  privateKey:
-    rotationPolicy: "Always"
----
-
-{{- else if eq $domain.ssl.issuer "selfsigned" }}
-apiVersion: {{ include "cert-manager.api-version" $ | trim }}
-kind: Certificate
-metadata:
-  name: {{ $.Release.Name }}-crt-{{ $index }}
-  labels:
-    {{- include "simple.release_labels" $ | nindent 4 }}
-spec:
-  secretName: {{ $.Release.Name }}-tls-{{ $index }}
+  secretName: {{ .Release.Name }}-tls
+  {{- if eq $context_ssl.issuer "selfsigned" }}
   duration: 2160h
-  renewBefore: 150h 
-  commonName: {{ $domain.hostname }}
+  renewBefore: 150h
+  commonName: {{ template "simple.domain" . }}
+  {{- end }}
   dnsNames:
-  - {{ $domain.hostname }}
+  - {{ template "simple.domain" . }}
   issuerRef:
-    name: {{ $domain.ssl.issuer }}
+    name: {{ $context_ssl.issuer }}
     kind: ClusterIssuer
   privateKey:
     rotationPolicy: "Always"
 ---
+{{- end }}
+{{- end }}
 
-{{- else if eq $domain.ssl.issuer "custom" }}
+# Certificates for exposeDomains
+
+{{- range $index, $domain := .Values.exposeDomains }}
+{{- $domain := mergeOverwrite ($.Values.exposeDomainsDefaults | toYaml | fromYaml) $domain }}
+{{- if $domain.ssl }}
+{{- if $domain.ssl.enabled }}
+{{- if eq $domain.ssl.issuer "custom" }}
 {{- if not $domain.ssl.existingTLSSecret }}
 apiVersion: v1
 kind: Secret
@@ -141,7 +69,33 @@ data:
   tls.key: {{ $domain.ssl.key | default "" | b64enc }}
 ---
 {{- end }}
-{{- end }}
+{{- else }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-crt-{{ $index }}
+  {{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+  annotations:
+    cert-manager.io/issue-temporary-certificate: "true"
+    acme.cert-manager.io/http01-override-ingress-name: "{{ $.Release.Name }}-simple-{{ $domain.ingress }}"
+  {{- end }}
+  labels:
+    {{- include "simple.release_labels" $ | nindent 4 }}
+spec:
+  secretName: {{ $.Release.Name }}-tls-{{ $index }}
+  {{- if eq $domain.ssl.issuer "selfsigned" }}
+  duration: 2160h
+  renewBefore: 150h
+  commonName: {{ $domain.hostname }}
+  {{- end }}
+  dnsNames:
+  - {{ $domain.hostname }}
+  issuerRef:
+    name: {{ $domain.ssl.issuer }}
+    kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: "Always"
+---
 {{- end }}
 {{- end }}
 {{- end }}
