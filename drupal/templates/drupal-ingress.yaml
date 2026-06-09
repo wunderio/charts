@@ -1,9 +1,9 @@
 {{- $ingress := .Values.ingress.default }}
 {{- $context_ssl := .Values.ssl }}
-{{- $letsencrypt_in_use := false }}
+{{- $cluster_issuer := "" }}
 {{- if $ingress.tls }}
-{{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-{{- $letsencrypt_in_use = true }}
+{{- if and (ne $context_ssl.issuer "selfsigned") (ne $context_ssl.issuer "custom") }}
+{{- $cluster_issuer = $context_ssl.issuer }}
 {{- end }}
 {{- end }}
 apiVersion: {{ include "ingress.api-version" . | trim }}
@@ -15,11 +15,7 @@ metadata:
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- end }}
     {{- if $ingress.tls }}
-    {{- if eq ( include "cert-manager.api-version" $ | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
-    {{- else }}
-    certmanager.k8s.io/acme-http01-edit-in-place: "true"
-    {{- end }}
     {{- if eq $ingress.type "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
     {{- end }}
@@ -52,8 +48,8 @@ metadata:
     {{- end }}
 
     {{- if eq $ingress.type "gce" }}
-    {{- if $letsencrypt_in_use }}
-    cert-manager.io/cluster-issuer: letsencrypt
+    {{- if $cluster_issuer }}
+    cert-manager.io/cluster-issuer: {{ $cluster_issuer }}
     {{- end }}
     {{- end }}
     {{- if $ingress.staticIpAddressName }}
@@ -61,8 +57,8 @@ metadata:
     {{- end }}
 
     {{- if or (eq $ingress.type "azure/application-gateway") (eq $ingress.type "azure-application-gateway") }}
-    {{- if $letsencrypt_in_use }}
-    cert-manager.io/cluster-issuer: letsencrypt
+    {{- if $cluster_issuer }}
+    cert-manager.io/cluster-issuer: {{ $cluster_issuer }}
     {{- end }}
     appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399, 401-404"
     {{- end }}
@@ -72,7 +68,7 @@ metadata:
     {{- end }}
 
     {{- if eq ( include "silta-cluster.traefik3.enabled" $ ) "true" }}
-    traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $.Release.Name }}-rl@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $.Release.Name | replace "--" "-" }}-rl@kubernetescrd
     {{- end }}
 
     {{- if (index .Values "silta-release").downscaler.enabled }}
@@ -163,14 +159,14 @@ spec:
   {{- end }}
 {{- end }}
 
-{{- $letsencrypt_in_use := false }}
+{{- $cluster_issuer := "" }}
 {{- range $index, $domain := $.Values.exposeDomains }}
-{{ $domain := merge $domain $.Values.exposeDomainsDefaults}}
+{{- $domain := mergeOverwrite (deepCopy $.Values.exposeDomainsDefaults) $domain }}
 {{- if eq $domain.ingress $ingress_index }}
 {{- if $domain.ssl }}
 {{- if $domain.ssl.enabled }}
-{{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
-{{- $letsencrypt_in_use = true }}
+{{- if and (ne $domain.ssl.issuer "selfsigned") (ne $domain.ssl.issuer "custom") }}
+{{- $cluster_issuer = $domain.ssl.issuer }}
 {{- end }}
 {{- end }}
 {{- end }}
@@ -187,11 +183,7 @@ metadata:
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- end }}
     {{- if $ingress.tls }}
-    {{- if eq ( include "cert-manager.api-version" $ | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
-    {{- else }}
-    certmanager.k8s.io/acme-http01-edit-in-place: "true"
-    {{- end }}
     {{- if eq $ingress.type "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
     {{- end }}
@@ -224,8 +216,8 @@ metadata:
     {{- end }}
 
     {{- if eq $ingress.type "gce" }}
-    {{- if $letsencrypt_in_use }}
-    cert-manager.io/cluster-issuer: letsencrypt
+    {{- if $cluster_issuer }}
+    cert-manager.io/cluster-issuer: {{ $cluster_issuer }}
     {{- end }}
     {{- end }}
     {{- if $ingress.staticIpAddressName }}
@@ -233,8 +225,8 @@ metadata:
     {{- end }}
 
     {{- if or (eq $ingress.type "azure/application-gateway") (eq $ingress.type "azure-application-gateway") }}
-    {{- if $letsencrypt_in_use }}
-    cert-manager.io/cluster-issuer: letsencrypt
+    {{- if $cluster_issuer }}
+    cert-manager.io/cluster-issuer: {{ $cluster_issuer }}
     {{- end }}
     appgw.ingress.kubernetes.io/health-probe-status-codes: "200-399, 401-404"
     {{- end }}
@@ -244,7 +236,7 @@ metadata:
     {{- end }}
 
     {{- if eq ( include "silta-cluster.traefik3.enabled" $ ) "true" }}
-    traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $.Release.Name }}-rl-{{ $ingress_index }}@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $.Release.Name | replace "--" "-" }}-rl-{{ $ingress_index }}@kubernetescrd
     {{- end }}
 
     {{- if (index $.Values "silta-release").downscaler.enabled }}
