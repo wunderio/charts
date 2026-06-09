@@ -15,11 +15,7 @@ metadata:
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- end }}
     {{- if $ingress.tls }}
-    {{- if eq ( include "cert-manager.api-version" . | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
-    {{- else }}
-    certmanager.k8s.io/acme-http01-edit-in-place: "true"
-    {{- end }}
     {{- if eq $ingress.type "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
     {{- end }}
@@ -70,7 +66,7 @@ metadata:
     {{- if $ingress.extraAnnotations }}
     {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- if eq ( include "silta-cluster.traefik3.enabled" $ ) "true" }}
-    traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $.Release.Name }}-rl@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $.Release.Name | replace "--" "-" }}-rl@kubernetescrd
     {{- end }}
     {{- end }}
 
@@ -184,11 +180,7 @@ metadata:
     kubernetes.io/ingress.class: {{ $ingress.type | quote }}
     {{- end }}
     {{- if $ingress.tls }}
-    {{- if eq ( include "cert-manager.api-version" $ | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
-    {{- else }}
-    certmanager.k8s.io/acme-http01-edit-in-place: "true"
-    {{- end }}
     {{- if eq $ingress.type "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
     {{- end }}
@@ -239,7 +231,7 @@ metadata:
     {{- if $ingress.extraAnnotations }}
     {{- $ingress.extraAnnotations | toYaml | nindent 4 }}
     {{- if eq ( include "silta-cluster.traefik3.enabled" $ ) "true" }}
-    traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $.Release.Name }}-rl@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: {{ $.Release.Namespace }}-{{ $.Release.Name | replace "--" "-" }}-rl@kubernetescrd
     {{- end }}
     {{- end }}
 
