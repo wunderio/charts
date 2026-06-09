@@ -4,7 +4,7 @@
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: {{ $.Release.Name }}-rl
+  name: {{ $.Release.Name | replace "--" "-" }}-rl
   labels:
     {{- include "simple.release_labels" $ | nindent 4 }}
 spec:
@@ -31,7 +31,7 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: Middleware
 metadata:
-  name: {{ $.Release.Name }}-rl-{{ $ingress_index }}
+  name: {{ $.Release.Name | replace "--" "-" }}-rl-{{ $ingress_index }}
   labels:
     {{- include "simple.release_labels" $ | nindent 4 }}
 spec:
