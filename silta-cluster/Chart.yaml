@@ -57,7 +57,7 @@ dependencies:
   repository: file://../silta-proxy
   condition: silta-proxy.enabled
 - name: instana-agent
-  version: 1.2.x
+  version: 2.0.x
   repository: https://agents.instana.io/helm
   condition: instana-agent.enabled
 - name: nfs-subdir-external-provisioner
