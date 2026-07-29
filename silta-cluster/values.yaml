@@ -166,6 +166,16 @@ traefik3:
     name: traefik
   namespaceOverride: silta-cluster
   ports:
+    web:
+      expose:
+        default: true
+      forwardedHeaders:
+        # Trust forwarded headers information (X-Forwarded-*).
+        trustedIPs: []
+        insecure: false
+      proxyProtocol:
+        trustedIPs: []
+        insecure: false
     websecure:
       forwardedHeaders:
         # Trust forwarded headers information (X-Forwarded-*).
@@ -206,12 +216,14 @@ traefik3:
 ssl:
   enabled: true
   email: admin@example.com
-  # Available issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
+  # Available issuers: letsencrypt-staging, letsencrypt, selfsigned, custom. Other values will be passed as issuerClass to cert-manager.
   issuer: letsencrypt
   # Used when certificate issuer is "custom"
   # ca: ""
   # key: ""
   # crt: ""
+  # Use wildcard certificate for the service hosts. Note: requires DNS-01 challenge and may not be supported by all issuers.
+  wildcard: false
 
 # Community ingress-nginx chart
 # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/
