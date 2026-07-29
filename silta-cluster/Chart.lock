@@ -1,19 +1,19 @@
 dependencies:
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
-  version: 4.13.8
+  version: 4.13.9
 - name: traefik1
   repository: file://../forked/traefik/traefik-1.87.7
   version: 1.87.7
 - name: traefik-crds
   repository: https://traefik.github.io/charts
-  version: 1.15.0
+  version: 1.18.0
 - name: traefik
   repository: https://traefik.github.io/charts
-  version: 39.0.5
+  version: 41.0.2
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
-  version: 4.13.8
+  version: 4.13.9
 - name: pxc-operator
   repository: https://percona.github.io/percona-helm-charts/
   version: 1.12.2
@@ -38,5 +38,5 @@ dependencies:
 - name: docker-registry
   repository: https://twuni.github.io/docker-registry.helm
   version: 2.1.0
-digest: sha256:e104a004c2777642c19555548a68a86c49b60026fa6580accf120d5b8d1a7868
-generated: "2026-03-17T14:06:51.315881314+02:00"
+digest: sha256:d90d2e8effb475b53d472812cf2c4219379d6489e32a3ae19ca7cff300bd3b06
+generated: "2026-07-08T10:33:45.030102074+03:00"
