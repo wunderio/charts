@@ -199,6 +199,14 @@ imagePullSecrets:
 {{- end }}
 
 {{- define "drupal.env" }}
+{{- include "drupal.env-common" . }}
+{{- end }}
+
+{{- define "drupal.pre-release-env" }}
+{{- include "drupal.env-common" . }}
+{{- end }}
+
+{{- define "drupal.env-common" }}
 - name: SILTA_CLUSTER
   value: "1"
 - name: PROJECT_NAME
@@ -215,18 +223,6 @@ imagePullSecrets:
 - name: TZ
   value: {{ .Values.timezone | quote }}
 {{- end }}
-{{- include "drupal.env-common" . }}
-{{- end }}
-
-{{- define "drupal.pre-release-env" }}
-{{- if .Values.timezone }}
-- name: TZ
-  value: {{ .Values.timezone | quote }}
-{{- end }}
-{{- include "drupal.env-common" . }}
-{{- end }}
-
-{{- define "drupal.env-common" }}
 {{- include "drupal.db-env" . }}
 - name: ERROR_LEVEL
   value: {{ .Values.php.errorLevel }}
