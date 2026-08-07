@@ -27,7 +27,9 @@ spec:
       enableServiceLinks: false
       containers:
       - name: pre-release
-        {{- include "drupal.php-container" . | nindent 8 }}
+        image: {{ .Values.php.image | quote }}
+        env:
+        {{- include "drupal.pre-release-env" . | indent 8 }}
         command: ["/bin/bash", "-c"]
         args:
         - |
