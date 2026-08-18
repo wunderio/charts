@@ -24,6 +24,10 @@ spec:
           env:
           - name: JWKS_URL
             value: {{ .Values.proxies.jwksUrl }}
+          - name: PROJECT_MAPPING_URL
+            value: {{ .Values.proxies.projectMappingURL | quote }}
+          - name: PROJECT_MAPPING_KEY
+            value: {{ .Values.proxies.projectMappingKey | quote }}
           - name: METRICS_WRITE_URL
             value: {{ .Values.proxies.metrics.writeUrl }}
           - name: METRICS_READ_URL
