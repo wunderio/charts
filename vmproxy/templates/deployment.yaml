@@ -24,6 +24,10 @@ spec:
           env:
           - name: JWKS_URL
             value: {{ .Values.proxies.jwksUrl }}
+          - name: PROJECT_MAPPING_URL
+            value: {{ .Values.proxies.projectMappingURL }}
+          - name: PROJECT_MAPPING_KEY
+            value: {{ .Values.proxies.projectMappingKey }}
           - name: METRICS_WRITE_URL
             value: {{ .Values.proxies.metrics.writeUrl }}
           - name: METRICS_READ_URL
@@ -38,7 +42,7 @@ spec:
             value: {{ .Values.proxies.logs.readUrl }}
           - name: DEBUG_LOGS_INSERT
             value: {{ .Values.proxies.logs.debugInsert | quote }}
-          - name: DEBUG_LOGS_SELECT 
+          - name: DEBUG_LOGS_SELECT
             value: {{ .Values.proxies.logs.debugSelect | quote }}
           - name: TRACES_WRITE_URL
             value: {{ .Values.proxies.traces.writeUrl }}

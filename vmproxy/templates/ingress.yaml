@@ -9,57 +9,57 @@ metadata:
     {{- end }}
 spec:
   rules:
-    - host: {{ .Values.ingress.host }}
-      http:
-        paths:
-        - backend:
-            service:
-              name: {{ $.Release.Name }}
-              port:
-                number: {{ $.Values.service.port }}
-          path: /metrics/insert
-          pathType: Prefix
-        - backend:
-            service:
-              name: {{ $.Release.Name }}
-              port:
-                number: {{ $.Values.service.port }}
-          path: /metrics/select
-          pathType: Prefix
-    - host: {{ .Values.ingress.host }}
-      http:
-        paths:
-        - backend:
-            service:
-              name: {{ $.Release.Name }}
-              port:
-                number: {{ $.Values.service.port }}
-          path: /logs/insert
-          pathType: Prefix
-        - backend:
-            service:
-              name: {{ $.Release.Name }}
-              port:
-                number: {{ $.Values.service.port }}
-          path: /logs/select
-          pathType: Prefix
-    - host: {{ .Values.ingress.host }}
-      http:
-        paths:
-        - backend:
-            service:
-              name: {{ $.Release.Name }}
-              port:
-                number: {{ $.Values.service.port }}
-          path: /traces/insert
-          pathType: Prefix
-        - backend:
-            service:
-              name: {{ $.Release.Name }}
-              port:
-                number: {{ $.Values.service.port }}
-          path: /traces/select
-          pathType: Prefix
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ $.Release.Name }}
+            port:
+              number: {{ $.Values.service.port }}
+        path: /metrics/insert
+        pathType: Prefix
+      - backend:
+          service:
+            name: {{ $.Release.Name }}
+            port:
+              number: {{ $.Values.service.port }}
+        path: /metrics/select
+        pathType: Prefix
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ $.Release.Name }}
+            port:
+              number: {{ $.Values.service.port }}
+        path: /logs/insert
+        pathType: Prefix
+      - backend:
+          service:
+            name: {{ $.Release.Name }}
+            port:
+              number: {{ $.Values.service.port }}
+        path: /logs/select
+        pathType: Prefix
+  - host: {{ .Values.ingress.host }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ $.Release.Name }}
+            port:
+              number: {{ $.Values.service.port }}
+        path: /traces/insert
+        pathType: Prefix
+      - backend:
+          service:
+            name: {{ $.Release.Name }}
+            port:
+              number: {{ $.Values.service.port }}
+        path: /traces/select
+        pathType: Prefix
   tls:
   - hosts:
     - {{ .Values.ingress.host }}
