@@ -128,6 +128,8 @@ traefik:
 traefik3crds:
   enabled: false
 
+traefik3enabled: false
+
 # Traefik 3 chart
 # https://github.com/traefik/traefik-helm-chart/blob/20a237feeeb5b541dae0b99bcdea8b94fae210a1/traefik/values.yaml
 # Important: This subchart can't be enabled with "enabled:true", use "traefik3.providers.kubernetesIngress.enabled:true" instead.
@@ -149,16 +151,31 @@ traefik3:
       # Use this instead of the legacy traefik chart
       enabled: false
       ingressClass: traefik
-      # false: "404 page not found", true: "no available server"
+      # false: "404 page not found", true: "503 no available server", when there are no endpoints available
       allowEmptyServices: false
+    kubernetesIngressNGINX:
+      enabled: false
+      ingressClass: traefik
+      ingressClassByName: true
+      watchIngressWithoutClass: true
     kubernetesGateway:
       enabled: false
   ingressClass:
     enabled: true
     isDefaultClass: false
-    name: "traefik"
+    name: traefik
   namespaceOverride: silta-cluster
   ports:
+    web:
+      expose:
+        default: true
+      forwardedHeaders:
+        # Trust forwarded headers information (X-Forwarded-*).
+        trustedIPs: []
+        insecure: false
+      proxyProtocol:
+        trustedIPs: []
+        insecure: false
     websecure:
       forwardedHeaders:
         # Trust forwarded headers information (X-Forwarded-*).
@@ -174,15 +191,11 @@ traefik3:
     limits:
       cpu: 1
       memory: 512M
-  logs:
-    general:
-      # @schema enum:["common", "json", null]; type:[string, null]; default: "common"
-      # format: common
-      # @schema enum:[TRACE,DEBUG,INFO,WARN,ERROR,FATAL,PANIC]; default: "INFO"
-      level: "WARN"
-    access:
-      # access logs
-      enabled: false
+  log:
+    # @schema enum:[TRACE,DEBUG,INFO,WARN,ERROR,FATAL,PANIC]; default: "INFO"
+    level: "WARN"
+  accessLog:
+    enabled: false
   tlsOptions:
     default:
       sniStrict: true
@@ -203,12 +216,14 @@ traefik3:
 ssl:
   enabled: true
   email: admin@example.com
-  # Available issuers: letsencrypt-staging, letsencrypt, selfsigned, custom
+  # Available issuers: letsencrypt-staging, letsencrypt, selfsigned, custom. Other values will be passed as issuerClass to cert-manager.
   issuer: letsencrypt
   # Used when certificate issuer is "custom"
   # ca: ""
   # key: ""
   # crt: ""
+  # Use wildcard certificate for the service hosts. Note: requires DNS-01 challenge and may not be supported by all issuers.
+  wildcard: false
 
 # Community ingress-nginx chart
 # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/

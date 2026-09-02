@@ -24,10 +24,10 @@ dependencies:
   condition: traefik3crds.enabled,traefik3.providers.kubernetesIngress.enabled,traefik3.providers.kubernetesGateway.enabled
 - name: traefik
   alias: traefik3
-  version: 39.x.x
+  version: 41.x.x
   repository: https://traefik.github.io/charts
   # use traefik3.providers.kubernetesIngress.enabled or traefik3.providers.kubernetesGateway.enabled
-  condition: traefik3.providers.kubernetesIngress.enabled,traefik3.providers.kubernetesGateway.enabled
+  condition: traefik3enabled
 - name: ingress-nginx
   # check kubernetes version requirements here: https://github.com/kubernetes/ingress-nginx
   version: 4.13.x
