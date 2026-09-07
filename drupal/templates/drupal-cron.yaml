@@ -22,7 +22,7 @@ spec:
   startingDeadlineSeconds: 3600
   failedJobsHistoryLimit: 1
   successfulJobsHistoryLimit: 1
-  suspend: false
+  suspend: {{ $job.suspend | default false }}
   jobTemplate:
     spec:
       {{- if or $job.activeDeadlineSeconds ($.Values.php.cronJobDefaults).activeDeadlineSeconds }}
@@ -35,6 +35,12 @@ spec:
             {{- include "drupal.release_labels" $ | nindent 12 }}
             cronjob: "true"
             cronjob-name: {{ $index | quote }}
+          {{- /* Per-cron annotations win over cronJobDefaults.annotations on a key clash. */}}
+          {{- $annotations := merge (dict) ($job.annotations | default dict) (($.Values.php.cronJobDefaults).annotations | default dict) }}
+          {{- with $annotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
         spec:
           enableServiceLinks: false
           containers:
