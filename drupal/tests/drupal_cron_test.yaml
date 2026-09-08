@@ -223,3 +223,89 @@ tests:
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.memory
           value: 20G
+
+  - it: has no pod annotations by default
+    template: drupal-cron.yaml
+    asserts:
+      - isNull:
+          path: spec.jobTemplate.spec.template.metadata.annotations
+
+  - it: takes custom pod annotations
+    template: drupal-cron.yaml
+    set:
+      php.cron.drupal.annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.metadata.annotations
+          value:
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+
+  - it: applies cronJobDefaults annotations to every cron job
+    template: drupal-cron.yaml
+    set:
+      php.cronJobDefaults.annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+      php.cron:
+        drupal:
+          command: foo
+          schedule: "0 * * * *"
+        project-cron:
+          command: bar
+          schedule: "30 * * * *"
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: spec.jobTemplate.spec.template.metadata.annotations
+          value:
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+        documentIndex: 0
+      - equal:
+          path: spec.jobTemplate.spec.template.metadata.annotations
+          value:
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+        documentIndex: 1
+
+  - it: merges cron job annotations over cronJobDefaults annotations
+    template: drupal-cron.yaml
+    set:
+      php.cronJobDefaults.annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+        example.com/default-only: "default"
+      php.cron.drupal.annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+        example.com/cron-only: "cron"
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.metadata.annotations
+          value:
+            cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+            example.com/default-only: "default"
+            example.com/cron-only: "cron"
+
+  - it: is not suspended by default
+    template: drupal-cron.yaml
+    asserts:
+      - equal:
+          path: spec.suspend
+          value: false
+
+  - it: can be suspended
+    template: drupal-cron.yaml
+    set:
+      php.cron.drupal.suspend: true
+    asserts:
+      - equal:
+          path: spec.suspend
+          value: true
+
+  - it: takes activeDeadlineSeconds from the cron job over cronJobDefaults
+    template: drupal-cron.yaml
+    set:
+      php.cronJobDefaults.activeDeadlineSeconds: 3600
+      php.cron.drupal.activeDeadlineSeconds: 7200
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.activeDeadlineSeconds
+          value: 7200
