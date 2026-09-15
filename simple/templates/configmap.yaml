@@ -51,14 +51,14 @@ data:
       {{- end }}
 
       real_ip_header              {{ .Values.nginx.real_ip_header }};
+      real_ip_recursive           on;
 
       include                     /etc/nginx/mime.types;
       default_type                application/octet-stream;
 
-      log_format  main            '$remote_addr - $remote_user [$time_local] "$request" '
-                                  '$status $body_bytes_sent "$http_referer" '
-                                  '"$http_user_agent" "$http_x_forwarded_for" $host "$http_ja3" "$http_ja4"';
-
+      log_format  main            '$remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent '
+                                  '"$http_referer" "$http_user_agent" "$http_x_forwarded_for" $host '
+                                  '"$http_ja3" "$http_ja4" $request_time';
 
       access_log                  /proc/self/fd/1 main;
 
