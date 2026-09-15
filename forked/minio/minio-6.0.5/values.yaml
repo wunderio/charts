@@ -45,8 +45,8 @@ helmKubectlJqImage:
   tag: 3.1.0
 image:
   pullPolicy: IfNotPresent
-  repository: minio/minio
-  tag: RELEASE.2020-08-08T04-50-06Z
+  repository: quay.io/minio/minio
+  tag: RELEASE.2025-09-07T16-13-09Z.hotfix.7aa24e772
 imagePullSecrets: []
 ingress:
   annotations: {}
@@ -66,8 +66,8 @@ makeBucketJob:
   annotations: null
 mcImage:
   pullPolicy: IfNotPresent
-  repository: minio/mc
-  tag: RELEASE.2020-08-08T02-33-58Z
+  repository: quay.io/minio/mc
+  tag: RELEASE.2025-08-13T08-35-41Z
 metrics:
   serviceMonitor:
     additionalLabels: {}
