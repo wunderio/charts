@@ -172,9 +172,9 @@ jobs:
       - name: silta-cluster diagnostics
         if: failure()
         run: |
-          kubectl get pods -A
-          kubectl describe pods -n silta-cluster
-          kubectl get events -A --sort-by=.lastTimestamp
+          kubectl get pods -A || true
+          kubectl describe pods -n silta-cluster || true
+          kubectl get events -A --sort-by=.lastTimestamp || true
 
       - name: Build Drupal chart images, deploy and test
         run: |
