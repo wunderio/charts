@@ -871,7 +871,8 @@ autoscaling/v2beta1
 {{- end }}
 
 {{/*
-Deployment notes — shared between NOTES.txt and the PR comment Job.
+Deployment notes for the PR comment Job (NOTES.txt keeps its own plain-text version,
+as CircleCI prints it verbatim).
 Outputs Markdown-formatted environment details.
 */}}
 {{- define "drupal.deployment-notes" -}}
