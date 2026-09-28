@@ -169,6 +169,13 @@ jobs:
           curl --resolve ${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} https://${CLUSTER_DOMAIN} -ILk --fail
           curl --resolve ${CLUSTER_DOMAIN}:80:${MINIKUBE_IP} --resolve ${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} http://${CLUSTER_DOMAIN} -IL --fail
 
+      - name: silta-cluster diagnostics
+        if: failure()
+        run: |
+          kubectl get pods -A
+          kubectl describe pods -n silta-cluster
+          kubectl get events -A --sort-by=.lastTimestamp
+
       - name: Build Drupal chart images, deploy and test
         run: |
 
