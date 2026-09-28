@@ -223,3 +223,22 @@ tests:
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].resources.limits.memory
           value: 20G
+
+  - it: sets activeDeadlineSeconds from cronJobDefaults
+    template: drupal-cron.yaml
+    set:
+      php.cronJobDefaults.activeDeadlineSeconds: 3600
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.activeDeadlineSeconds
+          value: 3600
+
+  - it: job activeDeadlineSeconds overrides cronJobDefaults
+    template: drupal-cron.yaml
+    set:
+      php.cronJobDefaults.activeDeadlineSeconds: 3600
+      php.cron.drupal.activeDeadlineSeconds: 600
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.activeDeadlineSeconds
+          value: 600

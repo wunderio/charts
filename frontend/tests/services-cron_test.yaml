@@ -322,3 +322,34 @@ tests:
       - equal:
           path: spec.jobTemplate.spec.template.spec.containers[0].securityContext.readOnlyRootFilesystem
           value: false
+
+  - it: sets activeDeadlineSeconds from cronJobDefaults
+    template: services-cron.yaml
+    set:
+      cronJobDefaults.activeDeadlineSeconds: 3600
+      services.foo:
+        image: 'bar'
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.activeDeadlineSeconds
+          value: 3600
+
+  - it: job activeDeadlineSeconds overrides cronJobDefaults
+    template: services-cron.yaml
+    set:
+      cronJobDefaults.activeDeadlineSeconds: 3600
+      services.foo:
+        image: 'bar'
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+            activeDeadlineSeconds: 600
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.activeDeadlineSeconds
+          value: 600
