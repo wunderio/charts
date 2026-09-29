@@ -269,6 +269,7 @@
           "type": ["object", "null"],
           "additionalProperties": false,
           "properties": {
+            "activeDeadlineSeconds": { "type": "integer" },
             "resources": {
               "type": ["object", "null"],
               "additionalProperties": false,
@@ -300,6 +301,10 @@
             "affinity": {
               "type": ["object", "null"],
               "additionalProperties": { "type": "string" }
+            },
+            "annotations": {
+              "type": ["object", "null"],
+              "additionalProperties": { "type": "string" }
             }
           }
         },
@@ -312,9 +317,15 @@
               "schedule": { "type": "string" },
               "command": { "type": "string" },
               "backoffLimit": { "type": "integer" },
+              "activeDeadlineSeconds": { "type": "integer" },
               "nodeSelector": { "type": ["object", "null"] },
               "tolerations": { "type": ["array", "null"] },
               "affinity": { "type": ["object", "null"] },
+              "annotations": {
+                "type": ["object", "null"],
+                "additionalProperties": { "type": "string" }
+              },
+              "suspend": { "type": "boolean" },
               "php_ini": { "type": "string" },
               "resources": {
                 "type": "object",
