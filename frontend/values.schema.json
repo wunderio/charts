@@ -300,6 +300,7 @@
                 "command": { "type": "string" },
                 "schedule": { "type": "string" },
                 "parallelism": { "type": "integer" },
+                "activeDeadlineSeconds": { "type": "integer" },
                 "nodeSelector": { "type": "object" },
                 "tolerations": { "type": "array" },
                 "affinity": { "type": "object" },
@@ -534,6 +535,7 @@
       "type": ["object", "null"],
       "additionalProperties": false,
       "properties": {
+        "activeDeadlineSeconds": { "type": "integer" },
         "resources": {
           "type": ["object", "null"],
           "additionalProperties": false,
