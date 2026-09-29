@@ -45,8 +45,8 @@ helmKubectlJqImage:
   tag: 3.1.0
 image:
   pullPolicy: IfNotPresent
-  repository: pgsty/minio
-  tag: RELEASE.2026-08-04T00-00-00Z
+  repository: wunderio/minio
+  tag: RELEASE.2020-08-08T04-50-06Z
 imagePullSecrets: []
 ingress:
   annotations: {}
