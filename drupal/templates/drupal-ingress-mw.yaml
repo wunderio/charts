@@ -1,3 +1,7 @@
+{{- /* HTTPRoute replaces the Ingress and issues its own Certificates, so this
+     must stay off when httproute.enabled is set — otherwise the release
+     carries two objects with the same Certificate names and fails to apply. */}}
+{{- if and (ne ((.Values.ingress).enabled | toString) "false") (not (.Values.httproute).enabled) }}
 {{- if eq ( include "silta-cluster.traefik3.enabled" $ ) "true" }}
 {{- $ingress := $.Values.ingress.default }}
 {{- if or (eq $ingress.type "traefik") (eq $ingress.type "nginx") }}
@@ -25,6 +29,7 @@ spec:
   {{- end }}
 
 {{- range $ingress_index, $ingress := $.Values.ingress }}
+{{- if kindIs "map" $ingress }}
 ---
 {{- $ingress := mergeOverwrite (deepCopy $.Values.ingress.default) $ingress }}
 {{- if or (eq $ingress.type "traefik") (eq $ingress.type "nginx") }}
@@ -49,6 +54,8 @@ spec:
     period: 1s
   {{- end }}
   {{- end }}
+{{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

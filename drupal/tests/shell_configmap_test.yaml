@@ -80,3 +80,52 @@ tests:
           content:
             name: GITAUTH_URL
             value: foo.bar
+
+  - it: Keyserver credentials come from existingSecret when it is set
+    template: shell-deployment.yaml
+    set:
+      shell.enabled: true
+      shell.gitAuth.keyserver.enabled: true
+      shell.gitAuth.keyserver.existingSecret: keyserver-credentials
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GITAUTH_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: keyserver.username
+                name: keyserver-credentials
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GITAUTH_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: keyserver.password
+                name: keyserver-credentials
+
+  - it: Shell secret is not rendered when existingSecret is set
+    template: shell-secret.yaml
+    set:
+      shell.enabled: true
+      shell.gitAuth.keyserver.existingSecret: keyserver-credentials
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: Shell secret carries the keyserver credentials by default
+    template: shell-secret.yaml
+    set:
+      shell.enabled: true
+      shell.gitAuth.keyserver.username: user
+      shell.gitAuth.keyserver.password: pass
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: data["keyserver.username"]
+          value: dXNlcg==
+      - equal:
+          path: data["keyserver.password"]
+          value: cGFzcw==

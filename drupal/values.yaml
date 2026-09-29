@@ -1,11 +1,30 @@
 # Subchart with few functionality that is reused for our other charts
 silta-release:
+  github:
+    prComment:
+      # Drupal renders its own PR-comment Job (templates/github-pr-comment.yaml)
+      # which includes deployment details, so the generic silta-release Job must
+      # stay off — otherwise a PR environment gets two comments per sync.
+      enabled: false
   # Enable downscaler by default.
   downscaler:
     enabled: true
     # Allows to modify How long should This release be active until downscaled. Value examples: 10y, 4w, 1h
     # releaseMinAge: '1w'
     releaseMinAge: ''
+
+# ArgoCD deployment mode. The ArgoCD platform chart sets this to true; the
+# CircleCI/Flux (legacy Silta) flow leaves it false.
+#
+# It only affects how the pre-release hooks are scheduled. ArgoCD runs the whole
+# PreSync phase before the Sync phase creates PVCs and ConfigMaps, so a PreSync
+# Job that mounts them stays Pending forever on a first sync and blocks the
+# deployment. With this enabled those Jobs become Sync-phase hooks ordered after
+# the volumes (sync-wave 1, deployments at 2) instead, and the pre-release Job
+# drops its lookup guard — ArgoCD's repo-server has no cluster access, so lookup
+# always returns empty there and the Job would never render at all.
+argocd:
+  enabled: false
 
 # Main domain of the cluster.
 # Subdomains of this domain will be created automatically for each environment.
@@ -19,6 +38,23 @@ projectName: ""
 # We typically pass the branch name when we build dedicated environments per branch.
 # This name is mainly used to create nice subdomains for each environment.
 environmentName: ""
+
+# --- GitHub PR Comment
+# When prNumber is set (injected by the platform chart for PR environments),
+# a PostSync Job posts deployment details as a PR comment via the GitHub API.
+# Requires the argocd-github-app secret in the namespace (synced by Kyverno).
+github:
+  prComment:
+    # Set automatically by the platform chart for PR environments.
+    prNumber: ""
+    # GitHub repository owner/name, e.g. "wunderio/client-fi-mysite".
+    # Set automatically by the platform chart from tenant.repoURL.
+    repository: ""
+    # Name of the Kubernetes secret containing GitHub App credentials.
+    # Must have keys: githubAppID, githubAppInstallationID, githubAppPrivateKey.
+    secretName: argocd-github-app
+    # Marker string used to upsert (update-or-create) the comment.
+    commentTag: "silta-deploy"
 
 # Configure image pull secrets for the containers. This is not needed on GKE.
 # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -89,6 +125,8 @@ exposeDomainsDefaults:
     issuer: letsencrypt
 
 ingress:
+  # Set to false to disable Ingress resources entirely (e.g. when using httproute).
+  # enabled: true
   default:
     type: traefik
     tls: true
@@ -117,6 +155,20 @@ ingress:
     # Custom ingress annotations
     # extraAnnotations:
     #   networking.gke.io/suppress-firewall-xpn-error: "true"
+
+# Gateway API HTTPRoute + ListenerSet (alternative to Ingress).
+# When enabled, creates HTTPRoute and ListenerSet resources instead of Ingress.
+# cert-manager auto-creates Certificates from ListenerSet annotations.
+# Requires: Gateway API v1.5+, cert-manager with ListenerSet feature gate.
+httproute:
+  enabled: false
+  # Name and namespace of the shared Gateway resource.
+  gatewayName: main
+  gatewayNamespace: traefik
+  # Port on the Gateway for HTTPS listeners.
+  gatewayPort: 8443
+  # Name of the Gateway listener to attach to (must allow the app's namespace).
+  listenerName: websecure-dev
 
 # Infrastructure related settings.
 cluster:
@@ -475,6 +527,10 @@ shell:
       url: ''
       username: ''
       password: ''
+      # Name of an existing Secret holding the keys keyserver.username and
+      # keyserver.password. When set, username/password above are ignored and
+      # the chart does not render its own shell Secret.
+      existingSecret: ''
   # Static ssh keys
   # Note: cluster administrator support required for duplicating keys in jumphost.
   authorizedKeys: []
@@ -1035,3 +1091,8 @@ logging:
 # - projectName (scrambles project name subdomain, e.g., release.yyy.<clusterDomain>)
 # - both (obfuscates both, e.g., zzz.<clusterDomain>)
 maskSubdomains: none
+
+# Pre-release cleanup job (runs before sync to clear caches).
+# Disable for ArgoCD deployments where PVCs may not exist during PreSync.
+cleanup:
+  enabled: true

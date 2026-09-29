@@ -1,0 +1,46 @@
+suite: Ingress middleware
+templates:
+  - drupal-ingress-mw.yaml
+tests:
+
+  # The Middleware CRD ships with Traefik 3. Rendering it on a cluster that does
+  # not have traefik.io/v1alpha1 fails the whole install with "no matches for
+  # kind Middleware", so every Middleware in this file — including the ones the
+  # ingress range emits — has to stay behind the capability check.
+
+  - it: emits no Middleware while the Traefik CRDs are absent
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: emits both Middlewares once the Traefik CRDs exist
+    capabilities:
+      apiVersions:
+        - traefik.io/v1alpha1
+    asserts:
+      - hasDocuments:
+          count: 2
+      - documentIndex: 0
+        isKind:
+          of: Middleware
+      - documentIndex: 0
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-rl
+      - documentIndex: 1
+        isKind:
+          of: Middleware
+      - documentIndex: 1
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-rl-default
+
+  - it: emits no Middleware when httproute takes over the routing
+    capabilities:
+      apiVersions:
+        - traefik.io/v1alpha1
+    set:
+      httproute.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0

@@ -1,4 +1,11 @@
-# Create minikube test deployments on different kubernetes versions
+# Chart tests.
+#
+# `validate` is the fast gate: lint, helm-unittest and a template render per
+# chart, so a broken template fails in under a minute.
+#
+# `minikube-test` is the slow one, and it is the only thing here that catches
+# API-version incompatibility, hook and PVC ordering, and routing regressions —
+# a render to /dev/null cannot. Keep it.
 name: Silta chart tests
 
 on:
@@ -381,3 +388,48 @@ jobs:
               --resolve test.simple-project-k8s.${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} \
               --retry 5 --retry-delay 5 \
               --fail
+
+  # --- Fast render/lint gate ---
+
+  validate:
+    name: Validate — ${{ matrix.chart }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        chart: [drupal, frontend, simple]
+    if: github.event.pull_request.draft == false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Helm
+        run: |
+          curl -fsSL https://get.helm.sh/helm-v3.16.4-linux-amd64.tar.gz | tar xz -C /tmp
+          sudo mv /tmp/linux-amd64/helm /usr/local/bin/helm
+          helm version
+
+      - name: Add dependency repos
+        run: |
+          helm repo add wunderio https://storage.googleapis.com/charts.wdr.io
+          helm repo add jouve https://jouve.github.io/charts/
+          helm repo add percona https://percona.github.io/percona-helm-charts/
+          helm repo update
+
+      - name: Install helm-unittest plugin
+        run: helm plugin install https://github.com/helm-unittest/helm-unittest --version 0.5.1
+
+      - name: Build chart dependencies
+        run: |
+          helm dependency build ./${{ matrix.chart }}
+          ls -la ./${{ matrix.chart }}/charts/ || true
+
+      - name: Lint chart
+        run: helm lint ./${{ matrix.chart }}
+
+      - name: Unit tests
+        run: helm unittest ./${{ matrix.chart }}
+
+      - name: Template render
+        run: |
+          helm template test-release ./${{ matrix.chart }} \
+            --values ${{ matrix.chart }}/test.values.yaml > /dev/null

@@ -5,11 +5,13 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
   annotations:
-    # This is what defines this resource as a hook. Without this line, the
-    # job is considered part of the release.
+    # Keep Helm hook annotations for backwards compatibility with Helm releases.
     "helm.sh/hook": "post-install,post-upgrade"
     "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": "before-hook-creation"
+    # ArgoCD hook: run after sync completes successfully.
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
 spec:
   completions: 1
   backoffLimit: 0
@@ -22,7 +24,7 @@ spec:
       enableServiceLinks: false
       containers:
       - name: post-release
-        image: {{ .Values.php.image | quote }}
+        image: {{ include "drupal.image" .Values.php.image | quote }}
         env:
         {{- include "drupal.env-common" . | nindent 8 }}
         command: ["/bin/bash", "-c"]

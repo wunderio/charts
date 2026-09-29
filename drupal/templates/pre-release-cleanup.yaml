@@ -1,9 +1,21 @@
+{{- if .Values.cleanup.enabled }}
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: "{{ .Release.Name }}-cleanup"
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
+  annotations:
+    # A Sync-phase hook, deliberately not PreSync: the Job mounts the `mounts`
+    # PVCs and the drupal ConfigMap, which the Sync phase creates. ArgoCD runs
+    # the whole PreSync phase first, so as a PreSync hook the Pod stays Pending
+    # on an initial sync and blocks the deployment. Sync-wave 1 orders it after
+    # those resources (wave 0) and before the deployments (wave 2).
+    # hook-delete-policy is required: ttlSecondsAfterFinished=0 makes the Job
+    # self-delete, and without it ArgoCD loops trying to recreate it.
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   ttlSecondsAfterFinished: 0
   template:
@@ -25,3 +37,4 @@ spec:
       serviceAccountName: {{ include "drupal.serviceAccountName" . }}
       volumes:
         {{- include "drupal.volumes" . | nindent 8 }}
+{{- end }}

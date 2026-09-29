@@ -12,7 +12,7 @@ metadata:
     {{- if .Values.ssl.enabled }}
 
     cert-manager.io/cluster-issuer: {{ .Values.ssl.issuer | quote }}
-  
+
     {{- if eq $ingress.class "traefik" }}
     traefik.ingress.kubernetes.io/frontend-entry-points: "http,https"
     {{- end }}
@@ -38,7 +38,7 @@ metadata:
     nginx.org/redirect-to-https: {{ $redirect_https | quote }}
     {{- end }}
     {{- end }}
-    
+
     {{- if eq ( include "silta-cluster.cert-manager-api-version" . | trim ) "cert-manager.io/v1" }}
     acme.cert-manager.io/http01-edit-in-place: "true"
     {{- else }}
@@ -68,7 +68,7 @@ spec:
     hosts:
       {{- if .Values.ssl.wildcard }}
       - "*.{{ .Values.clusterDomain }}"
-      {{- else }} 
+      {{- else }}
       {{- if $ingress.enabled }}
       - {{ .Values.clusterDomain }}
       {{- end }}
@@ -99,7 +99,7 @@ spec:
           {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
           service:
             name: {{ .Release.Name }}-splash
-            port: 
+            port:
               number: 80
           {{- else }}
           serviceName: {{ .Release.Name }}-splash
@@ -118,7 +118,7 @@ spec:
           {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
           service:
             name: {{ .Release.Name }}-deployment-remover
-            port: 
+            port:
               number: 80
           {{- else }}
           serviceName: {{ .Release.Name }}-deployment-remover
@@ -137,7 +137,7 @@ spec:
           {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
           service:
             name: {{ .Release.Name }}-ssh-key-server
-            port: 
+            port:
               number: 80
           {{- else }}
           serviceName: {{ .Release.Name }}-ssh-key-server
@@ -156,7 +156,7 @@ spec:
           {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
           service:
             name: {{ .Release.Name }}-placeholder-upscaler
-            port: 
+            port:
               number: 80
           {{- else }}
           serviceName: {{ .Release.Name }}-placeholder-upscaler
@@ -175,7 +175,7 @@ spec:
           {{- if eq ( include "silta-cluster.ingress-api-version" . | trim ) "networking.k8s.io/v1" }}
           service:
             name: {{ .Release.Name }}-docker-registry
-            port: 
+            port:
               number: 80
           {{- else }}
           serviceName: {{ .Release.Name }}-docker-registry

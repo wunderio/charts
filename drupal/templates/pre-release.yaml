@@ -1,9 +1,25 @@
 {{- if or (ne .Values.php.preupgrade.command "") .Values.php.preupgrade.backup }}
+{{- /*
+  Under plain Helm this is a pre-upgrade hook, so it runs before the release's
+  own resources are applied. When backups have just been enabled the backup PVC
+  does not exist yet and the Pod would sit Pending, so hold the Job back until
+  the claim is there.
+
+  ArgoCD cannot use that guard: its repo-server has no cluster access, so lookup
+  always returns empty and the Job would never render at all. There the
+  Sync-phase wave ordering below guarantees the claim exists first instead.
+*/}}
+{{- $render := true }}
+{{- if and (not .Values.argocd.enabled) .Values.php.preupgrade.backup }}
 {{- $claimName := printf "%s-backup" .Release.Name }}
 {{- if and ( eq $.Values.backup.storageClassName "silta-shared" ) ( eq ( include "silta-cluster.rclone.has-provisioner" $ ) "true" ) }}
 {{- $claimName = printf "%s-backup2" .Release.Name }}
 {{- end }}
-{{- if lookup "v1" "PersistentVolumeClaim" .Release.Namespace $claimName }}
+{{- if not (lookup "v1" "PersistentVolumeClaim" .Release.Namespace $claimName) }}
+{{- $render = false }}
+{{- end }}
+{{- end }}
+{{- if $render }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -11,10 +27,16 @@ metadata:
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
   annotations:
-    # This is what defines this resource as a hook. Without this line, the
-    # job is considered part of the release.
+    # Keep Helm hook annotations for backwards compatibility with Helm releases.
     "helm.sh/hook": "pre-upgrade"
     "helm.sh/hook-delete-policy": "before-hook-creation"
+    # ArgoCD: a Sync-phase hook rather than PreSync. The Job mounts the `mounts`
+    # PVCs, the drupal ConfigMap and — with backups on — the backup PVC, all of
+    # which the Sync phase creates. Wave 1 orders it after them (wave 0) and
+    # before the deployments (wave 2).
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   completions: 1
   backoffLimit: 0
@@ -27,7 +49,7 @@ spec:
       enableServiceLinks: false
       containers:
       - name: pre-release
-        image: {{ .Values.php.image | quote }}
+        image: {{ include "drupal.image" .Values.php.image | quote }}
         env:
         {{- include "drupal.pre-release-env" . | nindent 8 }}
         command: ["/bin/bash", "-c"]

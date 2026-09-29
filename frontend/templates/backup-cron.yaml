@@ -112,7 +112,7 @@ spec:
           {{- end }}
           {{- if $backupCommand }}
           - name: {{ $index }}
-            image: {{ $service.image | quote }}
+            image: {{ include "frontend.image" $service.image | quote }}
             command: ["/bin/bash", "-c"]
             args:
               - |

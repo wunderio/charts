@@ -1,0 +1,152 @@
+{{- $localGithub := index .Values "github" | default dict }}
+{{- $prComment := index $localGithub "prComment" | default dict }}
+{{- if not (index $prComment "prNumber") }}
+{{- $siltaRelease := index .Values "silta-release" | default dict }}
+{{- $platformGithub := index $siltaRelease "github" | default dict }}
+{{- $prComment = index $platformGithub "prComment" | default dict }}
+{{- end }}
+{{- if index $prComment "prNumber" }}
+---
+# PostSync Job that posts deployment details as a GitHub PR comment.
+# Only rendered for PR environments (prNumber is set by the platform chart).
+# Best-effort: the script exits 0 even if the GitHub API call fails,
+# so a comment failure does not mark the sync as failed.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-pr-comment"
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  activeDeadlineSeconds: 120
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        {{- include "drupal.release_labels" . | nindent 8 }}
+    spec:
+      restartPolicy: Never
+      enableServiceLinks: false
+      containers:
+        - name: pr-comment
+          image: alpine:3.20
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              apk add --no-cache curl openssl jq >/dev/null 2>&1
+
+              # --- GitHub App authentication ---
+              PRIVATE_KEY_FILE="/github-app/githubAppPrivateKey"
+
+              # Build JWT (RS256, valid 5 minutes)
+              NOW=$(date +%s)
+              IAT=$((NOW - 60))
+              EXP=$((NOW + 300))
+              HEADER=$(printf '{"alg":"RS256","typ":"JWT"}' | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+              PAYLOAD=$(printf '{"iat":%d,"exp":%d,"iss":"%s"}' "$IAT" "$EXP" "$GITHUB_APP_ID" | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+              SIGNATURE=$(printf '%s.%s' "$HEADER" "$PAYLOAD" | openssl dgst -sha256 -sign "$PRIVATE_KEY_FILE" | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+              JWT="${HEADER}.${PAYLOAD}.${SIGNATURE}"
+
+              # Exchange JWT for installation access token
+              TOKEN=$(curl -sf -X POST \
+                -H "Authorization: Bearer ${JWT}" \
+                -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/app/installations/${GITHUB_APP_INSTALLATION_ID}/access_tokens" \
+                | jq -r '.token') || {
+                echo "WARNING: Failed to get GitHub installation token. Skipping PR comment."
+                exit 0
+              }
+
+              if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+                echo "WARNING: GitHub token is empty. Skipping PR comment."
+                exit 0
+              fi
+
+              # --- Post or update PR comment ---
+              REPO="{{ get $prComment "repository" }}"
+              PR_NUMBER="{{ get $prComment "prNumber" }}"
+              COMMENT_TAG="{{ get $prComment "commentTag" }}-{{ .Release.Name }}"
+              MARKER="<!-- ${COMMENT_TAG} -->"
+
+              # Find existing comment by marker
+              EXISTING_ID=$(curl -sf \
+                -H "Authorization: token ${TOKEN}" \
+                -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/repos/${REPO}/issues/${PR_NUMBER}/comments?per_page=100" \
+                | jq -r ".[] | select(.body | contains(\"${MARKER}\")) | .id" \
+                | head -1) || true
+
+              if [ -n "$EXISTING_ID" ] && [ "$EXISTING_ID" != "null" ]; then
+                curl -sf -X PATCH \
+                  -H "Authorization: token ${TOKEN}" \
+                  -H "Accept: application/vnd.github+json" \
+                  -d "$(jq -n --rawfile body /comment/comment-body.txt '{body: $body}')" \
+                  "https://api.github.com/repos/${REPO}/issues/${PR_NUMBER}/comments/${EXISTING_ID}" \
+                  >/dev/null && echo "Updated existing PR comment." || echo "WARNING: Failed to update PR comment."
+              else
+                curl -sf -X POST \
+                  -H "Authorization: token ${TOKEN}" \
+                  -H "Accept: application/vnd.github+json" \
+                  -d "$(jq -n --rawfile body /comment/comment-body.txt '{body: $body}')" \
+                  "https://api.github.com/repos/${REPO}/issues/${PR_NUMBER}/comments" \
+                  >/dev/null && echo "Posted new PR comment." || echo "WARNING: Failed to post PR comment."
+              fi
+              exit 0
+          env:
+            - name: GITHUB_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ get $prComment "secretName" }}
+                  key: githubAppID
+            - name: GITHUB_APP_INSTALLATION_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ get $prComment "secretName" }}
+                  key: githubAppInstallationID
+          volumeMounts:
+            - name: github-app-key
+              mountPath: /github-app
+              readOnly: true
+            - name: comment-body
+              mountPath: /comment
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+      volumes:
+        - name: github-app-key
+          secret:
+            secretName: {{ get $prComment "secretName" }}
+            items:
+              - key: githubAppPrivateKey
+                path: githubAppPrivateKey
+        - name: comment-body
+          configMap:
+            name: {{ .Release.Name }}-pr-comment-body
+---
+# ConfigMap holding the Helm-rendered comment body.
+# Separating it from the Job args avoids shell escaping issues with
+# the rendered Markdown content.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-pr-comment-body
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+data:
+  comment-body.txt: |
+    ### :rocket: Deployment — `{{ .Release.Name }}`
+    {{ include "drupal.deployment-notes" . | nindent 4 }}
+    <!-- {{ get $prComment "commentTag" }}-{{ .Release.Name }} -->
+{{- end }}

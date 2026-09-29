@@ -1,3 +1,7 @@
+{{- /* HTTPRoute replaces the Ingress and issues its own Certificates, so this
+     must stay off when httproute.enabled is set — otherwise the release
+     carries two objects with the same Certificate names and fails to apply. */}}
+{{- if and (ne ((.Values.ingress).enabled | toString) "false") (not (.Values.httproute).enabled) }}
 {{- $ingress := .Values.ingress.default }}
 {{- $context_ssl := .Values.ssl }}
 {{- $cluster_issuer := "" }}
@@ -146,6 +150,7 @@ spec:
 
 # Ingresses for exposeDomains
 {{- range $ingress_index, $ingress := $.Values.ingress }}
+{{- if kindIs "map" $ingress }}
 
 {{- $ingress := mergeOverwrite (deepCopy $.Values.ingress.default) $ingress }}
 
@@ -299,5 +304,7 @@ spec:
   {{- end }}
   {{- end }}
 ---
+{{- end }}
+{{- end }}
 {{- end }}
 {{- end }}

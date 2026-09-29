@@ -5,7 +5,33 @@
     "clusterDomain": { "type": "string" },
     "projectName": { "type": "string" },
     "environmentName": { "type": "string" },
+    "github": {
+      "type": "object",
+      "properties": {
+        "prComment": {
+          "type": "object",
+          "properties": {
+            "prNumber": { "type": "string" },
+            "repository": { "type": "string" },
+            "secretName": { "type": "string" },
+            "commentTag": { "type": "string" }
+          }
+        }
+      }
+    },
     "branchName": { "type": "string" },
+    "argocd": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "cleanup": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
     "imagePullSecrets": { "type": "array" },
     "imagePullSecret": { "type": "string" },
     "serviceAccount": {
@@ -117,6 +143,20 @@
             "additionalProperties": { "type": "string" }
           }
         }
+      },
+      "properties": {
+        "enabled": { "type": "boolean" }
+      }
+    },
+    "httproute": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "gatewayName": { "type": "string" },
+        "gatewayNamespace": { "type": "string" },
+        "gatewayPort": { "type": "integer" },
+        "listenerName": { "type": "string" }
       }
     },
     "cluster": {
@@ -133,7 +173,7 @@
       "additionalProperties": false,
       "properties": {
         "version": { "type": "string" },
-        "image": { "type": "string" },
+        "image": { "oneOf": [{ "type": "string" }, { "type": "object", "properties": { "repository": { "type": "string" }, "tag": { "type": "string" } }, "required": ["repository", "tag"] }] },
         "basicauth": {
           "type": "object",
           "properties": {
@@ -230,7 +270,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "image": { "type": "string" },
+        "image": { "oneOf": [{ "type": "string" }, { "type": "object", "properties": { "repository": { "type": "string" }, "tag": { "type": "string" } }, "required": ["repository", "tag"] }] },
         "resources": {
           "type": "object",
           "additionalProperties": false,
@@ -434,7 +474,7 @@
       "additionalProperties": false,
       "properties": {
         "enabled": { "type": "boolean" },
-        "image": { "type": "string" },
+        "image": { "oneOf": [{ "type": "string" }, { "type": "object", "properties": { "repository": { "type": "string" }, "tag": { "type": "string" } }, "required": ["repository", "tag"] }] },
         "gitAuth": {
           "type": "object",
           "additionalProperties": false,
@@ -446,7 +486,8 @@
                 "enabled": { "type": "boolean" },
                 "url": { "type": "string" },
                 "username": { "type": "string" },
-                "password": { "type": "string" }
+                "password": { "type": "string" },
+                "existingSecret": { "type": "string" }
               }
             },
             "outsideCollaborators": { "type": "boolean" },

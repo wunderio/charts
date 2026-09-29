@@ -36,7 +36,7 @@ spec:
       enableServiceLinks: false
       containers:
       - name: {{ $serviceName }}
-        image: {{ $service.image | quote }}
+        image: {{ include "frontend.image" $service.image | quote }}
         {{- if $service.containerSecurityContext }}
         securityContext:
           {{- toYaml $service.containerSecurityContext | nindent 10 }}
@@ -176,7 +176,7 @@ spec:
       enableServiceLinks: false
       containers:
       - name: {{ $serviceName }}
-        image: {{ $service.image | quote }}
+        image: {{ include "frontend.image" $service.image | quote }}
         command: ["/bin/bash", "-c"]
         args:
         - |

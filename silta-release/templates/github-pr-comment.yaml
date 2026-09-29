@@ -1,0 +1,154 @@
+{{- if and .Values.github.prComment.enabled .Values.github.prComment.prNumber }}
+---
+# PostSync Job that posts the preview-environment URL as a GitHub PR comment.
+#
+# Shared by every Silta chart via the silta-release library chart. Rendered ONLY
+# when github.prComment.prNumber is set — which the ArgoCD platform chart injects
+# for PR environments (as silta-release.github.prComment). In the CircleCI/Flux
+# (legacy Silta) flow these values are never set, so the Job is not rendered,
+# keeping the chart backwards compatible. The ArgoCD hook annotations are inert
+# outside ArgoCD.
+#
+# Best-effort: the script exits 0 even on GitHub API failure, so a comment
+# problem never fails the sync.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Release.Name }}-pr-comment"
+  labels:
+    release: {{ .Release.Name }}
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+spec:
+  activeDeadlineSeconds: 120
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        release: {{ .Release.Name }}
+    spec:
+      restartPolicy: Never
+      enableServiceLinks: false
+      containers:
+        - name: pr-comment
+          image: alpine:3.20
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              apk add --no-cache curl openssl jq >/dev/null 2>&1
+
+              # --- GitHub App authentication ---
+              PRIVATE_KEY_FILE="/github-app/githubAppPrivateKey"
+
+              # Build a JWT (RS256, valid 5 minutes).
+              NOW=$(date +%s)
+              IAT=$((NOW - 60))
+              EXP=$((NOW + 300))
+              HEADER=$(printf '{"alg":"RS256","typ":"JWT"}' | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+              PAYLOAD=$(printf '{"iat":%d,"exp":%d,"iss":"%s"}' "$IAT" "$EXP" "$GITHUB_APP_ID" | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+              SIGNATURE=$(printf '%s.%s' "$HEADER" "$PAYLOAD" | openssl dgst -sha256 -sign "$PRIVATE_KEY_FILE" | openssl base64 -e -A | tr '+/' '-_' | tr -d '=')
+              JWT="${HEADER}.${PAYLOAD}.${SIGNATURE}"
+
+              # Exchange the JWT for an installation access token.
+              TOKEN=$(curl -sf -X POST \
+                -H "Authorization: Bearer ${JWT}" \
+                -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/app/installations/${GITHUB_APP_INSTALLATION_ID}/access_tokens" \
+                | jq -r '.token') || {
+                echo "WARNING: Failed to get GitHub installation token. Skipping PR comment."
+                exit 0
+              }
+
+              if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+                echo "WARNING: GitHub token is empty. Skipping PR comment."
+                exit 0
+              fi
+
+              # --- Upsert the PR comment (find by marker, then PATCH or POST) ---
+              REPO="{{ .Values.github.prComment.repository }}"
+              PR_NUMBER="{{ .Values.github.prComment.prNumber }}"
+              COMMENT_TAG="{{ .Values.github.prComment.commentTag }}-{{ .Release.Name }}"
+              MARKER="<!-- ${COMMENT_TAG} -->"
+
+              EXISTING_ID=$(curl -sf \
+                -H "Authorization: token ${TOKEN}" \
+                -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/repos/${REPO}/issues/${PR_NUMBER}/comments?per_page=100" \
+                | jq -r ".[] | select(.body | contains(\"${MARKER}\")) | .id" \
+                | head -1) || true
+
+              if [ -n "$EXISTING_ID" ] && [ "$EXISTING_ID" != "null" ]; then
+                curl -sf -X PATCH \
+                  -H "Authorization: token ${TOKEN}" \
+                  -H "Accept: application/vnd.github+json" \
+                  -d "$(jq -n --rawfile body /comment/comment-body.txt '{body: $body}')" \
+                  "https://api.github.com/repos/${REPO}/issues/${PR_NUMBER}/comments/${EXISTING_ID}" \
+                  >/dev/null && echo "Updated existing PR comment." || echo "WARNING: Failed to update PR comment."
+              else
+                curl -sf -X POST \
+                  -H "Authorization: token ${TOKEN}" \
+                  -H "Accept: application/vnd.github+json" \
+                  -d "$(jq -n --rawfile body /comment/comment-body.txt '{body: $body}')" \
+                  "https://api.github.com/repos/${REPO}/issues/${PR_NUMBER}/comments" \
+                  >/dev/null && echo "Posted new PR comment." || echo "WARNING: Failed to post PR comment."
+              fi
+              exit 0
+          env:
+            - name: GITHUB_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.github.prComment.secretName }}
+                  key: githubAppID
+            - name: GITHUB_APP_INSTALLATION_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.github.prComment.secretName }}
+                  key: githubAppInstallationID
+          volumeMounts:
+            - name: github-app-key
+              mountPath: /github-app
+              readOnly: true
+            - name: comment-body
+              mountPath: /comment
+              readOnly: true
+          resources:
+            requests:
+              cpu: 50m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+      volumes:
+        - name: github-app-key
+          secret:
+            secretName: {{ .Values.github.prComment.secretName }}
+            items:
+              - key: githubAppPrivateKey
+                path: githubAppPrivateKey
+        - name: comment-body
+          configMap:
+            name: {{ .Release.Name }}-pr-comment-body
+---
+# ConfigMap holding the Helm-rendered comment body. Kept separate from the Job
+# args to avoid shell-escaping issues with the rendered Markdown.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-pr-comment-body
+  labels:
+    release: {{ .Release.Name }}
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+data:
+  comment-body.txt: |
+    ### :rocket: Preview environment — `{{ .Release.Name }}`
+
+    Your pull request is deployed to a preview environment:
+
+    {{ if .Values.github.prComment.environmentUrl }}**{{ .Values.github.prComment.environmentUrl }}**{{ else }}_(environment URL not provided)_{{ end }}
+
+    <!-- {{ .Values.github.prComment.commentTag }}-{{ .Release.Name }} -->
+{{- end }}

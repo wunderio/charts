@@ -22,7 +22,7 @@ spec:
       initContainers:
       # Copy solr config from php container, it's the only way to avoid extra image build
       - name: conf-import
-        image: {{ .Values.php.image | quote }}
+        image: {{ include "drupal.image" .Values.php.image | quote }}
         command: ["/bin/bash", "-c"]
         args:
           - |

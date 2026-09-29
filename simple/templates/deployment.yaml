@@ -21,7 +21,7 @@ spec:
       containers:
       # Nginx container
       - name: nginx
-        image: {{ .Values.nginx.image | quote }}
+        image: {{ include "simple.image" .Values.nginx.image | quote }}
         env:
         ports:
         - containerPort: 8080

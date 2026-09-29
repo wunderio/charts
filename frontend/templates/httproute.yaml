@@ -1,0 +1,120 @@
+{{- if .Values.httproute.enabled }}
+{{- $context_ssl := .Values.ssl }}
+{{- $letsencrypt_in_use := false }}
+{{- if has $context_ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+{{- $letsencrypt_in_use = true }}
+{{- end }}
+{{- if $letsencrypt_in_use }}
+# Certificate for the primary domain.
+# With HTTPRoute, we use explicit Certificate CRDs since ListenerSet
+# is not yet supported by all Gateway API implementations.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Release.Name }}-crt
+  labels:
+    {{- include "frontend.release_labels" . | nindent 4 }}
+spec:
+  secretName: {{ .Release.Name }}-tls
+  dnsNames:
+    - {{ include "frontend.domain" . | quote }}
+  issuerRef:
+    name: {{ $context_ssl.issuer }}
+    kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: Always
+{{- range $index, $prefix := .Values.domainPrefixes }}
+{{- $params := dict "prefix" $prefix }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-crt-p{{ $index }}
+  labels:
+    {{- include "frontend.release_labels" $ | nindent 4 }}
+spec:
+  secretName: {{ $.Release.Name }}-tls-p{{ $index }}
+  dnsNames:
+    - '{{ include "frontend.domain" (merge $params $) }}'
+  issuerRef:
+    name: {{ $context_ssl.issuer }}
+    kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: Always
+{{- end }}
+---
+{{- end }}
+# HTTPRoute: routes traffic from the shared Gateway to the frontend service.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ .Release.Name }}-frontend
+  labels:
+    {{- include "frontend.release_labels" . | nindent 4 }}
+spec:
+  parentRefs:
+    - name: {{ .Values.httproute.gatewayName | default "main" }}
+      namespace: {{ .Values.httproute.gatewayNamespace | default "traefik" }}
+      sectionName: {{ .Values.httproute.listenerName | default "websecure-dev" }}
+  hostnames:
+    - {{ include "frontend.domain" . | quote }}
+    {{- range $index, $prefix := .Values.domainPrefixes }}
+    {{- $params := dict "prefix" $prefix }}
+    - '{{ include "frontend.domain" (merge $params $) }}'
+    {{- end }}
+  rules:
+    - backendRefs:
+        - kind: Service
+          name: {{ include "frontend.servicename" . }}
+          port: 80
+
+{{- /* HTTPRoutes for exposeDomains */ -}}
+{{- range $domain_index, $domain := .Values.exposeDomains }}
+{{- $domain := mergeOverwrite (deepCopy $.Values.exposeDomainsDefaults) $domain }}
+{{- $domain_ssl_le := false }}
+{{- if $domain.ssl }}
+{{- if $domain.ssl.enabled }}
+{{- if has $domain.ssl.issuer (list "letsencrypt" "letsencrypt-staging") }}
+{{- $domain_ssl_le = true }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if $domain_ssl_le }}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ $.Release.Name }}-crt-{{ $domain_index }}
+  labels:
+    {{- include "frontend.release_labels" $ | nindent 4 }}
+spec:
+  secretName: {{ $.Release.Name }}-tls-{{ $domain_index }}
+  dnsNames:
+    - {{ $domain.hostname | quote }}
+  issuerRef:
+    name: {{ $domain.ssl.issuer }}
+    kind: ClusterIssuer
+  privateKey:
+    rotationPolicy: Always
+{{- end }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ $.Release.Name }}-frontend-{{ $domain_index }}
+  labels:
+    {{- include "frontend.release_labels" $ | nindent 4 }}
+spec:
+  parentRefs:
+    - name: {{ $.Values.httproute.gatewayName | default "main" }}
+      namespace: {{ $.Values.httproute.gatewayNamespace | default "traefik" }}
+      sectionName: {{ $.Values.httproute.listenerName | default "websecure-dev" }}
+  hostnames:
+    - {{ $domain.hostname | quote }}
+  rules:
+    - backendRefs:
+        - kind: Service
+          name: {{ include "frontend.servicename" $ }}
+          port: 80
+{{- end }}
+{{- end }}

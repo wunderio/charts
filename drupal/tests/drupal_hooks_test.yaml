@@ -1,0 +1,111 @@
+suite: ArgoCD hook ordering
+templates:
+  # shell-deployment.yaml checksums the ConfigMap and the Secret, so both have
+  # to be part of the suite for it to render.
+  - drupal-configmap.yaml
+  - drupal-secret.yaml
+  - shell-configmap.yaml
+  - shell-secret.yaml
+  - pre-release-cleanup.yaml
+  - pre-release.yaml
+  - drupal-deployment.yaml
+  - shell-deployment.yaml
+tests:
+
+  # --- Cleanup Job ---
+  # It mounts the `mounts` PVCs and the drupal ConfigMap, which ArgoCD creates
+  # during the Sync phase. As a PreSync hook it would run before they exist and
+  # stay Pending on a first sync, so it has to be a Sync hook ordered after them.
+
+  - it: runs the cleanup Job as a Sync hook, never PreSync
+    template: pre-release-cleanup.yaml
+    asserts:
+      - equal:
+          path: metadata.annotations['argocd.argoproj.io/hook']
+          value: Sync
+      - equal:
+          path: metadata.annotations['argocd.argoproj.io/sync-wave']
+          value: "1"
+      - equal:
+          path: metadata.annotations['argocd.argoproj.io/hook-delete-policy']
+          value: HookSucceeded
+
+  - it: drops the cleanup Job when cleanup is disabled
+    template: pre-release-cleanup.yaml
+    set:
+      cleanup.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # --- Deployments ---
+  # Wave 2 keeps them behind the wave 1 hooks, which are behind the wave 0
+  # volumes and ConfigMap.
+
+  - it: deploys drupal after the hooks
+    template: drupal-deployment.yaml
+    asserts:
+      - equal:
+          path: metadata.annotations['argocd.argoproj.io/sync-wave']
+          value: "2"
+
+  - it: deploys the shell after the hooks
+    template: shell-deployment.yaml
+    asserts:
+      - equal:
+          path: metadata.annotations['argocd.argoproj.io/sync-wave']
+          value: "2"
+
+  # --- Pre-release Job ---
+
+  - it: skips the pre-release Job when nothing needs it
+    template: pre-release.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: runs a pre-release command as a Sync hook, keeping the Helm hook
+    template: pre-release.yaml
+    set:
+      php.preupgrade.command: drush deploy
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.annotations['argocd.argoproj.io/hook']
+          value: Sync
+      - equal:
+          path: metadata.annotations['argocd.argoproj.io/sync-wave']
+          value: "1"
+      - equal:
+          path: metadata.annotations['helm.sh/hook']
+          value: pre-upgrade
+
+  # Under plain Helm the Job is a pre-upgrade hook, so it is applied before the
+  # release's own resources. Holding it back until the backup claim exists keeps
+  # the Pod from sitting Pending the first time backups are switched on.
+  - it: holds back the backup Job while the claim is missing under Helm
+    template: pre-release.yaml
+    set:
+      php.preupgrade.backup: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # ArgoCD cannot use that guard — its repo-server has no cluster access, so
+  # lookup always comes back empty and the Job would never render. Wave ordering
+  # guarantees the claim is there instead.
+  - it: renders the backup Job under ArgoCD without the lookup guard
+    template: pre-release.yaml
+    set:
+      argocd.enabled: true
+      php.preupgrade.backup: true
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: metadata.annotations['argocd.argoproj.io/hook']
+          value: Sync
+      - equal:
+          path: metadata.annotations['argocd.argoproj.io/sync-wave']
+          value: "1"

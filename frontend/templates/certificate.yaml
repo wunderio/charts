@@ -1,3 +1,7 @@
+{{- /* HTTPRoute replaces the Ingress and issues its own Certificates, so this
+     must stay off when httproute.enabled is set — otherwise the release
+     carries two objects with the same Certificate names and fails to apply. */}}
+{{- if and (ne ((.Values.ingress).enabled | toString) "false") (not (.Values.httproute).enabled) }}
 {{- $context_ingress := .Values.ingress.default }}
 {{- $context_ssl := .Values.ssl }}
 {{- if $context_ingress.tls }}
@@ -139,6 +143,7 @@ spec:
   privateKey:
     rotationPolicy: "Always"
 ---
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

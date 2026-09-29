@@ -2,6 +2,28 @@
 # Keep track of the git branch from which the release was created.
 branchName: ""
 
+# GitHub PR-comment Job (posts the preview-environment URL on the pull request).
+# Rendered only when github.prComment.prNumber is set — the ArgoCD platform chart
+# injects these for PR environments via the parent's `silta-release.github` key.
+# In the CircleCI/Flux (legacy Silta) flow nothing sets prNumber, so the Job is
+# never rendered (backwards compatible).
+github:
+  prComment:
+    # Charts that render their own PR-comment Job (drupal) set this to false,
+    # so a PR environment never gets two comments for the same release.
+    enabled: true
+    # PR number; presence of this value gates the whole Job.
+    prNumber: ""
+    # GitHub repository, "owner/name".
+    repository: ""
+    # Preview environment URL, supplied by the platform chart.
+    environmentUrl: ""
+    # Secret with githubAppID, githubAppInstallationID, githubAppPrivateKey.
+    # Synced into tenant namespaces by the sync-github-token Kyverno policy.
+    secretName: argocd-github-app
+    # Marker used to upsert (update-or-create) the comment.
+    commentTag: "silta-preview"
+
 # By default, access to pods is limited to the current namespace, you can specify exceptions here.
 # Note that the key is only used for documentation purposes and to facilitate overrides.
 # Structure:

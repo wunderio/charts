@@ -1,0 +1,222 @@
+suite: HTTPRoute
+templates:
+  - drupal-httproute.yaml
+  - drupal-ingress.yaml
+  - drupal-ingress-mw.yaml
+  - drupal-certificate.yaml
+tests:
+
+  # --- Disabled (default) ---
+
+  - it: renders nothing while httproute is disabled
+    template: drupal-httproute.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: leaves the Ingress in place while httproute is disabled
+    template: drupal-ingress.yaml
+    asserts:
+      - isKind:
+          of: Ingress
+
+  # --- Ingress suppression ---
+  # HTTPRoute issues its own Certificates under the same names as
+  # certificate.yaml, so the Ingress path must switch off entirely.
+
+  - it: suppresses the Ingress when httproute is enabled
+    template: drupal-ingress.yaml
+    set:
+      httproute.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: suppresses the Ingress middleware when httproute is enabled
+    template: drupal-ingress-mw.yaml
+    set:
+      httproute.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: suppresses the Ingress Certificates when httproute is enabled
+    template: drupal-certificate.yaml
+    set:
+      httproute.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # --- Enabled ---
+
+  - it: emits a Certificate and an HTTPRoute when enabled
+    template: drupal-httproute.yaml
+    set:
+      httproute.enabled: true
+    asserts:
+      - hasDocuments:
+          count: 2
+      - documentIndex: 0
+        isKind:
+          of: Certificate
+      - documentIndex: 1
+        isKind:
+          of: HTTPRoute
+      - documentIndex: 1
+        equal:
+          path: apiVersion
+          value: gateway.networking.k8s.io/v1
+
+  - it: attaches to the shared gateway listener by default
+    template: drupal-httproute.yaml
+    set:
+      httproute.enabled: true
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.parentRefs[0].name
+          value: main
+      - documentIndex: 1
+        equal:
+          path: spec.parentRefs[0].namespace
+          value: traefik
+      - documentIndex: 1
+        equal:
+          path: spec.parentRefs[0].sectionName
+          value: websecure-dev
+
+  - it: honours an overridden gateway and listener
+    template: drupal-httproute.yaml
+    set:
+      httproute.enabled: true
+      httproute.gatewayName: edge
+      httproute.gatewayNamespace: gateways
+      httproute.listenerName: websecure-prod
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.parentRefs[0].name
+          value: edge
+      - documentIndex: 1
+        equal:
+          path: spec.parentRefs[0].namespace
+          value: gateways
+      - documentIndex: 1
+        equal:
+          path: spec.parentRefs[0].sectionName
+          value: websecure-prod
+
+  - it: routes to the drupal service on port 80
+    template: drupal-httproute.yaml
+    set:
+      httproute.enabled: true
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.rules[0].backendRefs[0].kind
+          value: Service
+      - documentIndex: 1
+        equal:
+          path: spec.rules[0].backendRefs[0].name
+          value: RELEASE-NAME-drupal
+      - documentIndex: 1
+        equal:
+          path: spec.rules[0].backendRefs[0].port
+          value: 80
+
+  - it: drops the Certificate when the issuer is not letsencrypt
+    template: drupal-httproute.yaml
+    set:
+      httproute.enabled: true
+      ssl.issuer: custom-issuer
+    asserts:
+      - hasDocuments:
+          count: 1
+      - documentIndex: 0
+        isKind:
+          of: HTTPRoute
+
+  # --- domainPrefixes ---
+
+  - it: adds a hostname and a Certificate per domain prefix
+    template: drupal-httproute.yaml
+    set:
+      httproute.enabled: true
+      domainPrefixes:
+        - en
+        - fi
+    asserts:
+      # main cert + one cert per prefix + the route
+      - hasDocuments:
+          count: 4
+      - documentIndex: 1
+        isKind:
+          of: Certificate
+      - documentIndex: 1
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-crt-p0
+      - documentIndex: 2
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-crt-p1
+      - documentIndex: 3
+        isKind:
+          of: HTTPRoute
+      # main hostname + one per prefix, and nothing beyond that
+      - documentIndex: 3
+        exists:
+          path: spec.hostnames[2]
+      - documentIndex: 3
+        notExists:
+          path: spec.hostnames[3]
+
+  # --- exposeDomains ---
+
+  - it: adds a Certificate and an HTTPRoute per exposed domain
+    template: drupal-httproute.yaml
+    set:
+      httproute.enabled: true
+      exposeDomains:
+        example:
+          hostname: example.com
+    asserts:
+      # main cert + main route + exposed cert + exposed route
+      - hasDocuments:
+          count: 4
+      - documentIndex: 2
+        isKind:
+          of: Certificate
+      - documentIndex: 2
+        equal:
+          path: spec.dnsNames[0]
+          value: example.com
+      - documentIndex: 3
+        isKind:
+          of: HTTPRoute
+      - documentIndex: 3
+        equal:
+          path: metadata.name
+          value: RELEASE-NAME-drupal-example
+      - documentIndex: 3
+        equal:
+          path: spec.hostnames[0]
+          value: example.com
+
+  - it: skips the Certificate for an exposed domain without letsencrypt
+    template: drupal-httproute.yaml
+    set:
+      httproute.enabled: true
+      exposeDomains:
+        example:
+          hostname: example.com
+          ssl:
+            enabled: false
+    asserts:
+      # main cert + main route + exposed route only
+      - hasDocuments:
+          count: 3
+      - documentIndex: 2
+        isKind:
+          of: HTTPRoute

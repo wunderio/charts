@@ -4,6 +4,10 @@ metadata:
   name: {{ .Release.Name }}-drupal
   labels:
     {{- include "drupal.release_labels" . | nindent 4 }}
+  annotations:
+    # Deploy after the Sync-phase pre-release hooks (wave 1), which in turn run
+    # after the PVCs and ConfigMap they mount (wave 0). Inert outside ArgoCD.
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicas }}
@@ -55,7 +59,7 @@ spec:
 
       # Nginx container
       - name: nginx
-        image: {{ .Values.nginx.image | quote }}
+        image: {{ include "drupal.image" .Values.nginx.image | quote }}
         env:
         - name: RELEASE_NAME
           value: "{{ .Release.Name }}"
