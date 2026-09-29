@@ -38,8 +38,28 @@ spec:
         ports:
         - containerPort: 8983
         command: {{ .Values.solr.command }}
+        {{- if or .Values.solr.modules .Values.solr.extraEnv }}
+        env:
+        {{- if .Values.solr.modules }}
+        - name: SOLR_MODULES
+          value: {{ join "," .Values.solr.modules | quote }}
+        {{- end }}
+        {{- with .Values.solr.extraEnv }}
+          {{- if kindIs "map" . }}
+            {{- range $key, $val := . }}
+        - name: {{ $key }}
+          value: {{ $val | quote }}
+            {{- end }}
+          {{- else }}
+            {{- toYaml . | nindent 8 }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
         args:
           {{- range .Values.solr.commandArgs }}
+          - {{ . | quote }}
+          {{- end }}
+          {{- range .Values.solr.extraCommandArgs }}
           - {{ . | quote }}
           {{- end }}
         livenessProbe:
