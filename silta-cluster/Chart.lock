@@ -10,13 +10,19 @@ dependencies:
   version: 1.18.0
 - name: traefik
   repository: https://traefik.github.io/charts
-  version: 41.4.0
+  version: 41.6.0
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
   version: 4.13.9
 - name: pxc-operator
   repository: https://percona.github.io/percona-helm-charts/
   version: 1.12.2
+- name: mariadb-operator-crds
+  repository: https://mariadb-operator.github.io/mariadb-operator
+  version: 26.10.1
+- name: mariadb-operator
+  repository: https://mariadb-operator.github.io/mariadb-operator
+  version: 26.10.1
 - name: minio
   repository: file://../forked/minio/minio-6.0.5
   version: 6.0.5
@@ -31,12 +37,12 @@ dependencies:
   version: 1.0.0
 - name: instana-agent
   repository: https://agents.instana.io/helm
-  version: 2.0.50
+  version: 2.0.53
 - name: nfs-subdir-external-provisioner
   repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
   version: 4.0.18
 - name: docker-registry
   repository: https://twuni.github.io/docker-registry.helm
   version: 2.1.0
-digest: sha256:6514cdd3fd7aa8a8da3a0c0e23139265b5a0de39232da79a58b71163ea522987
-generated: "2026-09-02T11:18:08.316873757+03:00"
+digest: sha256:a2851d40e4c5f4aaec9bf019da0b91ee8334245d90139a55fc769a2738f369db
+generated: "2026-09-28T14:54:51.411690312+03:00"
