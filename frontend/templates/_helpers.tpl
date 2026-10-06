@@ -111,6 +111,19 @@ rsync -az /values_mounts/ /backups/current/
 {{- end }}
 # MariaDB
 {{- if .Values.mariadb.enabled }}
+- name: MARIADB_DB_USER
+  value: "{{ .Values.mariadb.db.user }}"
+- name: MARIADB_DB_NAME
+  value: "{{ .Values.mariadb.db.name }}"
+- name: MARIADB_DB_HOST
+  value: {{ .Release.Name }}-mariadb
+- name: MARIADB_DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb
+      key: mariadb-password
+{{- end }}
+{{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
 - name: DB_USER
   value: "{{ .Values.mariadb.db.user }}"
 - name: DB_NAME
@@ -122,6 +135,33 @@ rsync -az /values_mounts/ /backups/current/
     secretKeyRef:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
+{{- end }}
+# MariaDB HA
+{{- if index ( index .Values "mariadb-ha" ) "enabled" }}
+- name: MARIADB_HA_DB_USER
+  value: "{{ (index .Values "mariadb-ha").db.user }}"
+- name: MARIADB_HA_DB_NAME
+  value: "{{ (index .Values "mariadb-ha").db.name }}"
+- name: MARIADB_HA_DB_HOST
+  value: {{ .Release.Name }}-mariadb-ha-primary
+- name: MARIADB_HA_DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb-ha
+      key: password
+{{- end }}
+{{- if and ( index ( index .Values "mariadb-ha" ) "enabled" ) ( eq .Values.db.primary "mariadb-ha" ) }}
+- name: DB_USER
+  value: "root"
+- name: DB_NAME
+  value: "{{ (index .Values "mariadb-ha").db.name }}"
+- name: DB_HOST
+  value: {{ .Release.Name }}-mariadb-ha-primary
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb-ha
+      key: root-password
 {{- end }}
 # MongoDB
 {{- if .Values.mongodb.enabled }}

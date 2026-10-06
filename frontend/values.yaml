@@ -467,6 +467,10 @@ cronJobDefaults:
   # tolerations: []
   # affinity: {}
 
+db:
+  # Available options: mariadb, mariadb-ha
+  primary: mariadb
+
 # Override the default values of the MariaDB subchart.
 # These settings are optimised for development environments.
 # see: https://github.com/wunderio/charts/blob/master/forked/bitnami/mariadb-7.10.4/values.yaml
@@ -508,6 +512,38 @@ mariadb:
   serviceAccount:
     create: true
   enableServiceLinks: false
+
+# provider: mariadb-operator
+mariadb-ha:
+  enabled: false
+  image: "docker-registry1.mariadb.com/library/mariadb:11.4"
+  imagePullPolicy: IfNotPresent
+  rootUser:
+    password: frontend
+  db:
+    name: frontend
+    user: frontend
+    password: frontend
+  # Odd number of replicas required, at least 3
+  replicas: 3
+  persistence:
+    size: 5Gi
+  # myCnf: |
+  #   [mariadb]
+  #   bind-address=*
+  #   default_storage_engine=InnoDB
+  #   binlog_format=row
+  #   innodb_autoinc_lock_mode=2
+  #   max_allowed_packet=256M
+  affinity:
+    antiAffinityEnabled: true
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1024Mi
 
 varnish:
   enabled: false
