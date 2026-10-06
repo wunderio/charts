@@ -52,6 +52,8 @@ jobs:
             helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
             # nginx-ingress
             helm repo add nginx-stable https://helm.nginx.com/stable
+            # mariadb-operator
+            helm repo add mariadb-operator https://mariadb-operator.github.io/mariadb-operator
 
             for CHARTFILE in `find . -name Chart.yaml`
             do

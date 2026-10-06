@@ -58,6 +58,7 @@ jobs:
             && helm repo add bitnami https://charts.bitnami.com/bitnami \
             && helm repo add wunderio https://storage.googleapis.com/charts.wdr.io \
             && helm repo add percona https://percona.github.io/percona-helm-charts/ \
+            && helm repo add mariadb-operator https://mariadb-operator.github.io/mariadb-operator \
             && helm repo add elastic https://helm.elastic.co \
             && helm repo add traefik https://traefik.github.io/charts \
             && helm repo add jouve https://jouve.github.io/charts/ \

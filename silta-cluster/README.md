@@ -77,6 +77,13 @@ When using GKE private cluster, enabling `ingress-nginx` (and `nginx-traefik`) w
 kubectl apply -f https://raw.githubusercontent.com/percona/percona-helm-charts/dcfc35a1158862da60a89010e4cabaa2b94560f5/charts/pxc-operator/crds/crd.yaml
 ```
 
+### MariaDB operator for replicated database support (optional)
+MariaDB operator is bundled with the chart, but it still requires a separate helm repository to be added.
+```
+helm repo add mariadb-operator https://mariadb-operator.github.io/mariadb-operator
+helm repo update
+```
+
 ### Google Filestore as storage (optional)
 
 Adds a storageclass, backed by Filestore.

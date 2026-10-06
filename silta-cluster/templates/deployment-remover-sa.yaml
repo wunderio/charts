@@ -217,6 +217,27 @@ rules:
   - delete
   - list
   - get
+- apiGroups:
+  - k8s.mariadb.com
+  resources:
+  - mariadbs
+  - backups
+  - restores
+  - databases
+  - users
+  - grants
+  - connections
+  - sqljobs
+  - maxscales
+  - physicalbackups
+  verbs:
+  - update
+  - create
+  - patch
+  - watch
+  - delete
+  - list
+  - get
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
