@@ -203,6 +203,30 @@ rules:
   - list
   - get
 - apiGroups:
+  - traefik.io
+  resources:
+  - middlewares
+  verbs:
+  - update
+  - create
+  - patch
+  - watch
+  - delete
+  - list
+  - get
+- apiGroups:
+  - gateway.networking.k8s.io
+  resources:
+  - httproutes
+  verbs:
+  - update
+  - create
+  - patch
+  - watch
+  - delete
+  - list
+  - get
+- apiGroups:
   - pxc.percona.com
   resources:
   - perconaxtradbclusterbackups
