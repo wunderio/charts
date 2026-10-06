@@ -748,6 +748,40 @@ mariadb:
     create: true
   enableServiceLinks: false
 
+# provider: mariadb-operator
+mariadb-ha:
+  enabled: false
+  image: "docker-registry1.mariadb.com/library/mariadb:11.4"
+  imagePullPolicy: IfNotPresent
+  rootUser:
+    password: drupal
+  db:
+    name: drupal
+    user: drupal
+    password: drupal
+  # Odd number of replicas required, at least 3
+  replicas: 3
+  persistence:
+    size: 5Gi 
+  # myCnf: |
+  #   [mariadb]
+  #   bind-address=*
+  #   default_storage_engine=InnoDB
+  #   binlog_format=row
+  #   innodb_autoinc_lock_mode=2
+  #   max_allowed_packet=256M
+  affinity:
+    antiAffinityEnabled: true
+    # Update the data-plane after an operator upgrade.
+    # autoUpdateDataPlane: true
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1024Mi
+
 varnish:
   # See https://github.com/wunderio/silta/blob/master/docs/silta-examples.md#using-varnish
   # to configure varnish for Your site correctly.
@@ -1006,7 +1040,7 @@ clamav:
       cpu: 1500m
       memory: 3Gi
 db:
-  # Available options: mariadb, pxc-db
+  # Available options: mariadb, mariadb-ha, pxc-db
   primary: mariadb
 
 # Percona XtraDB Cluster

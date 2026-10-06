@@ -1,0 +1,144 @@
+{{- $mariadbha := index .Values "mariadb-ha" }}
+{{- if $mariadbha.enabled }}
+{{- if not ( .Capabilities.APIVersions.Has "k8s.mariadb.com/v1alpha1" ) }}
+{{- fail "API k8s.mariadb.com/v1alpha1 unavailable, ask cluster administrator to enable mariadb-operator support in Silta cluster first!" }}
+{{- end }}
+{{- if or (lt (int $mariadbha.replicas) 3) (eq (mod (int $mariadbha.replicas) 2) 0) }}
+{{- fail "mariadb-ha.replicas must be an odd number, at least 3" }}
+{{- end }}
+apiVersion: k8s.mariadb.com/v1alpha1
+kind: MariaDB
+metadata:
+  name: {{ .Release.Name }}-mariadb-ha
+  labels:
+    app: mariadb
+    release: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    helm.sh/chart: {{ include "drupal.chart" . }}
+spec:
+  port: 3306
+  database: {{ $mariadbha.db.name | quote }}
+  username: {{ $mariadbha.db.user | quote }}
+  image: {{ $mariadbha.image | quote }}
+  imagePullPolicy: {{ $mariadbha.imagePullPolicy | quote }}
+  inheritMetadata:
+    labels:
+      app: mariadb
+      release: {{ .Release.Name }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+      app.kubernetes.io/managed-by: {{ .Release.Service }}
+      helm.sh/chart: {{ include "drupal.chart" . }}
+    annotations:
+      app: mariadb
+  replicas: {{ $mariadbha.replicas }}
+  galera:
+    enabled: true
+    primary:
+      automaticFailover: true
+  rootPasswordSecretKeyRef:
+    name: {{ .Release.Name }}-mariadb-ha
+    key: root-password
+    generate: false
+  passwordSecretKeyRef:
+    name: {{ .Release.Name }}-mariadb-ha
+    key: password
+    generate: false
+  {{- if $mariadbha.myCnf }}
+  myCnf: |
+    {{ $mariadbha.myCnf | nindent 4 }}
+  {{- end }}
+  {{- if $mariadbha.nodeSelector }}
+  nodeSelector:
+    {{- $mariadbha.nodeSelector | toYaml | nindent 4 }}
+  {{- end }}
+  {{ if $mariadbha.tolerations }}
+  tolerations:
+    {{- $mariadbha.tolerations | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if $mariadbha.affinity }}
+  affinity:
+    {{- $mariadbha.affinity | toYaml | nindent 4 }}
+  {{- end }}
+  {{- if $mariadbha.resources }}
+  resources:
+    {{ $mariadbha.resources | toYaml | nindent 4 }}
+  {{- end }}
+  storage:
+    size: {{ $mariadbha.persistence.size | quote}}
+    resizeInUseVolumes: true
+    waitForVolumeResize: true
+    volumeClaimTemplate:
+      metadata:
+        labels:
+          app: mariadb
+          release: {{ .Release.Name }}
+          app.kubernetes.io/instance: {{ .Release.Name }}
+          app.kubernetes.io/managed-by: {{ .Release.Service }}
+          helm.sh/chart: {{ include "drupal.chart" . }}
+      resources:
+        requests:
+          storage: {{ $mariadbha.persistence.size | quote}}
+      accessModes:
+        - ReadWriteOnce
+  # Error writing Galera config: open /etc/mysql/mariadb.conf.d/0-galera.cnf: permission denied
+  # https://github.com/mariadb-operator/mariadb-operator/blob/main/docs/GALERA.md#permission-denied-writing-galera-configuration
+  podSecurityContext:
+    runAsUser: 0
+  updateStrategy:
+    type: ReplicasFirstPrimaryLast
+    autoUpdateDataPlane: true
+  podDisruptionBudget:
+    maxUnavailable: 1
+  livenessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 5
+    timeoutSeconds: 5
+  readinessProbe:
+    initialDelaySeconds: 20
+    periodSeconds: 5
+    timeoutSeconds: 5
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .Release.Name }}-mariadb-ha
+  labels:
+    {{- include "drupal.release_labels" . | nindent 4 }}
+type: Opaque
+data:
+  password: "{{ $mariadbha.db.password | b64enc }}"
+  root-password: "{{ $mariadbha.rootUser.password | b64enc }}"
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-mariadb-ha
+  labels:
+    release: {{ .Release.Name }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  podSelector:
+    matchLabels:
+      release: {{ .Release.Name }}
+      app: mariadb
+  policyTypes:
+  - Ingress
+  ingress:
+  - ports:
+    - port: 3306
+    - port: 4567
+    - port: 4567
+      protocol: UDP
+    - port: 4568
+    - port: 4444
+    - port: 5555
+    - port: 5566
+    from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: mariadb-operator
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: silta-cluster
+{{- end }}

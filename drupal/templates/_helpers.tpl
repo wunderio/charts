@@ -175,6 +175,9 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
+      {{- if .optionalSecrets }}
+      optional: true
+      {{- end }}
 {{- end }}
 {{- if index ( index .Values "pxc-db" ) "enabled" }}
 - name: PXC_DB_USER
@@ -188,6 +191,25 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ include "pxc-database.fullname" . }}
       key: root
+      {{- if .optionalSecrets }}
+      optional: true
+      {{- end }}
+{{- end }}
+{{- if index ( index .Values "mariadb-ha" ) "enabled" }}
+- name: MARIADB_HA_DB_USER
+  value: "{{ (index .Values "mariadb-ha").db.user }}"
+- name: MARIADB_HA_DB_NAME
+  value: "{{ (index .Values "mariadb-ha").db.name }}"
+- name: MARIADB_HA_DB_HOST
+  value: {{ .Release.Name }}-mariadb-ha-primary
+- name: MARIADB_HA_DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb-ha
+      key: password
+      {{- if .optionalSecrets }}
+      optional: true
+      {{- end }}
 {{- end }}
 {{- if and .Values.mariadb.enabled ( eq .Values.db.primary "mariadb" ) }}
 - name: DB_USER
@@ -201,6 +223,9 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ .Release.Name }}-mariadb
       key: mariadb-password
+      {{- if .optionalSecrets }}
+      optional: true
+      {{- end }}
 {{- end }}
 {{- if and ( index ( index .Values "pxc-db" ) "enabled" ) ( eq .Values.db.primary "pxc-db" ) }}
 - name: DB_USER
@@ -214,6 +239,25 @@ imagePullSecrets:
     secretKeyRef:
       name: {{ include "pxc-database.fullname" . }}
       key: root
+      {{- if .optionalSecrets }}
+      optional: true
+      {{- end }}
+{{- end }}
+{{- if and ( index ( index .Values "mariadb-ha" ) "enabled" ) ( eq .Values.db.primary "mariadb-ha" ) }}
+- name: DB_USER
+  value: "root"
+- name: DB_NAME
+  value: "{{ (index .Values "mariadb-ha").db.name }}"
+- name: DB_HOST
+  value: {{ .Release.Name }}-mariadb-ha-primary
+- name: DB_PASS
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Release.Name }}-mariadb-ha
+      key: root-password
+      {{- if .optionalSecrets }}
+      optional: true
+      {{- end }}
 {{- end }}
 {{- end }}
 
