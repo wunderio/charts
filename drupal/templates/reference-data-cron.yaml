@@ -54,6 +54,7 @@ spec:
                 claimName: {{ include "drupal.referenceEnvironment" . }}-reference-data
                 {{- end }}
           serviceAccountName: {{ include "drupal.serviceAccountName" . }}
+          automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
 {{- end }}
 {{- end }}
 ---

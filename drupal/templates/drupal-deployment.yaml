@@ -177,6 +177,7 @@ spec:
           emptyDir: {}
         {{- end }}
       serviceAccountName: {{ include "drupal.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
       {{- if .Values.php.nodeSelector }}
       nodeSelector:
         {{- .Values.php.nodeSelector | toYaml | nindent 8 }}

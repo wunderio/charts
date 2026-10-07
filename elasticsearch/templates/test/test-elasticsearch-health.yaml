@@ -12,6 +12,7 @@ metadata:
     "helm.sh/hook": test
     "helm.sh/hook-delete-policy": hook-succeeded
 spec:
+  automountServiceAccountToken: {{ .Values.rbac.automountToken }}
   securityContext:
 {{ toYaml .Values.podSecurityContext | indent 4 }}
   containers:

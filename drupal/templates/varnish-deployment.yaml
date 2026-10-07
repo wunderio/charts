@@ -75,4 +75,5 @@ spec:
         secret:
           secretName: {{ .Release.Name }}-secrets-varnish
       serviceAccountName: {{ include "drupal.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
 {{- end }}

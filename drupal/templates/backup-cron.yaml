@@ -84,6 +84,7 @@ spec:
                 claimName: {{ .Release.Name }}-backup
                 {{- end }}
           serviceAccountName: {{ include "drupal.serviceAccountName" . }}
+          automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
 {{- end }}
 
 ---

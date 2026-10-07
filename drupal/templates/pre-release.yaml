@@ -69,6 +69,7 @@ spec:
       tolerations:
         {{- include "drupal.tolerations" .Values.php.preupgrade.nodeSelector | nindent 8 }}
       serviceAccountName: {{ include "drupal.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
       volumes:
         {{- include "drupal.volumes" . | nindent 8 }}
         {{- if .Values.php.preupgrade.backup }}

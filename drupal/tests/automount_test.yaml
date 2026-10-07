@@ -1,0 +1,71 @@
+suite: automount service account token
+templates:
+  - drupal-configmap.yaml
+  - drupal-secret.yaml
+  - drupal-deployment.yaml
+  - shell-configmap.yaml
+  - shell-secret.yaml
+  - shell-deployment.yaml
+  - varnish-configmap-vcl.yaml
+  - varnish-deployment.yaml
+  - solr-statefulset.yaml
+  - drupal-cron.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
+tests:
+
+  # Azure Policy / Defender ("Kubernetes clusters should disable automounting
+  # API credentials") reads the Pod spec only, so the field has to be present
+  # there — setting it on the ServiceAccount alone does not satisfy the check.
+
+  - it: is disabled in the pod spec by default
+    template: drupal-deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: can be enabled in the pod spec
+    template: drupal-deployment.yaml
+    set:
+      serviceAccount:
+        automountServiceAccountToken: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: true
+
+  - it: is disabled on the shell deployment
+    template: shell-deployment.yaml
+    set:
+      shell.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: is disabled on the varnish deployment
+    template: varnish-deployment.yaml
+    set:
+      varnish.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: is disabled on the solr statefulset
+    template: solr-statefulset.yaml
+    set:
+      solr.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: is disabled on the cron jobs
+    template: drupal-cron.yaml
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.automountServiceAccountToken
+          value: false

@@ -73,6 +73,7 @@ spec:
           subPath: control_key
           readOnly: true
       serviceAccountName: {{ include "frontend.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
       volumes:
       - name: varnish-vcl
         configMap:

@@ -31,6 +31,7 @@ spec:
     spec:
       restartPolicy: Never
       enableServiceLinks: false
+      automountServiceAccountToken: false
       containers:
         - name: pr-comment
           image: alpine:3.20

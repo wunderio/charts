@@ -102,6 +102,7 @@ spec:
           {{- .Values.signalsciences.resources | toYaml | nindent 10 }}
       {{- end }}
       serviceAccountName: {{ include "simple.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
       volumes:
         - name: nginx-conf
           configMap:
