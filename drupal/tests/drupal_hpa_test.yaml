@@ -70,3 +70,88 @@ tests:
                 type: Utilization
                 averageUtilization: bar
             type: Resource
+  - it: HPA scales on CPU only by default
+    template: drupal-deployment.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 23
+      apiVersions:
+        - autoscaling/v2
+    set:
+      autoscaling:
+        enabled: true
+    asserts:
+      - documentIndex: 1
+        lengthEqual:
+          path: spec.metrics
+          count: 1
+      - documentIndex: 1
+        equal:
+          path: spec.metrics[0].resource.name
+          value: cpu
+      - documentIndex: 1
+        notExists:
+          path: spec.behavior
+  - it: HPA keeps a project's own metrics list, memory included
+    template: drupal-deployment.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 23
+      apiVersions:
+        - autoscaling/v2
+    set:
+      autoscaling:
+        enabled: true
+        metrics:
+        - type: Resource
+          resource:
+            name: cpu
+            targetAverageUtilization: 80
+        - type: Resource
+          resource:
+            name: memory
+            targetAverageUtilization: 80
+    asserts:
+      - documentIndex: 1
+        lengthEqual:
+          path: spec.metrics
+          count: 2
+      - documentIndex: 1
+        equal:
+          path: spec.metrics[1].resource.name
+          value: memory
+  - it: HPA renders behavior when set
+    template: drupal-deployment.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 23
+      apiVersions:
+        - autoscaling/v2
+    set:
+      autoscaling:
+        enabled: true
+        behavior:
+          scaleDown:
+            stabilizationWindowSeconds: 300
+    asserts:
+      - documentIndex: 1
+        equal:
+          path: spec.behavior.scaleDown.stabilizationWindowSeconds
+          value: 300
+  - it: HPA omits behavior on autoscaling/v2beta1
+    template: drupal-deployment.yaml
+    capabilities:
+      majorVersion: 1
+      minorVersion: 22
+      apiVersions:
+        - autoscaling/v2beta1
+    set:
+      autoscaling:
+        enabled: true
+        behavior:
+          scaleDown:
+            stabilizationWindowSeconds: 300
+    asserts:
+      - documentIndex: 1
+        notExists:
+          path: spec.behavior

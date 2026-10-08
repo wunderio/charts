@@ -232,4 +232,8 @@ spec:
   {{- end }}
   {{- end }}
   {{- end }}
+  {{- if and .Values.autoscaling.behavior ( eq ( include "drupal.autoscaling.api-version" . | trim ) "autoscaling/v2" ) }}
+  behavior:
+    {{- toYaml .Values.autoscaling.behavior | nindent 4 }}
+  {{- end }}
 {{- end }}
