@@ -831,11 +831,11 @@ rm -f "{{ include "drupal.installing-file" . }}" || true
   {{ end }}
 
   {{- if .Values.php.preupgrade.backup }}
-    {{- include "drupal.backup-command" . }}
+{{ include "drupal.backup-command" . }}
   {{- end }}
 
   {{- if .Values.php.preupgrade.command }}
-    {{- .Values.php.preupgrade.command }}
+{{ .Values.php.preupgrade.command }}
   {{- end }}
 {{- end }}
 
