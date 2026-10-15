@@ -10,15 +10,11 @@ templates:
   - varnish-deployment.yaml
   - solr-statefulset.yaml
   - drupal-cron.yaml
+  - silta-hub.yaml
 capabilities:
   apiVersions:
     - pxc.percona.com/v1
 tests:
-
-  # Azure Policy / Defender ("Kubernetes clusters should disable automounting
-  # API credentials") reads the Pod spec only, so the field has to be present
-  # there — setting it on the ServiceAccount alone does not satisfy the check.
-
   - it: is disabled in the pod spec by default
     template: drupal-deployment.yaml
     asserts:
@@ -69,3 +65,33 @@ tests:
       - equal:
           path: spec.jobTemplate.spec.template.spec.automountServiceAccountToken
           value: false
+
+  # silta-hub renders two Job pod specs as embedded YAML strings inside a
+  # ConfigMap, so a bad indent would not show up as invalid chart YAML.
+  # Anchor on the exact pod-spec indentation (6 spaces) to catch that.
+  - it: is disabled in the embedded silta-hub push job
+    template: silta-hub.yaml
+    asserts:
+      - matchRegex:
+          path: data.syncPushJob
+          pattern: "(?m)^      automountServiceAccountToken: false$"
+
+  - it: is disabled in the embedded silta-hub pull job
+    template: silta-hub.yaml
+    asserts:
+      - matchRegex:
+          path: data.syncPullJob
+          pattern: "(?m)^      automountServiceAccountToken: false$"
+
+  - it: follows the serviceAccount value in the embedded silta-hub jobs
+    template: silta-hub.yaml
+    set:
+      serviceAccount:
+        automountServiceAccountToken: true
+    asserts:
+      - matchRegex:
+          path: data.syncPushJob
+          pattern: "(?m)^      automountServiceAccountToken: true$"
+      - matchRegex:
+          path: data.syncPullJob
+          pattern: "(?m)^      automountServiceAccountToken: true$"
