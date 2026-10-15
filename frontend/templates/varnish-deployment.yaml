@@ -33,9 +33,6 @@ spec:
           name: web
         - containerPort: 6082
           name: admin
-        livenessProbe:
-          tcpSocket:
-            port: 8080
         env:
         - name: VARNISH_STORAGE_BACKEND
           value: {{ .Values.varnish.storageBackend | quote }}
