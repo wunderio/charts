@@ -1486,19 +1486,19 @@ def test_default_automount_sa_token():
         r["statefulset"][uname]["spec"]["template"]["spec"][
             "automountServiceAccountToken"
         ]
-        == True
+        == False
     )
 
 
-def test_disable_automount_sa_token():
+def test_enable_automount_sa_token():
     config = """
 rbac:
-  automountToken: false
+  automountToken: true
 """
     r = helm_template(config)
     assert (
         r["statefulset"][uname]["spec"]["template"]["spec"][
             "automountServiceAccountToken"
         ]
-        == False
+        == True
     )

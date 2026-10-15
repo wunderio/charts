@@ -115,7 +115,9 @@ rbac:
   create: false
   serviceAccountAnnotations: {}
   serviceAccountName: ""
-  automountToken: true
+  # Mount service account token to the containers.
+  # Azure Defender / Azure Policy flags any pod without this set to false.
+  automountToken: false
 
 podSecurityPolicy:
   create: false

@@ -77,4 +77,5 @@ spec:
         source:
           emptyDir: {}
       serviceAccountName: {{ include "drupal.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
 {{- end }}

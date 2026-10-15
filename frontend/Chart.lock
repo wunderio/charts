@@ -27,4 +27,4 @@ dependencies:
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 19.1.5
 digest: sha256:fa3924831c3c18725a487fb6c03cc0ddb7cf8af2d838f89b8a7ccd58bf50464e
-generated: "2026-09-21T10:14:15.4482254+03:00"
+generated: "2026-10-15T15:29:46.708000376+03:00"

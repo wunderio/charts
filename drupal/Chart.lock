@@ -24,4 +24,4 @@ dependencies:
   repository: file://../silta-release
   version: 1.1.0
 digest: sha256:fd01e4a342c818451ae7902566fce4542d58af5987a04127898b2e6d5784f8f7
-generated: "2026-09-21T10:13:56.670593+03:00"
+generated: "2026-10-15T15:29:26.715394651+03:00"

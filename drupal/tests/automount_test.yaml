@@ -1,0 +1,97 @@
+suite: automount service account token
+templates:
+  - drupal-configmap.yaml
+  - drupal-secret.yaml
+  - drupal-deployment.yaml
+  - shell-configmap.yaml
+  - shell-secret.yaml
+  - shell-deployment.yaml
+  - varnish-configmap-vcl.yaml
+  - varnish-deployment.yaml
+  - solr-statefulset.yaml
+  - drupal-cron.yaml
+  - silta-hub.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
+tests:
+  - it: is disabled in the pod spec by default
+    template: drupal-deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: can be enabled in the pod spec
+    template: drupal-deployment.yaml
+    set:
+      serviceAccount:
+        automountServiceAccountToken: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: true
+
+  - it: is disabled on the shell deployment
+    template: shell-deployment.yaml
+    set:
+      shell.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: is disabled on the varnish deployment
+    template: varnish-deployment.yaml
+    set:
+      varnish.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: is disabled on the solr statefulset
+    template: solr-statefulset.yaml
+    set:
+      solr.enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: is disabled on the cron jobs
+    template: drupal-cron.yaml
+    asserts:
+      - equal:
+          path: spec.jobTemplate.spec.template.spec.automountServiceAccountToken
+          value: false
+
+  # silta-hub renders two Job pod specs as embedded YAML strings inside a
+  # ConfigMap, so a bad indent would not show up as invalid chart YAML.
+  # Anchor on the exact pod-spec indentation (6 spaces) to catch that.
+  - it: is disabled in the embedded silta-hub push job
+    template: silta-hub.yaml
+    asserts:
+      - matchRegex:
+          path: data.syncPushJob
+          pattern: "(?m)^      automountServiceAccountToken: false$"
+
+  - it: is disabled in the embedded silta-hub pull job
+    template: silta-hub.yaml
+    asserts:
+      - matchRegex:
+          path: data.syncPullJob
+          pattern: "(?m)^      automountServiceAccountToken: false$"
+
+  - it: follows the serviceAccount value in the embedded silta-hub jobs
+    template: silta-hub.yaml
+    set:
+      serviceAccount:
+        automountServiceAccountToken: true
+    asserts:
+      - matchRegex:
+          path: data.syncPushJob
+          pattern: "(?m)^      automountServiceAccountToken: true$"
+      - matchRegex:
+          path: data.syncPullJob
+          pattern: "(?m)^      automountServiceAccountToken: true$"
