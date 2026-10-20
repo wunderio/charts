@@ -36,8 +36,6 @@ jobs:
     if: github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4
-      # Test project repositories are private; the default GITHUB_TOKEN only
-      # covers this repo, so mint a short-lived read token from a GitHub App.
       - name: Generate test project repositories token
         id: app-token
         uses: actions/create-github-app-token@v2
