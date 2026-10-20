@@ -22,6 +22,7 @@ spec:
       {{- end }}
     spec:
 {{- include "memcached.imagePullSecrets" . | indent 6 }}
+      automountServiceAccountToken: {{ .Values.automountServiceAccountToken }}
       {{- if .Values.affinity }}
       affinity: {{- include "memcached.tplValue" (dict "value" .Values.affinity "context" $) | nindent 8 }}
       {{- end }}

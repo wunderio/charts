@@ -12,10 +12,10 @@ dependencies:
   condition: pxc-db.enabled
 - name: memcached
   version: 4.2.x
-  repository: https://storage.googleapis.com/charts.wdr.io
+  repository: file://../forked/bitnami/memcached-4.2.27
   condition: memcached.enabled
 - name: redis
-  version: 16.13.x
+  version: 19.1.5
   repository: https://storage.googleapis.com/charts.wdr.io
   condition: redis.enabled
 - name: mailhog

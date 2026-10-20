@@ -6,11 +6,11 @@ dependencies:
   repository: https://percona.github.io/percona-helm-charts/
   version: 1.12.3
 - name: memcached
-  repository: https://storage.googleapis.com/charts.wdr.io
+  repository: file://../forked/bitnami/memcached-4.2.27
   version: 4.2.27
 - name: redis
   repository: https://storage.googleapis.com/charts.wdr.io
-  version: 16.13.2
+  version: 19.1.5
 - name: mailhog
   repository: https://storage.googleapis.com/charts.wdr.io
   version: 5.1.0
@@ -23,5 +23,5 @@ dependencies:
 - name: silta-release
   repository: file://../silta-release
   version: 1.1.0
-digest: sha256:fd01e4a342c818451ae7902566fce4542d58af5987a04127898b2e6d5784f8f7
-generated: "2026-10-15T15:29:26.715394651+03:00"
+digest: sha256:613ed9821ac1919e504298b6d62705cc8cc3fe90127e19f1e2617b594ea09726
+generated: "2026-10-15T15:54:08.97335816+03:00"

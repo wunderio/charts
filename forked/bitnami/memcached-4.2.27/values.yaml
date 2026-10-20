@@ -8,6 +8,12 @@
 #     - myRegistryKeySecretName
 #   storageClass: myStorageClass
 
+## Mount the service account token into the pods.
+## Azure Policy / Defender ("Kubernetes clusters should disable automounting
+## API credentials") reads the Pod spec, so this must be present and false.
+##
+automountServiceAccountToken: false
+
 ## Bitnami Memcached image version
 ## ref: https://hub.docker.com/r/bitnami/memcached/tags/
 ##
