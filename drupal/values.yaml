@@ -930,6 +930,9 @@ redis:
         memory: 256Mi
   serviceAccount:
     automountServiceAccountToken: false
+  networkPolicy:
+    enabled: false
+    allowExternal: false
 
 # Mailpit service overrides
 # see: https://github.com/jouve/charts/blob/main/charts/mailpit/values.yaml

@@ -664,6 +664,8 @@ mongodb:
   # Use a low default to prevent unnecessary storage use.
   persistence:
     size: 1Gi
+  networkPolicy:
+    enabled: false
 
 # Posgresql overrides
 # see: https://github.com/wunderio/charts/blob/master/forked/bitnami/postgresql-13.2.24/values.yaml
@@ -682,6 +684,8 @@ postgresql:
   serviceAccount:
     create: true
     automountServiceAccountToken: false
+  networkPolicy:
+    enabled: false
 
 # https://github.com/wunderio/charts/blob/master/forked/bitnami/rabbitmq-16.0.3/values.yaml
 rabbitmq:
@@ -789,4 +793,5 @@ redis:
         memory: 256Mi
   serviceAccount:
     automountServiceAccountToken: false
-
+  networkPolicy:
+    enabled: false

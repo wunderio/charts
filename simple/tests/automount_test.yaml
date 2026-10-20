@@ -1,0 +1,26 @@
+suite: automount service account token
+templates:
+  - configmap.yaml
+  - deployment.yaml
+tests:
+
+  # Azure Policy / Defender ("Kubernetes clusters should disable automounting
+  # API credentials") reads the Pod spec only, so the field has to be present
+  # there — setting it on the ServiceAccount alone does not satisfy the check.
+
+  - it: is disabled in the pod spec by default
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: false
+
+  - it: can be enabled in the pod spec
+    set:
+      serviceAccount:
+        automountServiceAccountToken: true
+    template: deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.automountServiceAccountToken
+          value: true

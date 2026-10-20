@@ -45,6 +45,7 @@ spec:
         resources:
           {{- .Values.php.postinstall.resources | toYaml | nindent 10 }}
       serviceAccountName: {{ include "drupal.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
       volumes:
         {{- include "drupal.volumes" . | nindent 8 }}
         {{- if .Values.referenceData.enabled -}}

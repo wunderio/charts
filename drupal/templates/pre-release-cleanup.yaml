@@ -35,6 +35,7 @@ spec:
         volumeMounts:
           {{- include "drupal.volumeMounts" . | nindent 12 }}
       serviceAccountName: {{ include "drupal.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
       volumes:
         {{- include "drupal.volumes" . | nindent 8 }}
 {{- end }}

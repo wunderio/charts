@@ -88,6 +88,7 @@ spec:
         runAsUser: 0
         runAsGroup: 0
       serviceAccountName: {{ include "drupal.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
   volumeClaimTemplates:
   - metadata:
       name: {{ .Release.Name }}-solr-data
