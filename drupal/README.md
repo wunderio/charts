@@ -91,8 +91,8 @@ PHP, Cron and Shell containers have following environment variables:
     - ELASTICSEARCH_HOST: Elasticsearch server host.
   - When SMTP is enabled:
     - SMTP_ADDRESS, SSMTP_MAILHUB: SMTP server address. 
-    - SMTP_TLS, SSMTP_USETLS: true if TLS is enabled 
-    - SMTP_STARTTLS, SSMTP_USESTARTTLS: true if STARTTLS is enabled 
+    - SMTP_TLS: true if TLS is enabled. SSMTP_USETLS: YES if TLS is enabled, else NO.
+    - SMTP_STARTTLS: true if STARTTLS is enabled. SSMTP_USESTARTTLS: YES if STARTTLS is enabled, else NO.
     - SMTP_USERNAME, SSMTP_AUTHUSER: SMTP credentials
     - SMTP_PASSWORD, SSMTP_AUTHPASS: SMTP credentials
   - When Varnish is enabled:

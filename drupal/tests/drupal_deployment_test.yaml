@@ -232,6 +232,68 @@ tests:
           content:
             name: SSMTP_AUTHUSER
             value: foo
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SSMTP_USETLS
+            value: "NO"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SSMTP_USESTARTTLS
+            value: "NO"
+  - it: sets ssmtp TLS variables to YES when smtp TLS is enabled
+    template: drupal-deployment.yaml
+    set:
+      mailpit:
+        enabled: false
+      smtp:
+        enabled: true
+        address: examplehost:587
+        tls: true
+        starttls: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SSMTP_USETLS
+            value: "YES"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SSMTP_USESTARTTLS
+            value: "YES"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SMTP_TLS
+            value: "true"
+  - it: sets ssmtp TLS variables to NO when smtp TLS is explicitly disabled
+    template: drupal-deployment.yaml
+    set:
+      mailpit:
+        enabled: false
+      smtp:
+        enabled: true
+        address: examplehost:25
+        tls: false
+        starttls: false
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SSMTP_USETLS
+            value: "NO"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SSMTP_USESTARTTLS
+            value: "NO"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SMTP_TLS
+            value: "false"
 
   - it: sets the replica count correctly
     template: drupal-deployment.yaml

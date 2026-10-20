@@ -139,10 +139,11 @@ imagePullSecrets:
   {{ else }}
   value: {{ .Values.smtp.address | quote }}
   {{- end }}
+# ssmtp accepts only "YES" for UseTLS and UseSTARTTLS. Other values disable TLS.
 - name: SSMTP_USETLS
-  value: {{ .Values.smtp.tls | default false | quote }}
+  value: {{ if has (lower (toString .Values.smtp.tls)) (list "true" "yes") }}"YES"{{ else }}"NO"{{ end }}
 - name: SSMTP_USESTARTTLS
-  value: {{ .Values.smtp.starttls | default false | quote }}
+  value: {{ if has (lower (toString .Values.smtp.starttls)) (list "true" "yes") }}"YES"{{ else }}"NO"{{ end }}
 - name: SSMTP_AUTHUSER
   value: {{ .Values.smtp.username | quote }}
 - name: SSMTP_AUTHPASS
