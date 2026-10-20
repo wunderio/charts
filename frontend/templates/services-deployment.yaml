@@ -95,6 +95,7 @@ spec:
           {{- $.Values.serviceDefaults.resources | toYaml | nindent 10 }}
           {{- end }}
       serviceAccountName: {{ include "frontend.serviceAccountName" $ }}
+      automountServiceAccountToken: {{ $.Values.serviceAccount.automountServiceAccountToken }}
       volumes:
         {{ if $service.mounts }}
         {{- range $index, $mountName := $service.mounts }}
@@ -213,6 +214,7 @@ spec:
         {{- end }}
         {{- end }}
       serviceAccountName: {{ include "frontend.serviceAccountName" $ }}
+      automountServiceAccountToken: {{ $.Values.serviceAccount.automountServiceAccountToken }}
       volumes:
         {{ if $service.mounts }}
         {{- range $serviceName, $mountName := $service.mounts }}

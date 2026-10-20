@@ -36,6 +36,7 @@ data:
             resources:
               {{- .Values.php.postinstall.resources | toYaml | nindent 14 }}
           serviceAccountName: {{ include "drupal.serviceAccountName" . }}
+          automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}
   syncPullJob: |
@@ -64,5 +65,6 @@ data:
             resources:
               {{- .Values.php.postinstall.resources | toYaml | nindent 14 }}
           serviceAccountName: {{ .Release.Name }}-sa
+          automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
           volumes:
             {{- include "drupal.volumes" . | nindent 12 }}

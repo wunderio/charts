@@ -141,6 +141,7 @@ spec:
           {{- end }}
           restartPolicy: Never
           serviceAccountName: {{ include "frontend.serviceAccountName" . }}
+          automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
           volumes:
             - name: shared-data
               emptyDir:
