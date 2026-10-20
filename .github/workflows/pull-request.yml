@@ -36,6 +36,20 @@ jobs:
     if: github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4
+      # Test project repositories are private; the default GITHUB_TOKEN only
+      # covers this repo, so mint a short-lived read token from a GitHub App.
+      - name: Generate test project repositories token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.CHARTS_TEST_APP_ID }}
+          private-key: ${{ secrets.CHARTS_TEST_APP_PRIVATE_KEY }}
+          owner: wunderio
+          repositories: drupal-project-k8s,frontend-project-k8s,simple-project-k8s
+      - name: Configure git credentials for test project repositories
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: git config --global url."https://x-access-token:${GH_TOKEN}@github.com/wunderio/".insteadOf "http://github.com/wunderio/"
       - name: Silta CLI setup
         run: |
           mkdir -p ~/.local/bin
