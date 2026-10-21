@@ -88,15 +88,28 @@ autoscaling:
   enabled: false
   minReplicas: 1
   maxReplicas: 3
+  # CPU only. A PHP-FPM worker keeps the memory of its largest request until pm.max_requests
+  # recycles it, so pod memory falls slowly after a peak and a memory metric holds replicas
+  # long after the traffic has gone. It also stops memory requests from being sized for a quiet
+  # hour: a pod at its normal level would read close to 100%. To scale on memory as well, list
+  # both metrics in the project's silta.yml; Helm replaces this list, it does not merge it.
   metrics:
   - type: Resource
     resource:
       name: cpu
       targetAverageUtilization: 80
-  - type: Resource
-    resource:
-      name: memory
-      targetAverageUtilization: 80
+  # Optional HorizontalPodAutoscaler spec.behavior (autoscaling/v2 only), rendered as given.
+  # Example: scale up at once, scale down at most one pod per minute after 5 quiet minutes.
+  # behavior:
+  #   scaleUp:
+  #     stabilizationWindowSeconds: 0
+  #   scaleDown:
+  #     stabilizationWindowSeconds: 300
+  #     policies:
+  #     - type: Pods
+  #       value: 1
+  #       periodSeconds: 60
+  behavior: {}
 
 # Domain names that will be mapped to this deployment.
 # Example of exposing 2 additional domains for this deployment, each with its own certificate.
