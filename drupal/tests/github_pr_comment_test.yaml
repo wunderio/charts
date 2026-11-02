@@ -58,4 +58,4 @@ tests:
           pattern: "\\(Secret custom-token\\)"
       - notMatchRegex:
           path: spec.template.spec.containers[0].args[0]
-          pattern: github-pr-token
+          pattern: "\\(Secret github-pr-token\\)"

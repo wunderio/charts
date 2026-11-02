@@ -41,7 +41,7 @@ spec:
               apk add --no-cache curl jq >/dev/null 2>&1
 
               # --- GitHub token ---
-              # Written into the namespace by the platform (Secret github-pr-token): an
+              # Written into the namespace by the platform (Secret {{ .Values.github.prComment.secretName }}): an
               # installation token for this repository only, pull_requests: write, valid 1 hour.
               # The GitHub App key itself never reaches tenant namespaces.
               TOKEN="${GITHUB_TOKEN:-}"
