@@ -1,29 +1,67 @@
 ---
+# Build every chart from source and publish it to Harbor (oci://registry.wdr.io/charts).
+#
+# CircleCI still builds the charts for the GCS Helm repository
+# (https://storage.googleapis.com/charts.wdr.io); this workflow is the Harbor
+# path and does not touch GCS. A chart is published when its Chart.yaml version
+# is not in Harbor yet, so a version bump on master publishes it, a failed run is
+# retried by the next one, and a published version is never replaced.
 name: Publish Helm charts to OCI registry
 
 on:
   push:
     branches: [master]
-    paths:
-      - "drupal/**"
-      - "frontend/**"
-      - "simple/**"
-      - "elasticsearch/**"
-      - "silta-release/**"
+  # Safety net: picks up anything a failed or skipped run left behind.
+  schedule:
+    - cron: '30 4 * * *'
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Build, lint and package, but do not push
+        type: boolean
+        default: false
+      oci_repo:
+        description: Target OCI repository
+        type: string
+        default: oci://registry.wdr.io/charts
+
+permissions:
+  contents: read
+
+concurrency:
+  group: publish-oci-${{ github.ref }}
+  cancel-in-progress: false
 
 env:
-  REGISTRY: registry.wdr.io
-  REGISTRY_PATH: registry.wdr.io/charts
+  OCI_REPO: ${{ inputs.oci_repo || 'oci://registry.wdr.io/charts' }}
+  DRY_RUN: ${{ inputs.dry_run || false }}
+  # Harbor robot$ci (push on all projects); also used to read tags of a private project.
+  REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+  REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
 
 jobs:
+  detect:
+    name: Find unpublished chart versions
+    runs-on: ubuntu-latest
+    outputs:
+      charts: ${{ steps.detect.outputs.charts }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Compare Chart.yaml versions with Harbor
+        id: detect
+        run: echo "charts=$(.github/scripts/publish-oci.sh detect)" >> "$GITHUB_OUTPUT"
+
   publish:
     name: Package & Push — ${{ matrix.chart }}
+    needs: detect
+    if: needs.detect.outputs.charts != '[]'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        chart: [drupal, frontend, simple]
+        chart: ${{ fromJson(needs.detect.outputs.charts) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -33,33 +71,14 @@ jobs:
         with:
           version: v3.16.4
 
-      - name: Add dependency repos
-        run: |
-          helm repo add wunderio https://storage.googleapis.com/charts.wdr.io
-          helm repo add jouve https://jouve.github.io/charts/
-          helm repo add percona https://percona.github.io/percona-helm-charts/
-          helm repo update
-
-      - name: Build chart dependencies
-        run: helm dependency build ./${{ matrix.chart }}
-
-      - name: Lint chart
-        run: helm lint ./${{ matrix.chart }}
-
-      - name: Package chart
-        id: package
-        run: |
-          helm package ./${{ matrix.chart }} --destination /tmp/charts
-          PKG=$(ls /tmp/charts/${{ matrix.chart }}-*.tgz)
-          echo "package=${PKG}" >> "$GITHUB_OUTPUT"
-
+      # Also runs on a dry run, so a dry run proves the credentials work.
       - name: Log in to Harbor
         run: |
-          helm registry login '${{ env.REGISTRY }}' \
-            --username '${{ secrets.REGISTRY_USERNAME }}' \
-            --password '${{ secrets.REGISTRY_PASSWORD }}'
+          registry="${OCI_REPO#oci://}"
+          helm registry login "${registry%%/*}" --username "${REGISTRY_USERNAME}" \
+            --password-stdin <<<"${REGISTRY_PASSWORD}"
 
-      - name: Push chart to Harbor
-        run: |
-          helm push "${{ steps.package.outputs.package }}" \
-            "oci://${{ env.REGISTRY_PATH }}"
+      - name: Build, package and push
+        env:
+          CHART: ${{ matrix.chart }}
+        run: .github/scripts/publish-oci.sh publish "${CHART}"
