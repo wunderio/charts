@@ -46,7 +46,7 @@ spec:
               # The GitHub App key itself never reaches tenant namespaces.
               TOKEN="${GITHUB_TOKEN:-}"
               if [ -z "$TOKEN" ]; then
-                echo "WARNING: no GitHub token in the namespace (Secret github-pr-token). Skipping PR comment."
+                echo "WARNING: no GitHub token in the namespace (Secret {{ .Values.github.prComment.secretName }}). Skipping PR comment."
                 exit 0
               fi
 

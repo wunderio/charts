@@ -44,3 +44,18 @@ tests:
           path: spec.template.spec.containers[0].env[?(@.name == "GITHUB_APP_ID")]
       - notExists:
           path: spec.template.spec.containers[0].env[?(@.name == "GITHUB_APP_INSTALLATION_ID")]
+
+  - it: names the configured Secret in the missing-token warning
+    template: github-pr-comment.yaml
+    documentIndex: 0
+    set:
+      silta-release.github.prComment.prNumber: "5"
+      silta-release.github.prComment.repository: wunderio/client-fi-test
+      silta-release.github.prComment.secretName: custom-token
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: "\\(Secret custom-token\\)"
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: github-pr-token

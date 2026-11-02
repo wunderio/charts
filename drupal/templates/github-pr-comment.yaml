@@ -5,6 +5,7 @@
 {{- $platformGithub := index $siltaRelease "github" | default dict }}
 {{- $prComment = index $platformGithub "prComment" | default dict }}
 {{- end }}
+{{- $secretName := get $prComment "secretName" | default "github-pr-token" }}
 {{- if index $prComment "prNumber" }}
 ---
 # PostSync Job that posts deployment details as a GitHub PR comment.
@@ -47,7 +48,7 @@ spec:
               # The GitHub App key itself never reaches tenant namespaces.
               TOKEN="${GITHUB_TOKEN:-}"
               if [ -z "$TOKEN" ]; then
-                echo "WARNING: no GitHub token in the namespace (Secret github-pr-token). Skipping PR comment."
+                echo "WARNING: no GitHub token in the namespace (Secret {{ $secretName }}). Skipping PR comment."
                 exit 0
               fi
 
@@ -85,7 +86,7 @@ spec:
             - name: GITHUB_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ get $prComment "secretName" | default "github-pr-token" }}
+                  name: {{ $secretName }}
                   key: token
                   # Missing token: the script skips the comment instead of failing the hook.
                   optional: true
