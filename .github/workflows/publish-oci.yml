@@ -20,10 +20,6 @@ on:
         description: Build, lint and package, but do not push
         type: boolean
         default: false
-      oci_repo:
-        description: Target OCI repository
-        type: string
-        default: oci://registry.wdr.io/charts
 
 permissions:
   contents: read
@@ -33,7 +29,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  OCI_REPO: ${{ inputs.oci_repo || 'oci://registry.wdr.io/charts' }}
+  # Fixed, not an input: the robot credentials below are sent to this registry.
+  OCI_REPO: oci://registry.wdr.io/charts
   DRY_RUN: ${{ inputs.dry_run || false }}
   # Harbor robot$ci (push on all projects); also used to read tags of a private project.
   REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}

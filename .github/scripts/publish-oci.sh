@@ -51,8 +51,13 @@ manifest_status() {
     "") echo 000; return ;;
     *) head -n1 <<<"${auth}" | awk '{print $2}'; return ;;
   esac
-  realm="$(sed -n 's/^[Ww]ww-[Aa]uthenticate: Bearer .*realm="\([^"]*\)".*/\1/p' <<<"${auth}")"
-  service="$(sed -n 's/^[Ww]ww-[Aa]uthenticate: Bearer .*service="\([^"]*\)".*/\1/p' <<<"${auth}")"
+  realm="$(sed -n 's/^www-authenticate: bearer .*realm="\([^"]*\)".*/\1/Ip' <<<"${auth}")"
+  service="$(sed -n 's/^www-authenticate: bearer .*service="\([^"]*\)".*/\1/Ip' <<<"${auth}")"
+  # The registry names the token realm; send credentials only to its own host.
+  case "${realm}" in
+    "${scheme}://${host}/"*) ;;
+    *) echo "token realm ${realm:-missing} is not on ${host}" >&2; echo 000; return ;;
+  esac
   if [ -n "${REGISTRY_USERNAME:-}" ]; then
     # Credentials go through a curl config on stdin, not the command line.
     token="$(printf 'user = "%s:%s"\n' "${REGISTRY_USERNAME}" "${REGISTRY_PASSWORD:-}" |
