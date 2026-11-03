@@ -35,9 +35,17 @@ if [ "${PLAIN_HTTP}" = "true" ]; then
   push_args+=(--plain-http)
 fi
 accept="application/vnd.oci.image.manifest.v1+json"
+# A network blip should not fail a whole run.
+retry=(--retry 3 --retry-connrefused)
 
 work="$(mktemp -d)"
 trap 'rm -rf "${work}"' EXIT
+
+# Quote a value for a curl config file, where " and \ are special.
+curl_config_quote() {
+  local value="${1//\\/\\\\}"
+  printf '"%s"' "${value//\"/\\\"}"
+}
 
 # Print the HTTP status of the manifest <path>/<chart>:<version>: 200 exists,
 # 404 missing. Registries such as Harbor answer 401 with a Bearer challenge
@@ -45,7 +53,7 @@ trap 'rm -rf "${work}"' EXIT
 manifest_status() {
   local repo="$1" tag="$2" url auth realm service token
   url="${scheme}://${host}/v2/${repo}/manifests/${tag}"
-  auth="$(curl -sI -H "Accept: ${accept}" "${url}" | tr -d '\r')"
+  auth="$(curl -sI "${retry[@]}" -H "Accept: ${accept}" "${url}" | tr -d '\r')"
   case "$(head -n1 <<<"${auth}" | awk '{print $2}')" in
     401) ;;
     "") echo 000; return ;;
@@ -60,14 +68,14 @@ manifest_status() {
   esac
   if [ -n "${REGISTRY_USERNAME:-}" ]; then
     # Credentials go through a curl config on stdin, not the command line.
-    token="$(printf 'user = "%s:%s"\n' "${REGISTRY_USERNAME}" "${REGISTRY_PASSWORD:-}" |
-      curl -sf -K - -G "${realm}" --data-urlencode "service=${service}" \
+    token="$(printf 'user = %s\n' "$(curl_config_quote "${REGISTRY_USERNAME}:${REGISTRY_PASSWORD:-}")" |
+      curl -sf "${retry[@]}" -K - -G "${realm}" --data-urlencode "service=${service}" \
         --data-urlencode "scope=repository:${repo}:pull" | jq -r '.token // .access_token')"
   else
-    token="$(curl -sf -G "${realm}" --data-urlencode "service=${service}" \
+    token="$(curl -sf "${retry[@]}" -G "${realm}" --data-urlencode "service=${service}" \
       --data-urlencode "scope=repository:${repo}:pull" | jq -r '.token // .access_token')"
   fi
-  curl -s -o /dev/null -w '%{http_code}' -I -H "Accept: ${accept}" \
+  curl -s "${retry[@]}" -o /dev/null -w '%{http_code}' -I -H "Accept: ${accept}" \
     -H "Authorization: Bearer ${token}" "${url}"
 }
 

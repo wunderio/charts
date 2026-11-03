@@ -24,8 +24,9 @@ on:
 permissions:
   contents: read
 
+# One group for all refs: two runs that both see a version as missing would both push it.
 concurrency:
-  group: publish-oci-${{ github.ref }}
+  group: publish-oci
   cancel-in-progress: false
 
 env:
@@ -39,6 +40,9 @@ env:
 jobs:
   detect:
     name: Find unpublished chart versions
+    # Only master publishes; other branches may run a dry run. A version pushed from an
+    # unmerged branch would block master's version of it, as published versions are never replaced.
+    if: github.ref == 'refs/heads/master' || inputs.dry_run
     runs-on: ubuntu-latest
     outputs:
       charts: ${{ steps.detect.outputs.charts }}
