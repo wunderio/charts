@@ -1,0 +1,61 @@
+suite: GitHub PR comment
+templates:
+  - github-pr-comment.yaml
+tests:
+
+  - it: renders nothing outside PR environments
+    template: github-pr-comment.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # The Job reads a short-lived token that the platform writes into the namespace
+  # (github-pr-token: own repository, pull_requests: write, 1 hour). It must never
+  # see the GitHub App private key.
+  - it: reads the scoped token, optional so a missing token only skips the comment
+    template: github-pr-comment.yaml
+    documentIndex: 0
+    set:
+      silta-release.github.prComment.prNumber: "5"
+      silta-release.github.prComment.repository: wunderio/client-fi-test
+    asserts:
+      - isKind:
+          of: Job
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GITHUB_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: github-pr-token
+                key: token
+                optional: true
+
+  - it: does not mount or reference the GitHub App key
+    template: github-pr-comment.yaml
+    documentIndex: 0
+    set:
+      silta-release.github.prComment.prNumber: "5"
+      silta-release.github.prComment.repository: wunderio/client-fi-test
+    asserts:
+      - notExists:
+          path: spec.template.spec.volumes[?(@.secret.secretName == "argocd-github-app")]
+      - notExists:
+          path: spec.template.spec.containers[0].env[?(@.name == "GITHUB_APP_ID")]
+      - notExists:
+          path: spec.template.spec.containers[0].env[?(@.name == "GITHUB_APP_INSTALLATION_ID")]
+
+  - it: names the configured Secret in the missing-token warning
+    template: github-pr-comment.yaml
+    documentIndex: 0
+    set:
+      silta-release.github.prComment.prNumber: "5"
+      silta-release.github.prComment.repository: wunderio/client-fi-test
+      silta-release.github.prComment.secretName: custom-token
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: "\\(Secret custom-token\\)"
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: "\\(Secret github-pr-token\\)"

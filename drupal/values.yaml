@@ -42,7 +42,7 @@ environmentName: ""
 # --- GitHub PR Comment
 # When prNumber is set (injected by the platform chart for PR environments),
 # a PostSync Job posts deployment details as a PR comment via the GitHub API.
-# Requires the argocd-github-app secret in the namespace (synced by Kyverno).
+# Uses the github-pr-token secret the platform writes into the namespace.
 github:
   prComment:
     # Set automatically by the platform chart for PR environments.
@@ -50,9 +50,10 @@ github:
     # GitHub repository owner/name, e.g. "wunderio/client-fi-mysite".
     # Set automatically by the platform chart from tenant.repoURL.
     repository: ""
-    # Name of the Kubernetes secret containing GitHub App credentials.
-    # Must have keys: githubAppID, githubAppInstallationID, githubAppPrivateKey.
-    secretName: argocd-github-app
+    # Secret with key "token": a GitHub installation token for this repository only
+    # (pull_requests: write, valid 1 hour), written into tenant namespaces by the
+    # platform's github-pr-token CronJob. Missing token: the comment is skipped.
+    secretName: github-pr-token
     # Marker string used to upsert (update-or-create) the comment.
     commentTag: "silta-deploy"
 

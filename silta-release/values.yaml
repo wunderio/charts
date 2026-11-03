@@ -18,9 +18,10 @@ github:
     repository: ""
     # Preview environment URL, supplied by the platform chart.
     environmentUrl: ""
-    # Secret with githubAppID, githubAppInstallationID, githubAppPrivateKey.
-    # Synced into tenant namespaces by the sync-github-token Kyverno policy.
-    secretName: argocd-github-app
+    # Secret with key "token": a GitHub installation token for this repository only
+    # (pull_requests: write, valid 1 hour), written into tenant namespaces by the
+    # platform's github-pr-token CronJob. Missing token: the comment is skipped.
+    secretName: github-pr-token
     # Marker used to upsert (update-or-create) the comment.
     commentTag: "silta-preview"
 
