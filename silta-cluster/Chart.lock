@@ -10,7 +10,7 @@ dependencies:
   version: 1.18.0
 - name: traefik
   repository: https://traefik.github.io/charts
-  version: 41.6.0
+  version: 41.6.1
 - name: ingress-nginx
   repository: https://kubernetes.github.io/ingress-nginx
   version: 4.13.9
@@ -39,10 +39,10 @@ dependencies:
   repository: https://agents.instana.io/helm
   version: 2.0.53
 - name: nfs-subdir-external-provisioner
-  repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
-  version: 4.0.18
+  repository: https://starttoaster.github.io/nfs-subdir-external-provisioner/
+  version: 4.0.24
 - name: docker-registry
   repository: https://twuni.github.io/docker-registry.helm
   version: 2.1.0
-digest: sha256:a2851d40e4c5f4aaec9bf019da0b91ee8334245d90139a55fc769a2738f369db
-generated: "2026-09-28T14:54:51.411690312+03:00"
+digest: sha256:0b63f963b2860b7e2ec4bd6ec3ed466e3adb301228cd957765d4e0e1929140a1
+generated: "2026-10-08T15:47:43.17942378+03:00"
