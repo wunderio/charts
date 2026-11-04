@@ -487,7 +487,10 @@ nfs-subdir-external-provisioner:
     onDelete: delete
   image:
     repository: docker.io/wunderio/nfs-subdir-external-provisioner
-    tag: v5.0
+    # Uses more updated fork from Starttoaster as a base that fixes deprecated Endpoints API.
+    # Additional fix: volume data deletion
+    # https://github.com/wunderio/silta-nfs-subdir-external-provisioner/commit/da995f29cfda87f30f74c43ee71803bddc915c6e
+    tag: v4.0.6
 
 # This should be replaced when an actual sidecar implementation is available. 
 # https://github.com/kubernetes/enhancements/issues/753#issuecomment-713471597
