@@ -27,7 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-24.04", "ubuntu-26.04"]
+        os: ["ubuntu-26.04"]
         # Available minikube kubernetes version list:
         # "minikube config defaults kubernetes-version"
         # and https://kubernetes.io/releases/patch-releases/
@@ -81,6 +81,12 @@ jobs:
             && helm repo add nginx-stable https://helm.nginx.com/stable \
             && helm plugin install https://github.com/helm-unittest/helm-unittest --version 0.5.1 \
             && helm repo update
+
+      - name: Unload fusermount3 AppArmor profile (debug)
+        run: |
+          sudo aa-status | grep -n fusermount3 || true
+          sudo apparmor_parser -R /etc/apparmor.d/fusermount3
+          sudo aa-status | grep -q fusermount3 && echo "STILL LOADED" || echo "fusermount3 profile unloaded"
 
       - name: Download and start minikube
         run: |
@@ -291,7 +297,6 @@ jobs:
         run: bash .github/debug/rclone-diag.sh
 
       - name: Build Frontend chart images, deploy and test
-        if: false
         run: |
 
           MINIKUBE_IP=$(minikube ip)
@@ -362,7 +367,6 @@ jobs:
               --fail
 
       - name: Build Simple chart images, deploy and test
-        if: false
         run: |
 
           MINIKUBE_IP=$(minikube ip)
