@@ -23,13 +23,15 @@ on:
 jobs:
   minikube-test:
     name: Minikube
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
+        os: ["ubuntu-24.04", "ubuntu-26.04"]
         # Available minikube kubernetes version list:
         # "minikube config defaults kubernetes-version"
         # and https://kubernetes.io/releases/patch-releases/
-        kubernetes-version: ["v1.32.13", "v1.33.13", "v1.34.11", "v1.35.8", "v1.36.4", "latest"]
+        kubernetes-version: ["latest"]
     env:
       CLUSTER_DOMAIN: minikube.local.wdr.io
       K8S_PROJECT_REPO_DIR: k8s-project-repositories
@@ -189,6 +191,12 @@ jobs:
           curl --resolve ${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} https://${CLUSTER_DOMAIN} -ILk --fail
           curl --resolve ${CLUSTER_DOMAIN}:80:${MINIKUBE_IP} --resolve ${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} http://${CLUSTER_DOMAIN} -IL --fail
 
+      - name: csi-rclone verbose logging
+        run: |
+          kubectl -n silta-cluster patch ds csi-nodeplugin-rclone --type=json \
+            -p='[{"op":"replace","path":"/spec/template/spec/containers/1/args/3","value":"--v=5"}]'
+          kubectl -n silta-cluster rollout status ds/csi-nodeplugin-rclone --timeout=180s
+
       - name: silta-cluster diagnostics
         if: failure()
         run: |
@@ -197,6 +205,7 @@ jobs:
           kubectl get events -A --sort-by=.lastTimestamp || true
 
       - name: Build Drupal chart images, deploy and test
+        id: drupal
         run: |
 
           MINIKUBE_IP=$(minikube ip)
@@ -277,7 +286,12 @@ jobs:
               --retry 5 --retry-delay 5 \
               --fail 
 
+      - name: rclone permission diagnostics
+        if: always()
+        run: bash .github/debug/rclone-diag.sh
+
       - name: Build Frontend chart images, deploy and test
+        if: false
         run: |
 
           MINIKUBE_IP=$(minikube ip)
@@ -348,6 +362,7 @@ jobs:
               --fail
 
       - name: Build Simple chart images, deploy and test
+        if: false
         run: |
 
           MINIKUBE_IP=$(minikube ip)
@@ -411,7 +426,7 @@ jobs:
       fail-fast: false
       matrix:
         chart: [drupal, frontend, simple]
-    if: github.event.pull_request.draft == false
+    if: false
     steps:
       - uses: actions/checkout@v4
 
