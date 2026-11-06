@@ -66,6 +66,73 @@ tests:
             name: ENVIRONMENT_DOMAIN
             value: release-name.namespace.silta.wdr.io
 
+  - it: renders env values from Secrets and ConfigMaps
+    template: services-deployment.yaml
+    set:
+      services:
+        foo:
+          env:
+            plain: baz
+            FROM_SECRET:
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: my-key
+            FROM_CONFIGMAP:
+              valueFrom:
+                configMapKeyRef:
+                  name: my-config
+                  key: my-key
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: plain
+            value: baz
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FROM_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: my-secret
+                key: my-key
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FROM_CONFIGMAP
+            valueFrom:
+              configMapKeyRef:
+                name: my-config
+                key: my-key
+
+  - it: renders env values from Secrets in the post-install Job
+    template: services-deployment.yaml
+    set:
+      services:
+        foo:
+          image: 'bar'
+          postinstall:
+            command: echo hi
+          env:
+            FROM_SECRET:
+              valueFrom:
+                secretKeyRef:
+                  name: my-secret
+                  key: my-key
+    asserts:
+      - documentSelector:
+          path: kind
+          value: Job
+        contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: FROM_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: my-secret
+                key: my-key
+
   - it: uses the default port
     template: services-deployment.yaml
     set:

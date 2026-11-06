@@ -30,3 +30,37 @@ tests:
           content:
             name: TZ
             value: Foo/Bar
+
+  - it: renders service env values from Secrets in the backup container
+    template: backup-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+        backup:
+          command: echo "Hello world"
+        env:
+          plain: baz
+          FROM_SECRET:
+            valueFrom:
+              secretKeyRef:
+                name: my-secret
+                key: my-key
+      backup:
+        enabled: true
+    capabilities:
+      majorVersion: 1
+      minorVersion: 25
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[1].env
+          content:
+            name: plain
+            value: baz
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[1].env
+          content:
+            name: FROM_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: my-secret
+                key: my-key
