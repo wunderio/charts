@@ -25,6 +25,31 @@ tests:
           path: spec.jobTemplate.spec.parallelism
           value: 1
 
+  - it: renders service env values from Secrets
+    template: services-cron.yaml
+    set:
+      services.foo:
+        image: 'bar'
+        env:
+          FROM_SECRET:
+            valueFrom:
+              secretKeyRef:
+                name: my-secret
+                key: my-key
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+    asserts:
+      - contains:
+          path: spec.jobTemplate.spec.template.spec.containers[0].env
+          content:
+            name: FROM_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: my-secret
+                key: my-key
+
   - it: can override parallelism
     template: services-cron.yaml
     set:
