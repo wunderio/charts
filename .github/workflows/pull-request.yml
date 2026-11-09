@@ -23,7 +23,11 @@ on:
 jobs:
   minikube-test:
     name: Minikube
-    runs-on: ubuntu-latest
+    # Pinned to 24.04: on ubuntu-26.04 the host AppArmor "fusermount3" profile denies
+    # csi-rclone FUSE mounts under /var/lib/kubelet/pods, so silta-shared volumes fall back
+    # to a root-only local dir and Drupal's post-release fails with "Permission denied".
+    # Revert to ubuntu-latest once silta-cluster deploys a csi-rclone image with the fix.
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         # Available minikube kubernetes version list:
@@ -406,7 +410,7 @@ jobs:
 
   validate:
     name: Validate — ${{ matrix.chart }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04  # see note on minikube-test job
     strategy:
       fail-fast: false
       matrix:
