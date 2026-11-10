@@ -15,6 +15,11 @@ ssl:
   
 csi-rclone:
   enabled: true
+  # v3.1.2 moves fusermount3 out of /usr/bin, so the Ubuntu 26.04 runner's AppArmor
+  # "fusermount3" profile no longer denies mounts under /var/lib/kubelet/pods (wunderio/csi-rclone#69).
+  # CI pulls the published csi-rclone chart, so drop this once silta-cluster depends on
+  # csi-rclone chart 1.2.x (default v3.1.2) and its Chart.lock is regenerated.
+  version: v3.1.2
   params:
     remote: "s3"
     remotePath: "projectname"
