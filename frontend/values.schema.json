@@ -235,7 +235,7 @@
           "port": { "type": "integer" },
           "env": {
             "type": "object",
-            "additionalProperties": { "type": ["string", "boolean", "integer", "null"] }
+            "additionalProperties": { "type": ["string", "boolean", "integer", "number", "object", "null"] }
           },
           "exposedRoute": { "type": "string" },
           "replicas": { "type": "integer" },
