@@ -15,10 +15,10 @@ ssl:
   
 csi-rclone:
   enabled: true
+  version: latest
   params:
     remote: "s3"
     remotePath: "projectname"
-    
     # Minio as S3 provider
     s3-provider: "Minio"
     s3-endpoint: "http://silta-cluster-minio:9000"

@@ -327,6 +327,8 @@ nginx-traefik:
 csi-rclone:
   enabled: false
   priorityClassName: "high-priority"
+  # rclone CSI plugin image release version. https://cloud.docker.com/u/wunderio/repository/docker/wunderio/csi-rclone
+  # version: v3.1.2
   # Use silta cluster gke credentials. This is used when remote type is set to "google cloud storage".
   useGkeAuth: false
   # Do not allow csi-rclone subchart to install default secret because we want to generate it ourselves.
@@ -487,7 +489,10 @@ nfs-subdir-external-provisioner:
     onDelete: delete
   image:
     repository: docker.io/wunderio/nfs-subdir-external-provisioner
-    tag: v5.0
+    # Uses more updated fork from Starttoaster as a base that fixes deprecated Endpoints API.
+    # Additional fix: volume data deletion
+    # https://github.com/wunderio/silta-nfs-subdir-external-provisioner/commit/da995f29cfda87f30f74c43ee71803bddc915c6e
+    tag: v4.0.6
 
 # This should be replaced when an actual sidecar implementation is available. 
 # https://github.com/kubernetes/enhancements/issues/753#issuecomment-713471597

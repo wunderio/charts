@@ -69,7 +69,7 @@ dependencies:
   repository: https://agents.instana.io/helm
   condition: instana-agent.enabled
 - name: nfs-subdir-external-provisioner
-  repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
+  repository: https://starttoaster.github.io/nfs-subdir-external-provisioner/
   version: 4.0.x
   condition: nfs-subdir-external-provisioner.enabled
 - name: docker-registry

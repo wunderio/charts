@@ -1,67 +1,33 @@
-{{- if .Values.ingress.enabled }}
+{{- range $kind := list "insert" "select" }}
+{{- $ingress := index $.Values.ingress $kind | default dict }}
+{{- if $ingress.enabled }}
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Release.Name }}
+  {{- /* The insert Ingress keeps the release name it had before the split. */}}
+  name: {{ $.Release.Name }}{{ if eq $kind "select" }}-select{{ end }}
   annotations:
-    {{- range $key, $value := .Values.ingress.annotations }}
+    {{- range $key, $value := $ingress.annotations }}
     {{ $key }}: {{ $value | quote }}
     {{- end }}
 spec:
   rules:
-  - host: {{ .Values.ingress.host }}
+  - host: {{ $ingress.host }}
     http:
       paths:
+      {{- range $signal := list "metrics" "logs" "traces" }}
       - backend:
           service:
             name: {{ $.Release.Name }}
             port:
               number: {{ $.Values.service.port }}
-        path: /metrics/insert
+        path: /{{ $signal }}/{{ $kind }}
         pathType: Prefix
-      - backend:
-          service:
-            name: {{ $.Release.Name }}
-            port:
-              number: {{ $.Values.service.port }}
-        path: /metrics/select
-        pathType: Prefix
-  - host: {{ .Values.ingress.host }}
-    http:
-      paths:
-      - backend:
-          service:
-            name: {{ $.Release.Name }}
-            port:
-              number: {{ $.Values.service.port }}
-        path: /logs/insert
-        pathType: Prefix
-      - backend:
-          service:
-            name: {{ $.Release.Name }}
-            port:
-              number: {{ $.Values.service.port }}
-        path: /logs/select
-        pathType: Prefix
-  - host: {{ .Values.ingress.host }}
-    http:
-      paths:
-      - backend:
-          service:
-            name: {{ $.Release.Name }}
-            port:
-              number: {{ $.Values.service.port }}
-        path: /traces/insert
-        pathType: Prefix
-      - backend:
-          service:
-            name: {{ $.Release.Name }}
-            port:
-              number: {{ $.Values.service.port }}
-        path: /traces/select
-        pathType: Prefix
+      {{- end }}
+  {{- with $ingress.tls }}
   tls:
-  - hosts:
-    - {{ .Values.ingress.host }}
-    secretName: {{ $.Release.Name }}-ingress-tls
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+{{- end }}
 {{- end }}

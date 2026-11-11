@@ -36,11 +36,22 @@ service:
   type: ClusterIP
   port: 80
 
+# Public Ingresses: insert (write, used by collectors) and select (read).
+# Each has its own host, TLS and annotations (e.g. different Traefik
+# middlewares); both may use the same host. Put cert-manager annotations on
+# only one of them when they share a TLS secret.
 ingress:
-  enabled: false
-  annotations: {}
-  host: vmproxy.local
-  tls: []
+  insert:
+    enabled: false
+    annotations: {}
+    host: vmproxy.local
+    # e.g. [{secretName: vmproxy-ingress-tls, hosts: [vmproxy.local]}]
+    tls: []
+  select:
+    enabled: false
+    annotations: {}
+    host: vmproxy.local
+    tls: []
 
 resources:
   limits:
