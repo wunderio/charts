@@ -44,5 +44,5 @@ dependencies:
 - name: docker-registry
   repository: https://twuni.github.io/docker-registry.helm
   version: 2.1.0
-digest: sha256:a24f6c7d2b7cfe9adb0afc0bb677254b689588a861ef1ed160772f2475e15d90
-generated: "2026-11-06T11:42:40.644151861+02:00"
+digest: sha256:ddb3c8887a7e3955e73bd9ce750ae4b9aace0b8c46c5eb965aa37942209ddd6f
+generated: "2026-11-11T10:40:17.905876338+02:00"
