@@ -39,8 +39,13 @@ minio:
 gitAuth:
   enabled: true
   port: 2222
+  # ssh-bridge refuses to start without keyserver settings; dummy values are enough for CI
   keyserver:
-    enabled: false
+    enabled: true
+    url: http://localhost/api/1/git-ssh-keys
+    username: test
+    password: test
+  scope: test
   authorizedKeys: []
   annotations:
     metallb.universe.tf/allow-shared-ip: "shared"
