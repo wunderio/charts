@@ -21,6 +21,11 @@ rules:
   - apiGroups: ["k8s.mariadb.com"]
     resources: ["mariadbs"]
     verbs: ["get", "list", "patch", "update", "watch"]
+  # Placeholder basic auth hash, nginx.noauthips and page template, written by the
+  # drupal, frontend and simple charts into the release's Silta Release resource.
+  - apiGroups: ["silta.wdr.io"]
+    resources: ["releases"]
+    verbs: ["get"]
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
