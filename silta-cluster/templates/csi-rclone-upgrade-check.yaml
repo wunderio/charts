@@ -1,5 +1,8 @@
 {{- $rclone := index .Values "csi-rclone" }}
-{{- if $rclone.enabled }}
+{{- if and $rclone.enabled $rclone.version (ne (toString $rclone.version) "latest") }}
+{{- if not (regexMatch "^v?[0-9]+\\.[0-9]+\\.[0-9]+" (toString $rclone.version)) }}
+{{- fail (printf "csi-rclone.version must be \"latest\" or a semantic version (e.g. v3.1.2), got: %s" (toString $rclone.version)) }}
+{{- end }}
 {{- $imgversion := semver $rclone.version }}
 {{- if semverCompare "<3.0.0" ( printf "%d.%d.%d" $imgversion.Major $imgversion.Minor $imgversion.Patch ) }}
 {{- fail (printf "csi-rclone image (csi-rclone.version) upgrade required. Current image: %s, parsed version: %s, required minimum version: %s" $rclone.version (printf "%d.%d.%d" $imgversion.Major $imgversion.Minor $imgversion.Patch) "3.0.0" ) }}

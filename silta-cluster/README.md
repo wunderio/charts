@@ -189,7 +189,20 @@ Silta cluster uses traefik (1) ingress controller by default but it supports run
 
 #### SSH Jumphost
 
-SSH Jumphost authentication is based on [sshd-gitAuth](https://github.com/wunderio/sshd-gitauth) project that will authorize users based on their SSH private key. The key whitelist is built by listing all users that belong to a certain github organisation and allowing acccess to projects when user has at least `push` permission to the repository.
+The SSH Jumphost runs [silta-ssh-bridge](https://hub.docker.com/r/wunderio/silta-ssh-bridge) by default (`gitAuth.mode: bridge`). Instead of opening a second SSH connection to the destination container, it bridges the session to `kubectl exec`
+
+The previous [sshd-gitAuth](https://github.com/wunderio/sshd-gitauth) based jumphost is still available, but won't be maintained:
+
+```yaml
+gitAuth:
+  mode: openssh
+  image: wunderio/sshd-gitauth
+  imageTag: v1.0
+```
+
+After switching between modes, users get a one-time `REMOTE HOST IDENTIFICATION HAS CHANGED` warning, because the host key of the final hop changes. Remove the stale key (`ssh-keygen -R <host>`) and reconnect.
+
+In both modes, users are authorized based on their SSH private key. The key whitelist is built by listing all users that belong to a certain github organisation and allowing acccess to projects when user has at least `push` permission to the repository.
 
 You need to supply Github API Personal access token that will be used to get the list of organisation users. The access can be read only, following permissions are sufficient for the task: `public_repo, read:org, read:public_key, repo:status`.
 
