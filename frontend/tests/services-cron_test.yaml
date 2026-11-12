@@ -378,3 +378,83 @@ tests:
       - equal:
           path: spec.jobTemplate.spec.activeDeadlineSeconds
           value: 600
+
+  - it: names the CronJob after the release and the job
+    template: services-cron.yaml
+    release:
+      name: my-release
+    set:
+      services.foo:
+        image: 'bar'
+        cron:
+          foo:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+    asserts:
+      - equal:
+          path: metadata.name
+          value: my-release-foo
+      - equal:
+          path: metadata.labels.cronjob-name
+          value: foo
+
+  - it: keeps a name of exactly 52 characters as it is
+    template: services-cron.yaml
+    release:
+      name: a-release-name-which-is-forty-characters
+    set:
+      services.foo:
+        image: 'bar'
+        cron:
+          eleven-char:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+    asserts:
+      - equal:
+          path: metadata.name
+          value: a-release-name-which-is-forty-characters-eleven-char
+
+  - it: shortens a name longer than 52 characters and appends a hash
+    template: services-cron.yaml
+    release:
+      name: a-release-name-which-is-forty-characters
+    set:
+      services.foo:
+        image: 'bar'
+        cron:
+          backup-uploads:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+    asserts:
+      - equal:
+          path: metadata.name
+          value: a-release-name-which-is-forty-characters-backup-9bf9
+      - equal:
+          path: metadata.labels.cronjob-name
+          value: backup-uploads
+
+  - it: gives long job names with a shared prefix different names
+    template: services-cron.yaml
+    release:
+      name: a-release-name-which-is-forty-characters
+    set:
+      services.foo:
+        image: 'bar'
+        cron:
+          backup-uploads-daily:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+          backup-uploads-weekly:
+            command: echo "Hello world"
+            schedule: '1 2 3 * *'
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: metadata.name
+          value: a-release-name-which-is-forty-characters-backup-2165
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: a-release-name-which-is-forty-characters-backup-f5a5
+        documentIndex: 1

@@ -4,9 +4,15 @@
 apiVersion: {{ include "frontend.cron.api-version" $ | trim }}
 kind: CronJob
 metadata:
-  name: {{ $.Release.Name }}-{{ $jobName }}
+  {{- /* CronJob names are limited to 52 characters. Longer ones are cut and get a hash of the full name. */}}
+  {{- $cronName := printf "%s-%s" $.Release.Name $jobName }}
+  {{- if gt (len $cronName) 52 }}
+  {{- $cronName = printf "%s-%s" ($cronName | trunc 47 | trimSuffix "-") ($cronName | sha256sum | trunc 4) }}
+  {{- end }}
+  name: {{ $cronName }}
   labels:
     {{- include "frontend.release_labels" $ | nindent 4 }}
+    cronjob-name: {{ $jobName | quote }}
 spec:
   {{- if $.Values.timezone }}
   {{- if eq ( include "frontend.cron.timezone-support" $ ) "true" }}
