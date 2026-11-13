@@ -1,0 +1,34 @@
+suite: shell volume
+templates:
+  - shell-volume.yaml
+capabilities:
+  apiVersions:
+    - pxc.percona.com/v1
+tests:
+  - it: ssh keys pvc with an empty storageClassName omits the key
+    set:
+      shell:
+        mount:
+          storageClassName: ""
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: PersistentVolumeClaim
+      - equal:
+          path: metadata.name
+          value: RELEASE-NAME-ssh-keys
+      - notExists:
+          path: spec.storageClassName
+
+  - it: ssh keys pvc with a non-shared storageClassName keeps it
+    set:
+      shell:
+        mount:
+          storageClassName: foo
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.storageClassName
+          value: foo
