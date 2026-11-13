@@ -21,3 +21,21 @@ tests:
         equal:
           path: spec.resources.requests.storage
           value: 123Gi
+
+  - it: mount without storageClassName omits the key so the cluster default applies
+    template: drupal-volumes.yaml
+    set:
+      mounts:
+        public-files:
+          enabled: false
+        private-files:
+          enabled: false
+        extra-files:
+          enabled: true
+          storage: 1Gi
+          mountPath: /extra
+    asserts:
+      - isKind:
+          of: PersistentVolumeClaim
+      - notExists:
+          path: spec.storageClassName

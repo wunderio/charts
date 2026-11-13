@@ -22,6 +22,38 @@ tests:
           path: spec.resources.requests.storage
           value: 123Gi
   
+  - it: mount without storageClassName omits the key so the cluster default applies
+    template: volumes.yaml
+    set:
+      mounts:
+        example-data:
+          enabled: true
+          storage: 1Gi
+          mountPath: /data
+    asserts:
+      - hasDocuments:
+          count: 1
+      - isKind:
+          of: PersistentVolumeClaim
+      - notExists:
+          path: spec.storageClassName
+
+  - it: mount with a non-shared storageClassName keeps it
+    template: volumes.yaml
+    set:
+      mounts:
+        example-data:
+          enabled: true
+          storage: 1Gi
+          mountPath: /data
+          storageClassName: upcloud-block-storage-maxiops
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: spec.storageClassName
+          value: upcloud-block-storage-maxiops
+
   - it: backup pv creation when csi-rclone provisioner is unavailable
     template: backup-volume.yaml
     set:

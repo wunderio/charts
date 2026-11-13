@@ -39,7 +39,9 @@ metadata:
   annotations:
     storage.silta/storage-path: {{ $.Values.environmentName | default $.Release.Name }}/{{ $index }}
 spec:
-  storageClassName: {{ $mount.storageClassName }}
+  {{- with $mount.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
   accessModes:
     - {{ $mount.accessModes | default "ReadWriteMany" }}
   resources:
@@ -97,7 +99,9 @@ metadata:
     storage.silta/storage-path: {{ $.Values.environmentName | default $.Release.Name }}/shell-keys
     csi-rclone/umask: "077"
 spec:
-  storageClassName: {{ $.Values.shell.mount.storageClassName }}
+  {{- with $.Values.shell.mount.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
   accessModes:
     - {{ $.Values.shell.mount.accessModes | default "ReadWriteMany" }}
   resources:
