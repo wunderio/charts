@@ -400,25 +400,15 @@ php:
   # This is run every time a new environment is upgraded.
   postupgrade:
     command: |
-      # Cache rebuild needs to be done before anything else, since if for
-      # example service files have changed, Drupal might not be able to
-      # bootstrap, not even for the `drush status` command below.
-      if [[ $DRUPAL_CORE_VERSION -eq 7 ]] ; then
-        drush cache-clear all || true
-      else
-        drush eval "drupal_flush_all_caches();" || true
-      fi
+      # Rebuild caches first: if service definitions changed, Drupal may not
+      # bootstrap, and the status check below would then skip the deploy.
+      drush cache:rebuild || true
       if [[ "$(drush status --fields=bootstrap)" = *'Successful'* ]] ; then
-        drush updatedb -y
-        if [[ $DRUPAL_CORE_VERSION -gt 7 && -f $DRUPAL_CONFIG_PATH/core.extension.yml ]]; then
-          drush config-import -y
-          drush cache-rebuild
-        fi
+        drush deploy -y
       fi
     # Extra commands to run after previous 'command' block.
     # This removes the user step of copying the whole 'command' block and adding their own custom logic.
     afterCommand: |
-
 
   # Executes before the environment is installed. Could be useful for backups before environment is upgraded.
   preupgrade:
