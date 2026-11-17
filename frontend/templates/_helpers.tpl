@@ -78,7 +78,16 @@ ln -s "${BACKUP_LOCATION}/${BACKUP_ID}" /backups/current
 {{- define "frontend.backup.copy-mounts" -}}
 set -e
 
-rsync -az /values_mounts/ /backups/current/
+# Exit code 24 means files vanished during the copy. Apps delete temp files
+# while the backup runs, so this is not an error. Any other failure still stops
+# the job.
+rsync_status=0
+rsync -az /values_mounts/ /backups/current/ || rsync_status=$?
+if [ "$rsync_status" -eq 24 ]; then
+  echo "rsync: some files vanished during the copy, continuing"
+elif [ "$rsync_status" -ne 0 ]; then
+  exit "$rsync_status"
+fi
 {{- end }}
 
 {{- define "services.env" }}
