@@ -232,6 +232,25 @@ tests:
           content:
             name: SSMTP_AUTHUSER
             value: foo
+  - it: does not set ssmtp credentials when no smtp username is set
+    template: drupal-deployment.yaml
+    set:
+      mailpit:
+        enabled: false
+      smtp:
+        enabled: true
+        address: examplehost
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SSMTP_AUTHUSER
+          any: true
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SSMTP_AUTHPASS
+          any: true
 
   - it: sets the replica count correctly
     template: drupal-deployment.yaml
