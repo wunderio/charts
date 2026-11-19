@@ -141,7 +141,8 @@ spec:
       storage: {{ .Values.gitAuth.persistence.size }}
 {{- end }}
 
-{{- if eq .Values.gitAuth.mode "bridge" }}
+{{- /* bridge-only objects; nothing uses them when the jumphost is disabled */}}
+{{- if and .Values.gitAuth.enabled (eq .Values.gitAuth.mode "bridge") }}
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
