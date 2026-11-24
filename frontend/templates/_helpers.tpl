@@ -179,17 +179,18 @@ fi
 {{- end }}
 # Shell / Gitauth
 {{ if .Values.shell.enabled -}}
+{{- $keyserverSecret := .Values.shell.gitAuth.keyserver.existingSecret | default (printf "%s-secrets-shell" .Release.Name) -}}
 - name: GITAUTH_URL
   value: {{ .Values.shell.gitAuth.keyserver.url | default (printf "https://keys.%s/api/1/git-ssh-keys" .Values.clusterDomain) | quote }}
 - name: GITAUTH_USERNAME
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-secrets-shell
+      name: {{ $keyserverSecret }}
       key: keyserver.username
 - name: GITAUTH_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-secrets-shell
+      name: {{ $keyserverSecret }}
       key: keyserver.password
 - name: GITAUTH_SCOPE
   value: {{ .Values.shell.gitAuth.repositoryUrl }}
@@ -324,4 +325,19 @@ imagePullSecrets:
 {{- else }}
 {{- .Release.Name }}-sa
 {{- end }}
+{{- end }}
+
+{{/*
+Name of the Secret holding the Signal Sciences agent keys (signalsciences_accesskeyid,
+signalsciences_secretaccesskey).
+*/}}
+{{- define "frontend.signalsciences.secretName" -}}
+{{ .Values.signalsciences.existingSecret | default (printf "%s-secrets-frontend" .Release.Name) }}
+{{- end }}
+
+{{/*
+Name of the Secret holding the nginx basic auth user file (key ".htaccess").
+*/}}
+{{- define "frontend.basicauth.secretName" -}}
+{{ .Values.nginx.basicauth.existingSecret | default (printf "%s-secrets-frontend" .Release.Name) }}
 {{- end }}

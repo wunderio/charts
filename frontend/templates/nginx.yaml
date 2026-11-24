@@ -81,12 +81,12 @@ spec:
           - name: SIGSCI_ACCESSKEYID
             valueFrom:
               secretKeyRef:
-                name: {{ .Release.Name }}-secrets-frontend
+                name: {{ include "frontend.signalsciences.secretName" . }}
                 key: signalsciences_accesskeyid
           - name: SIGSCI_SECRETACCESSKEY
             valueFrom:
               secretKeyRef:
-                name: {{ .Release.Name }}-secrets-frontend
+                name: {{ include "frontend.signalsciences.secretName" . }}
                 key: signalsciences_secretaccesskey
         securityContext:
           readOnlyRootFilesystem: true
@@ -122,7 +122,7 @@ spec:
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
           secret:
-            secretName: {{ .Release.Name }}-secrets-frontend
+            secretName: {{ include "frontend.basicauth.secretName" . }}
             items:
               - key: .htaccess
                 path: .htaccess

@@ -196,6 +196,12 @@ nginx:
       username: silta
       password: demo
 
+    # Name of an existing Secret holding the nginx user file under the key
+    # .htaccess, one "user:hash" line per user (e.g. from `openssl passwd -apr1`).
+    # When set, credentials above are ignored and not written to the chart's
+    # Secret or the deployment notes.
+    existingSecret: ''
+
   # Security headers
   security_headers:
     X-Frame-Options: 'SAMEORIGIN'
@@ -346,6 +352,10 @@ shell:
       url: ''
       username: ''
       password: ''
+      # Name of an existing Secret holding the keys keyserver.username and
+      # keyserver.password. When set, username/password above are ignored and
+      # the chart does not render its own shell Secret.
+      existingSecret: ''
   mount:
     storageClassName: silta-shared
     csiDriverName: csi-rclone
@@ -715,6 +725,10 @@ signalsciences:
   enabled: false
   accesskeyid: ""
   secretaccesskey: ""
+  # Name of an existing Secret holding the agent keys under the keys
+  # signalsciences_accesskeyid and signalsciences_secretaccesskey. When set,
+  # accesskeyid and secretaccesskey above are ignored.
+  existingSecret: ""
   image: signalsciences/sigsci-agent
   imageTag: latest
   # sidecar container resources
