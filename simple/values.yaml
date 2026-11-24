@@ -171,6 +171,12 @@ nginx:
       username: silta
       password: demo
 
+    # Name of an existing Secret holding the nginx user file under the key
+    # .htaccess, one "user:hash" line per user (e.g. from `openssl passwd -apr1`).
+    # When set, credentials above are ignored and not written to the chart's
+    # Secret or the deployment notes.
+    existingSecret: ''
+
   # Trust X-Forwarded-For from these hosts for getting external IP
   realipfrom:
     gke-internal: 10.0.0.0/8
@@ -217,6 +223,10 @@ signalsciences:
   enabled: false
   accesskeyid: ""
   secretaccesskey: ""
+  # Name of an existing Secret holding the agent keys under the keys
+  # signalsciences_accesskeyid and signalsciences_secretaccesskey. When set,
+  # accesskeyid and secretaccesskey above are ignored.
+  existingSecret: ""
   image: signalsciences/sigsci-agent
   imageTag: latest
   # sidecar container resources

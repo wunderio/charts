@@ -184,7 +184,8 @@
                 "username": { "type": "string" },
                 "password": { "type": "string" }
               }
-            }
+            },
+            "existingSecret": { "type": "string" }
           }
         },
         "realipfrom": {
@@ -807,7 +808,8 @@
     "smtp": {
       "type": "object",
       "properties": {
-        "enabled": { "type": "boolean" }
+        "enabled": { "type": "boolean" },
+        "existingSecret": { "type": "string" }
       }
     },
     "silta-release": {
@@ -901,6 +903,7 @@
         "enabled": { "type": "boolean" },
         "accesskeyid": { "type": "string" },
         "secretaccesskey": { "type": "string" },
+        "existingSecret": { "type": "string" },
         "image": { "type": "string" },
         "imageTag": { "type": "string" },
         "resources": {

@@ -2,6 +2,7 @@ suite: Shell
 templates:
   - services-deployment.yaml
   - configmap.yaml
+  - shell-secret.yaml
 tests:
   - it: has no shell enabled by default
     template: services-deployment.yaml
@@ -50,3 +51,81 @@ tests:
             name: shell-keys
             persistentVolumeClaim:
               claimName: RELEASE-NAME-shell-keys
+
+  - it: reads keyserver credentials from existingSecret when it is set
+    template: services-deployment.yaml
+    set:
+      services:
+        foo:
+          image: 'bar'
+      shell:
+        enabled: true
+        gitAuth:
+          keyserver:
+            existingSecret: keyserver-credentials
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GITAUTH_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: keyserver.username
+                name: keyserver-credentials
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GITAUTH_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: keyserver.password
+                name: keyserver-credentials
+
+  - it: reads keyserver credentials from the chart's shell secret by default
+    template: services-deployment.yaml
+    set:
+      services:
+        foo:
+          image: 'bar'
+      shell:
+        enabled: true
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: GITAUTH_USERNAME
+            valueFrom:
+              secretKeyRef:
+                key: keyserver.username
+                name: RELEASE-NAME-secrets-shell
+
+  - it: does not render the shell secret when existingSecret is set
+    template: shell-secret.yaml
+    set:
+      shell:
+        enabled: true
+        gitAuth:
+          keyserver:
+            existingSecret: keyserver-credentials
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: renders the shell secret with the keyserver credentials by default
+    template: shell-secret.yaml
+    set:
+      shell:
+        enabled: true
+        gitAuth:
+          keyserver:
+            username: user
+            password: pass
+    asserts:
+      - hasDocuments:
+          count: 1
+      - equal:
+          path: data["keyserver.username"]
+          value: dXNlcg==
+      - equal:
+          path: data["keyserver.password"]
+          value: cGFzcw==

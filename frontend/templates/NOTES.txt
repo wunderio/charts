@@ -14,8 +14,12 @@ Deployed {{ .Release.Name }} successfully, your site is available here:
   {{- end }}
 
   {{ if .Values.nginx.basicauth.enabled -}}
+  {{ if .Values.nginx.basicauth.existingSecret -}}
+  Basicauth credentials: stored in the Secret {{ .Values.nginx.basicauth.existingSecret }}
+  {{- else -}}
   Basicauth username: {{ .Values.nginx.basicauth.credentials.username }}
   Basicauth password: {{ .Values.nginx.basicauth.credentials.password }}
+  {{- end }}
   {{- end }}
 
 {{- if .Values.mailhog.enabled }}

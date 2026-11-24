@@ -107,6 +107,43 @@ imagePullSecrets:
 {{- end }}
 {{- end }}
 
+{{/*
+"true" when the SMTP password comes from smtp.existingSecret, "" otherwise.
+smtp.existingSecret only applies to an external SMTP server: with mailpit or
+mailhog the chart keeps rendering its own (empty) password Secret.
+*/}}
+{{- define "drupal.smtp.useExistingSecret" -}}
+{{- if and .Values.smtp.existingSecret (not .Values.mailpit.enabled) (not .Values.mailhog.enabled) -}}
+true
+{{- end -}}
+{{- end }}
+
+{{/*
+Name of the Secret holding the SMTP password (key "password").
+*/}}
+{{- define "drupal.smtp.secretName" -}}
+{{- if include "drupal.smtp.useExistingSecret" . -}}
+{{ .Values.smtp.existingSecret }}
+{{- else -}}
+{{ .Release.Name }}-secrets-smtp
+{{- end -}}
+{{- end }}
+
+{{/*
+Name of the Secret holding the Signal Sciences agent keys (signalsciences_accesskeyid,
+signalsciences_secretaccesskey).
+*/}}
+{{- define "drupal.signalsciences.secretName" -}}
+{{ .Values.signalsciences.existingSecret | default (printf "%s-secrets-drupal" .Release.Name) }}
+{{- end }}
+
+{{/*
+Name of the Secret holding the nginx basic auth user file (key ".htaccess").
+*/}}
+{{- define "drupal.basicauth.secretName" -}}
+{{ .Values.nginx.basicauth.existingSecret | default (printf "%s-secrets-drupal" .Release.Name) }}
+{{- end }}
+
 {{- define "smtp.env" }}
 - name: SMTP_ADDRESS
   {{- if .Values.mailpit.enabled }}
@@ -125,7 +162,7 @@ imagePullSecrets:
 - name: SMTP_PASSWORD
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-secrets-smtp
+      name: {{ include "drupal.smtp.secretName" . }}
       key: password
       {{- if .optionalSecrets }}
       optional: true
@@ -149,7 +186,7 @@ imagePullSecrets:
 - name: SSMTP_AUTHPASS
   valueFrom:
     secretKeyRef:
-      name: {{ .Release.Name }}-secrets-smtp
+      name: {{ include "drupal.smtp.secretName" . }}
       key: password
       {{- if .optionalSecrets }}
       optional: true
@@ -445,6 +482,44 @@ done
 mariadb -u $DB_USER -p$DB_PASS -h $DB_HOST -P ${DB_PORT:-3306} -e "CREATE DATABASE IF NOT EXISTS $DB_NAME;"
 {{- end }}
 
+{{- /*
+Sets NEW_ENVIRONMENT=true when the Drupal database has no tables, false otherwise.
+
+The post-release hook uses this instead of .Release.IsInstall to decide whether to
+import reference data and run php.postinstall.command. ArgoCD renders charts with
+`helm template`, where .Release.IsInstall is always true, so a render-time check
+would drop and re-import the database on every sync.
+
+This only counts tables. It does not ask Drupal (drush status) because a failed
+bootstrap can also mean an existing site with broken settings or a transient
+database error, and the reference import starts with `drush sql-drop`.
+
+If the count cannot be read, the script exits non-zero: no import, and the hook
+fails loudly instead of guessing. Run after drupal.wait-for-db-command and
+drupal.create-db.
+*/ -}}
+{{- define "drupal.detect-new-environment" }}
+echo "Checking whether database ${DB_NAME} is empty."
+if ! DB_TABLE_COUNT="$(mariadb -N -B -u "$DB_USER" -p"$DB_PASS" -h "$DB_HOST" -P "${DB_PORT:-3306}" \
+    -e "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '${DB_NAME}';")"; then
+  echo "ERROR: Could not count the tables in database ${DB_NAME}. Not importing reference data or running the post-install command." >&2
+  exit 1
+fi
+case "${DB_TABLE_COUNT}" in
+  ''|*[!0-9]*)
+    echo "ERROR: Unexpected table count '${DB_TABLE_COUNT}' for database ${DB_NAME}. Not importing reference data or running the post-install command." >&2
+    exit 1
+    ;;
+esac
+if [ "${DB_TABLE_COUNT}" -eq 0 ]; then
+  NEW_ENVIRONMENT=true
+  echo "Database ${DB_NAME} has no tables: treating this as a new environment."
+else
+  NEW_ENVIRONMENT=false
+  echo "Database ${DB_NAME} has ${DB_TABLE_COUNT} tables: treating this as an existing environment."
+fi
+{{- end }}
+
 {{- define "drupal.wait-for-elasticsearch-command" }}
 TIME_WAITING=0
 echo -n "Waiting for Elasticsearch.";
@@ -511,28 +586,33 @@ wait
 
   trap 'rm -f "$INSTALLING_FILE" || true' EXIT
 
-  {{ if and .Release.IsInstall .Values.referenceData.enabled -}}
-    {{ include "drupal.import-reference-files" . }}
-  {{- end }}
-
   {{ include "drupal.wait-for-db-command" . }}
   {{ include "drupal.create-db" . }}
 
-  {{ if .Release.IsInstall }}
+  # A new environment is one whose database has no tables. This replaces
+  # .Release.IsInstall, which is always true when ArgoCD renders the chart.
+  {{- include "drupal.detect-new-environment" . | nindent 2 }}
+
+  {{- $importReferenceData := and .Values.referenceData.enabled (ne .Values.referenceData.referenceEnvironment .Values.environmentName) }}
+
+  if [ "$NEW_ENVIRONMENT" == "true" ]; then
     touch "$INSTALLING_FILE"
-    {{- if .Values.referenceData.enabled }}
-      {{ include "drupal.import-reference-db" . }}
+    {{- if $importReferenceData }}
+    {{- include "drupal.import-reference-files" . | nindent 4 }}
+    {{- include "drupal.import-reference-db" . | nindent 4 }}
+    {{- else if .Values.referenceData.enabled }}
+    echo "This is the reference environment, not importing its own reference data."
     {{- end }}
-  {{- end }}
+  fi
 
   {{ if .Values.elasticsearch.enabled }}
     {{ include "drupal.wait-for-elasticsearch-command" . }}
   {{ end }}
 
-  {{ if .Release.IsInstall }}
+  if [ "$NEW_ENVIRONMENT" == "true" ]; then
     {{ .Values.php.postinstall.command }}
     rm -f "$INSTALLING_FILE" || true
-  {{ end }}
+  fi
   {{ .Values.php.postupgrade.command }}
   {{- if .Values.php.postupgrade.afterCommand }}
     {{ .Values.php.postupgrade.afterCommand }}
@@ -963,10 +1043,16 @@ http://{{ $domain.hostname }}/mailpit
 
 **Basic Auth:**
 
+{{- if .Values.nginx.basicauth.existingSecret }}
+
+Credentials are in the Secret `{{ .Values.nginx.basicauth.existingSecret }}`.
+{{- else }}
+
 | | |
 |---|---|
 | Username | `{{ .Values.nginx.basicauth.credentials.username }}` |
 | Password | `{{ .Values.nginx.basicauth.credentials.password }}` |
+{{- end }}
 {{- end }}
 {{- if .Values.shell.enabled }}
 

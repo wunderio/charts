@@ -41,9 +41,12 @@ Mailpit available at:
 {{- if .Values.nginx.basicauth.enabled }}
 
 Basic access authentication credentials:
-
+{{ if .Values.nginx.basicauth.existingSecret }}
+  Stored in the Secret {{ .Values.nginx.basicauth.existingSecret }}.
+{{- else }}
   Username: {{ .Values.nginx.basicauth.credentials.username }}
   Password: {{ .Values.nginx.basicauth.credentials.password }}
+{{- end }}
 {{- end }}
 
 {{- if .Values.shell.enabled }}

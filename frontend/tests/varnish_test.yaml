@@ -1,0 +1,157 @@
+suite: varnish deployment
+templates:
+  - varnish-configmap-vcl.yaml
+  - varnish-secret.yaml
+  - varnish-deployment.yaml
+tests:
+  - it: is a deployment when enabled
+    template: varnish-deployment.yaml
+    set:
+      varnish.enabled: true
+    asserts:
+      - isKind:
+          of: Deployment
+      - equal:
+          path: metadata.labels.service
+          value: varnish
+
+  - it: is not rendered when disabled
+    template: varnish-deployment.yaml
+    set:
+      varnish.enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  # Both probes use varnishadm. A second, duplicate livenessProbe key here once
+  # made the rendered document invalid YAML, which silently dropped this suite.
+  - it: probes varnish over varnishadm
+    template: varnish-deployment.yaml
+    set:
+      varnish.enabled: true
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].livenessProbe.exec.command'
+          value: ["varnishadm", "-t", "1", "ping"]
+      - equal:
+          path: 'spec.template.spec.containers[0].readinessProbe.exec.command'
+          value: ["varnishadm", "-t", "1", "ping"]
+      - notExists:
+          path: 'spec.template.spec.containers[0].livenessProbe.tcpSocket'
+
+  - it: exposes the web and admin ports
+    template: varnish-deployment.yaml
+    set:
+      varnish.enabled: true
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].ports'
+          content:
+            containerPort: 8080
+            name: web
+      - contains:
+          path: 'spec.template.spec.containers[0].ports'
+          content:
+            containerPort: 6082
+            name: admin
+
+  - it: uses the right docker image
+    template: varnish-deployment.yaml
+    set:
+      varnish.enabled: true
+      varnish.image: 'varnish-12345'
+      varnish.imageTag: 'tag-678'
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].image'
+          value: 'varnish-12345:tag-678'
+
+  - it: sets VARNISH_STORAGE_BACKEND environment variable correctly
+    template: varnish-deployment.yaml
+    set:
+      varnish.enabled: true
+      varnish.storageBackend: 'type,/storage/location,size'
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].env'
+          content:
+            name: VARNISH_STORAGE_BACKEND
+            value: 'type,/storage/location,size'
+
+  - it: sets VARNISH_EXTRA_PARAMS environment variable correctly
+    template: varnish-deployment.yaml
+    set:
+      varnish.enabled: true
+      varnish.extraParams: '-foo -bar'
+    asserts:
+      - contains:
+          path: 'spec.template.spec.containers[0].env'
+          content:
+            name: VARNISH_EXTRA_PARAMS
+            value: '-foo -bar'
+
+  - it: omits VARNISH_EXTRA_PARAMS when unset
+    template: varnish-deployment.yaml
+    set:
+      varnish.enabled: true
+      varnish.extraParams: ''
+    asserts:
+      - notContains:
+          path: 'spec.template.spec.containers[0].env'
+          content:
+            name: VARNISH_EXTRA_PARAMS
+            value: ''
+          any: true
+
+  - it: takes resource requests and limits
+    template: varnish-deployment.yaml
+    set:
+      varnish.enabled: true
+      varnish.resources:
+        requests:
+          cpu: 123m
+          memory: 1G
+        limits:
+          cpu: 234m
+          memory: 2G
+    asserts:
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.requests.cpu'
+          value: 123m
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.requests.memory'
+          value: 1G
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.limits.cpu'
+          value: 234m
+      - equal:
+          path: 'spec.template.spec.containers[0].resources.limits.memory'
+          value: 2G
+
+  - it: mounts the vcl configMap and the varnish secret
+    template: varnish-deployment.yaml
+    set:
+      varnish.enabled: true
+    asserts:
+      - contains:
+          path: 'spec.template.spec.volumes'
+          content:
+            name: varnish-vcl
+            configMap:
+              name: RELEASE-NAME-varnish-vcl
+      - contains:
+          path: 'spec.template.spec.volumes'
+          content:
+            name: varnish-secret
+            secret:
+              secretName: RELEASE-NAME-secrets-varnish
+
+  - it: redeploys when the configMap or secret changes
+    template: varnish-deployment.yaml
+    set:
+      varnish.enabled: true
+    asserts:
+      - exists:
+          path: 'spec.template.metadata.annotations.varnish-cm-checksum'
+      - exists:
+          path: 'spec.template.metadata.annotations.varnish-sec-checksum'

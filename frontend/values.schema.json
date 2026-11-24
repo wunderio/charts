@@ -190,7 +190,8 @@
                 "username": { "type": "string" },
                 "password": { "type": "string" }
               }
-            }
+            },
+            "existingSecret": { "type": "string" }
           }
         },
         "security_headers": { "type": [ "object", "array" ] },
@@ -594,7 +595,8 @@
               "properties": {
                 "url": { "type": "string" },
                 "username": { "type": "string" },
-                "password": { "type": "string" }
+                "password": { "type": "string" },
+                "existingSecret": { "type": "string" }
               }
             },
             "outsideCollaborators": { "type": "boolean" },
@@ -834,6 +836,7 @@
         "enabled": { "type": "boolean" },
         "accesskeyid": { "type": "string" },
         "secretaccesskey": { "type": "string" },
+        "existingSecret": { "type": "string" },
         "image": { "type": "string" },
         "imageTag": { "type": "string" },
         "resources": {
