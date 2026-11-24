@@ -238,6 +238,12 @@ nginx:
       username: silta
       password: demo
 
+    # Name of an existing Secret holding the nginx user file under the key
+    # .htaccess, one "user:hash" line per user (e.g. from `openssl passwd -apr1`).
+    # When set, credentials above are ignored and not written to the chart's
+    # Secret or the deployment notes.
+    existingSecret: ''
+
   # Header containing real IP address
   real_ip_header: X-Forwarded-For
 
@@ -384,7 +390,8 @@ php:
           memory: 488Mi
 
   # Post-installation hook.
-  # This is run every time a new environment is created.
+  # This is run when the post-release hook finds an empty database (no tables),
+  # which is how a new environment is detected under both Helm and ArgoCD.
   postinstall:
     # Specify any particular commands to be executed after an environment is installed.
     # If referenced data is enabled, it gets imported before this step.
@@ -572,6 +579,9 @@ mounts:
 
 # Configure reference data that will be used when creating new environments.
 referenceData:
+  # Reference data is imported by the post-release hook only when the database has
+  # no tables, and never on the reference environment itself. A database with any
+  # tables is left alone, so syncs and upgrades don't overwrite existing data.
   enabled: true
 
   # The name of the environment from which reference data will be copied.
@@ -981,6 +991,10 @@ smtp:
   # address: smtp.example.com:25
   # username: ""
   # password: ""
+  # Name of an existing Secret holding the SMTP password under the key
+  # password. When set, password above is ignored and the chart does not render
+  # its own SMTP Secret. Ignored while mailpit or mailhog is enabled.
+  existingSecret: ''
 
 # Solr.
 solr:
@@ -1105,6 +1119,10 @@ signalsciences:
   enabled: false
   accesskeyid: ""
   secretaccesskey: ""
+  # Name of an existing Secret holding the agent keys under the keys
+  # signalsciences_accesskeyid and signalsciences_secretaccesskey. When set,
+  # accesskeyid and secretaccesskey above are ignored.
+  existingSecret: ""
   image: signalsciences/sigsci-agent
   imageTag: latest
   # sidecar container resources

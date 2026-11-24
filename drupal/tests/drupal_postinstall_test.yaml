@@ -134,3 +134,95 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].resources.limits.memory
           value: 4G
+
+  # The post-release Job runs as an ArgoCD PostSync hook after every sync, and
+  # ArgoCD renders with `helm template` where .Release.IsInstall is always true.
+  # Whether to import reference data is decided at runtime from the database.
+  - it: decides whether this is a new environment from the database's table count
+    template: post-release.yaml
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: "SELECT COUNT\\(\\*\\) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '\\$\\{DB_NAME\\}'"
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'NEW_ENVIRONMENT=true'
+      # Fail closed: if the table count cannot be read, stop before importing.
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: '(?s)if ! DB_TABLE_COUNT=.*Could not count the tables[^\n]*\n\s*exit 1'
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'drush status[^\n]*\n[^\n]*NEW_ENVIRONMENT'
+
+  - it: checks the database before importing reference files or the database
+    template: post-release.yaml
+    set:
+      environmentName: feature-x
+      referenceData.referenceEnvironment: master
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: '(?s)Waiting for database.*CREATE DATABASE IF NOT EXISTS.*information_schema.TABLES.*if \[ "\$NEW_ENVIRONMENT" == "true" \]; then\s+touch "\$INSTALLING_FILE".*Importing public-files files.*Dropping old database.*\n\s+fi\n'
+      # Nothing imports before the check.
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: '(?s)Importing public-files files.*information_schema.TABLES'
+
+  - it: renders the same import gate on upgrade as on install
+    template: post-release.yaml
+    release:
+      upgrade: true
+    set:
+      environmentName: feature-x
+      referenceData.referenceEnvironment: master
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: '(?s)if \[ "\$NEW_ENVIRONMENT" == "true" \]; then\s+touch "\$INSTALLING_FILE".*Dropping old database'
+
+  - it: never imports reference data on the reference environment
+    template: post-release.yaml
+    set:
+      environmentName: master
+      referenceData.referenceEnvironment: master
+    asserts:
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'Dropping old database'
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'Importing public-files files'
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'not importing its own reference data'
+      # It still exports after deployment.
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'Dump reference database'
+
+  - it: does not import reference data when it is disabled
+    template: post-release.yaml
+    set:
+      environmentName: feature-x
+      referenceData.enabled: false
+    asserts:
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'Dropping old database'
+      - notMatchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'Importing public-files files'
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'information_schema.TABLES'
+
+  - it: runs the post-install command only for a new environment
+    template: post-release.yaml
+    set:
+      php.postinstall.command: run-postinstall
+      php.postupgrade.command: run-postupgrade
+    asserts:
+      - matchRegex:
+          path: spec.template.spec.containers[0].args[0]
+          pattern: 'if \[ "\$NEW_ENVIRONMENT" == "true" \]; then\s+run-postinstall\s+rm -f "\$INSTALLING_FILE" \|\| true\s+fi\s+run-postupgrade'

@@ -140,12 +140,12 @@ spec:
         - name: SIGSCI_ACCESSKEYID
           valueFrom:
             secretKeyRef:
-              name: {{ .Release.Name }}-secrets-drupal
+              name: {{ include "drupal.signalsciences.secretName" . }}
               key: signalsciences_accesskeyid
         - name: SIGSCI_SECRETACCESSKEY
           valueFrom:
             secretKeyRef:
-              name: {{ .Release.Name }}-secrets-drupal
+              name: {{ include "drupal.signalsciences.secretName" . }}
               key: signalsciences_secretaccesskey
         securityContext:
           readOnlyRootFilesystem: true
@@ -167,7 +167,7 @@ spec:
         {{- if .Values.nginx.basicauth.enabled }}
         - name: nginx-basicauth
           secret:
-            secretName: {{ .Release.Name }}-secrets-drupal
+            secretName: {{ include "drupal.basicauth.secretName" . }}
             items:
               - key: .htaccess
                 path: .htaccess
