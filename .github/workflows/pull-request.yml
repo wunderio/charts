@@ -36,18 +36,6 @@ jobs:
     if: github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4
-      - name: Generate test project repositories token
-        id: app-token
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ secrets.CHARTS_TEST_APP_ID }}
-          private-key: ${{ secrets.CHARTS_TEST_APP_PRIVATE_KEY }}
-          owner: wunderio
-          repositories: drupal-project-k8s,frontend-project-k8s,simple-project-k8s
-      - name: Configure git credentials for test project repositories
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: git config --global url."https://x-access-token:${GH_TOKEN}@github.com/wunderio/".insteadOf "http://github.com/wunderio/"
       - name: Silta CLI setup
         run: |
           mkdir -p ~/.local/bin
@@ -202,12 +190,12 @@ jobs:
           MINIKUBE_IP=$(minikube ip)
           CLUSTER_DOCKER_REGISTRY=registry.${CLUSTER_DOMAIN}:80
 
-          # Check out drupal-project-k8s repo or use prebuilt images
-          if [ -d "${K8S_PROJECT_REPO_DIR}/drupal-project-k8s" ]; then 
-              rm -Rf "${K8S_PROJECT_REPO_DIR}/drupal-project-k8s"; 
+          # Check out drupal-project repo or use prebuilt images
+          if [ -d "${K8S_PROJECT_REPO_DIR}/drupal-project" ]; then 
+              rm -Rf "${K8S_PROJECT_REPO_DIR}/drupal-project"; 
           fi
-          mkdir -p "${K8S_PROJECT_REPO_DIR}/drupal-project-k8s"
-          git clone http://github.com/wunderio/drupal-project-k8s.git "${K8S_PROJECT_REPO_DIR}/drupal-project-k8s"
+          mkdir -p "${K8S_PROJECT_REPO_DIR}/drupal-project"
+          git clone --depth 1 https://github.com/wunderio/drupal-project.git "${K8S_PROJECT_REPO_DIR}/drupal-project"
 
           # Composer install
           # PHP_COMPOSER_VERSION=2.1.12
@@ -216,7 +204,7 @@ jobs:
           #   php -r "unlink('composer-setup.php');" && \
           #   composer --version
 
-          composer install -n --prefer-dist --ignore-platform-reqs --optimize-autoloader -d "${K8S_PROJECT_REPO_DIR}/drupal-project-k8s"
+          composer install -n --prefer-dist --ignore-platform-reqs --optimize-autoloader -d "${K8S_PROJECT_REPO_DIR}/drupal-project"
 
           # Tunnel to in-cluster docker registry. Required due to docker push inability to use selfsigned/insecure repositories that ain't local
           # Find a free port. Credit: stefanobaghino / https://unix.stackexchange.com/posts/423052/revisions
@@ -226,17 +214,17 @@ jobs:
 
           # Build images
 
-          NGINX_IMAGE=/drupal-project-k8s/test-drupal-nginx:latest
-          PHP_IMAGE=/drupal-project-k8s/test-drupal-php:latest
-          SHELL_IMAGE=/drupal-project-k8s/test-drupal-shell:latest
+          NGINX_IMAGE=/drupal-project/test-drupal-nginx:latest
+          PHP_IMAGE=/drupal-project/test-drupal-php:latest
+          SHELL_IMAGE=/drupal-project/test-drupal-shell:latest
 
-          docker build --tag ${BRIDGED_DOCKER_REGISTRY}${NGINX_IMAGE} -f "${K8S_PROJECT_REPO_DIR}/drupal-project-k8s/silta/nginx.Dockerfile" "${K8S_PROJECT_REPO_DIR}/drupal-project-k8s/web"
+          docker build --tag ${BRIDGED_DOCKER_REGISTRY}${NGINX_IMAGE} -f "${K8S_PROJECT_REPO_DIR}/drupal-project/silta/nginx.Dockerfile" "${K8S_PROJECT_REPO_DIR}/drupal-project/web"
           docker image push ${BRIDGED_DOCKER_REGISTRY}${NGINX_IMAGE}
           
-          docker build --tag ${BRIDGED_DOCKER_REGISTRY}${PHP_IMAGE} -f "${K8S_PROJECT_REPO_DIR}/drupal-project-k8s/silta/php.Dockerfile" "${K8S_PROJECT_REPO_DIR}/drupal-project-k8s"
+          docker build --tag ${BRIDGED_DOCKER_REGISTRY}${PHP_IMAGE} -f "${K8S_PROJECT_REPO_DIR}/drupal-project/silta/php.Dockerfile" "${K8S_PROJECT_REPO_DIR}/drupal-project"
           docker image push ${BRIDGED_DOCKER_REGISTRY}${PHP_IMAGE}
 
-          docker build --tag ${BRIDGED_DOCKER_REGISTRY}${SHELL_IMAGE} -f "${K8S_PROJECT_REPO_DIR}/drupal-project-k8s/silta/shell.Dockerfile" "${K8S_PROJECT_REPO_DIR}/drupal-project-k8s"
+          docker build --tag ${BRIDGED_DOCKER_REGISTRY}${SHELL_IMAGE} -f "${K8S_PROJECT_REPO_DIR}/drupal-project/silta/shell.Dockerfile" "${K8S_PROJECT_REPO_DIR}/drupal-project"
           docker image push ${BRIDGED_DOCKER_REGISTRY}${SHELL_IMAGE}
 
           # Dependency build for local chart
@@ -262,18 +250,18 @@ jobs:
               --db-user-pass "dbpw" \
               --gitauth-username "test" \
               --gitauth-password "test" \
-              --namespace drupal-project-k8s \
+              --namespace drupal-project \
               --helm-flags "--set ssl.issuer=selfsigned" \
               --deployment-timeout 15m
 
-          kubectl exec -it deploy/test-shell -n drupal-project-k8s -- drush si -y
+          kubectl exec -it deploy/test-shell -n drupal-project -- drush si -y
 
           # Web request test
-          curl http://test.drupal-project-k8s.${CLUSTER_DOMAIN} \
+          curl http://test.drupal-project.${CLUSTER_DOMAIN}/user/login \
               --user silta:demo --location-trusted \
               --head --insecure --location \
-              --resolve test.drupal-project-k8s.${CLUSTER_DOMAIN}:80:${MINIKUBE_IP} \
-              --resolve test.drupal-project-k8s.${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} \
+              --resolve test.drupal-project.${CLUSTER_DOMAIN}:80:${MINIKUBE_IP} \
+              --resolve test.drupal-project.${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} \
               --retry 5 --retry-delay 5 \
               --fail 
 
@@ -284,15 +272,14 @@ jobs:
           CLUSTER_DOCKER_REGISTRY=registry.${CLUSTER_DOMAIN}:80
 
           # Checkout k8s repository
-          if [ -d "${K8S_PROJECT_REPO_DIR}/frontend-project-k8s" ]; then 
-              rm -Rf "${K8S_PROJECT_REPO_DIR}/frontend-project-k8s"; 
+          if [ -d "${K8S_PROJECT_REPO_DIR}/frontend-project" ]; then 
+              rm -Rf "${K8S_PROJECT_REPO_DIR}/frontend-project"; 
           fi
-          mkdir -p "${K8S_PROJECT_REPO_DIR}/frontend-project-k8s"
-          git clone http://github.com/wunderio/frontend-project-k8s.git "${K8S_PROJECT_REPO_DIR}/frontend-project-k8s"
+          mkdir -p "${K8S_PROJECT_REPO_DIR}/frontend-project"
+          git clone --depth 1 https://github.com/wunderio/frontend-project.git "${K8S_PROJECT_REPO_DIR}/frontend-project"
 
           # npm install
-          cd "${K8S_PROJECT_REPO_DIR}/frontend-project-k8s/hello" && npm install && cd - 
-          cd "${K8S_PROJECT_REPO_DIR}/frontend-project-k8s/world" && npm install && cd - 
+          cd "${K8S_PROJECT_REPO_DIR}/frontend-project" && npm install && cd -
 
           # Dependency build for local chart
           helm dependency build ./frontend
@@ -310,14 +297,10 @@ jobs:
           kubectl -n silta-cluster port-forward service/silta-cluster-docker-registry $DOCKER_REGISTRY_PORT:80 2>&1 >/dev/null &
 
           # Build images
-          HELLO_IMAGE=/frontend-project-k8s/test-frontend-hello:latest
-          WORLD_IMAGE=/frontend-project-k8s/test-frontend-world:latest
+          NODE_IMAGE=/frontend-project/test-frontend-node:latest
 
-          docker build --tag ${BRIDGED_DOCKER_REGISTRY}${HELLO_IMAGE} -f "${K8S_PROJECT_REPO_DIR}/frontend-project-k8s/silta/hello.Dockerfile" "${K8S_PROJECT_REPO_DIR}/frontend-project-k8s"
-          docker image push ${BRIDGED_DOCKER_REGISTRY}${HELLO_IMAGE}
-
-          docker build --tag ${BRIDGED_DOCKER_REGISTRY}${WORLD_IMAGE} -f "${K8S_PROJECT_REPO_DIR}/frontend-project-k8s/silta/world.Dockerfile" "${K8S_PROJECT_REPO_DIR}/frontend-project-k8s"
-          docker image push ${BRIDGED_DOCKER_REGISTRY}${WORLD_IMAGE}
+          docker build --tag ${BRIDGED_DOCKER_REGISTRY}${NODE_IMAGE} -f "${K8S_PROJECT_REPO_DIR}/frontend-project/silta/node.Dockerfile" "${K8S_PROJECT_REPO_DIR}/frontend-project"
+          docker image push ${BRIDGED_DOCKER_REGISTRY}${NODE_IMAGE}
 
           # Deploy
           silta ci release deploy \
@@ -327,25 +310,18 @@ jobs:
             --silta-environment-name test \
             --cluster-domain "${CLUSTER_DOMAIN}" \
             --cluster-type minikube \
-            --namespace frontend-project-k8s \
-            --helm-flags "--set ssl.issuer=selfsigned --set services.hello.image=${CLUSTER_DOCKER_REGISTRY}${HELLO_IMAGE} --set services.world.image=${CLUSTER_DOCKER_REGISTRY}${WORLD_IMAGE} --set services.hello.exposedRoute=/hello --set services.world.exposedRoute=/world" \
+            --namespace frontend-project \
+            --helm-flags "--set ssl.issuer=selfsigned --set services.node.image=${CLUSTER_DOCKER_REGISTRY}${NODE_IMAGE} --set services.node.exposedRoute=/" \
             --deployment-timeout 15m
 
-            # Web request test
-            curl http://test.frontend-project-k8s.${CLUSTER_DOMAIN}/hello \
-              --user silta:demo --location-trusted \
-              --head --insecure --location \
-              --resolve test.frontend-project-k8s.${CLUSTER_DOMAIN}:80:${MINIKUBE_IP} \
-              --resolve test.frontend-project-k8s.${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} \
-              --retry 5 --retry-delay 5 \
-              --fail
-            curl http://test.frontend-project-k8s.${CLUSTER_DOMAIN}/world \
-              --user silta:demo --location-trusted \
-              --head --insecure --location \
-              --resolve test.frontend-project-k8s.${CLUSTER_DOMAIN}:80:${MINIKUBE_IP} \
-              --resolve test.frontend-project-k8s.${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} \
-              --retry 5 --retry-delay 5 \
-              --fail
+          # Web request test
+          curl http://test.frontend-project.${CLUSTER_DOMAIN}/ \
+            --user silta:demo --location-trusted \
+            --head --insecure --location \
+            --resolve test.frontend-project.${CLUSTER_DOMAIN}:80:${MINIKUBE_IP} \
+            --resolve test.frontend-project.${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} \
+            --retry 5 --retry-delay 5 \
+            --fail
 
       - name: Build Simple chart images, deploy and test
         run: |
@@ -354,11 +330,11 @@ jobs:
           CLUSTER_DOCKER_REGISTRY=registry.${CLUSTER_DOMAIN}:80
 
           # Checkout k8s repository
-          if [ -d "${K8S_PROJECT_REPO_DIR}/simple-project-k8s" ]; then 
-              rm -Rf "${K8S_PROJECT_REPO_DIR}/simple-project-k8s"; 
+          if [ -d "${K8S_PROJECT_REPO_DIR}/simple-project" ]; then 
+              rm -Rf "${K8S_PROJECT_REPO_DIR}/simple-project"; 
           fi
-          mkdir -p "${K8S_PROJECT_REPO_DIR}/simple-project-k8s"
-          git clone http://github.com/wunderio/simple-project-k8s.git "${K8S_PROJECT_REPO_DIR}/simple-project-k8s"
+          mkdir -p "${K8S_PROJECT_REPO_DIR}/simple-project"
+          git clone --depth 1 https://github.com/wunderio/simple-project.git "${K8S_PROJECT_REPO_DIR}/simple-project"
 
           # Dependency build for local chart
           helm dependency build ./simple
@@ -370,7 +346,7 @@ jobs:
           helm install --dry-run --generate-name ./simple --values simple/test.values.yaml
 
           # Build images
-          SIMPLE_NGINX_IMAGE=/simple-project-k8s/test-simple-nginx:latest
+          SIMPLE_NGINX_IMAGE=/simple-project/test-simple-nginx:latest
 
           # Tunnel to in-cluster docker registry. Required due to docker push inability to use selfsigned/insecure repositories that ain't local
           # Find a free port. Credit: stefanobaghino / https://unix.stackexchange.com/posts/423052/revisions
@@ -378,7 +354,7 @@ jobs:
           BRIDGED_DOCKER_REGISTRY="localhost:${DOCKER_REGISTRY_PORT}"
           kubectl -n silta-cluster port-forward service/silta-cluster-docker-registry $DOCKER_REGISTRY_PORT:80 2>&1 >/dev/null &
 
-          docker build --tag ${BRIDGED_DOCKER_REGISTRY}${SIMPLE_NGINX_IMAGE} -f "${K8S_PROJECT_REPO_DIR}/simple-project-k8s/silta/nginx.Dockerfile" "${K8S_PROJECT_REPO_DIR}/simple-project-k8s/hello"
+          docker build --tag ${BRIDGED_DOCKER_REGISTRY}${SIMPLE_NGINX_IMAGE} -f "${K8S_PROJECT_REPO_DIR}/simple-project/silta/nginx.Dockerfile" "${K8S_PROJECT_REPO_DIR}/simple-project/web"
           docker image push ${BRIDGED_DOCKER_REGISTRY}${SIMPLE_NGINX_IMAGE}
 
           silta ci release deploy \
@@ -388,17 +364,17 @@ jobs:
               --silta-environment-name test \
               --cluster-domain "${CLUSTER_DOMAIN}" \
               --cluster-type minikube \
-              --namespace simple-project-k8s \
+              --namespace simple-project \
               --nginx-image-url ${CLUSTER_DOCKER_REGISTRY}${SIMPLE_NGINX_IMAGE} \
               --helm-flags "--set ssl.issuer=selfsigned" \
               --deployment-timeout 15m
 
           # Web request test
-          curl http://test.simple-project-k8s.${CLUSTER_DOMAIN} \
+          curl http://test.simple-project.${CLUSTER_DOMAIN} \
               --user silta:demo --location-trusted \
               --head --insecure --location \
-              --resolve test.simple-project-k8s.${CLUSTER_DOMAIN}:80:${MINIKUBE_IP} \
-              --resolve test.simple-project-k8s.${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} \
+              --resolve test.simple-project.${CLUSTER_DOMAIN}:80:${MINIKUBE_IP} \
+              --resolve test.simple-project.${CLUSTER_DOMAIN}:443:${MINIKUBE_IP} \
               --retry 5 --retry-delay 5 \
               --fail
 
