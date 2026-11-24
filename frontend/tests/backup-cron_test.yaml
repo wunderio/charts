@@ -64,3 +64,28 @@ tests:
               secretKeyRef:
                 name: my-secret
                 key: my-key
+
+  - it: tolerates rsync exit code 24 when copying mounts
+    template: backup-cron.yaml
+    set:
+      mounts.files:
+        enabled: true
+        storage: 1G
+        mountPath: /app/files
+        storageClassName: silta-shared
+      services.foo:
+        image: 'bar'
+        mounts:
+          - files
+      backup:
+        enabled: true
+    capabilities:
+      majorVersion: 1
+      minorVersion: 25
+    asserts:
+      - matchRegex:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
+          pattern: 'rsync -az /values_mounts/ /backups/current/ \|\| rsync_status=\$\?'
+      - matchRegex:
+          path: spec.jobTemplate.spec.template.spec.containers[0].args[0]
+          pattern: '"\$rsync_status" -eq 24'
