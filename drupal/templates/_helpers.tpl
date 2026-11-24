@@ -143,6 +143,7 @@ imagePullSecrets:
   value: {{ .Values.smtp.tls | default false | quote }}
 - name: SSMTP_USESTARTTLS
   value: {{ .Values.smtp.starttls | default false | quote }}
+{{- if .Values.smtp.username }}
 - name: SSMTP_AUTHUSER
   value: {{ .Values.smtp.username | quote }}
 - name: SSMTP_AUTHPASS
@@ -153,6 +154,7 @@ imagePullSecrets:
       {{- if .optionalSecrets }}
       optional: true
       {{- end }}
+{{- end }}
 {{- end }}
 
 {{- define "drupal.ref-data-env" }}
