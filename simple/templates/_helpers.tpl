@@ -100,3 +100,18 @@ imagePullSecrets:
 {{- .Release.Name }}-sa
 {{- end }}
 {{- end }}
+
+{{/*
+Name of the Secret holding the Signal Sciences agent keys (signalsciences_accesskeyid,
+signalsciences_secretaccesskey).
+*/}}
+{{- define "simple.signalsciences.secretName" -}}
+{{ .Values.signalsciences.existingSecret | default (printf "%s-secrets-simple" .Release.Name) }}
+{{- end }}
+
+{{/*
+Name of the Secret holding the nginx basic auth user file (key ".htaccess").
+*/}}
+{{- define "simple.basicauth.secretName" -}}
+{{ .Values.nginx.basicauth.existingSecret | default (printf "%s-secrets-simple" .Release.Name) }}
+{{- end }}
