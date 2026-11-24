@@ -79,11 +79,12 @@ jobs:
           CHARTS: ${{ inputs.charts }}
         run: |
           missing="$(.github/scripts/publish-oci.sh detect)"
-          # A manual run publishes only the charts it names; detect lists them as ./<dir>.
+          # A manual run publishes only the charts it names. detect lists them as <dir>
+          # (silta-cluster, forked/foo), so a name is normalised to that form.
           if [ "${EVENT}" = workflow_dispatch ] && [ "${CHARTS}" != all ]; then
             wanted=()
             for chart in ${CHARTS}; do
-              chart="./${chart#./}"
+              chart="${chart#./}"
               chart="${chart%/}"
               if [ ! -f "${chart}/Chart.yaml" ]; then
                 echo "::error::No chart at ${chart}/Chart.yaml"
