@@ -42,7 +42,9 @@ metadata:
   annotations:
     storage.silta/storage-path: {{ $.Values.environmentName | default $.Release.Name }}/{{ $index }}
 spec:
-  storageClassName: {{ $mount.storageClassName }}
+  {{- with $mount.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
   accessModes:
     - ReadWriteMany
   resources:
@@ -100,7 +102,9 @@ metadata:
   annotations:
     storage.silta/storage-path: {{ .Values.environmentName | default .Release.Name }}/reference-data
 spec:
-  storageClassName: {{ .Values.referenceData.storageClassName }}
+  {{- with .Values.referenceData.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
   accessModes:
     - ReadWriteMany
   resources:

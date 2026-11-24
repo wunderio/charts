@@ -28,3 +28,33 @@ tests:
     - hasDocuments:
         count: 2
       template: backup-volume.yaml
+
+  - it: backup pvc with an empty storageClassName omits the key
+    template: backup-volume.yaml
+    set:
+      backup:
+        enabled: true
+        storageClassName: ""
+    asserts:
+    - hasDocuments:
+        count: 1
+    - isKind:
+        of: PersistentVolumeClaim
+    - equal:
+        path: metadata.name
+        value: RELEASE-NAME-backup
+    - notExists:
+        path: spec.storageClassName
+
+  - it: backup pvc with a non-shared storageClassName keeps it
+    template: backup-volume.yaml
+    set:
+      backup:
+        enabled: true
+        storageClassName: foo
+    asserts:
+    - hasDocuments:
+        count: 1
+    - equal:
+        path: spec.storageClassName
+        value: foo

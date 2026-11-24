@@ -38,7 +38,9 @@ metadata:
   annotations:
     storage.silta/storage-path: {{ .Values.environmentName | default .Release.Name }}/backups
 spec:
-  storageClassName: {{ .Values.backup.storageClassName }}
+  {{- with .Values.backup.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
   accessModes:
     - ReadWriteMany
   resources:

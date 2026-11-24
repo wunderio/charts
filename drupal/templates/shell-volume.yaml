@@ -43,7 +43,9 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: {{ .Values.shell.mount.storageClassName }}
+  {{- with .Values.shell.mount.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
   resources:
     requests:
       storage: {{ .Values.shell.mount.storage }}
