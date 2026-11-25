@@ -3,6 +3,14 @@ version: 2.1
 orbs:
   silta: silta/silta@1
 
+parameters:
+  # Set to true when triggering a pipeline on master by hand to deploy charts released
+  # outside a release/* pull request (silta-cluster, csi-rclone, ...). It deploys every
+  # chart version on master to GCS, as the GCS repository is rebuilt as a whole.
+  publish:
+    type: boolean
+    default: false
+
 executors:
   cicd83:
     docker:
@@ -80,6 +88,24 @@ jobs:
     resource_class: small
 
     steps:
+      - checkout
+      # Only releases are deployed: the merge of a release/* pull request, or a pipeline
+      # triggered with publish=true. Other merges' version bumps wait for the next release.
+      - run:
+          name: Deploy only releases
+          command: |
+            subject="$(git log -1 --format=%s)"
+            case "${subject}" in
+              "Merge pull request #"*" from wunderio/release/"*)
+                echo "Release merge: ${subject}" ;;
+              *)
+                if [ "<< pipeline.parameters.publish >>" = true ]; then
+                  echo "Manual publish"
+                else
+                  echo "Not a release merge, skipping deploy: ${subject}"
+                  circleci-agent step halt
+                fi ;;
+            esac
       - restore_cache:
           key: v1-{{ .Revision }}
       - run:

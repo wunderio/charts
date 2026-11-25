@@ -1,21 +1,32 @@
 ---
-# Build every chart from source and publish it to Harbor (oci://registry.wdr.io/charts).
+# Build charts from source and publish them to Harbor (oci://registry.wdr.io/charts).
 #
 # CircleCI still builds the charts for the GCS Helm repository
 # (https://storage.googleapis.com/charts.wdr.io); this workflow is the Harbor
 # path and does not touch GCS. A chart is published when its Chart.yaml version
-# is not in Harbor yet, so a version bump on master publishes it, a failed run is
-# retried by the next one, and a published version is never replaced.
+# is not in Harbor yet, and a published version is never replaced.
+#
+# Only releases publish:
+# - Merging a release/* pull request into master publishes every chart version
+#   on master that Harbor lacks. A version bump merged in any other pull request
+#   waits on master for the next release.
+# - A manual run on master publishes the charts named in its `charts` input: for
+#   charts that are released on their own (silta-cluster, csi-rclone, vmproxy, ...)
+#   and for hotfixes. A failed run is retried by re-running its failed jobs.
 name: Publish Helm charts to OCI registry
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches: [master]
-  # Safety net: picks up anything a failed or skipped run left behind.
-  schedule:
-    - cron: '30 4 * * *'
   workflow_dispatch:
     inputs:
+      charts:
+        description: >-
+          Chart directories to publish, space-separated (e.g. "silta-cluster csi-rclone"),
+          or "all" for every version on the branch that Harbor lacks
+        type: string
+        required: true
       dry_run:
         description: Build, lint and package, but do not push
         type: boolean
@@ -36,23 +47,59 @@ env:
   # Harbor robot$ci (push on all projects); also used to read tags of a private project.
   REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
   REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+  # The merge commit of a release pull request; the branch tip for a manual run.
+  CHECKOUT_REF: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
 
 jobs:
   detect:
     name: Find unpublished chart versions
-    # Only master publishes; other branches may run a dry run. A version pushed from an
-    # unmerged branch would block master's version of it, as published versions are never replaced.
-    if: github.ref == 'refs/heads/master' || inputs.dry_run
+    # A merged release/* pull request from this repository, or a manual run. Only master
+    # publishes; other branches may run a dry run. A version pushed from an unmerged branch
+    # would block master's version of it, as published versions are never replaced.
+    if: >-
+      (github.event_name == 'pull_request'
+        && github.event.pull_request.merged
+        && startsWith(github.event.pull_request.head.ref, 'release/')
+        && github.event.pull_request.head.repo.full_name == github.repository)
+      || (github.event_name == 'workflow_dispatch'
+        && (github.ref == 'refs/heads/master' || inputs.dry_run))
     runs-on: ubuntu-latest
     outputs:
       charts: ${{ steps.detect.outputs.charts }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CHECKOUT_REF }}
 
       - name: Compare Chart.yaml versions with Harbor
         id: detect
-        run: echo "charts=$(.github/scripts/publish-oci.sh detect)" >> "$GITHUB_OUTPUT"
+        env:
+          EVENT: ${{ github.event_name }}
+          CHARTS: ${{ inputs.charts }}
+        run: |
+          missing="$(.github/scripts/publish-oci.sh detect)"
+          # A manual run publishes only the charts it names. detect lists them as <dir>
+          # (silta-cluster, forked/foo), so a name is normalised to that form.
+          if [ "${EVENT}" = workflow_dispatch ] && [ "${CHARTS}" != all ]; then
+            wanted=()
+            for chart in ${CHARTS}; do
+              chart="${chart#./}"
+              chart="${chart%/}"
+              if [ ! -f "${chart}/Chart.yaml" ]; then
+                echo "::error::No chart at ${chart}/Chart.yaml"
+                exit 1
+              fi
+              wanted+=("${chart}")
+            done
+            if [ "${#wanted[@]}" -eq 0 ]; then
+              echo "::error::Name the charts to publish, or \"all\""
+              exit 1
+            fi
+            missing="$(jq -c --args '[.[] | select(IN($ARGS.positional[]))]' "${wanted[@]}" <<<"${missing}")"
+          fi
+          echo "Publishing: ${missing}"
+          echo "charts=${missing}" >> "$GITHUB_OUTPUT"
 
   publish:
     name: Package & Push — ${{ matrix.chart }}
@@ -66,6 +113,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ env.CHECKOUT_REF }}
 
       - name: Set up Helm
         uses: azure/setup-helm@v4
