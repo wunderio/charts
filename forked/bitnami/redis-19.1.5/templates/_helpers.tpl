@@ -344,3 +344,21 @@ redis: sentinel.service.createMaster
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{/*
+Name of a master or replicas StatefulSet (Silta change).
+Kubernetes adds a controller-revision-hash label to each StatefulSet pod whose
+value is the StatefulSet name plus "-" and a 10-character hash, and label values
+are limited to 63 characters, so a StatefulSet name must be at most 52 characters.
+A longer name is truncated and given a hash suffix. Names that fit are unchanged,
+and Services and Secrets keep their full names.
+Usage: {{ include "redis.statefulsetName" (dict "component" "master" "context" $) }}
+*/}}
+{{- define "redis.statefulsetName" -}}
+{{- $name := printf "%s-%s" (include "common.names.fullname" .context) .component -}}
+{{- if gt (len $name) 52 -}}
+{{- printf "%s-%s" (trunc 46 $name | trimSuffix "-") (sha256sum $name | trunc 5) -}}
+{{- else -}}
+{{- $name -}}
+{{- end -}}
+{{- end -}}
