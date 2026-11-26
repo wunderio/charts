@@ -7,7 +7,7 @@ SPDX-License-Identifier: APACHE-2.0
 apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
 kind: {{ .Values.replica.kind }}
 metadata:
-  name: {{ printf "%s-replicas" (include "common.names.fullname" .) }}
+  name: {{ include "redis.statefulsetName" (dict "component" "replicas" "context" $) }}
   namespace: {{ include "common.names.namespace" . | quote }}
   labels: {{- include "common.labels.standard" ( dict "customLabels" .Values.commonLabels "context" $ ) | nindent 4 }}
     app.kubernetes.io/component: replica
@@ -136,7 +136,7 @@ spec:
             {{- if .Values.replica.externalMaster.enabled }}
               value: {{ .Values.replica.externalMaster.host | quote }}
             {{- else if and (eq (int64 .Values.master.count) 1) (eq .Values.master.kind "StatefulSet") }}
-              value: {{ template "common.names.fullname" . }}-master-0.{{ template "common.names.fullname" . }}-headless.{{ include "common.names.namespace" . }}.svc.{{ .Values.clusterDomain }}
+              value: {{ include "redis.statefulsetName" (dict "component" "master" "context" $) }}-0.{{ template "common.names.fullname" . }}-headless.{{ include "common.names.namespace" . }}.svc.{{ .Values.clusterDomain }}
             {{- else }}
               value: {{ template "common.names.fullname" . }}-master.{{ include "common.names.namespace" . }}.svc.{{ .Values.clusterDomain }}
             {{- end }}

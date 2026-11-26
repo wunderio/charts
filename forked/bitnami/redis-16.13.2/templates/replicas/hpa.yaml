@@ -16,7 +16,7 @@ spec:
   scaleTargetRef:
     apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
     kind: StatefulSet
-    name: {{ printf "%s-replicas" (include "common.names.fullname" .) }}
+    name: {{ include "redis.statefulsetName" (dict "component" "replicas" "context" $) }}
   minReplicas: {{ .Values.replica.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.replica.autoscaling.maxReplicas }}
   metrics:

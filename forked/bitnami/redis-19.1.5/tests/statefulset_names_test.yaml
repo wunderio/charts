@@ -1,0 +1,75 @@
+# Silta change: Kubernetes labels each StatefulSet pod with controller-revision-hash,
+# the StatefulSet name plus "-" and a 10-character hash. Label values are limited to
+# 63 characters, so StatefulSet names must be at most 52 characters.
+suite: StatefulSet names fit the pod label limit
+templates:
+  - templates/master/application.yaml
+  - templates/master/service.yaml
+  - templates/replicas/application.yaml
+  - templates/replicas/hpa.yaml
+  # Included by the StatefulSets for their checksum annotations
+  - templates/configmap.yaml
+  - templates/health-configmap.yaml
+  - templates/scripts-configmap.yaml
+  - templates/secret.yaml
+release:
+  # 40 characters, the longest release name Silta generates
+  name: deploy-more-structured-loggi-752b-nextjs
+set:
+  auth:
+    password: "foo"
+tests:
+  - it: shortens the master StatefulSet name of a long release to 52 characters
+    template: templates/master/application.yaml
+    asserts:
+      - isKind:
+          of: StatefulSet
+      - equal:
+          path: metadata.name
+          value: deploy-more-structured-loggi-752b-nextjs-redis-9228d
+
+  - it: keeps the full master Service name of a long release
+    template: templates/master/service.yaml
+    asserts:
+      - equal:
+          path: metadata.name
+          value: deploy-more-structured-loggi-752b-nextjs-redis-master
+
+  - it: keeps the master StatefulSet name of a short release unchanged
+    template: templates/master/application.yaml
+    release:
+      name: short-branch
+    asserts:
+      - equal:
+          path: metadata.name
+          value: short-branch-redis-master
+
+  - it: shortens the replicas StatefulSet name of a long release to 52 characters
+    template: templates/replicas/application.yaml
+    set:
+      architecture: replication
+    asserts:
+      - equal:
+          path: metadata.name
+          value: deploy-more-structured-loggi-752b-nextjs-redis-6236a
+
+  - it: points replicas at the shortened master pod
+    template: templates/replicas/application.yaml
+    set:
+      architecture: replication
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: REDIS_MASTER_HOST
+            value: deploy-more-structured-loggi-752b-nextjs-redis-9228d-0.deploy-more-structured-loggi-752b-nextjs-redis-headless.NAMESPACE.svc.cluster.local
+
+  - it: targets the shortened replicas StatefulSet from the HPA
+    template: templates/replicas/hpa.yaml
+    set:
+      architecture: replication
+      replica.autoscaling.enabled: true
+    asserts:
+      - equal:
+          path: spec.scaleTargetRef.name
+          value: deploy-more-structured-loggi-752b-nextjs-redis-6236a
