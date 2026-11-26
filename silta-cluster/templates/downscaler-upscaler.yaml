@@ -58,5 +58,14 @@ spec:
                 fieldPath: metadata.namespace
           - name: TRUSTED_PROXIES
             value: {{ index (index .Values "silta-downscaler") "trustedProxies" | default list | join "," | quote }}
+          {{- with (index .Values "silta-downscaler").api }}
+          {{- if .enabled }}
+          - name: API_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ required "silta-downscaler.api.tokenSecret.name is required when the API is enabled" .tokenSecret.name }}
+                key: {{ .tokenSecret.key | default "token" }}
+          {{- end }}
+          {{- end }}
 
 {{- end }}
