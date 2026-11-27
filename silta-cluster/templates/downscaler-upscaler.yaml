@@ -56,5 +56,19 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+          # The release API downscales from here too, and creates the upscaler proxy.
+          - name: PLACEHOLDER_PROXY_IMAGE
+            value: '{{ index (index (index .Values "silta-downscaler") "proxy") "image" }}:{{ index (index (index .Values "silta-downscaler") "proxy") "imageTag" }}'
+          - name: TRUSTED_PROXIES
+            value: {{ index (index .Values "silta-downscaler") "trustedProxies" | default list | join "," | quote }}
+          {{- with (index .Values "silta-downscaler").api }}
+          {{- if .enabled }}
+          - name: API_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: {{ required "silta-downscaler.api.tokenSecret.name is required when the API is enabled" .tokenSecret.name }}
+                key: {{ .tokenSecret.key | default "token" }}
+          {{- end }}
+          {{- end }}
 
 {{- end }}

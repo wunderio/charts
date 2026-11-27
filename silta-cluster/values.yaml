@@ -470,6 +470,19 @@ silta-downscaler:
   proxy:
     image: wunderio/silta-downscaler
     imageTag: v1-proxy
+  # Proxies in front of the placeholder page (ingress controller, upscaler proxy). The visitor's
+  # address for nginx.noauthips is the rightmost X-Forwarded-For entry outside these ranges.
+  # Add CDN ranges here to let nginx.noauthips work for sites behind a CDN.
+  trustedProxies:
+    - 10.0.0.0/8
+  # Release API (/api/v1/releases/...) for tools such as static-sites: wake and suspend releases
+  # on demand. Callers send "Authorization: Bearer <token>". The token lives in an existing Secret
+  # in the release namespace; it is never set in values.
+  api:
+    enabled: false
+    tokenSecret:
+      name: ""
+      key: token
 
 # https://github.com/wunderio/charts/blob/master/silta-proxy
 silta-proxy:
